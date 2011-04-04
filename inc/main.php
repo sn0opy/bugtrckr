@@ -4,7 +4,8 @@
 	{
 		function start()
 		{
-			F3::set('template', 'home.tpl.php');
+            
+            F3::set('template', 'home.tpl.php');
 			$this->tpserve();
 		}
 
@@ -42,12 +43,25 @@
 
 			$hash = rand();	// Created while saving into DB
 
-			showTicket($hash);
+			$this->showTicket($hash);
 		}
 
+        function showUsers()
+        {
+            $this->tpserve();
+        }
+
+        function showUser()
+        {
+
+            $user = new user;
+            $user->show();
+            $this->tpserver();
+        }
 
 		private function tpserve()
 		{
+            
 			echo Template::serve('main.tpl.php');
 		}
 	}

@@ -1,6 +1,6 @@
 <?php
 
-	class Milestone
+	class Milestone extends F3instance
 	{
 
 	}

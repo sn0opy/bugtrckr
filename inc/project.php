@@ -1,7 +1,7 @@
 <?php
 
 
-	class Project
+	class Project extends F3instance
 	{
 		private $id;
 		private $hash;

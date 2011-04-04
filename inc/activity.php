@@ -1,6 +1,6 @@
 <?php
 
-	class Activity
+	class Activity extends F3instance
 	{
 
 	}
