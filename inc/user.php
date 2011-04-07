@@ -25,4 +25,12 @@
             return 1; # will be replace with cookie stuff later
         }
 
+
+
+        public function logout()
+        {
+            F3::set('SESSION', null);
+            session_destroy();
+        }
+
 	}
