@@ -64,6 +64,18 @@ body
     padding-top: 5px;
 }
 
+#failure
+{
+	background: #FAA;
+	border:	solid 2px #F54;
+	color:	#F00;
+	width:	200px;
+	height:	40px;
+}
+
+/*
+ *
+ */
 .formRow
 {
     float: left;

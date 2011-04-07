@@ -27,10 +27,9 @@
 		function showTickets()
 		{
 			/* Get ordering */
-			$order = F3::get('PARAMS["ordering"]') == " " ? 
-					F3::get('PARAMS["ordering"]') : "id";
+			$order = F3::get('PARAMS["order"]') != NULL ? 
+					F3::get('PARAMS["order"]') : "id";
 			
-
 			/* Get Project */
 			$project = F3::get('project');
 			$project = 1;
@@ -52,7 +51,7 @@
 
 			$db = F3::get('DB');
 			$db = new DB($db['dsn']);
-			$result = $db->sql("SELECT * FROM Ticket WHERE id = $hash");
+			$result = $db->sql("SELECT * FROM Ticket WHERE hash = '$hash'");
 
 			F3::set('ticket', $result[0]);
             F3::set('template', 'ticket.tpl.php');
@@ -77,12 +76,19 @@
 			$ticket->setCategory(1);
 			$ticket->setProject(1);
 
-			var_dump($ticket->save());
+			$hash = $ticket->save();
 
-			$hash = 1;
 			/* Redirect to the added Ticket */
-			F3::set('PARAMS["hash"]', $hash);
-			$this->showTicket($hash);
+			if ($hash == 0)
+			{
+				F3::set('FAILURE', 'Failure while adding Ticket');
+				$this->showTickets();
+			}
+			else
+			{
+				F3::set('PARAMS["hash"]', $hash);
+				$this->showTicket($hash);
+			}
 		}
 
         function showUsers()

@@ -78,18 +78,26 @@
 			$db = new DB($db['dsn']);
 
 			if ($this->id > 0)
-				return	$db->sql("UPDATE Ticket SET " .
+			{
+				$stat = $db->sql("UPDATE Ticket SET " .
 						"owner = $this->owner, " .
 						"state = $this->state, " .
 						"priority = $this->priority " .
 						"WHERE id = $this->id");
+				return is_array($stat) ? $this->hash : 0;
+			}
 			else
-				return 	$db->sql("INSERT INTO Ticket " .
+			{
+				$id = $db->sql("SELECT max(id)+1 as next FROM Ticket");
+				$stat = $db->sql("INSERT INTO Ticket " .
 						"(hash, title, description, owner, type, state, " .
-						"priority, category, project) VALUES " .
-						"('MD5(id)', '$this->title', '$this->description',".
+						"priority, category, project, created) VALUES " .
+						"('". md5($id[0]['next'])."', '$this->title', '$this->description',".
 						" $this->owner, $this->type, $this->state," .
-						" $this->priority, $this->category, $this->project)");
+						" $this->priority, $this->category, $this->project, ".
+						time() .")");
+				return is_array($stat) ? md5($id[0]['next']) : 0;
+			}
 
 		}
 

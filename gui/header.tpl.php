@@ -24,4 +24,12 @@
 	
 
         <div id="content">
-            <div id="innerContentLOL">
+			<div id="innerContentLOL">
+
+				<F3:check if="{@FAILURE}">
+					<F3:true>
+						<div id="failure">
+							{@FAILURE}
+						</div>
+					</F3:true>
+				 </F3:check>
