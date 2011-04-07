@@ -27,8 +27,21 @@
 			<div class="formLabel">Type</div>
 			<div class="formValue">
 				<select name="type" size="1">
-					<option>Feature</option>
-					<option>Bug</option>
+					<option value="1">Feature</option>
+					<option value="2">Bug</option>
+				</select>
+			</div>
+		</div>
+
+		<div class="formRow">
+			<div class="formLabel">Priority</div>
+			<div class="formValue">
+				<select name="priority" size="1">
+					<option value="1">1 - Low</option>
+					<option>2</option>
+					<option>3</option>
+					<option>4</option>
+					<option value="5">5 - High</option>
 				</select>
 			</div>
 		</div>

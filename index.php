@@ -21,8 +21,7 @@ $app->route('GET /timeline', 'main->showTimeline');
 $app->route('GET /tickets', 'main->showTickets');
 $app->route('GET /tickets/@order', 'main->showTickets');
 $app->route('GET /ticket/@hash', 'main->showTicket');
-$app->route('GET /user', 'main->testUser');
+$app->route('GET /user/@hash', 'main->showUser');
 $app->route('POST /ticket', 'main->addTicket');
 
 $app->run();
-
