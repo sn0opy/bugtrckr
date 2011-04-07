@@ -25,5 +25,3 @@ $app->route('GET /ticket/@hash', 'main->showTicket');
 $app->route('POST /ticket', 'main->addTicket');
 
 $app->run();
-
-/*  Test */

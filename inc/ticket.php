@@ -53,6 +53,31 @@
 			$this->priority = $priority;
 		}
 
+		public function setCategory($category)
+		{
+			$this->category = $category;
+		}
 
+		/** 
+		 *
+		 */
+		public function save()
+		{
+			if ($id > 0)
+				return 
+				F3::sql("UPDATE Ticket SET " .
+						"owner = " . $this->owner->getId() . ", ".
+						"state = $this->state, " .
+						"priority = $this->priority ".
+						"WHERE id = $this->id");
+			else
+				return
+				F3::sql("INSERT INTO " .
+						"(title, description, owner, type, state, ".
+						"priority, category) VALUES ".
+						"('$this->title', '$this->description', ". 
+						$owner->getId() .", $this->type, $this->state, " .
+						"$this->priority, $this->category)"));
+		}
 
 	}
