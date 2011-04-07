@@ -62,9 +62,12 @@
 
 		function addTicket()
 		{
+			$post = F3::get('POST');
+			var_dump($post);
+			$hash = 1;	// Created while saving into DB
 
-			$hash = rand();	// Created while saving into DB
-
+			/* Redirect to the added Ticket */
+			F3::set('PARAMS["hash"]', $hash);
 			$this->showTicket($hash);
 		}
 

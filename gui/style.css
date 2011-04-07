@@ -166,7 +166,18 @@ table.ticket th
 	font-weight: normal;
 }
 
+#add
+{
+	background: gray;
+	border: solid 2px;
+	display: none;
+	position: absolute;
+	width: 400px; 
+	z-index: 5;
+}
+
 .clearfix
 {
     clear: both;
 }
+
