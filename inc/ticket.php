@@ -3,9 +3,18 @@
 	class Ticket extends F3instance
 	{
 
-        function __construct()
-        {
+		private $id;
 
-        }
+		function __construct()
+		{
+			parent::__construct();
+			$this->id = rand();
+		}
+
+
+		public function getId()
+		{
+			return $this->id;
+		}
 
 	}

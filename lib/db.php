@@ -72,6 +72,7 @@ class DB extends Base {
 		if (!isset($stats[$this->dsn]['queries'][$cmd]))
 			$stats[$this->dsn]['queries'][$cmd]=0;
 		$stats[$this->dsn]['queries'][$cmd]++;
+
 		return $result;
 	}
 
