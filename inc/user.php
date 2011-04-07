@@ -52,7 +52,15 @@
 
         public function save()
         {
-            
+            $ax = new Axon('User', new DB(F3::get('DB.dsn')));
+            $ax->load('hash = "' .$this->hash. '"');
+            $ax->name = $this->name;
+            $ax->hash = $this->hash;
+            $ax->password = $this->password;
+            $ax->salt = $this->salt;
+            $ax->email = $this->email;
+            $ax->admin = $this->admin;
+            $ax->save();
         }
 
 

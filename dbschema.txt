@@ -1,18 +1,2 @@
-sqlite> .tables
-Ticket  User  
-sqlite> .schema Ticket
-
 CREATE TABLE Ticket (id INTEGER PRIMARY KEY AUTOINCREMENT, hash varchar(12) UNIQUE, title varchar(40), description text, created int, owner int, type int, state int, priority int, category int, project int);
-
-sqlite> .schema User
-CREATE TABLE User
-(
-id int,
-name varchar,
-hash varchar,
-password varchar,
-salt varchar,
-email varchar,
-admin bool,
-PRIMARY KEY (id)
-);
+CREATE TABLE User (id integer PRIMARY KEY AUTOINCREMENT, hash varchar(12) UNIQUE, password varchar, salt varchar, email varchar, admin bool);

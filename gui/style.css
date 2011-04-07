@@ -67,10 +67,14 @@ body
 #failure
 {
 	background: #FAA;
-	border:	solid 2px #F54;
+	border:	solid 1px #F54;
 	color:	#F00;
-	width:	200px;
-	height:	40px;
+    margin: 0 auto;
+    padding: 5px;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    width: 500px;
 }
 
 /*

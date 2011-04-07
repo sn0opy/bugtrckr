@@ -1,6 +1,6 @@
 <?php
 
-	class main 
+	class main
 	{
 		function start()
 		{
@@ -96,21 +96,35 @@
             $hash = F3::get('PARAMS.hash');
             $db = new DB(F3::get('DB.dsn'));
             $result = $db->sql('SELECT * FROM User WHERE hash = :hash', array(':hash' => $hash));
-            F3::set('user', $result[0]);
+            
+            if(!$result) 
+                F3::set('FAILURE', 'Failure, user not found.');
+            else
+                F3::set('user', $result[0]);
+
             F3::set('template', 'user.tpl.php');
+            $this->tpserve();
+        }
+
+        function showUserRegister()
+        {
+            F3::set('template', 'userRegister.tpl.php');
             $this->tpserve();
         }
 
         function registerUser()
         {
-            $salt = helper::randStr();
+            $helper = new helper();
+            $salt = $helper->randStr();
+
             $user = new user();
             $user->setName(F3::get('POST.name'));
             $user->setEmail(F3::get('POST.email'));
-            $user->setPassword(helper::salting($salt, F3::get('POST.password')));
+            $user->setPassword($helper->salting($salt, F3::get('POST.password')));
             $user->setSalt($salt);
-            $user->setHash(/** ONOEZ! **/);
+            $user->setHash($helper->getFreeHash('User'));
             $user->setAdmin(0);
+            $user->save();
         }
 
 		private function tpserve()
