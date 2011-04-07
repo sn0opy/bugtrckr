@@ -62,10 +62,24 @@
 
 		function addTicket()
 		{
-			$post = F3::get('POST');
-			var_dump($post);
-			$hash = 1;	// Created while saving into DB
+			require_once 'ticket.php';
 
+			$post = F3::get('POST');
+			$owner = F3::get('SESSION');
+
+			$ticket = new Ticket();
+			$ticket->setTitle($post['title']);
+			$ticket->setDescription($post['description']);
+			$ticket->setOwner(1/*$owner*/);
+			$ticket->setType($post['type']);
+			$ticket->setState(1);
+			$ticket->setPriority($post['priority']);
+			$ticket->setCategory(1);
+			$ticket->setProject(1);
+
+			var_dump($ticket->save());
+
+			$hash = 1;
 			/* Redirect to the added Ticket */
 			F3::set('PARAMS["hash"]', $hash);
 			$this->showTicket($hash);
