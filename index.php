@@ -2,13 +2,14 @@
 
 $app=require(__DIR__.'/lib/base.php');
 
+require 'inc/config.inc.php';
 require 'inc/main.php';
 
 $app->set('CACHE', true);
 $app->set('DEBUG', 2);
 $app->set('EXTEND', true);
 $app->set('GUI','gui/');
-$app->set('DB', array('dsn'=>'sqlite:/Users/philipp/Sites/bugtrckr/bugtrckr.db'));
+$app->set('DB', array('dsn'=>'sqlite:./' .$dbFile));
 
 require 'lang/de-DE.php';
 

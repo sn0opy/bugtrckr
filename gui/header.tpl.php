@@ -8,40 +8,20 @@
 	</head>
 
 	<body>
-		<div id="site">
-			<div id="head">
+        <div id="head">
 
-			</div>
+        </div>
 
-			<div id="menu">
-				<a href="/{@BASE}">
-					<div class="menuitem">
-						Home
-					</div>
-				</a>
-
-				<a href="/{@BASE}tickets">
-					<div class="menuitem">
-						Tickets
-					</div>
-				</a>
-
-				<a href="/{@BASE}roadmap">
-					<div class="menuitem">
-						Roadmap
-					</div>
-				</a>
-				
-				<a href="/{@BASE}timeline">
-					<div class="menuitem">
-						Timeline
-					</div>
-				</a>
-
-				<div class="menuitem">
-				</div>
-
-			</div>
+        <div id="menu">
+            <ul>
+                <li><a href="/{@BASE}">Home</a></li>
+                <li><a href="/{@BASE}tickets">Tickets</a></li>
+                <li><a href="/{@BASE}roadmap">Roadmap</a></li>
+                <li><a href="/{@BASE}timeline">Timeline</a></li>
+            </ul>
+            <br class="clearfix" />
+        </div>
 	
 
-			<div id="content">
+        <div id="content">
+            <div id="innerContentLOL">

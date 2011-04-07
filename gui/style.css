@@ -1,79 +1,84 @@
 *
 {
-	margin:				0px;
-	padding:			0px;
+	margin:	0px;
+	padding: 0px;
 }
 
 body
 {
-	color:				#000000;
-	font-size:			14px;
-	font-style:			Verdana,Arial;
+	color: #333;
+	font: 10pt Helvetica;
 }
 
 /* 
  *	
  */
-#site
-{
-	background:			#EEEEEE;
-	min-height:			600px;
-	min-width:			800px;
-
-}
-
 #head
 {
-	background:			#005FFF;
-	height:				50px;
-	width:				100%;
+	background: #005FFF;
+	height:	50px;
 }
 
 #menu
 {
-	background-image:	url('../img/menu.png');
-	height:				30px;
-	width:				100%;
+    background: #DDD;
 }
 
-#menu a
+#menu ul
 {
-	text-align:			center;
-	font-family:		Sans-Serif;
-	font-size:			16px;
-	padding-top:		50px;
+    list-style-type: none;
 }
 
-#menu a:hover
+#menu li
 {
-	background-image:	url('../img/menu-hover.png');
-	color:				#444444;
+    float: left;
+    padding: 15px;
 }
 
-#menu .menuitem
+#menu li:hover
 {
-	float:				left;
-	height:				30px;
-	margin-right:		5px;
-	width:				80px;
+    background-color: #CCC;
+}
+
+#menu li a:hover
+{
+    text-decoration: underline;
 }
 
 #content
 {
-	background:			#DDDDDD;
-	float:				left;
-	height:				100%;
-	padding:			10px;
-	width:				100%;
+	float: left;
+    width: 100%;
+}
+
+#innerContentLOL
+{
+    padding: 10px;
 }
 
 #foot
 {
-	background:			#AAAAAA;
-	font-size:			12px;
-	float:				left;
-	height:				20px;
-	width:				100%;
+    clear: both;
+    text-align: center;
+    border-top: 1px solid #CCC;
+    padding-top: 5px;
+}
+
+.formRow
+{
+    float: left;
+    width: 100%;
+}
+
+.formLabel
+{
+    float: left;
+    width: 130px;
+}
+
+.formValue
+{
+    float: left;
 }
 
 /* 
@@ -86,8 +91,7 @@ h1
 
 h2
 {
-	font-size:			26px;
-   	font-weight:		bold;
+	font-size: 16pt;
 }
 
 /* 
@@ -95,8 +99,8 @@ h2
  */
 a
 {
-	color:				#000000;
-	text-decoration:	none;
+	color: #000;
+	text-decoration: none;
 }
 
 /* 
@@ -104,33 +108,33 @@ a
  */
 table.overview
 {
-	color:				#000099;
-	width:				95%;
+	color: #000099;
+    width: 100%;
 }
 
 table.overview a
 {
-	color:				#000099;
+	color: #009;
 }
 
 table.overview th
 {
-	font-weight:		bold;
+	font-weight: bold;
 }
 
 table.overview tr:hover
 {
-	background:			#AAAAAA;
+	background: #AAA;
 }
 
 table.overview .tr0
 {
-	background:			#DDDDDD;
+	background: #DDD;
 }
 
 table.overview .tr1
 {
-	background:			#FFFFFF;
+	background:	#FFF;
 }
 
 /* 
@@ -138,9 +142,9 @@ table.overview .tr1
  */
 div.ticket
 {
-	background:			#77AADC;
-	width:				500px;
-	height:				200px;
+	background: #77AADC;
+	width: 500px;
+	height:	200px;
 }
 
 /* 
@@ -148,16 +152,21 @@ div.ticket
  */
 table.ticket 
 {
-	border-collapse: 	collapse;
-	width:				95%;
+	border-collapse: collapse;
+	width: 95%;
 }
 
 table.ticket tr
 {
-	border-bottom:		1px dotted #000000;
+	border-bottom: 1px dotted #000;
 }
 
 table.ticket th
 {
-	font-weight:		normal;
+	font-weight: normal;
+}
+
+.clearfix
+{
+    clear: both;
 }

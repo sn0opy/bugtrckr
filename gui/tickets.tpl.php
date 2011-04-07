@@ -1,7 +1,6 @@
 <h2>Tickets</h2>
 
 	<img src="/{@BASE}img/new.png" height="20px"/>
-
 <table class="overview">
 	<tr>
 		<th><a href="/{@BASE}tickets/id">{@ID}</a></th>
