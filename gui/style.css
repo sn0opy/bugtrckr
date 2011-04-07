@@ -68,6 +68,7 @@ body
 {
     float: left;
     width: 100%;
+    margin-bottom: 2px;
 }
 
 .formLabel

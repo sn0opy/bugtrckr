@@ -1,7 +1,5 @@
 <?php
 
-/* geht */
-
 $app=require(__DIR__.'/lib/base.php');
 
 require 'inc/config.inc.php';
@@ -26,4 +24,3 @@ $app->route('POST /ticket', 'main->addTicket');
 
 $app->run();
 
-/*  Test */
