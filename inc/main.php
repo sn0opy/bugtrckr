@@ -89,4 +89,11 @@
             
 			echo Template::serve('main.tpl.php');
 		}
+
+        public function testUser()
+        {
+            $user = new user;
+            $user->login();
+            $this->tpserve();
+        }
 	}
