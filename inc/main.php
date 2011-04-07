@@ -91,22 +91,31 @@
 			}
 		}
 
-        function showUsers()
+        function showUser()
         {
+            $hash = F3::get('PARAMS.hash');
+            $db = new DB(F3::get('DB.dsn'));
+            $result = $db->sql('SELECT * FROM User WHERE hash = :hash', array(':hash' => $hash));
+            F3::set('user', $result[0]);
+            F3::set('template', 'user.tpl.php');
             $this->tpserve();
         }
 
-        function showUser()
+        function registerUser()
         {
-
-            $user = new user;
-            $user->show();
-            $this->tpserver();
+            $salt = helper::randStr();
+            $user = new user();
+            $user->setName(F3::get('POST.name'));
+            $user->setEmail(F3::get('POST.email'));
+            $user->setPassword(helper::salting($salt, F3::get('POST.password')));
+            $user->setSalt($salt);
+            $user->setHash(/** ONOEZ! **/);
+            $user->setAdmin(0);
         }
 
 		private function tpserve()
-		{
-            
+		{            
 			echo Template::serve('main.tpl.php');
 		}
+
 	}

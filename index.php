@@ -9,7 +9,8 @@ $app->set('CACHE', true);
 $app->set('DEBUG', 2);
 $app->set('EXTEND', true);
 $app->set('GUI','gui/');
-$app->set('DB', array('dsn'=>'sqlite:./' .$dbFile));
+$app->set('AUTOLOAD', 'inc/');
+$app->set('DB', array('dsn'=>'sqlite:' .$dbFile));
 
 require 'lang/de-DE.php';
 
@@ -20,6 +21,7 @@ $app->route('GET /timeline', 'main->showTimeline');
 $app->route('GET /tickets', 'main->showTickets');
 $app->route('GET /tickets/@order', 'main->showTickets');
 $app->route('GET /ticket/@hash', 'main->showTicket');
+$app->route('GET /user/@hash', 'main->showUser');
 $app->route('POST /ticket', 'main->addTicket');
 
 $app->run();

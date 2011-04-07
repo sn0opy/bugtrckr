@@ -1,0 +1,27 @@
+sqlite> .tables
+Ticket  User  
+sqlite> .schema Ticket
+CREATE TABLE Ticket
+(
+id int,
+owner int,
+project int,
+created date,
+title varchar(40),
+state int,
+type int,
+description text,
+PRIMARY KEY (id)
+);
+sqlite> .schema User
+CREATE TABLE User
+(
+id int,
+name varchar,
+hash varchar,
+password varchar,
+salt varchar,
+email varchar,
+admin bool,
+PRIMARY KEY (id)
+);
