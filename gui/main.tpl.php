@@ -6,8 +6,8 @@
             <p>{@FAILURE}</p>
         </div>
     </F3:true>
-    <F3:false>
-        <F3:include href="{@template}" />
+	<F3:false>	
+		<F3:include href="{@template}" />
     </F3:false>
 </F3:check>
 <F3:include href="footer.tpl.php" />

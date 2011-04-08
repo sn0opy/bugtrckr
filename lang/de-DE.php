@@ -12,9 +12,13 @@ $lang['LOW'] = 'niedrig';
 $lang['HIGH'] = 'hoch';
 $lang['PRIORITY'] = 'Priorit&auml;t';
 $lang['SUBMIT'] = 'Best&auml;tigen';
+$lang['NEW'] = 'Neu';
+$lang['CLOSED'] = 'Geschlossen';
+$lang['BUG'] = 'Fehler';
+$lang['FEATURE'] = 'Funktion';
 
 
-$lang['ADDMILESTONE'] = 'Meilenstein hinzuf&uumml;gen';
+$lang['ADDMILESTONE'] = 'Meilenstein hinzuf&uuml;gen';
 $lang['TICKETSLEFT'] = 'Tickets offen';
 $lang['ADDTICKET'] = 'Ticket hinzuf&uuml;gen';
 

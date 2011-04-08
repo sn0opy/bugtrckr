@@ -9,7 +9,9 @@
 			$this->tpserve();
 		}
 
-
+		/**
+		 *
+		 */
 		function showRoadmap()
 		{
 			$road = array(array());
@@ -39,14 +41,18 @@
 			$this->tpserve();
 		}
 
-
+		/**
+		 *
+		 */
 		function showTimeline()
 		{
             F3::set('template', 'timeline.tpl.php');
 			$this->tpserve();
 		}
 
-
+		/**
+		 *
+		 */
 		function showTickets()
 		{
 			/* Get ordering */
@@ -62,27 +68,36 @@
 			$db = new DB($db['dsn']);
 			$result = $db->sql("SELECT t.id, t.hash, t.title, t.description, t.created, t.owner, t.type, t.state, t.priority, t.category FROM Ticket t, Milestone m WHERE t.milestone = m.id AND m.project = $project ORDER BY t.$order");
 
+			/* Translate Statenr into String */
+			$ticket_state = F3::get('ticket_state');
+			foreach($result as $i=>$ticket)
+			{
+				$result[$i]['state'] = $ticket_state[$ticket['state']];
+			}
+
 			F3::set('tickets', $result);
             F3::set('template', 'tickets.tpl.php');
 			$this->tpserve();
 		}
 
-
+		/**
+		 *
+		 */
 		function showTicket()
 		{
-
 			$hash = F3::get('PARAMS["hash"]');
 
-			$db = F3::get('DB');
-			$db = new DB($db['dsn']);
-			$result = $db->sql("SELECT * FROM Ticket WHERE hash = '$hash'");
- 
-			F3::set('ticket', $result[0]);
-            F3::set('template', 'ticket.tpl.php');
+			$ticket = new Ticket();
+			$ticket->load("hash = '$hash'");
+
+			F3::set('ticket', $ticket->toArray());
+			F3::set('template', 'ticket.tpl.php');
 			$this->tpserve();
 		}
 
-
+		/**
+		 *
+		 */
 		function addTicket()
 		{
 			require_once 'ticket.php';
@@ -101,7 +116,7 @@
 			$ticket->setMilestone(1);
 
 			$hash = $ticket->save();
-			var_dump($hash);
+			
 			/* Redirect to the added Ticket */
 			if (!is_string($hash) && $hash == 0)
 			{

@@ -14,6 +14,9 @@ $app->set('DB', array('dsn'=>'sqlite:' .$dbFile));
 
 require 'lang/de-DE.php';
 //require 'lang/en-GB.php';
+//
+
+require 'inc/mapping.inc.php';
 
 
 $app->route('GET /', 'main->start');
