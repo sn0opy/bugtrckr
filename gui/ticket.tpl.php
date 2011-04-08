@@ -1,16 +1,16 @@
-<h2>{@ticket.title}</h2>
+<h1>{@ticket.title}</h1>
 
 <div class="ticket">
 	<table class="ticket">
 		<tr>
-			<th>{@CREATED}</th>
+			<th>{@LANG.CREATED}</th>
 			<td>{@ticket.created}</td>
-			<th>{@OWNER}</th>
+			<th>{@LANG.OWNER}</th>
 			<td>{@ticket.owner}</td>
 		</tr>
 
 		<tr>
-			<th>{@STATUS}</th>
+			<th>{@LANG.STATUS}</th>
 			<td>{@ticket.state}</td>
 			<th></th>
 			<td></td>
@@ -18,7 +18,7 @@
 	</table>
 </div>
 
-<h3>{@DESCRIPTION}</h3>
+<h2>{@DESCRIPTION}</h2>
 
 <p>
 	{@ticket.description}

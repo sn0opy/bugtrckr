@@ -12,6 +12,29 @@
 
 		function showRoadmap()
 		{
+			$road = array(array());
+			$i = 0;
+
+			/* Get Project */
+			$project = F3::get('project');
+			$project = 1;
+
+			/* Get Data from DB */
+			$db = F3::get('DB');
+			$db = new DB($db['dsn']);
+			$milestones = $db->sql("SELECT * FROM Milestone WHERE project = $project ORDER BY finished");
+					
+			foreach($milestones as $milestone)
+			{
+				$road[$i]['milestone'] = $milestone;
+				$road[$i]['tickets'] = 
+					$db->sql("SELECT hash, title, type FROM Ticket WHERE milestone = ". $milestone['id']);
+				$road[$i]['ticketcount'] = 
+					$db->sql("SELECT count(id) as count FROM Ticket WHERE milestone = ". $milestone['id']);
+				$i++;
+			}
+
+			F3::set('road', $road);
             F3::set('template', 'roadmap.tpl.php');
 			$this->tpserve();
 		}
@@ -37,7 +60,7 @@
 			/* Get Data from DB */
 			$db = F3::get('DB');
 			$db = new DB($db['dsn']);
-			$result = $db->sql("SELECT * FROM Ticket WHERE project = $project ORDER BY $order");
+			$result = $db->sql("SELECT t.id, t.hash, t.title, t.description, t.created, t.owner, t.type, t.state, t.priority, t.category FROM Ticket t, Milestone m WHERE t.milestone = m.id AND m.project = $project ORDER BY t.$order");
 
 			F3::set('tickets', $result);
             F3::set('template', 'tickets.tpl.php');
@@ -47,12 +70,13 @@
 
 		function showTicket()
 		{
+
 			$hash = F3::get('PARAMS["hash"]');
 
 			$db = F3::get('DB');
 			$db = new DB($db['dsn']);
 			$result = $db->sql("SELECT * FROM Ticket WHERE hash = '$hash'");
-
+ 
 			F3::set('ticket', $result[0]);
             F3::set('template', 'ticket.tpl.php');
 			$this->tpserve();
@@ -74,12 +98,12 @@
 			$ticket->setState(1);
 			$ticket->setPriority($post['priority']);
 			$ticket->setCategory(1);
-			$ticket->setProject(1);
+			$ticket->setMilestone(1);
 
 			$hash = $ticket->save();
-
+			var_dump($hash);
 			/* Redirect to the added Ticket */
-			if ($hash == 0)
+			if (!is_string($hash) && $hash == 0)
 			{
 				F3::set('FAILURE', 'Failure while adding Ticket');
 				$this->showTickets();

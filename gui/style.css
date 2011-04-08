@@ -198,3 +198,13 @@ table.ticket th
     clear: both;
 }
 
+ul.sublist
+{
+	padding: 10px;
+}
+
+p.info
+{
+	color:	green;
+	font-weight: bold;
+}

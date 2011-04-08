@@ -1,9 +1,23 @@
 <?php
-F3::set('ID', 'Id');
-F3::set('TITLE', 'Titel');
-F3::set('STATUS', 'Status');
-F3::set('CREATED', 'Erstellt');
-F3::set('OWNER', 'Besitzer');
-F3::set('DESCRIPTION', 'Beschreibung');
+$lang = array();
 
+$lang['ID'] = 'Id';
+$lang['TITLE'] = 'Titel';
+$lang['STATUS'] = 'Status';
+$lang['CREATED'] = 'Erstellt';
+$lang['OWNER'] = 'Besitzer';
+$lang['DESCRIPTION'] = 'Beschreibung';
+$lang['TYPE'] = 'Typ';
+$lang['LOW'] = 'niedrig';
+$lang['HIGH'] = 'hoch';
+$lang['PRIORITY'] = 'Priorit&auml;t';
+$lang['SUBMIT'] = 'Best&auml;tigen';
+
+
+$lang['ADDMILESTONE'] = 'Meilenstein hinzuf&uumml;gen';
+$lang['TICKETSLEFT'] = 'Tickets offen';
+$lang['ADDTICKET'] = 'Ticket hinzuf&uuml;gen';
+
+
+F3::set('LANG', $lang);
 ?>

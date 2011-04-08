@@ -12,7 +12,7 @@
 		private $state;
 		private $priority;
 		private $category;
-		private $project;
+		private $milestone;
 
 		function __construct()
 		{
@@ -59,9 +59,9 @@
 			$this->category = $category;
 		}
 
-		public function setProject($project)
+		public function setMilestone($milestone)
 		{
-			$this->project = $project;
+			$this->milestone = $milestone;
 		}
 
 		public function getHash()
@@ -82,7 +82,8 @@
 				$stat = $db->sql("UPDATE Ticket SET " .
 						"owner = $this->owner, " .
 						"state = $this->state, " .
-						"priority = $this->priority " .
+						"priority = $this->priority, " .
+						"milestone = $this->milestone ".
 						"WHERE id = $this->id");
 				return is_array($stat) ? $this->hash : 0;
 			}
@@ -91,11 +92,12 @@
 				$id = $db->sql("SELECT max(id)+1 as next FROM Ticket");
 				$stat = $db->sql("INSERT INTO Ticket " .
 						"(hash, title, description, owner, type, state, " .
-						"priority, category, project, created) VALUES " .
+						"priority, category, milestone, created) VALUES " .
 						"('". md5($id[0]['next'])."', '$this->title', '$this->description',".
 						" $this->owner, $this->type, $this->state," .
-						" $this->priority, $this->category, $this->project, ".
+						" $this->priority, $this->category, $this->milestone, ".
 						time() .")");
+
 				return is_array($stat) ? md5($id[0]['next']) : 0;
 			}
 
