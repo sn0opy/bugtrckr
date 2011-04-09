@@ -2,7 +2,7 @@
 
 <p>
 Bugtrckr is a minimal but feature rich Bugtracking System.
-It's build in PHP and uses the Fat Free Framework.
+It's programmed with PHP and the Fat Free Framework.
 </p>
 
 <p>Created by sn0opy &amp; Hanspolo</p>
