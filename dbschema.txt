@@ -20,3 +20,8 @@ INSERT INTO Project (id, hash, name) VALUES (1, 1, 'Example Project');
 #
 CREATE TABLE Milestone (id INTEGER PRIMARY KEY AUTOINCREMENT, hash char(12) UNIQUE, name varchar, description text, finished int, project int);
 INSERT INTO Milestone (id, hash, name, description, finished, project) VALUES (1, 1, 'First Milestone', 'UUUUAH', 1, 1);
+#
+# Activity
+#
+CREATE TABLE Activity (id INTEGER PRIMARY KEY AUTOINCREMENT, hash char(12) UNIQUE, description text, user int, changed int, project int);
+INSERT INTO Activity (id, hash, description, user, changed, project) VALUES (1, 1, 'Example Activity', 1, 1, 1);

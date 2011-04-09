@@ -16,6 +16,10 @@ $lang['NEW'] = 'Neu';
 $lang['CLOSED'] = 'Geschlossen';
 $lang['BUG'] = 'Fehler';
 $lang['FEATURE'] = 'Funktion';
+$lang['CHANGED'] = 'Ge&auml;ndert';
+$lang['CHANGEDBY'] = 'Ge&auml;ndert von';
+$lang['NAME'] = 'Name';
+$lang['FINISHEDAT'] = 'Endet am';
 
 
 $lang['ADDMILESTONE'] = 'Meilenstein hinzuf&uuml;gen';

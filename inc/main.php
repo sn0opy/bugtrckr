@@ -16,19 +16,21 @@
 		{
 			$road = array(array());
 			$i = 0;
+			$ms = new Milestone();
+			$t = new Ticket();
 
 			/* Get Project */
 			$project = F3::get('project');
 			$project = 1;
 
 			/* Get Data from DB */
-			$db = F3::get('DB');
-			$db = new DB($db['dsn']);
-			$milestones = $db->sql("SELECT * FROM Milestone WHERE project = $project ORDER BY finished");
-					
+			$db = new DB(F3::get('DB.dsn'));
+			$milestones = $db->sql("SELECT id FROM Milestone WHERE project = $project ORDER BY finished");
+
 			foreach($milestones as $milestone)
 			{
-				$road[$i]['milestone'] = $milestone;
+				$ms->load("id = $milestone[id]");
+				$road[$i]['milestone'] = $ms->toArray();
 				$road[$i]['tickets'] = 
 					$db->sql("SELECT hash, title, type FROM Ticket WHERE milestone = ". $milestone['id']);
 				$road[$i]['ticketcount'] = 
@@ -46,6 +48,24 @@
 		 */
 		function showTimeline()
 		{
+			$a = new Activity();
+			$timeline = array();
+
+			$db = new DB(F3::get('DB.dsn'));
+
+			/* Get Project */
+			$project = F3::get('project');
+			$project = 1;
+
+			$activities = $db->sql("SELECT id FROM Activity WHERE project = $project ORDER BY changed");
+
+			foreach($activities as $activity)
+			{
+				$a->load("id = $activity[id]");
+				$timeline[] = $a->toArray();
+			}
+
+			F3::set('activities', $timeline);
             F3::set('template', 'timeline.tpl.php');
 			$this->tpserve();
 		}
@@ -64,8 +84,7 @@
 			$project = 1;
 
 			/* Get Data from DB */
-			$db = F3::get('DB');
-			$db = new DB($db['dsn']);
+			$db = new DB(F3::get('DB.dsn'));
 			$result = $db->sql("SELECT t.id, t.hash, t.title, t.description, t.created, t.owner, t.type, t.state, t.priority, t.category FROM Ticket t, Milestone m WHERE t.milestone = m.id AND m.project = $project ORDER BY t.$order");
 
 			/* Translate Statenr into String */

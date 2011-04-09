@@ -55,6 +55,7 @@
 			</div>
 		</div>
 	</form>
+	<br class="clearfix" />
 </div>
 
 <table class="overview">

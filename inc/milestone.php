@@ -16,10 +16,14 @@
 		}
 
 
-		public function setId($id)
+		public function getId()
 		{
-			$this->id = $id;
-			$this->hash = md5($id);
+			return $this->id;
+		}
+
+		public function getHash()
+		{
+			return $this->hash;
 		}
 
 		public function setName($name)
@@ -27,9 +31,19 @@
 			$this->name = $name;
 		}
 
+		public function getName()
+		{
+			return $this->name;
+		}
+
 		public function setDescription($description)
 		{
 			$this->description = $description;
+		}
+
+		public function getDescription()
+		{
+			return $this->description;
 		}
 
 		public function setFinished($finished)
@@ -37,16 +51,27 @@
 			$this->finished = $finished;
 		}
 
+		public function getFinished()
+		{
+			return $this->finished;
+		}
+
 		public function setProject($project)
 		{
 			$this->project = $project;
 		}
 
+		public function getProject()
+		{
+			return $this->project;
+		}
 
+		/**
+		 *
+		 */
 		public function save()
 		{
-			$db = F3::get('DB');
-			$db = new DB($db['dsn']);
+			$db = new DB(F3::get('DB.dsn'));
 
 			if ($this->id > 0)
 			{
@@ -62,9 +87,46 @@
 				$stat = $db->sql("INSERT INTO Milestone ".
 						"(hash, name, description, finished, project) VALUES ".
 						"('". md5($id[0]['next']) ."', '$this->name', ".
-						"'$this->description', $this->finished, $this->project)";
+						"'$this->description', $this->finished, $this->project)");
 
 				return is_array($stat) ? md5($id[0]['next']) : 0;
 			}
+		}
+
+		/**
+		 *
+		 */
+		public function load($stmt)
+		{
+			$db = new DB(F3::get('DB.dsn'));
+
+			$result = $db->sql("SELECT * FROM Milestone WHERE $stmt");
+
+			if (is_array($result))
+			{
+				$this->id = $result[0]['id'];
+				$this->hash = $result[0]['hash'];
+				$this->name = $result[0]['name'];
+				$this->description = $result[0]['description'];
+				$this->finished = $result[0]['finished'];
+				$this->project = $result[0]['project'];
+			}
+		}
+
+		/**
+		 *
+		 */
+		public function toArray()
+		{
+			$milestone = array();
+
+			$milestone['id'] = $this->id;
+			$milestone['hash'] = $this->hash;
+			$milestone['name'] = $this->name;
+			$milestone['description'] = $this->description;
+			$milestone['finished'] = date('d.m.Y', $this->finished);
+			$milestone['project'] = $this->project;
+
+			return $milestone;
 		}
 	}

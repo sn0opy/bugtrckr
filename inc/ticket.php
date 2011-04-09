@@ -120,8 +120,7 @@
 		 */
 		public function save()
 		{
-			$db = F3::get('DB');
-			$db = new DB($db['dsn']);
+			$db = new DB(F3::get('DB.dsn'));
 
 			if ($this->id > 0)
 			{
@@ -153,8 +152,7 @@
 		 */
 		public function load($stmt)
 		{
-			$db = F3::get('DB');
-			$db = new DB($db['dsn']);
+			$db = new DB(F3::get('DB.dsn'));
 
 			$result = $db->sql("SELECT * FROM Ticket WHERE $stmt");
 
