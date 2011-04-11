@@ -29,5 +29,6 @@ $app->route('GET /user/@hash', 'main->showUser');
 $app->route('GET /user/new', 'main->showUserRegister');
 $app->route('POST /user/new', 'main->registerUser');
 $app->route('POST /ticket', 'main->addTicket');
+$app->route('POST /milestone', 'main->addMilestone');
 
 $app->run();
