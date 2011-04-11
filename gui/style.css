@@ -125,13 +125,13 @@ a
  */
 table.overview
 {
-	color: #000099;
+	color: #222;
     width: 100%;
 }
 
 table.overview a
 {
-	color: #009;
+	color: #444;
 }
 
 table.overview th
@@ -160,6 +160,10 @@ table.overview .tr1
 div.ticket
 {
 	background: #77AADC;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	padding: 4px;
 	width: 500px;
 	height:	200px;
 }
@@ -170,7 +174,7 @@ div.ticket
 table.ticket 
 {
 	border-collapse: collapse;
-	width: 95%;
+	width: 100%;
 }
 
 table.ticket tr
@@ -186,8 +190,15 @@ table.ticket th
 #add
 {
 	background: gray;
-	border: solid 2px;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-top: solid 2px #666;
+	border-left: solid 2px #666;
+	border-right: solid 4px #000;
+	border-bottom: solid 4px #000;
 	display: none;
+	opacity: 0.9;
 	position: absolute;
 	width: 400px; 
 	z-index: 5;

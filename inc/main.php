@@ -14,30 +14,21 @@
 		 */
 		function showRoadmap()
 		{
-			$road = array(array());
-			$i = 0;
-			$ms = new Milestone();
-			$t = new Ticket();
+			require_once 'dao.inc.php';
+
+			$road = array();
 
 			/* Get Project */
 			$project = F3::get('project');
 			$project = 1;
 
-			/* Get Data from DB */
-			$db = new DB(F3::get('DB.dsn'));
-			$milestones = $db->sql("SELECT id FROM Milestone WHERE project = $project ORDER BY finished");
-
+			$milestones = Dao::getMilestones("project = $project");
+			
 			foreach($milestones as $milestone)
 			{
-				$ms->load("id = $milestone[id]");
-				$road[$i]['milestone'] = $ms->toArray();
-				$road[$i]['tickets'] = 
-					$db->sql("SELECT hash, title, type FROM Ticket WHERE milestone = ". $milestone['id']);
-				$road[$i]['ticketcount'] = 
-					$db->sql("SELECT count(id) as count FROM Ticket WHERE milestone = ". $milestone['id']);
-				$i++;
+				$road[] = $milestone->toArray();
 			}
-
+			
 			F3::set('road', $road);
             F3::set('template', 'roadmap.tpl.php');
 			$this->tpserve();
@@ -75,6 +66,8 @@
 		 */
 		function showTickets()
 		{
+			require_once 'dao.inc.php';
+
 			/* Get ordering */
 			$order = F3::get('PARAMS["order"]') != NULL ? 
 					F3::get('PARAMS["order"]') : "id";
@@ -84,17 +77,16 @@
 			$project = 1;
 
 			/* Get Data from DB */
-			$db = new DB(F3::get('DB.dsn'));
-			$result = $db->sql("SELECT t.id, t.hash, t.title, t.description, t.created, t.owner, t.type, t.state, t.priority, t.category FROM Ticket t, Milestone m WHERE t.milestone = m.id AND m.project = $project ORDER BY t.$order");
+			$tickets = Dao::getTickets("milestone IN " .
+				"(SELECT id FROM Milestone WHERE project = $project)" .
+				"ORDER BY $order");
 
-			/* Translate Statenr into String */
-			$ticket_state = F3::get('ticket_state');
-			foreach($result as $i=>$ticket)
+			foreach($tickets as $i=>$ticket)
 			{
-				$result[$i]['state'] = $ticket_state[$ticket['state']];
+				$tickets[$i] = $tickets[$i]->toArray();
 			}
 
-			F3::set('tickets', $result);
+			F3::set('tickets', $tickets);
             F3::set('template', 'tickets.tpl.php');
 			$this->tpserve();
 		}
@@ -158,6 +150,7 @@
 
 			$post = F3::get('POST');
 			$project = F3::get('SESSION.project');
+			$project = 1;
 
 			$milestone = new Milestone();
 			$milestone->setName($post['name']);

@@ -35,11 +35,11 @@
 <F3:repeat group="{@road}" key="{@i}" value="{@item}">
 
 <div class="milestone">
-	<h2>{@item.milestone.name}</h2>
+	<h2>{@item.name}</h2>
 	
-	<p>{@item.milestone.description}</p>
+	<p>{@item.description}</p>
 
-	<p class="info">{@item.ticketcount.0.count} {@LANG.TICKETSLEFT}</p>
+	<p class="info">{@item.tickets} {@LANG.TICKETSLEFT}</p>
 
 	<ul class="sublist">
 	<F3:repeat group="{@item.tickets}" key="{@j}" value="{@ticket}">
