@@ -140,12 +140,41 @@
 			if (!is_string($hash) && $hash == 0)
 			{
 				F3::set('FAILURE', 'Failure while adding Ticket');
-				$this->showTickets();
+				$this->tpserve();
 			}
 			else
 			{
 				F3::set('PARAMS["hash"]', $hash);
 				$this->showTicket($hash);
+			}
+		}
+
+		/**
+		 *
+		 */
+		function addMilestone()
+		{
+			require_once 'milestone.php';
+
+			$post = F3::get('POST');
+			$project = F3::get('SESSION.project');
+
+			$milestone = new Milestone();
+			$milestone->setName($post['name']);
+			$milestone->setDescription($post['description']);
+			$milestone->setFinished($post['finished']);
+			$milestone->setProject($project);
+
+			$hash = $milestone->save();
+
+			if (!is_string($hash) && $hash == 0)
+			{
+				F3::set('FAILURE', 'Failure while adding Milestone');
+				$this->tpserve();
+			}
+			else
+			{
+				$this->showRoadmap();
 			}
 		}
 
