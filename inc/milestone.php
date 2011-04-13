@@ -12,11 +12,9 @@
 		private $description;
 		private $finished;
 		private $project;
-		private $tickets;
 
 		public function __construct()
 		{
-			$this->tickets = array();
 			parent::__construct();
 		}
 
@@ -71,11 +69,6 @@
 			return $this->project;
 		}
 
-		public function getTickets()
-		{
-			return $this->tickets;
-		}
-
 		/**
 		 *
 		 */
@@ -120,8 +113,6 @@
 				$this->description = $result[0]['description'];
 				$this->finished = $result[0]['finished'];
 				$this->project = $result[0]['project'];
-
-				$this->tickets = Dao::getTickets("milestone = $this->id");
 			}
 		}
 
@@ -138,13 +129,6 @@
 			$milestone['description'] = $this->description;
 			$milestone['finished'] = date('d.m.Y', $this->finished);
 			$milestone['project'] = $this->project;
-
-			$milestone['tickets'] = array();
-
-			foreach($this->tickets as $ticket)
-			{
-				$milestone['tickets'][] = $ticket->toArray();
-			}
 
 			return $milestone;
 		}

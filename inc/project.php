@@ -6,7 +6,7 @@
 		private $id;
 		private $hash;
 		private $name;
-
+		
 		function __construct()
 		{
 			parent::__construct();

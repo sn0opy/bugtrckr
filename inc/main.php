@@ -21,11 +21,21 @@
 			/* Get Project */
 			$project = F3::get('SESSION.project');
 
+			/* Get Milestones */				
 			$milestones = Dao::getMilestones("project = $project");
-			
-			foreach($milestones as $milestone)
+
+			foreach($milestones as $i=>$milestone)
 			{
-				$road[] = $milestone->toArray();
+				$road[$i]['milestone'] = $milestone->toArray();
+
+				/* Get all Tickets of this milestone */				
+				$road[$i]['tickets'] = Dao::getTickets("milestone = ". $milestone->getId());
+				foreach($road[$i]['tickets'] as $j=>$ticket)
+				{
+					$road[$i]['tickets'][$j] = $ticket->toArray();
+				}
+
+				$road[$i]['ticketcount'] = count($road[$i]['tickets']);
 			}
 			
 			F3::set('road', $road);
@@ -175,6 +185,9 @@
 			F3::reroute($url);
 		}
 
+		/**
+		 *
+		 */
         function showUser()
         {
             $hash = F3::get('PARAMS.hash');
