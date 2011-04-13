@@ -12,6 +12,11 @@ $app->set('GUI','gui/');
 $app->set('AUTOLOAD', 'inc/');
 $app->set('DB', array('dsn'=>'sqlite:' .$dbFile));
 
+
+
+$app->set('SESSION.project', 1);
+$app->set('SESSION.user', 1);
+
 require 'lang/de-DE.php';
 //require 'lang/en-GB.php';
 //
@@ -30,5 +35,6 @@ $app->route('GET /user/new', 'main->showUserRegister');
 $app->route('POST /user/new', 'main->registerUser');
 $app->route('POST /ticket', 'main->addTicket');
 $app->route('POST /milestone', 'main->addMilestone');
+$app->route('POST /project/select', 'main->selectProject');
 
 $app->run();

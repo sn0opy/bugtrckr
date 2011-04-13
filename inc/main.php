@@ -1,5 +1,7 @@
 <?php
 
+	require_once 'dao.inc.php';
+
 	class main
 	{
 		function start()
@@ -14,13 +16,10 @@
 		 */
 		function showRoadmap()
 		{
-			require_once 'dao.inc.php';
-
 			$road = array();
 
 			/* Get Project */
-			$project = F3::get('project');
-			$project = 1;
+			$project = F3::get('SESSION.project');
 
 			$milestones = Dao::getMilestones("project = $project");
 			
@@ -39,21 +38,16 @@
 		 */
 		function showTimeline()
 		{
-			$a = new Activity();
 			$timeline = array();
 
-			$db = new DB(F3::get('DB.dsn'));
-
 			/* Get Project */
-			$project = F3::get('project');
-			$project = 1;
+			$project = F3::get('SESSION.project');
 
-			$activities = $db->sql("SELECT id FROM Activity WHERE project = $project ORDER BY changed");
+			$activities = Dao::getActivities("project = $project");
 
 			foreach($activities as $activity)
 			{
-				$a->load("id = $activity[id]");
-				$timeline[] = $a->toArray();
+				$timeline[] = $activity->toArray();
 			}
 
 			F3::set('activities', $timeline);
@@ -66,15 +60,12 @@
 		 */
 		function showTickets()
 		{
-			require_once 'dao.inc.php';
-
 			/* Get ordering */
 			$order = F3::get('PARAMS["order"]') != NULL ? 
 					F3::get('PARAMS["order"]') : "id";
 			
 			/* Get Project */
-			$project = F3::get('project');
-			$project = 1;
+			$project = F3::get('SESSION.project');
 
 			/* Get Data from DB */
 			$tickets = Dao::getTickets("milestone IN " .
@@ -150,7 +141,6 @@
 
 			$post = F3::get('POST');
 			$project = F3::get('SESSION.project');
-			$project = 1;
 
 			$milestone = new Milestone();
 			$milestone->setName($post['name']);
@@ -169,6 +159,20 @@
 			{
 				$this->showRoadmap();
 			}
+		}
+
+		/**
+		 *
+		 */
+		function selectProject()
+		{
+			$post = F3::get('POST');
+			$url = F3::get('SERVER.HTTP_REFERER');
+
+			$project = new Project();
+			$project->load("hash = '$post[project]'");
+
+			F3::reroute($url);
 		}
 
         function showUser()
@@ -208,7 +212,15 @@
         }
 
 		private function tpserve()
-		{            
+		{
+			$projects = Dao::getProjects('1 = 1');
+			foreach($projects as $i=>$project)
+			{
+				$projects[$i] = $project->toArray();
+			}
+
+			F3::set('projects', $projects);
+	
 			echo Template::serve('main.tpl.php');
 		}
 
