@@ -8,6 +8,7 @@ body
 {
 	color: #333;
 	font: 10pt Helvetica;
+	min-width: 900px;
 }
 
 /* 
@@ -48,6 +49,7 @@ body
 #content
 {
 	float: left;
+	font-size: 12px;
     width: 100%;
 }
 
@@ -120,6 +122,11 @@ a
 	text-decoration: none;
 }
 
+table
+{
+	font-size: 12px;
+}
+
 /* 
  *	
  */
@@ -153,6 +160,38 @@ table.overview .tr1
 {
 	background:	#FFF;
 }
+
+table.overview .id
+{
+	width: 5%;
+}
+
+table.overview .title
+{
+
+}
+
+table.overview .state
+{
+	width: 6%;
+}
+
+table.overview .priority
+{
+	width: 8%;
+}
+
+table.overview .created
+{
+	width: 12%;
+}
+
+table.overview .owner
+{
+	width: 7%;
+}
+
+
 
 /* 
  *	

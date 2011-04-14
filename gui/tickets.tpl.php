@@ -31,7 +31,6 @@
 				<select name="type" size="1">
 					<option value="1">{@LANG.BUG}</option>
 					<option value="2">{@LANG.FEATURE}</option>
-					<option value="3">{@LANG.REQUIREMENT}</option>
 				</select>
 			</div>
 		</div>
@@ -72,7 +71,7 @@
 
 <table class="overview">
 	<tr>
-		<th><a href="/{@BASE}tickets/id">{@LANG.ID}</a></th>
+		<th><a href="/{@BASE}tickets/id">#</a></th>
 		<th><a href="/{@BASE}tickets/title">{@LANG.TITLE}</a></th>
 		<th><a href="/{@BASE}tickets/state">{@LANG.STATUS}</a></th>
 		<th><a href="/{@BASE}tickets/priority">{@LANG.PRIORITY}</a></th>
@@ -82,12 +81,14 @@
 
 	<F3:repeat group="{@tickets}" key="{@i}" value="{@ticket}">
 	<tr class="tr{@i%2}">
-		<td>{@ticket.id}</td>
-		<td><a href="/{@BASE}ticket/{@ticket.hash}">{@ticket.title}</a></td>
-		<td>{@ticket.state}</td>
-		<td>{@ticket.priority}</td>
-		<td>{@ticket.created}</td>
-		<td>{@ticket.owner}</td>
+		<td class="id">{@i+1}</td>
+		<td class="title">
+			<a href="/{@BASE}ticket/{@ticket.hash}">{@ticket.title}</a>
+		</td>
+		<td class="state">{@ticket.state}</td>
+		<td class="priority">{@ticket.priority}</td>
+		<td class="created">{@ticket.created}</td>
+		<td class="owner">{@ticket.owner}</td>
 	</tr>
 	</F3:repeat>
 </table>

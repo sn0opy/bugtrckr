@@ -19,7 +19,6 @@ $lang['NEW'] = 'Neu';
 $lang['CLOSED'] = 'Geschlossen';
 $lang['BUG'] = 'Fehler';
 $lang['FEATURE'] = 'Funktion';
-$lang['REQUIREMENT'] = 'Requirement';
 $lang['CHANGED'] = 'Ge&auml;ndert';
 $lang['CHANGEDBY'] = 'Ge&auml;ndert von';
 $lang['NAME'] = 'Name';

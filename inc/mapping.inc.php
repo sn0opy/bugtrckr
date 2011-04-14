@@ -8,7 +8,6 @@ $ticket_state = array(
 $ticket_type = array(
 	'1' => F3::get('LANG.BUG'),
 	'2' => F3::get('LANG.FEATURE'),
-	'3' => F3::get('LANG.REQUIREMENT')
 );
 
 $ticket_priority = array(
@@ -16,7 +15,7 @@ $ticket_priority = array(
 	'2' => F3::get('LANG.HIGH'),
 	'3' => F3::get('LANG.NORMAL'),
 	'4' => F3::get('LANG.LOW'),
-	'5' => F3::get('LANG_VERYLOW')
+	'5' => F3::get('LANG.VERYLOW')
 );
 
 
