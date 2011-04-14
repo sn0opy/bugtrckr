@@ -181,6 +181,7 @@
 			$ticket = array();
 			$ticket_state = F3::get('ticket_state');
 			$ticket_type = F3::get('ticket_type');
+			$ticket_priority = F3::get('ticket_priority');
 
 			$ticket['id'] = $this->id;
 			$ticket['hash'] = $this->hash;
@@ -190,7 +191,7 @@
 			$ticket['owner'] = $this->owner;
 			$ticket['type'] = $ticket_type[$this->type];
 			$ticket['state'] = $ticket_state[$this->state];
-			$ticket['priority'] = $this->priority;
+			$ticket['priority'] = $ticket_priority[$this->priority];
 			$ticket['category'] = $this->category;
 			$ticket['milestone'] = $this->milestone;
 

@@ -23,12 +23,11 @@
 				<li>
 					<form method="POST" action="/{@BASE}project/select">
 						<select name="project" size="1" onchange="submit()">
-							<option></option>
 							<F3:repeat group="{@projects}" value="{@project}">
 								<F3:check if="{@project.id == @SESSION.project}">
 									<F3:true>
 										<option value="{@project.hash}"
-												checked="checked">
+												selected="selected">
 											{@project.name}
 										</option>
 									</F3:true>

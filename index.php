@@ -14,7 +14,6 @@ $app->set('DB', array('dsn'=>'sqlite:' .$dbFile));
 
 
 
-$app->set('SESSION.project', 1);
 $app->set('SESSION.user', 1);
 
 require 'lang/de-DE.php';

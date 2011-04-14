@@ -77,6 +77,14 @@
 			/* Get Project */
 			$project = F3::get('SESSION.project');
 
+			/* Get Milestones of the Project */
+			$milestones = Dao::getMilestones("project = $project");
+
+			foreach($milestones as $i=>$milestone)
+			{
+				$milestones[$i] = $milestone->toArray();
+			}
+
 			/* Get Data from DB */
 			$tickets = Dao::getTickets("milestone IN " .
 				"(SELECT id FROM Milestone WHERE project = $project)" .
@@ -84,9 +92,10 @@
 
 			foreach($tickets as $i=>$ticket)
 			{
-				$tickets[$i] = $tickets[$i]->toArray();
+				$tickets[$i] = $ticket->toArray();
 			}
 
+			F3::set('milestones', $milestones);
 			F3::set('tickets', $tickets);
             F3::set('template', 'tickets.tpl.php');
 			$this->tpserve();
@@ -115,17 +124,17 @@
 			require_once 'ticket.php';
 
 			$post = F3::get('POST');
-			$owner = F3::get('SESSION');
+			$owner = F3::get('SESSION.user');
 
 			$ticket = new Ticket();
 			$ticket->setTitle($post['title']);
 			$ticket->setDescription($post['description']);
-			$ticket->setOwner(1/*$owner*/);
+			$ticket->setOwner($owner);
 			$ticket->setType($post['type']);
 			$ticket->setState(1);
 			$ticket->setPriority($post['priority']);
 			$ticket->setCategory(1);
-			$ticket->setMilestone(1);
+			$ticket->setMilestone($post['milestone']);
 
 			$hash = $ticket->save();
 			
@@ -181,6 +190,8 @@
 
 			$project = new Project();
 			$project->load("hash = '$post[project]'");
+
+			F3::set('SESSION.project', $project->getId());
 
 			F3::reroute($url);
 		}
