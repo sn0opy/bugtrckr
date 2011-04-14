@@ -1,27 +1,27 @@
 #
 # Ticket
 #
-CREATE TABLE Ticket (id INTEGER PRIMARY KEY AUTOINCREMENT, hash char(12) UNIQUE, title varchar(40), description text, created int, owner int, type int, state int, priority int, category int, milestone int);
-INSERT INTO Ticket (id, hash, title, description, created, owner, type, state, riority, category, milestone) VALUES (1, 1, 'Example Ticket', 'This Ticket is just a little example', 1, 2, 1, 1, 3, 1, 1);
+CREATE TABLE Ticket (id INTEGER PRIMARY KEY AUTOINCREMENT, hash char(12) UNIQUE, title varchar(40), description text, created int, owner int, type int, state int, priority int, category varchar(40), milestone int);
+INSERT INTO Ticket (id, hash, title, description, created, owner, type, state, riority, category, milestone) VALUES (1, 'b026324c6904b2a9cb4b88d6d61c81d1', 'Example Ticket', 'This Ticket is just a little example', 1, 2, 1, 1, 3, 1, 1);
 #
 # User
 #
 CREATE TABLE User (id integer PRIMARY KEY AUTOINCREMENT, hash varchar(12) UNIQUE, password varchar, salt varchar, email varchar, admin bool);
 INSERT INTO User (id, hash, password, salt, email, admin) 
-VALUES (1, 1, 1, 1, 'admin@bugtrckr', 1)
-VALUES (2, 2, 2, 2, 'johndoe@bugtrckr', 0);
+VALUES (1, 'b026324c6904b2a9cb4b88d6d61c81d1', 1, 1, 'admin@bugtrckr', 1)
+VALUES (2, '26ab0db90d72e28ad0ba1e22ee510510', 2, 2, 'johndoe@bugtrckr', 0);
 #
 # Project
 #
 CREATE TABLE Project (id INTEGER PRIMARY KEY AUTOINCREMENT, hash char(12) UNIQUE, name varchar);
-INSERT INTO Project (id, hash, name) VALUES (1, 1, 'Example Project');
+INSERT INTO Project (id, hash, name) VALUES (1, 'b026324c6904b2a9cb4b88d6d61c81d1', 'Example Project');
 #
 # Milestone
 #
 CREATE TABLE Milestone (id INTEGER PRIMARY KEY AUTOINCREMENT, hash char(12) UNIQUE, name varchar, description text, finished int, project int);
-INSERT INTO Milestone (id, hash, name, description, finished, project) VALUES (1, 1, 'First Milestone', 'UUUUAH', 1, 1);
+INSERT INTO Milestone (id, hash, name, description, finished, project) VALUES (1, 'b026324c6904b2a9cb4b88d6d61c81d1', 'First Milestone', 'UUUUAH', 1, 1);
 #
 # Activity
 #
 CREATE TABLE Activity (id INTEGER PRIMARY KEY AUTOINCREMENT, hash char(12) UNIQUE, description text, user int, changed int, project int);
-INSERT INTO Activity (id, hash, description, user, changed, project) VALUES (1, 1, 'Example Activity', 1, 1, 1);
+INSERT INTO Activity (id, hash, description, user, changed, project) VALUES (1, 'b026324c6904b2a9cb4b88d6d61c81d1', 'Example Activity', 1, 1, 1);

@@ -26,6 +26,11 @@
 		</div>
 
 		<div class="formRow">
+			<div class="formLabel">{@LANG.CATEGORY}</div>
+			<div class="formValue"><input type="text" name="category" /></div>
+		</div>
+
+		<div class="formRow">
 			<div class="formLabel">{@LANG.TYPE}</div>
 			<div class="formValue">
 				<select name="type" size="1">

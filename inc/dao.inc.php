@@ -82,5 +82,24 @@
 			return $result;
 		}
 
+		/**
+		 *
+		 */
+		static function addActivity($message)
+		{
+			$userId = F3::get('SESSION.user');
+			$projectId = F3::get('SESSION.project');
+
+			$user = new User();
+			$user->load("id = $userId");
+
+			$activity = new Activity();
+
+			$activity->setDescription($user->getName() . " " . $message);
+			$activity->setProject($projectId);
+			$activity->setUser($userId);
+
+			$activity->save();
+		}
 
 	}

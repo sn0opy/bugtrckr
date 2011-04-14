@@ -150,6 +150,7 @@
 			}
 			else
 			{
+				Dao::addActivity("created Ticket ". $ticket->getTitle());
 				F3::set('PARAMS["hash"]', $hash);
 				$this->showTicket($hash);
 			}
@@ -180,6 +181,7 @@
 			}
 			else
 			{
+				Dao::addActivity("created Milestone ". $milestone->getName());
 				$this->showRoadmap();
 			}
 		}

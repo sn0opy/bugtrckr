@@ -140,7 +140,7 @@
 						"priority, category, milestone, created) VALUES " .
 						"('". md5($id[0]['next'])."', '$this->title', '$this->description',".
 						" $this->owner, $this->type, $this->state," .
-						" $this->priority, $this->category, $this->milestone, ".
+						" $this->priority, '$this->category', $this->milestone, ".
 						time() .")");
 
 				return is_array($stat) ? md5($id[0]['next']) : 0;

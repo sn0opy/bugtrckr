@@ -6,6 +6,7 @@
 		private $hash;
 		private $description;
 		private $user;
+		private $project;
 		private $changed;
 
 		function __construct()
@@ -72,7 +73,7 @@
 			$stat = $db->sql("INSERT INTO Activity " .
 					"(hash, description, user, changed, project) VALUES " .
 					"('". md5($id[0]['next']) ."', '$this->description', " .
-					"$this->user, " . time() . ", $project)");
+					"$this->user, " . time() . ", $this->project)");
 
 			return is_array($stat) ? md5($id[0]['next']) : 0;
 		}

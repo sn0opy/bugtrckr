@@ -23,6 +23,7 @@ $lang['CHANGED'] = 'Changed';
 $lang['CHANGEDBY'] = 'Changed by';
 $lang['NAME'] = 'Name';
 $lang['FINISHEDAT'] = 'Finish at';
+$lang['CATEGORY'] = 'Category';
 
 $lang['ADDMILESTONE'] = 'Add Milestone';
 $lang['TICKETSLEFT'] = 'Tickets left';
