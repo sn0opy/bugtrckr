@@ -159,13 +159,23 @@ table.overview .tr1
  */
 div.ticket
 {
-	background: #77AADC;
+	background: #ADE;
+	border: 1px solid #8BC;
 	border-radius: 3px;
 	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px;
 	padding: 4px;
-	width: 500px;
-	height:	200px;
+	width: 80%;
+}
+
+div.ticket hr
+{
+	background-color: #AAA;
+	border: 0 none;
+	color: #AAA;	
+	height: 1px;
+	margin-top: 4px;
+	margin-bottom: 4px;
 }
 
 /* 
@@ -179,12 +189,11 @@ table.ticket
 
 table.ticket tr
 {
-	border-bottom: 1px dotted #000;
 }
 
-table.ticket th
+table.ticket th,td
 {
-	font-weight: normal;
+	padding: 2px;
 }
 
 #add

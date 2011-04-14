@@ -111,7 +111,11 @@
 			$ticket = new Ticket();
 			$ticket->load("hash = '$hash'");
 
+			$milestone = new Milestone();
+			$milestone->load("id = ". $ticket->getMilestone());
+
 			F3::set('ticket', $ticket->toArray());
+			F3::set('milestone', $milestone->toArray());
 			F3::set('template', 'ticket.tpl.php');
 			$this->tpserve();
 		}
