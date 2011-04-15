@@ -31,7 +31,12 @@
         {
             // check if intl module is loaded, otherwise use own fallback
             if(!extension_loaded('intl'))
+            {
                 if(!$this->exists('lng'))
-                    $this->set('lng', include $this->get('LOCALES').$this->get('LANGUAGE').'.php');
+                {
+                    $locale = include $this->get('LOCALES').$this->get('LANGUAGE').'.php';
+                    $this->set('lng', $locale['lng']);
+                }
+            }
         }
     }
