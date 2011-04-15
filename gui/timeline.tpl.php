@@ -1,8 +1,8 @@
-<h1>Timeline</h1>
+<h1>{@lng.timeline}</h1>
 
 <table class="overview">
 	<tr>
-		<th>{@LANG.DESCRIPTION}</th><th>{@LANG.CHANGED}</th><th>{@LANG.CHANGEDBY}</th>
+		<th>{@lng.description}</th><th>{@lng.changed}</th><th>{@lng.changedby}</th>
 	</tr>
 <F3:repeat group="{@activities}" value="{@activity}">
 	<tr>

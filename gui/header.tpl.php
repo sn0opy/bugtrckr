@@ -14,11 +14,11 @@
 
         <div id="menu">
             <ul>
-                <li><a href="/{@BASE}">Home</a></li>
-                <li><a href="/{@BASE}tickets">Tickets</a></li>
-                <li><a href="/{@BASE}roadmap">Roadmap</a></li>
-				<li><a href="/{@BASE}timeline">Timeline</a></li>
-				<li><a href="/{@BASE}user/new">Registration</a></li>
+                <li><a href="/{@BASE}">{@lng.home}</a></li>
+                <li><a href="/{@BASE}tickets">{@lng.tickets}</a></li>
+                <li><a href="/{@BASE}roadmap">{@lng.roadmap}</a></li>
+				<li><a href="/{@BASE}timeline">{@lng.timeline}</a></li>
+				<li><a href="/{@BASE}user/new">{@lng.registration}</a></li>
 
 				<li>
 					<form method="POST" action="/{@BASE}project/select">

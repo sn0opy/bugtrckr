@@ -1,7 +1,7 @@
-<h1>Roadmap</h1>
+<h1>{@lng.roadmap}</h1>
 
 <button type="button" onclick="document.getElementById('add').style.display = 'block'">
-	{@LANG.ADDMILESTONE}
+	{@lng.addmilestone}
 </button>
 
 <div id="add">
@@ -12,20 +12,20 @@
 
 	<form method="POST" action="/{@BASE}milestone">
 		<div class="formRow">
-			<div class="formLabel">{@LANG.NAME}</div>
+			<div class="formLabel">{@lng.name}</div>
 			<div class="formValue"><input type="text" name="name" /></div>
 		</div>
 		<div class="formRow">
-			<div class="formLabel">{@LANG.DESCRIPTION}</div>
+			<div class="formLabel">{@lng.description}</div>
 			<div class="formValue"><textarea name="description"></textarea></div>
 		</div>
 		<div class="formRow">
-			<div class="formLabel">{@LANG.FINISHEDAT}</div>
+			<div class="formLabel">{@lng.finisheddate}</div>
 			<div class="formValue"><input type="text" name="finished" /></div>
 		</div>
 		<div class="formRow">
 			<div class="formLabel">&nbsp;</div>
-			<div class="formValue"><input type="submit" value="{@LANG.SUBMIT}" /></div>
+			<div class="formValue"><input type="submit" value="{@lng.submit}" /></div>
 		</div>
 	</form>
 	<br class="clearfix" />
@@ -39,7 +39,7 @@
 	
 	<p>{@item.milestone.description}</p>
 
-	<p class="info">{@item.ticketcount} {@LANG.TICKETSLEFT}</p>
+	<p class="info">{@item.ticketcount} {@lng.ticketsleft}</p>
 
 	<ul class="sublist">
 	<F3:repeat group="{@item.tickets}" key="{@j}" value="{@ticket}">

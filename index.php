@@ -10,15 +10,11 @@ $app->set('DEBUG', 2);
 $app->set('EXTEND', true);
 $app->set('GUI','gui/');
 $app->set('AUTOLOAD', 'inc/');
+$app->set('LOCALES','lang/');
+$app->set('LANGUAGE', 'de'); // substr($_SERVER["HTTP_ACCEPT_LANGUAGE"], 0, 2);
 $app->set('DB', array('dsn'=>'sqlite:' .$dbFile));
 
-
-
 $app->set('SESSION.user', 1);
-
-require 'lang/de-DE.php';
-//require 'lang/en-GB.php';
-//
 
 require 'inc/mapping.inc.php';
 

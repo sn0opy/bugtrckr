@@ -3,7 +3,7 @@
 
 
 			<div id="foot">
-				Created in 2011
+				{@lng.footer_created} 2011
 			</div>
 
 		</div>

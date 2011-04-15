@@ -1,7 +1,7 @@
 <F3:include href="header.tpl.php" />
 <F3:check if="{@FAILURE}">
     <F3:true>
-        <h2>Error</h2>
+        <h2>{@lng.error}</h2>
         <div id="failure">
             <p>{@FAILURE}</p>
         </div>

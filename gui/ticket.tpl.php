@@ -3,35 +3,35 @@
 <div class="ticket">
 	<table class="ticket">
 		<tr>
-			<th>{@LANG.STATUS}</th>
+			<th>{@lng.STATUS}</th>
 			<td>{@ticket.state}</td>
-			<th>{@LANG.CREATED}</th>
+			<th>{@lng.created}</th>
 			<td>{@ticket.created}</td>
 		</tr>
 
 		<tr>
-			<th>{@LANG.PRIORITY}</th>
+			<th>{@lng.priority}</th>
 			<td>{@ticket.priority}</td>
 			<th></th>
 			<td></td>
 		</tr>
 
 		<tr>
-			<th>{@LANG.OWNER}</th>
+			<th>{@lng.owner}</th>
 			<td>{@ticket.owner}</td>
 			<th></th>
 			<td></td>
 		</tr>
 
 		<tr>
-			<th>{@LANG.CATEGORY}</th>
+			<th>{@lng.category}</th>
 			<td>{@ticket.category}</td>
 			<th></th>
 			<td></td>
 		</tr>
 
 		<tr>
-			<th>{@LANG.MILESTONE}</th>
+			<th>{@lng.milestone}</th>
 			<td>{@milestone.name}</td>
 			<th></th>
 			<td></td>
@@ -40,7 +40,7 @@
 
 	<hr noshade="noshade" />
 
-	<h2>{@LANG.DESCRIPTION}</h2>
+	<h2>{@lng.description}</h2>
 
 	<p>
 		{@ticket.description}

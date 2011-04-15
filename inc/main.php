@@ -2,7 +2,7 @@
 
 	require_once 'dao.inc.php';
 
-	class main
+	class main extends F3instance
 	{
 		function start()
 		{
@@ -248,9 +248,9 @@
 			{
 				$projects[$i] = $project->toArray();
 			}
-
+            
 			F3::set('projects', $projects);
-	
+            #echo $this->render('main.tpl.php');
 			echo Template::serve('main.tpl.php');
 		}
 

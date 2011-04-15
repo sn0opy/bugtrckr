@@ -1,8 +1,8 @@
-<h1>Tickets</h1>
+<h1>{@lang.tickets}</h1>
 
 <button type="button"
 	onclick="document.getElementById('add').style.display = 'block'" >
-	{@LANG.ADDTICKET} 
+	{@lng.addtiket}
 </button>
 
 {* Form for new Tickets *}
@@ -14,47 +14,47 @@
 
 	<form method="POST" action="/{@BASE}ticket/">
 		<div class="formRow">
-			<div class="formLabel">{@LANG.TITLE}</div>
+			<div class="formLabel">{@lng.title}</div>
 			<div class="formValue"><input type="text" name="title" /></div>
 		</div>
 
 		<div class="formRow">
-			<div class="formLabel">{@LANG.DESCRIPTION}</div>
+			<div class="formLabel">{@lng.description}</div>
 			<div class="formValue">
 				<textarea name="description"></textarea>
 			</div>
 		</div>
 
 		<div class="formRow">
-			<div class="formLabel">{@LANG.CATEGORY}</div>
+			<div class="formLabel">{@lng.category}</div>
 			<div class="formValue"><input type="text" name="category" /></div>
 		</div>
 
 		<div class="formRow">
-			<div class="formLabel">{@LANG.TYPE}</div>
+			<div class="formLabel">{@lng.type}</div>
 			<div class="formValue">
 				<select name="type" size="1">
-					<option value="1">{@LANG.BUG}</option>
-					<option value="2">{@LANG.FEATURE}</option>
+					<option value="1">{@lng.bug}</option>
+					<option value="2">{@lng.feature}</option>
 				</select>
 			</div>
 		</div>
 
 		<div class="formRow">
-			<div class="formLabel">{@LANG.PRIORITY}</div>
+			<div class="formLabel">{@lng.PRIORITY}</div>
 			<div class="formValue">
 				<select name="priority" size="1">
-					<option value="1">1 - {@LANG.VERYHIGH}</option>
-					<option value="2">2 - {@LANG.HIGHT}</option>
-					<option value="3">3 - {@LANG.NORMAL}</option>
-					<option value="4">4 - {@LANG.LOW}</option>
-					<option value="5">5 - {@LANG.VERYLOW}</option>
+					<option value="1">1 - {@lng.veryhigh}</option>
+					<option value="2">2 - {@lng.high}</option>
+					<option value="3">3 - {@lng.normal}</option>
+					<option value="4">4 - {@lng.low}</option>
+					<option value="5">5 - {@lng.verylow}</option>
 				</select>
 			</div>
 		</div>
 
 		<div class="formRow">
-			<div class="formLabel">{@LANG.MILESTONE}</div>
+			<div class="formLabel">{@lng.milestone}</div>
 			<div class="formValue">
 				<select name="milestone" size="1">
 				<F3:repeat group="{@milestones}" value="{@milestone}">
@@ -67,7 +67,7 @@
 		<div class="formRow">
 			<div class="formLabel">&nbsp;</div>
 			<div class="formValue">
-				<input type="submit" value="{@LANG.SUBMIT}" />
+				<input type="submit" value="{@lng.SUBMIT}" />
 			</div>
 		</div>
 	</form>
@@ -77,11 +77,11 @@
 <table class="overview">
 	<tr>
 		<th><a href="/{@BASE}tickets/id">#</a></th>
-		<th><a href="/{@BASE}tickets/title">{@LANG.TITLE}</a></th>
-		<th><a href="/{@BASE}tickets/state">{@LANG.STATUS}</a></th>
-		<th><a href="/{@BASE}tickets/priority">{@LANG.PRIORITY}</a></th>
-		<th><a href="/{@BASE}tickets/created">{@LANG.CREATED}</a></th>
-		<th>{@LANG.OWNER}</th>
+		<th><a href="/{@BASE}tickets/title">{@lng.title}</a></th>
+		<th><a href="/{@BASE}tickets/state">{@lng.status}</a></th>
+		<th><a href="/{@BASE}tickets/priority">{@lng.priority}</a></th>
+		<th><a href="/{@BASE}tickets/created">{@lng.created}</a></th>
+		<th>{@lng.OWNER}</th>
 	</tr>
 
 	<F3:repeat group="{@tickets}" key="{@i}" value="{@ticket}">
