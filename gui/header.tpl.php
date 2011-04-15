@@ -9,7 +9,7 @@
 
 	<body>
         <div id="head">
-
+            <h1>bugtrckr</h1>
         </div>
 
         <div id="menu">

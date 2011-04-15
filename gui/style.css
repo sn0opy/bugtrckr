@@ -16,7 +16,7 @@ body
  */
 #head
 {
-	background: #B3D9FF;
+	background: #006080;
 	height:	50px;
 }
 
@@ -135,7 +135,12 @@ input, textarea, select
  */
 h1
 {
-
+    line-height: 50px;
+    text-align: right;
+    margin-right: 60px;
+    color: #FFF;
+    font-style: italic;
+    text-shadow: 1px 1px 3px #000;
 }
 
 h2
