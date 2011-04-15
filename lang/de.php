@@ -36,6 +36,7 @@ return array('lng' => array(
     'footer_created' => 'Erstellt in',
     'error' => 'Fehler',
     'password' => 'Passwort',
-    'email' => 'E-Mail'
+    'email' => 'E-Mail',
+    'login' => 'Anmelden'
 ));
 

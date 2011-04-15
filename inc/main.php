@@ -249,6 +249,34 @@
             $user->save();
         }
 
+        function showUserLogin()
+        {
+            $this->set('template', 'userLogin.tpl.php');
+            $this->tpserve();
+        }
+
+        function loginUser()
+        {
+            $user = new user();
+            $user->load('email = "' .$this->get('POST.email'). '"'); // get salt
+            $salt = $user->getSalt();
+
+            $user->load("email = '" .$this->get('POST.email'). "' AND password = '" . $this->helper->salting($salt, $this->get('POST.password')). "'");
+
+            if(!$user->getId()) {
+                $this->set('FAILURE', 'Login failed.');
+                $this->reroute('/user/login');
+            } else {
+                $this->set('SESSION.userName', $user->getName());
+                $this->set('SESSION.userPassword', $user->getPassword());
+                $this->set('SESSION.userHash', $user->getHash());
+                $this->set('SESSION.userId', $user->getId());
+                $this->reroute('/');
+            }
+
+            $this->tpserve();
+        }
+
 		private function tpserve()
 		{
 			$projects = Dao::getProjects('1 = 1');

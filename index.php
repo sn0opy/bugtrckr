@@ -14,8 +14,6 @@ $app->set('LOCALES','lang/');
 $app->set('LANGUAGE', 'de'); // substr($_SERVER["HTTP_ACCEPT_LANGUAGE"], 0, 2);
 $app->set('DB', array('dsn'=>'sqlite:' .$dbFile));
 
-$app->set('SESSION.user', 1);
-
 require 'inc/mapping.inc.php';
 
 
@@ -27,6 +25,9 @@ $app->route('GET /tickets/@order', 'main->showTickets');
 $app->route('GET /ticket/@hash', 'main->showTicket');
 $app->route('GET /user/@hash', 'main->showUser');
 $app->route('GET /user/new', 'main->showUserRegister');
+$app->route('GET /user/login', 'main->showUserLogin');
+
+$app->route('POST /user/login', 'main->loginUser');
 $app->route('POST /user/new', 'main->registerUser');
 $app->route('POST /ticket', 'main->addTicket');
 $app->route('POST /milestone', 'main->addMilestone');

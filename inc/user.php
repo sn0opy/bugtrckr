@@ -10,9 +10,14 @@
         private $admin;
         private $name;
 
+        private $ax;
+
         public function __construct()
         {
             parent::__construct();
+
+            require_once "lib/db.php";
+            $this->ax = new Axon('User', new DB(F3::get('DB.dsn')));
         }
 
         public function setId($id)
@@ -50,36 +55,66 @@
             $this->admin = $admin;
         }
 
+        public function getId()
+        {
+            return $this->id;
+        }
+
+        public function getName()
+        {
+            return $this->name;
+        }
+
+        public function getHash()
+        {
+            return $this->hash;
+        }
+
+        public function getPassword()
+        {
+            return $this->password;
+        }
+
+        public function getSalt()
+        {
+            return $this->salt;
+        }
+
+        public function getEmail()
+        {
+            return $this->email;
+        }
+
+        public function getAdmin()
+        {
+            return $this->admin;
+        }
+
         public function save()
         {
-            $ax = new Axon('User', new DB(F3::get('DB.dsn')));
-            $ax->load('hash = "' .$this->hash. '"');
-            $ax->name = $this->name;
-            $ax->hash = $this->hash;
-            $ax->password = $this->password;
-            $ax->salt = $this->salt;
-            $ax->email = $this->email;
-            $ax->admin = $this->admin;
-            $ax->save();
+            $this->ax->load('hash = "' .$this->hash. '"');
+            $this->ax->name = $this->name;
+            $this->ax->hash = $this->hash;
+            $this->ax->password = $this->password;
+            $this->ax->salt = $this->salt;
+            $this->ax->email = $this->email;
+            $this->ax->admin = $this->admin;
+            $this->ax->save();
         }
 
-
-
-
-        public function login()
+        public function load($smtm)
         {
-            $email = 'sasch9r@gmail.com'; #F3::get('POST.email');
-            $pass = '1234'; #F3::get('POST.password');
+            $this->ax->load($smtm);
 
-            $this->db->find('email = "' .$email. '"');
-
-            if(!$ax->dry())
+            if(!$this->ax->dry())
             {
-                $salt = $ax->salt;
-                $saltedPass = $this->encryptPw($salt, $pass);
-
-                $this->db->sqlbind('SELECT id FROM User WHERE email = :email AND password = :password', array(':email' => $email, ':password' => $saltedPass));
+                $this->name = $this->ax->name;
+                $this->hash = $this->ax->hash;
+                $this->password = $this->ax->password;
+                $this->salt = $this->ax->salt;
+                $this->email = $this->ax->email;
+                $this->admin = $this->ax->admin;
+                $this->id = $this->ax->id;
             }
         }
-
 	}
