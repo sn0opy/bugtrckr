@@ -4,15 +4,13 @@
 
 	class main extends F3instance
 	{
+        private $helper;
+
         function  __construct() {
             parent::__construct();
 
-            // check if intl module is loaded, otherwise use own fallback
-            if(!extension_loaded('intl'))
-                if(!$this->exists('lng'))
-                    $this->set('lng', include $this->get('LOCALES').$this->get('LANGUAGE').'.php');
-                
-            
+            $this->helper = new helper;
+            $this->helper->intlSupport();
         }
 
 		function start()
@@ -239,15 +237,14 @@
 
         function registerUser()
         {
-            $helper = new helper();
-            $salt = $helper->randStr();
+            $salt = $this->helper->randStr();
 
             $user = new user();
             $user->setName(F3::get('POST.name'));
             $user->setEmail(F3::get('POST.email'));
-            $user->setPassword($helper->salting($salt, F3::get('POST.password')));
+            $user->setPassword($this->helper->salting($salt, F3::get('POST.password')));
             $user->setSalt($salt);
-            $user->setHash($helper->getFreeHash('User'));
+            $user->setHash($this->helper->getFreeHash('User'));
             $user->setAdmin(0);
             $user->save();
         }

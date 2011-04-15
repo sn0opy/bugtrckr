@@ -1,4 +1,4 @@
-<h1>{@lang.tickets}</h1>
+<h1>{@lng.tickets}</h1>
 
 <button type="button"
 	onclick="document.getElementById('add').style.display = 'block'" >

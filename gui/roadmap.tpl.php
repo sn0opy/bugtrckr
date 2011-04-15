@@ -35,7 +35,7 @@
 <F3:repeat group="{@road}" key="{@i}" value="{@item}">
 
 <div class="milestone">
-	<h2>{@item.milestone.name}</h2>
+	<h3>{@item.milestone.name}</h3>
 	
 	<p>{@item.milestone.description}</p>
 
