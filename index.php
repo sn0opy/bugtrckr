@@ -16,7 +16,6 @@ $app->set('DB', array('dsn'=>'sqlite:' .$dbFile));
 
 require 'inc/mapping.inc.php';
 
-
 $app->route('GET /', 'main->start');
 $app->route('GET /roadmap', 'main->showRoadmap');
 $app->route('GET /timeline', 'main->showTimeline');

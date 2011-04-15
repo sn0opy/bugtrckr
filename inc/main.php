@@ -48,7 +48,7 @@
 			}
 			
 			F3::set('road', $road);
-            F3::set('template', 'roadmap.tpl.php');
+			F3::set('template', 'roadmap.tpl.php');
 			$this->tpserve();
 		}
 
@@ -265,13 +265,13 @@
 
             if(!$user->getId()) {
                 $this->set('FAILURE', 'Login failed.');
-                $this->reroute('/user/login');
+                $this->reroute('/'. F3::get('BASE') .'user/login');
             } else {
                 $this->set('SESSION.userName', $user->getName());
                 $this->set('SESSION.userPassword', $user->getPassword());
                 $this->set('SESSION.userHash', $user->getHash());
                 $this->set('SESSION.userId', $user->getId());
-                $this->reroute('/');
+                $this->reroute('/'. F3::get('BASE'));
             }
 
             $this->tpserve();
