@@ -87,15 +87,15 @@
 		 */
 		static function addActivity($message)
 		{
-			$userId = F3::get('SESSION.user');
+			$userId = F3::get('SESSION.userId');
 			$projectId = F3::get('SESSION.project');
 
 			$user = new User();
 			$user->load("id = $userId");
-
+			
 			$activity = new Activity();
 
-			$activity->setDescription($user->getName() . " " . $message);
+			$activity->setDescription($user->getName() ." $message");
 			$activity->setProject($projectId);
 			$activity->setUser($userId);
 
