@@ -2,7 +2,7 @@
 
 <button type="button"
 	onclick="document.getElementById('add').style.display = 'block'" >
-	{@lng.addtiket}
+	{@lng.addticket}
 </button>
 
 {* Form for new Tickets *}
@@ -41,7 +41,7 @@
 		</div>
 
 		<div class="formRow">
-			<div class="formLabel">{@lng.PRIORITY}</div>
+			<div class="formLabel">{@lng.priority}</div>
 			<div class="formValue">
 				<select name="priority" size="1">
 					<option value="1">1 - {@lng.veryhigh}</option>
@@ -67,7 +67,7 @@
 		<div class="formRow">
 			<div class="formLabel">&nbsp;</div>
 			<div class="formValue">
-				<input type="submit" value="{@lng.SUBMIT}" />
+				<input type="submit" value="{@lng.submit}" />
 			</div>
 		</div>
 	</form>

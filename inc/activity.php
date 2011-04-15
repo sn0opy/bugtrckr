@@ -83,8 +83,7 @@
 		 */
 		public function load($stmt)
 		{
-			$db = F3::get('DB');
-			$db = new DB($db['dsn']);
+			$db = new DB(F3::get('DB.dsn'));
 
 			$result = $db->sql("SELECT * FROM Activity WHERE $stmt");
 

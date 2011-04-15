@@ -238,15 +238,15 @@ table.ticket th,td
 #add
 {
 	background: gray;
-	border-radius: 3px;
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
 	border-top: solid 2px #666;
 	border-left: solid 2px #666;
 	border-right: solid 4px #000;
 	border-bottom: solid 4px #000;
 	display: none;
-	opacity: 0.9;
+	opacity: 0.95;
 	position: absolute;
 	width: 400px; 
 	z-index: 5;
@@ -273,3 +273,4 @@ div.milestone
 	border-bottom: dotted 2px black;
 	margin-bottom: 5px;
 }
+
