@@ -46,11 +46,34 @@
                         <li class="alignright">Eingeloggt als <a href="/{@BASE}user/{@SESSION.userHash}"><strong>{htmlentities(@SESSION.userName)}</strong></a> [<a href="/{@BASE}user/logout">{@lng.logout}</a>]</li>
                     </F3:true>
                     <F3:false>
-                        <li class="alignright"><a href="/{@BASE}user/login">{@lng.login}</a></li>
+                        <li class="alignright"><a href="/{@BASE}user/login" onclick="document.getElementById('login').style.display = 'block'; return false">{@lng.login}</a></li>
                     </F3:false>
                 </F3:check>
 			</ul>
             <br class="clearfix" />
+
+            <div id="login">
+                <h3 class="floatleft">{@lng.login}</h3>
+                <a class="closeButton" href="#" onclick="document.getElementById('login').style.display = 'none'">
+                    X
+                </a>
+
+                <form action="/{@BASE}user/login" method="post">
+                    <div class="formRow">
+                        <div class="formLabel">{@lng.email}: </div>
+                        <div class="formValue"><input type="text" name="email" /></div>
+                    </div>
+                    <div class="formRow">
+                        <div class="formLabel">{@lng.password}: </div>
+                        <div class="formValue"><input type="password" name="password" /></div>
+                    </div>
+                    <div class="formRow">
+                        <div class="formLabel">&nbsp;</div>
+                        <div class="formValue"><input type="submit" value="{@lng.login}" /></div>
+                    </div>
+                </form>
+                <br class="clearfix" />
+            </div>
         </div>
 	
 

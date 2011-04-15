@@ -16,14 +16,16 @@ body
  */
 #head
 {
-	background: #006080;
+	background: #068;
 	height:	50px;
+    font: 10pt Georgia;
 }
 
 #menu
 {
-    background: #FFF;
-    border-bottom: 1px solid #CCC;
+    background: #068;
+    padding: 10px;
+    border-bottom: 1px solid #333;
 }
 
 #menu ul
@@ -34,18 +36,28 @@ body
 #menu li
 {
     float: left;
-    padding: 10px;
+    margin-right: 10px;
+    margin-left: 10px;
+    border-bottom: 3px solid #068;
 }
 
-#menu li a:hover
+#menu a
 {
-    text-decoration: underline;
+    text-transform: uppercase;
+    color: #FFF;
+}
+
+#menu li:hover
+{
+    border-bottom: 3px solid #FFF;
 }
 
 #menu select
 {
-    border: 1px dashed #DDD;
+    border: 0px;
     margin-top: -3px;
+    background: #068;
+    color: #FFF;
 }
 
 #content
@@ -271,7 +283,7 @@ table.ticket th,td
 	padding: 2px;
 }
 
-#add
+#add, #login
 {
 	background: #EEE;
     border: 1px solid #BBB;
