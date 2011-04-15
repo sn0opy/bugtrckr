@@ -1,4 +1,4 @@
-<h1>{@ticket.title}</h1>
+<h2>{@ticket.title}</h2>
 
 <div class="ticket">
 	<table class="ticket">

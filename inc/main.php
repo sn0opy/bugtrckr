@@ -277,6 +277,16 @@
             $this->tpserve();
         }
 
+        function logoutUser()
+        {
+            $this->set('SESSION.userName', NULL);
+            $this->set('SESSION.userPassword', NULL);
+            $this->set('SESSION.userHash', NULL);
+            $this->set('SESSION.userId', NULL);
+            session_destroy();
+            $this->reroute('/'. F3::get('BASE'));  
+        }
+
 		private function tpserve()
 		{
 			$projects = Dao::getProjects('1 = 1');

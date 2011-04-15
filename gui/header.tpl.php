@@ -41,6 +41,14 @@
 						</select>
 					</form>
 				</li>
+                <F3:check if="{@SESSION.userId}">
+                    <F3:true>
+                        <li class="alignright">Eingeloggt als <a href="/{@BASE}user/{@SESSION.userHash}"><strong>{htmlentities(@SESSION.userName)}</strong></a> [<a href="/{@BASE}user/logout">{@lng.logout}</a>]</li>
+                    </F3:true>
+                    <F3:false>
+                        <li class="alignright"><a href="/{@BASE}user/login">{@lng.login}</a></li>
+                    </F3:false>
+                </F3:check>
 			</ul>
             <br class="clearfix" />
         </div>

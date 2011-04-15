@@ -1,14 +1,14 @@
-<h1>{@lng.roadmap}</h1>
+<h2>{@lng.roadmap}</h2>
 
 <button type="button" onclick="document.getElementById('add').style.display = 'block'">
 	{@lng.addmilestone}
 </button>
 
 <div id="add">
-	<button onclick="document.getElementById('add').style.display = 'none'"
-			style="float: right">
+    <h3 class="floatleft">{@lng.addmilestone}</h3>
+	<a class="closeButton" href="#" onclick="document.getElementById('add').style.display = 'none'">
 		X
-	</button>
+	</a>
 
 	<form method="POST" action="/{@BASE}milestone">
 		<div class="formRow">

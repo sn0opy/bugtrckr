@@ -33,10 +33,12 @@ return array('lng' => array(
     'home' => 'Startseite',
     'tickets' => 'Tickets',
     'roadmap' => 'Plan',
-    'footer_created' => 'Erstellt in',
+    'footer' => '©2011 Sn0opy &amp; Hanspolo',
     'error' => 'Fehler',
     'password' => 'Passwort',
     'email' => 'E-Mail',
-    'login' => 'Anmelden'
+    'login' => 'Anmelden',
+    'alreadyLoggedIn' => 'Du bist bereits eingeloggt.',
+    'logout' => 'Ausloggen'
 ));
 

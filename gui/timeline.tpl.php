@@ -1,4 +1,4 @@
-<h1>{@lng.timeline}</h1>
+<h2>{@lng.timeline}</h2>
 
 <table class="overview">
 	<tr>

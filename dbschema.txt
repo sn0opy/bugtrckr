@@ -6,7 +6,7 @@ INSERT INTO Ticket (id, hash, title, description, created, owner, type, state, r
 #
 # User
 #
-CREATE TABLE User (id integer PRIMARY KEY AUTOINCREMENT, hash varchar(12) UNIQUE, password varchar, salt varchar, email varchar, admin bool);
+CREATE TABLE User (id integer PRIMARY KEY AUTOINCREMENT, name varchar(45), hash varchar(12) UNIQUE, password varchar, salt varchar, email varchar, admin bool);
 INSERT INTO User (id, hash, password, salt, email, admin) 
 VALUES (1, 'b026324c6904b2a9cb4b88d6d61c81d1', 1, 1, 'admin@bugtrckr', 1)
 VALUES (2, '26ab0db90d72e28ad0ba1e22ee510510', 2, 2, 'johndoe@bugtrckr', 0);

@@ -1,16 +1,16 @@
-<h1>{@lng.tickets}</h1>
+<h2>{@lng.tickets}</h2>
 
 <button type="button"
 	onclick="document.getElementById('add').style.display = 'block'" >
-	{@lng.addtiket}
+	{@lng.addticket}
 </button>
 
 {* Form for new Tickets *}
 <div id="add">
-	<button onclick="document.getElementById('add').style.display = 'none'"
-			style="float: right">
+    <h3 class="floatleft">{@lng.addticket}</h3>
+    <a class="closeButton" href="#" onclick="document.getElementById('add').style.display = 'none'">
 		X
-	</button>
+	</a>
 
 	<form method="POST" action="/{@BASE}ticket/">
 		<div class="formRow">
@@ -41,7 +41,7 @@
 		</div>
 
 		<div class="formRow">
-			<div class="formLabel">{@lng.PRIORITY}</div>
+			<div class="formLabel">{@lng.priority}</div>
 			<div class="formValue">
 				<select name="priority" size="1">
 					<option value="1">1 - {@lng.veryhigh}</option>
@@ -67,7 +67,7 @@
 		<div class="formRow">
 			<div class="formLabel">&nbsp;</div>
 			<div class="formValue">
-				<input type="submit" value="{@lng.SUBMIT}" />
+				<input type="submit" value="{@lng.submit}" />
 			</div>
 		</div>
 	</form>
@@ -81,7 +81,7 @@
 		<th><a href="/{@BASE}tickets/state">{@lng.status}</a></th>
 		<th><a href="/{@BASE}tickets/priority">{@lng.priority}</a></th>
 		<th><a href="/{@BASE}tickets/created">{@lng.created}</a></th>
-		<th>{@lng.OWNER}</th>
+		<th>{@lng.owner}</th>
 	</tr>
 
 	<F3:repeat group="{@tickets}" key="{@i}" value="{@ticket}">

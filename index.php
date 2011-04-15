@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 $app=require(__DIR__.'/lib/base.php');
 
 require 'inc/config.inc.php';
@@ -25,6 +27,7 @@ $app->route('GET /ticket/@hash', 'main->showTicket');
 $app->route('GET /user/@hash', 'main->showUser');
 $app->route('GET /user/new', 'main->showUserRegister');
 $app->route('GET /user/login', 'main->showUserLogin');
+$app->route('GET /user/logout', 'main->logoutUser');
 
 $app->route('POST /user/login', 'main->loginUser');
 $app->route('POST /user/new', 'main->registerUser');

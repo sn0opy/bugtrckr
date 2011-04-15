@@ -16,13 +16,14 @@ body
  */
 #head
 {
-	background: #005FFF;
+	background: #B3D9FF;
 	height:	50px;
 }
 
 #menu
 {
-    background: #DDD;
+    background: #FFF;
+    border-bottom: 1px solid #CCC;
 }
 
 #menu ul
@@ -33,17 +34,18 @@ body
 #menu li
 {
     float: left;
-    padding: 15px;
-}
-
-#menu li:hover
-{
-    background-color: #CCC;
+    padding: 10px;
 }
 
 #menu li a:hover
 {
     text-decoration: underline;
+}
+
+#menu select
+{
+    border: 1px dashed #DDD;
+    margin-top: -3px;
 }
 
 #content
@@ -58,12 +60,12 @@ body
     padding: 10px;
 }
 
-#foot
+#footer
 {
     clear: both;
     text-align: center;
     border-top: 1px solid #CCC;
-    padding-top: 5px;
+    padding-top: 10px;
 }
 
 #failure
@@ -77,6 +79,34 @@ body
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
     width: 500px;
+}
+
+.alignright
+{
+    position: absolute;
+    right: 0px;
+}
+
+.floatright
+{
+    float: right;
+}
+
+.floatleft
+{
+    float: left;
+}
+
+input, textarea, select
+{
+    color: #555;
+    background: #FFF;
+    border: 1px solid #CCC;
+    font: 10pt Helvetica;
+    padding: 3px;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
 }
 
 /*
@@ -111,6 +141,7 @@ h1
 h2
 {
 	font-size: 16pt;
+    margin-bottom: 20px;
 }
 
 /* 
@@ -237,20 +268,54 @@ table.ticket th,td
 
 #add
 {
-	background: gray;
-	border-radius: 3px;
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
-	border-top: solid 2px #666;
-	border-left: solid 2px #666;
-	border-right: solid 4px #000;
-	border-bottom: solid 4px #000;
+	background: #EEE;
+    border: 1px solid #BBB;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	box-shadow: 3px 3px 3px #333;
 	display: none;
-	opacity: 0.9;
 	position: absolute;
 	width: 400px; 
 	z-index: 5;
+    left: 50%;
+    margin-left: -210px;
+    padding: 20px;
 }
+
+#add input, #add textarea
+{
+    width: 400px;
+}
+
+#add textarea
+{
+    height: 120px;
+}
+
+.closeButton
+{
+    float: right;
+    border-radius: 5px;
+    display: block;
+    text-align: center;
+    width: 20px;
+    height: 20px;
+    line-height: 25px;
+    border: 1px solid #AAA;
+
+}
+
+.closeButton:hover
+{
+    box-shadow: inset 1px 1px 2px #333;
+}
+
+#add .formRow
+{
+    margin-bottom: 10px;
+}
+
 
 .clearfix
 {
