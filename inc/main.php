@@ -4,6 +4,17 @@
 
 	class main extends F3instance
 	{
+        function  __construct() {
+            parent::__construct();
+
+            // check if intl module is loaded, otherwise use own fallback
+            if(!extension_loaded('intl'))
+                if(!$this->exists('lng'))
+                    $this->set('lng', include $this->get('LOCALES').$this->get('LANGUAGE').'.php');
+                
+            
+        }
+
 		function start()
 		{
             
