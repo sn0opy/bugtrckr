@@ -137,7 +137,7 @@
 			require_once 'ticket.php';
 
 			$post = F3::get('POST');
-			$owner = F3::get('SESSION.user');
+			$owner = F3::get('SESSION.userId');
 
 			$ticket = new Ticket();
 			$ticket->setTitle($post['title']);
