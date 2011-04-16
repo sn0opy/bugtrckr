@@ -23,6 +23,7 @@
 				<li>
 					<form method="POST" action="/{@BASE}project/select">
 						<select name="project" size="1" onchange="submit()">
+							<option value="0"></option>
 							<F3:repeat group="{@projects}" value="{@project}">
 								<F3:check if="{@project.id == @SESSION.project}">
 									<F3:true>
