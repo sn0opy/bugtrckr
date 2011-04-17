@@ -221,10 +221,15 @@
             $result = $db->sql('SELECT * FROM User WHERE hash = :hash', array(':hash' => $hash));
             
             if(!$result) 
-                F3::set('FAILURE', 'Failure, user not found.');
+                F3::set('FAILURE', 'User not found.');
             else
                 F3::set('user', $result[0]);
 
+
+            $userTickets = Dao::getTickets('owner = ' .F3::get('user.id'));
+            F3::set('tickets', helper::objectToArray($userTickets));
+
+            print_r(F3::get('tickets'));
             F3::set('template', 'user.tpl.php');
             $this->tpserve();
         }

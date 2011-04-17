@@ -18,7 +18,11 @@
                 <li><a href="/{@BASE}tickets">{@lng.tickets}</a></li>
                 <li><a href="/{@BASE}roadmap">{@lng.roadmap}</a></li>
 				<li><a href="/{@BASE}timeline">{@lng.timeline}</a></li>
-				<li><a href="/{@BASE}user/new">{@lng.registration}</a></li>
+                <F3:check if="{@SESSION.userId}">
+                    <F3:false>
+                        <li><a href="/{@BASE}user/new">{@lng.registration}</a></li>
+                    </F3:false>
+                </F3:check>
 
 				<li>
 					<form method="POST" action="/{@BASE}project/select">
@@ -43,7 +47,7 @@
 				</li>
                 <F3:check if="{@SESSION.userId}">
                     <F3:true>
-                        <li class="alignright">Eingeloggt als <a href="/{@BASE}user/{@SESSION.userHash}"><strong>{htmlentities(@SESSION.userName)}</strong></a> [<a href="/{@BASE}user/logout">{@lng.logout}</a>]</li>
+                        <li class="alignright">Eingeloggt als <a href="/{@BASE}user/{@SESSION.userHash}"><strong class="normalText">{htmlentities(@SESSION.userName)}</strong></a> [<a href="/{@BASE}user/logout" class="normalText">{@lng.logout}</a>]</li>
                     </F3:true>
                     <F3:false>
                         <li class="alignright"><a href="/{@BASE}user/login" onclick="document.getElementById('login').style.display = 'block'; return false">{@lng.login}</a></li>
