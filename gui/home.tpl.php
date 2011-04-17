@@ -1,4 +1,4 @@
-<h1>Bugtrckr</h1>
+<h2>Bugtrckr</h2>
 
 <p>
 Bugtrckr is a minimal but feature rich Bugtracking System.

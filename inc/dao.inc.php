@@ -92,7 +92,7 @@
 
 			$user = new User();
 			$user->load("id = $userId");
-			
+
 			$activity = new Activity();
 
 			$activity->setDescription($user->getName() ." $message");
