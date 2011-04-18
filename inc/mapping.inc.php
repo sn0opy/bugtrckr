@@ -11,7 +11,7 @@ F3::set('ticket_type', array(
 ));
 
 F3::set('ticket_priority', array(
-	'1' => F3::get('lng.VERYHIGH'),
+	'1' => F3::get('lng.veryhigh'),
 	'2' => F3::get('lng.high'),
 	'3' => F3::get('lng.normal'),
 	'4' => F3::get('lng.low'),

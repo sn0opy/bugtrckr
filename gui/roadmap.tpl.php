@@ -37,7 +37,7 @@
 <div class="milestone">
 	<h3>{htmlentities(@item.milestone.name)}</h3>
 	
-	<p>{htmlentities(nl2br(@item.milestone.description))}</p>
+	<p>{nl2br(htmlentities(@item.milestone.description))}</p>
 
 	<p class="info">{@item.ticketcount} {@lng.ticketsleft}</p>
 

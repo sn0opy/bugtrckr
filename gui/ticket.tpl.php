@@ -40,10 +40,10 @@
 
 	<hr noshade="noshade" />
 
-	<h2>{@lng.description}</h2>
+	<h3>{@lng.description}</h3>
 
 	<p>
-		{@ticket.description}
+		{nl2br(htmlentities(@ticket.description))}
 	</p>
 </div>
 
