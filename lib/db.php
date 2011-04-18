@@ -71,8 +71,8 @@ class DB extends Base {
 					$query->execute();
 				}
 				// Check SQLSTATE
-				if ($query->errorCode()!=PDO::ERR_NONE) {
-					$error=$query->errorinfo();
+				if ($this->pdo->errorCode()!=PDO::ERR_NONE) {
+					$error=$this->pdo->errorinfo();
 					trigger_error($error[2]);
 					return FALSE;
 				}

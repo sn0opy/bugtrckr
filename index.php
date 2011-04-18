@@ -26,7 +26,7 @@ $app->route('GET /timeline', 'main->showTimeline');
 $app->route('GET /tickets', 'main->showTickets');
 $app->route('GET /tickets/@order', 'main->showTickets');
 $app->route('GET /ticket/@hash', 'main->showTicket');
-$app->route('GET /user/@hash', 'main->showUser');
+$app->route('GET /user/@name', 'main->showUser');
 $app->route('GET /user/new', 'main->showUserRegister');
 $app->route('GET /user/login', 'main->showUserLogin');
 $app->route('GET /user/logout', 'main->logoutUser');

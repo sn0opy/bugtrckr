@@ -11,13 +11,16 @@
         <div id="head">
             <h1>bugtrckr</h1>
         </div>
-
         <div id="menu">
             <ul>
                 <li><a href="/{@BASE}">{@lng.home}</a></li>
-                <li><a href="/{@BASE}tickets">{@lng.tickets}</a></li>
-                <li><a href="/{@BASE}roadmap">{@lng.roadmap}</a></li>
-				<li><a href="/{@BASE}timeline">{@lng.timeline}</a></li>
+                <F3:check if="{@SESSION.project}">
+                    <F3:true>
+                        <li><a href="/{@BASE}tickets">{@lng.tickets}</a></li>
+                        <li><a href="/{@BASE}roadmap">{@lng.roadmap}</a></li>
+                        <li><a href="/{@BASE}timeline">{@lng.timeline}</a></li>
+                    </F3:true>
+                </F3:check>
                 <F3:check if="{@SESSION.userId}">
                     <F3:false>
                         <li><a href="/{@BASE}user/new">{@lng.registration}</a></li>
@@ -26,19 +29,18 @@
 
 				<li>
 					<form method="POST" action="/{@BASE}project/select">
-						<select name="project" size="1" onchange="submit()">
-							<option value="0"></option>
+						<select name="project" size="1" onclick="submit()">
 							<F3:repeat group="{@projects}" value="{@project}">
 								<F3:check if="{@project.id == @SESSION.project}">
 									<F3:true>
 										<option value="{@project.hash}"
 												selected="selected">
-											{@project.name}
+											{htmlentities(@project.name)}
 										</option>
 									</F3:true>
 									<F3:false>
 										<option value="{@project.hash}">
-											{@project.name}
+											{htmlentities(@project.name)}
 										</option>
 									</F3:false>
 								</F3:check>
@@ -48,7 +50,7 @@
 				</li>
                 <F3:check if="{@SESSION.userId}">
                     <F3:true>
-                        <li class="alignright">Eingeloggt als <a href="/{@BASE}user/{@SESSION.userHash}"><strong class="normalText">{htmlentities(@SESSION.userName)}</strong></a> [<a href="/{@BASE}user/logout" class="normalText">{@lng.logout}</a>]</li>
+                        <li class="alignright">Eingeloggt als <a href="/{@BASE}user/{htmlentities(@SESSION.userName)}"><strong class="normalText">{htmlentities(@SESSION.userName)}</strong></a> [<a href="/{@BASE}user/logout" class="normalText">{@lng.logout}</a>]</li>
                     </F3:true>
                     <F3:false>
                         <li class="alignright"><a href="/{@BASE}user/login" onclick="document.getElementById('login').style.display = 'block'; return false">{@lng.login}</a></li>
@@ -71,6 +73,10 @@
                     <div class="formRow">
                         <div class="formLabel">{@lng.password}: </div>
                         <div class="formValue"><input type="password" name="password" /></div>
+                    </div>
+                    <div class="formRow">
+                        <div class="formLabel">&nbsp;</div>
+                        <div class="formValue"><a href="/{@BASE}user/new">{@lng.noaccount}</a></div>
                     </div>
                     <div class="formRow">
                         <div class="formLabel">&nbsp;</div>

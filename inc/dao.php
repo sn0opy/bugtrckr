@@ -93,4 +93,10 @@
 			$activity->save();
 		}
 
+        static function getUserName($uid)
+        {
+            $ax = new Axon('User');
+            $ax->load('id = ' .$uid);
+            return $ax->name;
+        }
 	}

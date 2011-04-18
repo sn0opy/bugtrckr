@@ -41,6 +41,7 @@ return array('lng' => array(
     'alreadyLoggedIn' => 'Du bist bereits eingeloggt.',
     'logout' => 'Ausloggen',
     'informations' => 'Informationen',
-    'user' => 'Benutzer'
+    'user' => 'Benutzer',
+    'noaccount' => 'Noch keinen Account?'
 ));
 

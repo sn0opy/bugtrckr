@@ -132,16 +132,19 @@
 			}
 			else
 			{
-				$id = F3::get('DB')->sql("SELECT max(id)+1 as next FROM Ticket");
+
+                $helper = new helper();
+                $hash = $helper->getFreeHash('Ticket');
+                
 				$stat = F3::get('DB')->sql("INSERT INTO Ticket " .
 						"(hash, title, description, owner, type, state, " .
 						"priority, category, milestone, created) VALUES " .
-						"('". md5($id[0]['next'])."', '$this->title', '$this->description',".
+						"('".$hash."', '$this->title', '$this->description',".
 						" $this->owner, $this->type, $this->state," .
 						" $this->priority, '$this->category', $this->milestone, ".
 						time() .")");
 
-				return is_array($stat) ? md5($id[0]['next']) : 0;
+				return is_array($stat) ? $hash : 0;
 			}
 		}
 
@@ -184,7 +187,7 @@
 			$ticket['title'] = $this->title;
 			$ticket['description'] = $this->description;
 			$ticket['created'] = date('d.m.Y H:i', $this->created);
-			$ticket['owner'] = $this->owner;
+			$ticket['owner'] = Dao::getUserName($this->owner);
 			$ticket['type'] = $ticket_type[$this->type];
 			$ticket['state'] = $ticket_state[$this->state];
 			$ticket['priority'] = $ticket_priority[$this->priority];

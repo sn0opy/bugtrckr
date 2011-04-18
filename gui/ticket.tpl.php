@@ -18,7 +18,7 @@
 
 		<tr>
 			<th>{@lng.owner}</th>
-			<td>{@ticket.owner}</td>
+			<td><a href="/{@BASE}user/{@ticket.owner}">{@ticket.owner}</a></td>
 			<th></th>
 			<td></td>
 		</tr>

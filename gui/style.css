@@ -167,6 +167,12 @@ h2
     margin-bottom: 20px;
 }
 
+h3
+{
+    margin-top: 30px;
+    margin-bottom: 2px;
+}
+
 /* 
  *	
  */
@@ -184,6 +190,11 @@ table
 /* 
  *	
  */
+.userTickets
+{
+    width: 70% !important;
+}
+
 table.overview
 {
 	color: #222;
@@ -305,6 +316,12 @@ table.ticket th,td
     margin-left: -210px;
     padding: 20px;
     color: #333;
+}
+
+#add a, #login a
+{
+    color: #333 !important;
+    text-transform: none;
 }
 
 #add input, #add textarea

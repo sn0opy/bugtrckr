@@ -214,8 +214,8 @@
 		 */
         function showUser()
         {
-            $hash = F3::get('PARAMS.hash');
-            $result = F3::get('DB')->sql('SELECT * FROM User WHERE hash = :hash', array(':hash' => $hash));
+            $name = F3::get('PARAMS.name');
+            $result = F3::get('DB')->sql('SELECT * FROM User WHERE name = :name', array(':name' => $name));
             
             if(!$result) 
                 F3::set('FAILURE', 'User not found.');
@@ -224,7 +224,11 @@
 
 
             $userTickets = Dao::getTickets('owner = ' .F3::get('user.id'));
-            F3::set('tickets', helper::objectToArray($userTickets));
+            
+            foreach($userTickets as $i => $userTicket)
+				$userTickets[$i] = $userTicket->toArray();
+            
+            F3::set('tickets', $userTickets);
             F3::set('template', 'user.tpl.php');
             $this->tpserve();
         }

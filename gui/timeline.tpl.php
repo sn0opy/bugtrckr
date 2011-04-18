@@ -6,9 +6,9 @@
 	</tr>
 <F3:repeat group="{@activities}" key={@i} value="{@activity}">
 	<tr class="tr{@i%2}">
-		<td>{@activity.description}</td>
-		<td>{@activity.changed}</td>
-		<td>{@activity.user}</td>
+		<td>{htmlentities(@activity.description)}</td>
+		<td>{htmlentities(@activity.changed)}</td>
+		<td><a href="/{@BASE}user/{htmlentities(@activity.user)}">{htmlentities(@activity.user)}</a></td>
 	</tr>
 </F3:repeat>
 </table>

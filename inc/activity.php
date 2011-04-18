@@ -103,10 +103,11 @@
 			$activity['id'] = $this->id;
 			$activity['hash'] = $this->hash;
 			$activity['description'] = $this->description;
-			$activity['user'] = $this->user;
+			$activity['user'] = Dao::getUserName($this->user);
 			$activity['changed'] = date('d.m.Y H:i', $this->changed);
 			$activity['project'] = $this->project;
 
 			return $activity;
 		}
 	}
+    
