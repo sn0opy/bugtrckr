@@ -11,24 +11,24 @@ class Base {
 
 	//@{ Locale-specific error/exception messages
 	const
-		TEXT_Illegal='{@CONTEXT} is not a valid framework variable name',
-		TEXT_Config='The configuration file {@CONTEXT} was not found',
-		TEXT_Section='{@CONTEXT} is not a valid section',
+		TEXT_Illegal='%s is not a valid framework variable name',
+		TEXT_Config='The configuration file %s was not found',
+		TEXT_Section='%s is not a valid section',
 		TEXT_MSet='Invalid multi-variable assignment',
-		TEXT_NotArray='{@CONTEXT} is not an array',
-		TEXT_PHPExt='PHP extension {@CONTEXT} is not enabled',
+		TEXT_NotArray='%s is not an array',
+		TEXT_PHPExt='PHP extension %s is not enabled',
 		TEXT_Apache='Apache mod_rewrite module is not enabled',
-		TEXT_Object='{@CONTEXT} cannot be used in object context',
-		TEXT_Class='Undefined class {@CONTEXT}',
-		TEXT_Method='Undefined method {@CONTEXT}',
-		TEXT_Conflict='{@CONTEXT} conflicts with framework method name',
-		TEXT_NotFound='The requested URL {@CONTEXT} was not found',
-		TEXT_Handler='The route handler {@CONTEXT} is invalid',
+		TEXT_Object='%s cannot be used in object context',
+		TEXT_Class='Undefined class %s',
+		TEXT_Method='Undefined method %s',
+		TEXT_Conflict='%s conflicts with framework method name',
+		TEXT_NotFound='The requested URL %s was not found',
+		TEXT_Handler='The route handler %s is invalid',
 		TEXT_NoRoutes='No routes specified',
-		TEXT_HTTP='HTTP status code {@CONTEXT} is invalid',
-		TEXT_Render='Unable to render {@CONTEXT} - file does not exist',
-		TEXT_Form='The input handler for {@CONTEXT} is invalid',
-		TEXT_Static='{@CONTEXT} must be a static method';
+		TEXT_HTTP='HTTP status code %s is invalid',
+		TEXT_Render='Unable to render %s - file does not exist',
+		TEXT_Form='The input handler for %s is invalid',
+		TEXT_Static='%s must be a static method';
 	//@}
 
 	//@{ HTTP status codes (RFC 2616)
@@ -135,10 +135,14 @@ class Base {
 			@public
 	**/
 	static function stringify($val) {
-		return preg_replace('/\s+=>\s+/','=>',var_export(
+		return preg_replace('/\h+=>\h+/','=>',
 			is_object($val) && !method_exists($val,'__set_state')?
 				(method_exists($val,'__toString')?
-					(string)$val:get_class($val)):$val,TRUE));
+					var_export((string)$val,TRUE):
+					('object('.get_class($val).')'.
+						(($vars=get_object_vars($val))?
+							('{'.self::csv($vars).'}'):''))):
+				var_export($val,TRUE));
 	}
 
 	/**
@@ -239,11 +243,10 @@ class Base {
 			@public
 	**/
 	static function valid($key) {
-		if (preg_match('/^\w+(?:\[[^\]]+\]|\.\w+)*$/',$key))
+		if (preg_match('/^(\w+(?:\[[^\]]+\]|\.\w+|->\w+)*)$/',$key))
 			return TRUE;
 		// Invalid variable name
-		self::$vars['CONTEXT']=var_export($key,TRUE);
-		trigger_error(self::TEXT_Illegal);
+		trigger_error(sprintf(self::TEXT_Illegal,var_export($key,TRUE)));
 		return FALSE;
 	}
 
@@ -256,19 +259,30 @@ class Base {
 	**/
 	static function &ref($key,$set=TRUE) {
 		// Traverse array
-		$matches=preg_split('/\[\h*[\'"]?|[\'"]?\h*\]|\./',
-			$key,NULL,PREG_SPLIT_NO_EMPTY);
+		$matches=preg_split('/\[\h*[\'"]?|[\'"]?\h*\]|\.|(->)/',
+			$key,NULL,PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
 		if ($set)
 			$var=&self::$vars;
 		else
 			$var=self::$vars;
 		// Grab the specified array element
+		$obj=FALSE;
 		foreach ($matches as $match) {
+			if ($match=='->') {
+				$obj=TRUE;
+				continue;
+			}
 			if ($set) {
-				if (!is_array($var))
-					// Create element
-					$var=array();
-				$var=&$var[$match];
+				if ($obj && is_object($var)) {
+					$var=&$var->$match;
+					$obj=FALSE;
+				}
+				else
+					$var=&$var[$match];
+			}
+			elseif ($obj && is_object($var) && property_exists($var,$match)) {
+				$var=$var->$match;
+				$obj=FALSE;
 			}
 			elseif (is_array($var) && isset($var[$match]))
 				$var=$var[$match];
@@ -335,15 +349,26 @@ class Base {
 	}
 
 	/**
+		Return HTML-friendly dump of PHP expression
+			@return string
+			@param $expr mixed
+			@public
+	**/
+	static function dump($expr) {
+		ob_start();
+		var_dump($expr);
+		echo '<pre><code>'.ob_get_clean().'</code></pre>'."\n";
+	}
+
+	/**
 		Intercept calls to undefined methods
 			@param $func string
 			@param $args array
 			@public
 	**/
 	function __call($func,array $args) {
-		self::$vars['CONTEXT']=get_called_class().'->'.
-			$func.'('.self::csv($args).')';
-		trigger_error(self::TEXT_Method);
+		trigger_error(sprintf(self::TEXT_Method,get_called_class().'->'.
+			$func.'('.self::csv($args).')'));
 	}
 
 	/**
@@ -353,9 +378,8 @@ class Base {
 			@public
 	**/
 	static function __callStatic($func,array $args) {
-		self::$vars['CONTEXT']=get_called_class().'::'.
-			$func.'('.self::csv($args).')';
-		trigger_error(self::TEXT_Method);
+		trigger_error(sprintf(self::TEXT_Method,get_called_class().'::'.
+			$func.'('.self::csv($args).')'));
 	}
 
 	/**
@@ -364,8 +388,7 @@ class Base {
 	**/
 	function __construct() {
 		// Prohibit use of class as an object
-		self::$vars['CONTEXT']=get_called_class();
-		trigger_error(self::TEXT_Object);
+		trigger_error(sprintf(self::TEXT_Object,get_called_class()));
 	}
 
 }
@@ -575,8 +598,7 @@ class F3 extends Base {
 		else {
 			if (!is_file($file)) {
 				// Configuration file not found
-				self::$vars['CONTEXT']=$file;
-				trigger_error(self::TEXT_Config);
+				trigger_error(sprintf(self::TEXT_Config,$file));
 				return;
 			}
 			// Map sections to framework methods
@@ -592,8 +614,7 @@ class F3 extends Base {
 					// Section header
 					if (!isset($map[$match[1]])) {
 						// Unknown section
-						self::$vars['CONTEXT']=$section;
-						trigger_error(self::TEXT_Section);
+						trigger_error(sprintf(self::TEXT_Section,$section));
 						return;
 					}
 					$ptr=&$cfg[$match[1]];
@@ -656,8 +677,7 @@ class F3 extends Base {
 	static function pick($key,$col) {
 		$rows=self::ref($key);
 		if (!is_array($rows)) {
-			self::$vars['CONTEXT']=$key;
-			trigger_error(self::TEXT_NotArray);
+			trigger_error(sprintf(self::TEXT_NotArray,$key));
 			return FALSE;
 		}
 		return array_map(
@@ -681,8 +701,7 @@ class F3 extends Base {
 	static function sort($key,$col,$order=self::SORT_Asc,$flag=TRUE) {
 		$val=&self::ref($key,TRUE);
 		if (!is_array($val)) {
-			self::$vars['CONTEXT']=$key;
-			trigger_error(self::TEXT_NotArray);
+			trigger_error(sprintf(self::TEXT_NotArray,$key));
 			return FALSE;
 		}
 		usort(
@@ -707,8 +726,7 @@ class F3 extends Base {
 	static function transpose($key) {
 		$rows=&self::ref($key,TRUE);
 		if (!is_array($rows)) {
-			self::$vars['CONTEXT']=$key;
-			trigger_error(self::TEXT_NotArray);
+			trigger_error(sprintf(self::TEXT_NotArray,$key));
 			return FALSE;
 		}
 		foreach ($rows as $keyx=>$cols)
@@ -726,8 +744,7 @@ class F3 extends Base {
 	static function status($code) {
 		if (!defined('self::HTTP_'.$code)) {
 			// Invalid status code
-			self::$vars['CONTEXT']=$code;
-			trigger_error(self::TEXT_HTTP);
+			trigger_error(sprintf(self::TEXT_HTTP,$code));
 			return FALSE;
 		}
 		// Get description
@@ -840,7 +857,7 @@ class F3 extends Base {
 			@param $funcs string
 			@public
 	**/
-	static function dispatch($funcs) {
+	static function call($funcs) {
 		$classes=array();
 		$funcs=is_string($funcs)?explode('|',$funcs):array($funcs);
 		foreach ($funcs as $func) {
@@ -866,10 +883,10 @@ class F3 extends Base {
 				}
 			}
 			if (!is_callable($func)) {
-				self::$vars['CONTEXT']=is_array($func) && count($func)>1?
-					(get_class($func[0]).(is_object($func[0])?'->':'::').
-						$func[1]):$func;
-				trigger_error(self::TEXT_Handler);
+				trigger_error(sprintf(self::TEXT_Handler,
+					is_array($func) && count($func)>1?
+						(get_class($func[0]).(is_object($func[0])?'->':'::').
+							$func[1]):$func));
 				return;
 			}
 			$oop=is_array($func) &&
@@ -993,7 +1010,7 @@ class F3 extends Base {
 					else {
 						// Cache this page
 						ob_start();
-						self::dispatch($funcs);
+						self::call($funcs);
 						self::$vars['RESPONSE']=ob_get_clean();
 						if (!self::$vars['ERROR'] &&
 							self::$vars['RESPONSE']) {
@@ -1018,11 +1035,11 @@ class F3 extends Base {
 					if ($_SERVER['REQUEST_METHOD']=='PUT') {
 						// Associate PUT with file handle of stdin stream
 						self::$vars['PUT']=fopen('php://input','rb');
-						self::dispatch($funcs);
+						self::call($funcs);
 						fclose(self::$vars['PUT']);
 					}
 					else
-						self::dispatch($funcs);
+						self::call($funcs);
 					self::$vars['RESPONSE']=ob_get_clean();
 				}
 				$elapsed=time()-$time;
@@ -1091,8 +1108,7 @@ class F3 extends Base {
 						$func=array(new $match[1],$match[2]);
 					if (!is_callable($func)) {
 						// Invalid handler
-						self::$vars['CONTEXT']=$field;
-						trigger_error(self::TEXT_Form);
+						trigger_error(sprintf(self::TEXT_Form,$field));
 						return;
 					}
 					call_user_func($func,self::$vars[$found][$field]);
@@ -1100,8 +1116,7 @@ class F3 extends Base {
 				return;
 			}
 			// Invalid handler
-			self::$vars['CONTEXT']=$field;
-			trigger_error(self::TEXT_Form);
+			trigger_error(sprintf(self::TEXT_Form,$field));
 			return;
 		}
 	}
@@ -1133,8 +1148,7 @@ class F3 extends Base {
 			return self::$vars['TIDY'] && extension_loaded('tidy')?
 				self::tidy($out):$out;
 		}
-		self::$vars['CONTEXT']=$view;
-		trigger_error(self::TEXT_Render);
+		trigger_error(sprintf(self::TEXT_Render,$view));
 	}
 
 	/**
@@ -1209,28 +1223,24 @@ class F3 extends Base {
 		// Generate internal server error if code is zero
 		if (!$code)
 			$code=500;
-		elseif ($code==404) {
-			self::$vars['CONTEXT']=$_SERVER['REQUEST_URI'];
-			$str=self::subst(self::TEXT_NotFound);
-		}
+		elseif ($code==404)
+			$str=self::subst(
+				sprintf(self::TEXT_NotFound,$_SERVER['REQUEST_URI']));
 		$out='';
-		$line=0;
 		if (is_null($trace))
 			$trace=debug_backtrace();
 		$class=NULL;
+		$line=0;
 		if (is_array($trace)) {
 			// Stringify the stack trace
 			ob_start();
 			foreach ($trace as $nexus) {
 				// Remove stack trace noise
-				if (!isset($nexus['line']) ||
-					(self::$vars['DEBUG']<2 && ($nexus['file']==__FILE__ ||
-						isset($nexus['class']) &&
-						preg_match('/^Base|Cache|'.__CLASS__.'.*/',
-							$nexus['class']) ||
-						isset($nexus['function']) &&
-						preg_match('/^(call_user_func|include|require|'.
-							'trigger_error|{.+})/',$nexus['function']))))
+				if (self::$vars['DEBUG']<2 && $nexus['file']==__FILE__ ||
+					isset($nexus['function']) &&
+					preg_match('/^(call_user_func(?:_array)?|'.
+						'trigger_error|{.+}|'.__FUNCTION__.'|__)/',
+							$nexus['function']))
 					continue;
 				if ($code!=404)
 					echo '#'.$line.' '.
@@ -1238,12 +1248,12 @@ class F3 extends Base {
 							(self::fixslashes($nexus['file']).':'.
 								$nexus['line'].' '):'').
 						(isset($nexus['function'])?
-							((isset($nexus['class'])?$nexus['class']:'').
-								(isset($nexus['type'])?$nexus['type']:'').
+							((isset($nexus['class'])?
+								($nexus['class'].$nexus['type']):'').
 									$nexus['function'].
-							(!preg_match('/{.+}/',$nexus['function']) &&
+							'('.(!preg_match('/{.+}/',$nexus['function']) &&
 								isset($nexus['args'])?
-								('('.self::csv($nexus['args']).')'):'')):'').
+								(self::csv($nexus['args'])):'').')'):'').
 							"\n";
 				$line++;
 			}
@@ -1259,7 +1269,6 @@ class F3 extends Base {
 			'text'=>preg_replace('/\v/','',self::subst($str)),
 			'trace'=>self::$vars['DEBUG']?$out:''
 		);
-		unset(self::$vars['CONTEXT']);
 		if (self::$vars['DEBUG']<2 && self::$vars['QUIET'])
 			return;
 		// Write to server's error log (with complete stack trace)
@@ -1277,7 +1286,7 @@ class F3 extends Base {
 		self::$vars['ERROR']['trace']=nl2br(self::$vars['ERROR']['trace']);
 		$func=self::$vars['ONERROR'];
 		if ($func)
-			self::dispatch($func);
+			self::call($func);
 		else
 			echo self::subst(
 				'<html>'.
@@ -1346,21 +1355,18 @@ class F3 extends Base {
 							$method=new ReflectionMethod($class,'onload');
 							if ($method->isStatic())
 								call_user_func(array($class,'onload'));
-							else {
-								self::$vars['CONTEXT']=$class.'::onload';
-								trigger_error(self::TEXT_Static);
-							}
+							else
+								trigger_error(sprintf(self::TEXT_Static,
+									$class.'::onload'));
 						}
 					}
 					return;
 				}
 			}
 		}
-		if (count(spl_autoload_functions())==1) {
+		if (count(spl_autoload_functions())==1)
 			// No other registered autoload functions exist
-			self::$vars['CONTEXT']=$class;
-			trigger_error(self::TEXT_Class);
-		}
+			trigger_error(sprintf(self::TEXT_Class,$class));
 	}
 
 	/**
@@ -1575,21 +1581,18 @@ class F3 extends Base {
 						$method=new ReflectionMethod($class,'onload');
 						if ($method->isStatic())
 							call_user_func(array($class,'onload'));
-						else {
-							self::$vars['CONTEXT']=$class.'::onload';
-							trigger_error(self::TEXT_Static);
-						}
+						else
+							trigger_error(sprintf(self::TEXT_Static,
+								$class.'::onload'));
 					}
 				}
 				if (in_array($func,$loaded[$class]))
 					// Proxy for plugin
 					return call_user_func_array(array($class,$func),$args);
 			}
-		if (count(spl_autoload_functions())==1) {
+		if (count(spl_autoload_functions())==1)
 			// No other registered autoload functions exist
-			self::$vars['CONTEXT']=$func;
-			trigger_error(self::TEXT_Method);
-		}
+			trigger_error(sprintf(self::TEXT_Method,$func));
 		return FALSE;
 	}
 
@@ -1601,10 +1604,10 @@ class Cache extends Base {
 	//@{ Locale-specific error/exception messages
 	const
 		TEXT_Backend='Cache back-end is invalid',
-		TEXT_Store='Unable to save {@CONTEXT} to cache',
-		TEXT_Fetch='Unable to retrieve {@CONTEXT} from cache',
-		TEXT_Clear='Unable to clear {@CONTEXT} from cache',
-		TEXT_Write='{@CONTEXT.0} must have write permission on {@CONTEXT.1}';
+		TEXT_Store='Unable to save %s to cache',
+		TEXT_Fetch='Unable to retrieve %s from cache',
+		TEXT_Clear='Unable to clear %s from cache',
+		TEXT_Write='%s must have write permission on %s';
 	//@}
 
 	static
@@ -1643,9 +1646,8 @@ class Cache extends Base {
 					if (!is_writable(dirname($match[6])) &&
 						function_exists('posix_getpwuid')) {
 							$uid=posix_getpwuid(posix_geteuid());
-							self::$vars['CONTEXT']=array($uid['name'],
-								realpath(dirname($match[6])));
-							trigger_error(self::TEXT_Write);
+							trigger_error(sprintf(self::TEXT_Write,
+								$uid['name'],realpath(dirname($match[6]))));
 							return FALSE;
 					}
 					// Create the framework's cache folder
@@ -1658,8 +1660,7 @@ class Cache extends Base {
 			else {
 				$ext=strtolower($match[1]?:($match[2]?:$match[4]));
 				if (!extension_loaded($ext)) {
-					self::$vars['CONTEXT']=$ext;
-					trigger_error(self::TEXT_PHPExt);
+					trigger_error(sprintf(self::TEXT_PHPExt,$ext));
 					return FALSE;
 				}
 				if (isset($match[2]) && $match[2]) {
@@ -1732,8 +1733,7 @@ class Cache extends Base {
 				break;
 		}
 		if (is_bool($ok) && !$ok) {
-			self::$vars['CONTEXT']=$name;
-			trigger_error(self::TEXT_Store);
+			trigger_error(sprintf(self::TEXT_Store,$name));
 			return FALSE;
 		}
 		// Free up space for level-1 cache
@@ -1794,10 +1794,8 @@ class Cache extends Base {
 		if (is_bool($val)) {
 			$stats['CACHE']['backend']['misses']++;
 			// No error display if specified
-			if (!$quiet) {
-				self::$vars['CONTEXT']=$name;
-				trigger_error(self::TEXT_Fetch);
-			}
+			if (!$quiet)
+				trigger_error(sprintf(self::TEXT_Fetch,$name));
 			self::$buffer[$name]=NULL;
 			return FALSE;
 		}
@@ -1846,8 +1844,7 @@ class Cache extends Base {
 				break;
 		}
 		if (is_bool($ok) && !$ok) {
-			self::$vars['CONTEXT']=$name;
-			trigger_error(self::TEXT_Clear);
+			trigger_error(sprintf(self::TEXT_Clear,$name));
 			return FALSE;
 		}
 		// Check level-1 cache first
@@ -1936,9 +1933,7 @@ class F3instance {
 			return F3::ref('TIDY') && extension_loaded('tidy')?
 				F3::tidy($out):$out;
 		}
-		$var=&F3::ref('CONTEXT');
-		$var=$view;
-		trigger_error(F3::TEXT_Render);
+		trigger_error(sprintf(F3::TEXT_Render,$view));
 	}
 
 	/**
@@ -1968,10 +1963,9 @@ class F3instance {
 		// Check for conflicts
 		$class=new ReflectionClass($this);
 		foreach ($class->getMethods() as $func)
-			if (in_array($func->name,$def)) {
-				F3::set('CONTEXT',get_called_class().'->'.$func->name);
-				trigger_error(F3::TEXT_Conflict);
-			}
+			if (in_array($func->name,$def))
+				trigger_error(sprintf(F3::TEXT_Conflict,
+					get_called_class().'->'.$func->name));
 	}
 
 }

@@ -38,19 +38,17 @@
 		 */
 		public function save()
 		{
-			$db = new DB(F3::get('DB.dsn'));
-
 			if ($this->id > 0)
 			{
-				$stat = $db->sql("UPDATE Project SET name = $this->name " .
+				$stat = F3::get('DB')->sql("UPDATE Project SET name = $this->name " .
 						"WHERE id = $this->id");
 
 				return is_array($stat) ? $this->hash : 0;
 			}
 			else
 			{
-				$id = $db->sql("SELECT max(id)+1 as next FROM Project");
-				$stat = $db->sql("INSERT INTO Project " .
+				$id = F3::get('DB')->sql("SELECT max(id)+1 as next FROM Project");
+				$stat = F3::get('DB')->sql("INSERT INTO Project " .
 						"(hash, name) VALUES " .
 						"('". md5($id[0]['next']) ."', '$this->name')");
 
@@ -63,15 +61,14 @@
 		 */
 		public function load($stmt)
 		{
-			$db = new DB(F3::get('DB.dsn'));
+            $ax = new Axon('Project');
+            $ax->load($stmt);
 
-			$result = $db->sql("SELECT * FROM Project WHERE $stmt");
-
-			if (is_array($result))
+			if (!$ax->dry())
 			{
-				$this->id = $result[0]['id'];
-				$this->hash = $result[0]['hash'];
-				$this->name = $result[0]['name'];
+				$this->id = $ax->id;
+				$this->hash = $ax->hash;
+				$this->name = $ax->name;
 			}
 		}
 

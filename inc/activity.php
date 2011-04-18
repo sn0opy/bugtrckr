@@ -66,11 +66,8 @@
 		 */
 		public function save()
 		{
-			$db = F3::get('DB');
-			$db = new DB($db['dsn']);
-
-			$id = $db->sql("SELECT max(id)+1 as next FROM Activity");
-			$stat = $db->sql("INSERT INTO Activity " .
+			$id = F3::get('DB')->sql("SELECT max(id)+1 as next FROM Activity");
+			$stat = F3::get('DB')->sql("INSERT INTO Activity " .
 					"(hash, description, user, changed, project) VALUES " .
 					"('". md5($id[0]['next']) ."', '$this->description', " .
 					"$this->user, " . time() . ", $this->project)");
@@ -83,9 +80,7 @@
 		 */
 		public function load($stmt)
 		{
-			$db = new DB(F3::get('DB.dsn'));
-
-			$result = $db->sql("SELECT * FROM Activity WHERE $stmt");
+			$result = F3::get('DB')->sql("SELECT * FROM Activity WHERE $stmt");
 
 			if (is_array($result))
 			{

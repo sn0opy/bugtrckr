@@ -19,19 +19,21 @@
 class DB extends Base {
 
 	public
-		//@{ PHP data object/properties
-		$pdo,$dsn,$user,$pw,$opt;
-		//@}
+		//! Exposed data object properties
+		$backend,$pdo,$result;
+	private
+		//! Connection parameters
+		$dsn,$user,$pw,$opt;
 
 	/**
-		Process SQL statement
+		Process SQL statement(s)
 			@return array
-			@param $cmd string
+			@param $cmd mixed
 			@param $args array
 			@param $ttl int
 			@public
 	**/
-	function sql($cmd,array $args=NULL,$ttl=0) {
+	function exec($cmds,array $args=NULL,$ttl=0) {
 		if (!$this->pdo)
 			$this->pdo=new PDO($this->dsn,$this->user,$this->pw,$this->opt);
 		$stats=&self::ref('STATS');
@@ -40,43 +42,69 @@ class DB extends Base {
 				'cache'=>array(),
 				'queries'=>array()
 			);
-		$hash='sql.'.self::hash($cmd);
-		$cached=Cache::cached($hash);
-		if ($ttl && $cached && $_SERVER['REQUEST_TIME']-$cached<$ttl) {
-			// Gather cached queries for profiler
-			if (!isset($stats[$this->dsn]['cache'][$cmd]))
-				$stats[$this->dsn]['cache'][$cmd]=0;
-			$stats[$this->dsn]['cache'][$cmd]++;
-			return Cache::get($hash);
+		$batch=is_array($cmds);
+		if (!$batch) {
+			$cmds=array($cmds);
+			$args=array($args);
 		}
-		if (is_null($args))
-			$query=$this->pdo->query($cmd);
-		elseif (is_object($query=$this->pdo->prepare($cmd))) {
-			foreach ($args as $key=>$value)
-				if (is_array($value))
-					$query->bindvalue($key,$value[0],$value[1]);
-				else
-					$query->bindvalue($key,$value,$this->type($value));
-			$query->execute();
+		else
+			$this->pdo->beginTransaction();
+		foreach (array_combine($cmds,$args) as $cmd=>$arg) {
+			$hash='sql.'.self::hash($cmd);
+			$cached=Cache::cached($hash);
+			if ($ttl && $cached && $_SERVER['REQUEST_TIME']-$cached<$ttl) {
+				// Gather cached queries for profiler
+				if (!isset($stats[$this->dsn]['cache'][$cmd]))
+					$stats[$this->dsn]['cache'][$cmd]=0;
+				$stats[$this->dsn]['cache'][$cmd]++;
+				$this->result=Cache::get($hash);
+			}
+			else {
+				if (is_null($arg))
+					$query=$this->pdo->query($cmd);
+				elseif (is_object($query=$this->pdo->prepare($cmd))) {
+					foreach ($arg as $key=>$value)
+						if (is_array($value))
+							$query->bindvalue($key,$value[0],$value[1]);
+						else
+							$query->bindvalue($key,$value,$this->type($value));
+					$query->execute();
+				}
+				// Check SQLSTATE
+				if ($query->errorCode()!=PDO::ERR_NONE) {
+					$error=$query->errorinfo();
+					trigger_error($error[2]);
+					return FALSE;
+				}
+				$this->result=$query->fetchall(PDO::FETCH_ASSOC);
+				if ($ttl)
+					Cache::set($hash,$this->result,$ttl);
+				// Gather real queries for profiler
+				if (!isset($stats[$this->dsn]['queries'][$cmd]))
+					$stats[$this->dsn]['queries'][$cmd]=0;
+				$stats[$this->dsn]['queries'][$cmd]++;
+			}
 		}
-		// Check SQLSTATE
-		if ($query->errorCode()!=PDO::ERR_NONE) {
-			$error=$query->errorinfo();
-			trigger_error($error[2]);
-			return FALSE;
-		}
-		$result=$query->fetchall(PDO::FETCH_ASSOC);
-		if ($ttl)
-			Cache::set($hash,$result,$ttl);
-		// Gather real queries for profiler
-		if (!isset($stats[$this->dsn]['queries'][$cmd]))
-			$stats[$this->dsn]['queries'][$cmd]=0;
-		$stats[$this->dsn]['queries'][$cmd]++;
-		return $result;
+		if ($batch)
+			$this->pdo->commit();
+		return $this->result;
 	}
 
 	/**
-		Return PDO data type of specified value
+		Convenience method for direct SQL queries (static call)
+			@return array
+			@param $cmds mixed
+			@param $args mixed
+			@param $ttl int
+			@param $db string
+			@public
+	**/
+	static function sql($cmds,array $args=NULL,$ttl=0,$db='DB') {
+		return self::$vars[$db]->exec($cmds,$args,$ttl);
+	}
+
+	/**
+		Return auto-detected PDO data type of specified value
 			@return int
 			@param $val mixed
 			@public
@@ -105,9 +133,10 @@ class DB extends Base {
 	**/
 	function __construct($dsn,$user=NULL,$pw=NULL,$opt=NULL) {
 		if (!isset(self::$vars['MYSQL']))
+			// Default MySQL character set
 			self::$vars['MYSQL']='utf8';
 		if (!$opt)
-			// Default options
+			// Append other default options
 			$opt=array(PDO::ATTR_EMULATE_PREPARES=>FALSE)+(
 				extension_loaded('pdo_mysql') &&
 				preg_match('/^mysql:/',$dsn)?
@@ -115,7 +144,8 @@ class DB extends Base {
 						'SET NAMES '.self::$vars['MYSQL']):array()
 			);
 		list($this->dsn,$this->user,$this->pw,$this->opt)=
-			array(self::subst($dsn),$user,$pw,$opt);
+			array($this->subst($dsn),$user,$pw,$opt);
+		$this->backend=strstr($this->dsn,':',TRUE);
 	}
 
 }
@@ -125,10 +155,11 @@ class Axon extends Base {
 
 	//@{ Locale-specific error/exception messages
 	const
-		TEXT_AxonTable='Unable to map table {@CONTEXT} to Axon',
+		TEXT_AxonConnect='Undefined database',
+		TEXT_AxonTable='Unable to map table %s to Axon',
 		TEXT_AxonEmpty='Axon is empty',
 		TEXT_AxonArray='Must be an array of Axon objects',
-		TEXT_AxonNotMapped='The field {@CONTEXT} does not exist',
+		TEXT_AxonNotMapped='The field %s does not exist',
 		TEXT_AxonCantUndef='Cannot undefine an Axon-mapped field',
 		TEXT_AxonCantUnset='Cannot unset an Axon-mapped field',
 		TEXT_AxonConflict='Name conflict with Axon-mapped field',
@@ -183,7 +214,7 @@ class Axon extends Base {
 	function select(
 		$fields=NULL,$cond=NULL,$group=NULL,$seq=NULL,$limit=0,$ofs=0) {
 		$rows=is_array($cond)?
-			$this->db->sql(
+			$this->db->exec(
 				'SELECT '.($fields?:'*').' FROM '.$this->table.
 					($cond?(' WHERE '.$cond[0]):'').
 					($group?(' GROUP BY '.$group):'').
@@ -192,7 +223,7 @@ class Axon extends Base {
 					($ofs?(' OFFSET '.$ofs):'').';',
 				$cond[1]
 			):
-			$this->db->sql(
+			$this->db->exec(
 				'SELECT '.($fields?:'*').' FROM '.$this->table.
 					($cond?(' WHERE '.$cond):'').
 					($group?(' GROUP BY '.$group):'').
@@ -339,7 +370,7 @@ class Axon extends Base {
 				$values.=($values?',':'').':'.$field;
 				$bind[':'.$field]=array($val,$this->db->type($val));
 			}
-			$this->db->sql(
+			$this->db->exec(
 				'INSERT INTO '.$this->table.' ('.$fields.') '.
 					'VALUES ('.$values.');',$bind);
 			$this->_id=$this->db->pdo->lastinsertid();
@@ -357,7 +388,7 @@ class Axon extends Base {
 				$cond.=($cond?' AND ':'').$pkey.'=:c_'.$pkey;
 				$bind[':c_'.$pkey]=array($val,$this->db->type($val));
 			}
-			$this->db->sql(
+			$this->db->exec(
 				'UPDATE '.$this->table.' SET '.$set.
 					($cond?(' WHERE '.$cond):'').';',$bind);
 		}
@@ -377,7 +408,7 @@ class Axon extends Base {
 	function erase($force=FALSE) {
 		if (method_exists($this,'beforeErase') && !$this->beforeErase())
 			return;
-		$this->db->sql('DELETE FROM '.$this->table.
+		$this->db->exec('DELETE FROM '.$this->table.
 			(($cond=$this->cond)?(' WHERE '.$cond):($force?'':'FALSE')).';');
 		$this->reset();
 		if (method_exists($this,'afterErase'))
@@ -439,18 +470,37 @@ class Axon extends Base {
 			@public
 	**/
 	function sync($table,$db=NULL,$freq=60) {
-		if (!$db)
-			$db=self::$vars['DB'];
+		if (!$db) {
+			if (isset(self::$vars['DB']))
+				$db=self::$vars['DB'];
+			else {
+				trigger_error(self::TEXT_AxonConnect);
+				return;
+			}
+		}
 		// DB schema
 		$result=array(
 			'mysql'=>array(
 				'SHOW columns FROM '.$table.';','Field','Key','PRI'),
 			'sqlite2?'=>array(
-				'PRAGMA table_info('.$table.');','name','pk',1)
+				'PRAGMA table_info('.$table.');','name','pk',1),
+			'(mssql|sybase|dblib|pgsql)'=>array(
+				'SELECT c.column_name AS field,t.constraint_type AS key '.
+				'FROM information_schema.columns AS c '.
+				'LEFT OUTER JOIN '.
+					'information_schema.key_column_usage AS k ON '.
+						'c.table_name=k.table_name AND '.
+						'c.column_name=k.column_name '.
+				'LEFT OUTER JOIN '.
+					'information_schema.table_constraints AS t ON '.
+						'k.table_name=t.table_name AND '.
+						'k.constraint_name=t.constraint_name '.
+				'WHERE '.
+					'c.table_name="'.$table.'";','field','key','PRIMARY KEY')
 		);
 		$match=FALSE;
 		foreach ($result as $dsn=>$val)
-			if (preg_match('/^'.$dsn.':/',$db->dsn)) {
+			if (preg_match('/^'.$dsn.'$/',$db->backend)) {
 				$match=TRUE;
 				break;
 			}
@@ -462,10 +512,9 @@ class Axon extends Base {
 			return;
 		// Initialize Axon
 		list($this->db,$this->table)=array($db,$table);
-		$rows=$db->sql($val[0],NULL,$freq);
+		$rows=$db->exec($val[0],NULL,$freq);
 		if (!$rows) {
-			self::$vars['CONTEXT']=$table;
-			trigger_error(self::TEXT_AxonTable);
+			trigger_error(sprintf(self::TEXT_AxonTable,$table));
 			return;
 		}
 		// Populate properties
@@ -501,8 +550,7 @@ class Axon extends Base {
 	**/
 	function undef($field) {
 		if (isset($this->fields[$field]) || !self::isdef($field)) {
-			self::$vars['CONTEXT']=$field;
-			trigger_error(self::TEXT_AxonCantUndef);
+			trigger_error(sprintf(self::TEXT_AxonCantUndef,$field));
 			return;
 		}
 		unset($this->adhoc[$field]);

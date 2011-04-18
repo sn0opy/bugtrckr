@@ -1,8 +1,5 @@
 <?php
 
-	require_once 'dao.inc.php';
-	require_once 'ticket.php';
-
 	class Milestone extends F3instance
 	{
 
@@ -74,11 +71,9 @@
 		 */
 		public function save()
 		{
-			$db = new DB(F3::get('DB.dsn'));
-
 			if ($this->id > 0)
 			{
-				$stat = $db->sql("UPDATE Milestone SET " .
+				$stat = F3::get('DB')->sql("UPDATE Milestone SET " .
 						"finished = $finished" .
 						"WHERE id = $this->id");
 
@@ -86,8 +81,8 @@
 			}
 			else
 			{
-				$id = $db->sql("SELECT max(id)+1 as next FROM Milestone");
-				$stat = $db->sql("INSERT INTO Milestone ".
+				$id = F3::get('DB')->sql("SELECT max(id)+1 as next FROM Milestone");
+				$stat = F3::get('DB')->sql("INSERT INTO Milestone ".
 						"(hash, name, description, finished, project) VALUES ".
 						"('". md5($id[0]['next']) ."', '$this->name', ".
 						"'$this->description', $this->finished, $this->project)");
@@ -101,9 +96,7 @@
 		 */
 		public function load($stmt)
 		{
-			$db = new DB(F3::get('DB.dsn'));
-
-			$result = $db->sql("SELECT * FROM Milestone WHERE $stmt");
+			$result = F3::get('DB')->sql("SELECT * FROM Milestone WHERE $stmt");
 
 			if (is_array($result))
 			{

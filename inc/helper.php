@@ -18,8 +18,7 @@
 
         public function getFreeHash($table, $length = 12)
         {
-            $db = new DB(F3::get('DB.dsn'));
-            $ax = new Axon($table, $db);
+            $ax = new Axon($table);
             do {
                 $hash = self::randStr($length);
                 $ax->find('hash = "' .$hash. '"');

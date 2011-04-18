@@ -1,6 +1,6 @@
 <?php
 
-	class Dao
+	class Dao extends F3instance
 	{
 		/**
 		 *
@@ -8,10 +8,7 @@
 		static function getMilestones($stmt)
 		{
 			$result = array();
- 
-			$db = new DB(F3::get('DB.dsn'));
-
-			$milestones = $db->sql("SELECT id FROM Milestone WHERE $stmt");
+			$milestones = F3::get('DB')->sql("SELECT id FROM Milestone WHERE $stmt");
 
 			foreach($milestones as $i=>$milestone)
 			{
@@ -29,9 +26,7 @@
 		{
 			$result = array();
 
-			$db = new DB(F3::get('DB.dsn'));
-
-			$tickets = $db->sql("SELECT id FROM Ticket WHERE $stmt");
+			$tickets = F3::get('DB')->sql("SELECT id FROM Ticket WHERE $stmt");
 
 			foreach($tickets as $i=>$ticket)
 			{
@@ -49,9 +44,7 @@
 		{
 			$result = array();
 
-			$db = new DB(F3::get('DB.dsn'));
-
-			$activities = $db->sql("SELECT id FROM Activity WHERE $stmt");
+			$activities = F3::get('DB')->sql("SELECT id FROM Activity WHERE $stmt");
 
 			foreach($activities as $i=>$activity)
 			{
@@ -69,9 +62,7 @@
 		{
 			$result = array();
 
-			$db = new DB(F3::get('DB.dsn'));
-
-			$projects = $db->sql("SELECT id FROM Project WHERE $stmt");
+			$projects = F3::get('DB')->sql("SELECT id FROM Project WHERE $stmt");
 
 			foreach($projects as $i=>$project)
 			{

@@ -120,11 +120,9 @@
 		 */
 		public function save()
 		{
-			$db = new DB(F3::get('DB.dsn'));
-
 			if ($this->id > 0)
 			{
-				$stat = $db->sql("UPDATE Ticket SET " .
+				$stat = F3::get('DB')->sql("UPDATE Ticket SET " .
 						"owner = $this->owner, " .
 						"state = $this->state, " .
 						"priority = $this->priority, " .
@@ -134,8 +132,8 @@
 			}
 			else
 			{
-				$id = $db->sql("SELECT max(id)+1 as next FROM Ticket");
-				$stat = $db->sql("INSERT INTO Ticket " .
+				$id = F3::get('DB')->sql("SELECT max(id)+1 as next FROM Ticket");
+				$stat = F3::get('DB')->sql("INSERT INTO Ticket " .
 						"(hash, title, description, owner, type, state, " .
 						"priority, category, milestone, created) VALUES " .
 						"('". md5($id[0]['next'])."', '$this->title', '$this->description',".
@@ -152,9 +150,7 @@
 		 */
 		public function load($stmt)
 		{
-			$db = new DB(F3::get('DB.dsn'));
-
-			$result = $db->sql("SELECT * FROM Ticket WHERE $stmt");
+			$result = F3::get('DB')->sql("SELECT * FROM Ticket WHERE $stmt");
 
 			if (is_array($result))
 			{

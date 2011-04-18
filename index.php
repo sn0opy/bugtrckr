@@ -2,7 +2,7 @@
 
 session_start();
 
-$app=require(__DIR__.'/lib/base.php');
+$app = require(__DIR__.'/lib/base.php');
 
 require 'inc/config.inc.php';
 require 'inc/main.php';
@@ -14,7 +14,9 @@ $app->set('GUI','gui/');
 $app->set('AUTOLOAD', 'inc/');
 $app->set('LOCALES','lang/');
 $app->set('LANGUAGE', 'de'); // substr($_SERVER["HTTP_ACCEPT_LANGUAGE"], 0, 2);
-$app->set('DB', array('dsn'=>'sqlite:' .$dbFile));
+$app->set('PROXY', 1);
+
+F3::set('DB', new DB('sqlite:' .$dbFile));
 
 require 'inc/mapping.inc.php';
 

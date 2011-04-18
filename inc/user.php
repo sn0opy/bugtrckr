@@ -16,8 +16,7 @@
         {
             parent::__construct();
 
-            require_once "lib/db.php";
-            $this->ax = new Axon('User', new DB(F3::get('DB.dsn')));
+            $this->ax = new Axon('User');
         }
 
         public function setId($id)

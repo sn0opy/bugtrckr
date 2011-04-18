@@ -1,7 +1,5 @@
 <?php
 
-	require_once 'dao.inc.php';
-
 	class main extends F3instance
 	{
         private $helper;
@@ -217,8 +215,7 @@
         function showUser()
         {
             $hash = F3::get('PARAMS.hash');
-            $db = new DB(F3::get('DB.dsn'));
-            $result = $db->sql('SELECT * FROM User WHERE hash = :hash', array(':hash' => $hash));
+            $result = F3::get('DB')->sql('SELECT * FROM User WHERE hash = :hash', array(':hash' => $hash));
             
             if(!$result) 
                 F3::set('FAILURE', 'User not found.');
@@ -228,8 +225,6 @@
 
             $userTickets = Dao::getTickets('owner = ' .F3::get('user.id'));
             F3::set('tickets', helper::objectToArray($userTickets));
-
-            print_r(F3::get('tickets'));
             F3::set('template', 'user.tpl.php');
             $this->tpserve();
         }
