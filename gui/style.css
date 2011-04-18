@@ -26,6 +26,7 @@ body
     background: #068;
     padding: 10px;
     border-bottom: 1px solid #333;
+    color: #FFF;
 }
 
 #menu ul
@@ -119,6 +120,11 @@ input, textarea, select
     border-radius: 3px;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
+}
+
+.normalText
+{
+    text-transform: none !important;
 }
 
 /*
@@ -298,6 +304,7 @@ table.ticket th,td
     left: 50%;
     margin-left: -210px;
     padding: 20px;
+    color: #333;
 }
 
 #add input, #add textarea

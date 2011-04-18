@@ -39,6 +39,8 @@ return array('lng' => array(
     'email' => 'E-Mail',
     'login' => 'Anmelden',
     'alreadyLoggedIn' => 'Du bist bereits eingeloggt.',
-    'logout' => 'Ausloggen'
+    'logout' => 'Ausloggen',
+    'informations' => 'Informationen',
+    'user' => 'Benutzer'
 ));
 

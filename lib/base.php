@@ -27,7 +27,7 @@ class Base {
 		TEXT_NoRoutes='No routes specified',
 		TEXT_HTTP='HTTP status code {@CONTEXT} is invalid',
 		TEXT_Render='Unable to render {@CONTEXT} - file does not exist',
-		TEXT_Form='The form field hander {@CONTEXT} is invalid',
+		TEXT_Form='The input handler for {@CONTEXT} is invalid',
 		TEXT_Static='{@CONTEXT} must be a static method';
 	//@}
 
@@ -111,7 +111,7 @@ class Base {
 		//! HTTP methods for RESTful interface
 		HTTP_Methods='GET|HEAD|POST|PUT|DELETE|OPTIONS';
 
-	static
+	protected static
 		//! Global variables
 		$vars,
 		//! NULL reference
@@ -135,12 +135,10 @@ class Base {
 			@public
 	**/
 	static function stringify($val) {
-		return var_export(
+		return preg_replace('/\s+=>\s+/','=>',var_export(
 			is_object($val) && !method_exists($val,'__set_state')?
 				(method_exists($val,'__toString')?
-					(string)$val:get_class($val)):
-					(is_array($val)?array_map('self::stringify',$val):
-						(string)$val),TRUE);
+					(string)$val:get_class($val)):$val,TRUE));
 	}
 
 	/**
@@ -283,10 +281,10 @@ class Base {
 	/**
 		Simple token substitution
 			@return string
-			@param $str string
+			@param $val mixed
 			@public
 	**/
-	static function subst($str) {
+	static function subst($val) {
 		return preg_replace_callback(
 			'/{@(\w+(?:\[[^\]]+\]|\.\w+)*)(?:->(\w+))?}/',
 			function($var) {
@@ -300,9 +298,10 @@ class Base {
 					// Variable variable? Call recursively
 					$val=$self::subst($val);
 				// Check syntax before replacing contents
-				return eval('return (string)'.$self::stringify($val).';');
+				return eval('return (string)'.
+					$self::stringify($val).';');
 			},
-			$str
+			(string)$val
 		);
 	}
 
@@ -375,24 +374,6 @@ class Base {
 class F3 extends Base {
 
 	/**
-		Auto-start/stop a session
-			@param $state boolean
-			@public
-	**/
-	static function session($state) {
-		if (!strlen(session_id()))
-			session_start();
-		if ($state)
-			// Sync framework and PHP global
-			self::$vars['SESSION']=&$_SESSION;
-		else {
-			// End the session
-			session_unset();
-			session_destroy();
-		}
-	}
-
-	/**
 		Bind value to framework variable
 			@param $key string
 			@param $val mixed
@@ -407,14 +388,28 @@ class F3 extends Base {
 		if (!self::valid($key))
 			return;
 		// Referencing a SESSION variable element auto-starts a session
-		if (preg_match('/^SESSION\b/',$key))
-			self::session(TRUE);
+		if (preg_match('/^SESSION\b/',$key) && !session_id()) {
+			session_start();
+			// Sync framework and PHP global
+			self::$vars['SESSION']=&$_SESSION;
+		}
 		$name=self::remix($key);
 		$var=&self::ref($name);
-		if (is_string($val) && !preg_match('/^[A-Z]+\b/',$key) && $conv)
-			// Userland variable; Convert to HTML entities
-			$val=htmlspecialchars($val,
-				ENT_COMPAT,self::$vars['ENCODING'],FALSE);
+		if (is_array($val)) {
+			$var=array();
+			// Recursive token substitution
+			foreach ($val as $subk=>$subv)
+				self::set($key.'['.var_export($subk,TRUE).']',
+					$subv,FALSE,$conv);
+			return;
+		}
+		elseif (is_string($val)) {
+			$val=self::subst($val);
+			if (!preg_match('/^[A-Z]+\b/',$key) && $conv)
+				// Userland variable; Convert to HTML entities
+				$val=htmlspecialchars($val,
+					ENT_COMPAT,self::$vars['ENCODING'],FALSE);
+		}
 		$var=$val;
 		if (preg_match('/LANGUAGE|LOCALES/',$key) &&
 			extension_loaded('intl')) {
@@ -451,8 +446,7 @@ class F3 extends Base {
 	}
 
 	/**
-		Retrieve value of framework variable and apply locale rules;
-		Convert special characters to HTML entities (default)
+		Retrieve value of framework variable and apply locale rules
 			@return mixed
 			@param $key string
 			@param $args mixed
@@ -465,17 +459,17 @@ class F3 extends Base {
 		if (!self::valid($key))
 			return self::$null;
 		// Referencing a SESSION variable element auto-starts a session
-		if (preg_match('/^SESSION\b/',$key))
-			self::session(TRUE);
+		if (preg_match('/^SESSION\b/',$key) && !session_id()) {
+			session_start();
+			// Sync framework and PHP global
+			self::$vars['SESSION']=&$_SESSION;
+		}
 		$name=self::remix($key);
 		$val=self::ref($name,FALSE);
-		if (is_string($val)) {
-			$val=self::subst($val);
-			if (extension_loaded('intl') &&
-				$msg=msgfmt_create(Locale::getDefault(),$val))
-				// Format string according to locale rules
-				$val=$msg->format(is_array($args)?$args:array($args));
-		}
+		if (is_string($val) && extension_loaded('intl') &&
+			$msg=msgfmt_create(Locale::getDefault(),$val))
+			// Format string according to locale rules
+			$val=$msg->format(is_array($args)?$args:array($args));
 		elseif (is_null($val)) {
 			// Attempt to retrieve from cache
 			$hash='var.'.self::hash($name);
@@ -497,8 +491,13 @@ class F3 extends Base {
 		if (!self::valid($key))
 			return;
 		// Clearing SESSION array ends the current session
-		if ($key=='SESSION')
-			self::session(FALSE);
+		if ($key=='SESSION') {
+			if (!session_id())
+				session_start();
+			// End the session
+			session_unset();
+			session_destroy();
+		}
 		preg_match('/^('.self::PHP_Globals.')(.*)$/',$key,$match);
 		if (isset($match[1])) {
 			$name=self::remix($key,FALSE);
@@ -522,6 +521,11 @@ class F3 extends Base {
 			@public
 	**/
 	static function exists($key) {
+		if (preg_match('/{.+}/',$key))
+			// Variable variable
+			$key=self::subst($key);
+		if (!self::valid($key))
+			return FALSE;
 		$var=&self::ref(self::remix($key));
 		return isset($var);
 	}
@@ -645,14 +649,14 @@ class F3 extends Base {
 		Retrieve values from a specified column of a multi-dimensional
 		framework array variable
 			@return array
-			@param $name string
+			@param $key string
 			@param $col mixed
 			@public
 	**/
-	static function pick($name,$col) {
-		$rows=self::ref($name);
+	static function pick($key,$col) {
+		$rows=self::ref($key);
 		if (!is_array($rows)) {
-			self::$vars['CONTEXT']=$name;
+			self::$vars['CONTEXT']=$key;
 			trigger_error(self::TEXT_NotArray);
 			return FALSE;
 		}
@@ -668,16 +672,16 @@ class F3 extends Base {
 		Sort a multi-dimensional framework array variable on a specified
 		column
 			@return array
-			@param $name string
+			@param $key string
 			@param $col mixed
 			@param $order integer
 			@param $flag boolean
 			@public
 	**/
-	static function sort($name,$col,$order=self::SORT_Asc,$flag=TRUE) {
-		$val=&self::ref($name,TRUE);
+	static function sort($key,$col,$order=self::SORT_Asc,$flag=TRUE) {
+		$val=&self::ref($key,TRUE);
 		if (!is_array($val)) {
-			self::$vars['CONTEXT']=$name;
+			self::$vars['CONTEXT']=$key;
 			trigger_error(self::TEXT_NotArray);
 			return FALSE;
 		}
@@ -686,9 +690,8 @@ class F3 extends Base {
 			function($val1,$val2) use($col,$order) {
 				$self=__CLASS__;
 				list($v1,$v2)=array($val1[$col],$val2[$col]);
-				return $order*
-					(((is_int($v1) || is_float($v1)) &&
-						(is_int($v2) || is_float($v2)))?
+				return $order*(((is_int($v1) || is_float($v1)) &&
+					(is_int($v2) || is_float($v2)))?
 					$self::sign($v1-$v2):strcmp($v1,$v2));
 			}
 		);
@@ -697,14 +700,14 @@ class F3 extends Base {
 	/**
 		Rotate a two-dimensional framework array variable
 			@return array
-			@param $name string
+			@param $key string
 			@param $flag boolean
 			@public
 	**/
-	static function transpose($name) {
-		$rows=&self::ref($name,TRUE);
+	static function transpose($key) {
+		$rows=&self::ref($key,TRUE);
 		if (!is_array($rows)) {
-			self::$vars['CONTEXT']=$name;
+			self::$vars['CONTEXT']=$key;
 			trigger_error(self::TEXT_NotArray);
 			return FALSE;
 		}
@@ -787,7 +790,8 @@ class F3 extends Base {
 			@param $uri string
 			@public
 	**/
-	static function reroute($uri=NULL) {
+	static function reroute($uri) {
+		$uri=self::subst($uri);
 		if (PHP_SAPI!='cli' && !headers_sent()) {
 			// HTTP redirect
 			self::status($_SERVER['REQUEST_METHOD']!='GET'?303:301);
@@ -801,29 +805,18 @@ class F3 extends Base {
 	/**
 		Assign handler to route pattern
 			@param $pattern string
-			@param $func mixed
+			@param $funcs mixed
 			@param $ttl integer
 			@param $hotlink boolean
 			@public
 	**/
-	static function route($pattern,$func,$ttl=0,$hotlink=TRUE) {
-		if (is_string($func) &&
-			preg_match('/([\w\\\]+)->(\w+)/',$func,$match))
-			// Convert class->method syntax to callback
-			$func=array(new $match[1],$match[2]);
-		if (!is_callable($func)) {
-			self::$vars['CONTEXT']=is_array($func) && count($func)>1?
-				(get_class($func[0]).(is_object($func[0])?'->':'::').
-					$func[1]):$func;
-			trigger_error(self::TEXT_Handler);
-			return;
-		}
+	static function route($pattern,$funcs,$ttl=0,$hotlink=TRUE) {
 		list($methods,$route)=explode(' ',$pattern,2);
 		foreach (explode('|',$methods) as $method)
 			// Use pattern and HTTP methods as route indexes
 			self::$vars['ROUTES'][$route][strtoupper($method)]=
 				// Save handler, cache timeout and hotlink permission
-				array($func,$ttl,$hotlink);
+				array($funcs,$ttl,$hotlink);
 	}
 
 	/**
@@ -844,18 +837,57 @@ class F3 extends Base {
 
 	/**
 		Call route handler
-			@param $func mixed
+			@param $funcs string
 			@public
 	**/
-	static function dispatch($func) {
-		if (is_string($func) && strpos($func,'::'))
-			$func=explode('::',$func);
-		$oop=is_array($func) && (is_object($func[0]) || is_string($func[0]));
-		if ($oop && method_exists($func[0],$before='beforeRoute'))
-			call_user_func(array($func[0],$before));
-		call_user_func($func);
-		if ($oop && method_exists($func[0],$after='afterRoute'))
-			call_user_func(array($func[0],$after));
+	static function dispatch($funcs) {
+		$classes=array();
+		$funcs=is_string($funcs)?explode('|',$funcs):array($funcs);
+		foreach ($funcs as $func) {
+			if (is_string($func)) {
+				// Replace tokens in route handler, if any
+				$diff=FALSE;
+				if (preg_match('/{.+}/',$func)) {
+					$func=self::subst($func);
+					$diff=TRUE;
+				}
+				if (preg_match('/(.+)(->|::)(.+)/',$func,$match)) {
+					if ($diff && (!class_exists($match[1]) ||
+						!method_exists($match[1],$match[3]))) {
+						self::error(404);
+						return;
+					}
+					$func=array($match[2]=='->'?
+						new $match[1]:$match[1],$match[3]);
+				}
+				elseif ($diff && !function_exists($func)) {
+					self::error(404);
+					return;
+				}
+			}
+			if (!is_callable($func)) {
+				self::$vars['CONTEXT']=is_array($func) && count($func)>1?
+					(get_class($func[0]).(is_object($func[0])?'->':'::').
+						$func[1]):$func;
+				trigger_error(self::TEXT_Handler);
+				return;
+			}
+			$oop=is_array($func) &&
+				(is_object($func[0]) || is_string($func[0]));
+			if ($oop && method_exists($func[0],$before='beforeRoute') &&
+				!in_array($func[0],$classes)) {
+				// Execute beforeRoute() once per class
+				call_user_func(array($func[0],$before));
+				$classes[]=is_object($func[0])?get_class($func[0]):$func[0];
+			}
+			call_user_func($func);
+			if ($oop && method_exists($func[0],$after='afterRoute') &&
+				!in_array($func[0],$classes)) {
+				// Execute afterRoute() once per class
+				call_user_func(array($func[0],$after));
+				$classes[]=is_object($func[0])?get_class($func[0]):$func[0];
+			}
+		}
 	}
 
 	/**
@@ -907,7 +939,7 @@ class F3 extends Base {
 			foreach ($route as $method=>$proc) {
 				if (!preg_match('/'.$method.'/',$_SERVER['REQUEST_METHOD']))
 					continue;
-				list($func,$ttl,$hotlink)=$proc;
+				list($funcs,$ttl,$hotlink)=$proc;
 				if (!$hotlink && isset(self::$vars['HOTLINK']) &&
 					isset($_SERVER['HTTP_REFERER']) &&
 					parse_url($_SERVER['HTTP_REFERER'],PHP_URL_HOST)!=
@@ -961,7 +993,7 @@ class F3 extends Base {
 					else {
 						// Cache this page
 						ob_start();
-						self::dispatch($func);
+						self::dispatch($funcs);
 						self::$vars['RESPONSE']=ob_get_clean();
 						if (!self::$vars['ERROR'] &&
 							self::$vars['RESPONSE']) {
@@ -986,11 +1018,11 @@ class F3 extends Base {
 					if ($_SERVER['REQUEST_METHOD']=='PUT') {
 						// Associate PUT with file handle of stdin stream
 						self::$vars['PUT']=fopen('php://input','rb');
-						self::dispatch($func);
+						self::dispatch($funcs);
 						fclose(self::$vars['PUT']);
 					}
 					else
-						self::dispatch($func);
+						self::dispatch($funcs);
 					self::$vars['RESPONSE']=ob_get_clean();
 				}
 				$elapsed=time()-$time;
@@ -1030,14 +1062,15 @@ class F3 extends Base {
 	/**
 		Call form field handler
 			@param $fields string
-			@param $func mixed
+			@param $funcs mixed
 			@param $tags string
 			@param $filter integer
-			@param $options array
+			@param $opt array
 			@public
 	**/
-	static function input($fields,$func,
-		$tags=NULL,$filter=FILTER_UNSAFE_RAW,array $options=array()) {
+	static function input($fields,$funcs,
+		$tags=NULL,$filter=FILTER_UNSAFE_RAW,$opt=array()) {
+		$funcs=is_string($funcs)?explode('|',$funcs):array($funcs);
 		foreach (explode('|',$fields) as $field) {
 			$found=NULL;
 			// Sanitize relevant globals
@@ -1046,18 +1079,45 @@ class F3 extends Base {
 				if (isset(self::$vars[$var][$field])) {
 					self::$vars[$var][$field]=filter_var(
 						self::scrub(self::$vars[$var][$field],$tags),
-						$filter,$options);
+						$filter,$opt);
 					if (!$found)
 						$found=$var;
 				}
-			if ($found && is_callable($func)) {
-				call_user_func($func,self::$vars[$found][$field]);
+			if ($found) {
+				foreach ($funcs as $func) {
+					if (is_string($func) &&
+						preg_match('/([\w\\\]+)->(\w+)/',$func,$match))
+						// Convert class->method syntax to callback
+						$func=array(new $match[1],$match[2]);
+					if (!is_callable($func)) {
+						// Invalid handler
+						self::$vars['CONTEXT']=$field;
+						trigger_error(self::TEXT_Form);
+						return;
+					}
+					call_user_func($func,self::$vars[$found][$field]);
+				}
 				return;
 			}
 			// Invalid handler
-			self::$vars['CONTEXT']=$func;
+			self::$vars['CONTEXT']=$field;
 			trigger_error(self::TEXT_Form);
+			return;
 		}
+	}
+
+	/**
+		Clean and repair HTML
+			@return string
+			@param $html string
+			@public
+	**/
+	static function tidy($html) {
+		$tidy=new Tidy;
+		$tidy->parseString($html,self::$vars['TIDY'],
+			str_replace('-','',self::$vars['ENCODING']));
+		$tidy->cleanRepair();
+		return (string)$tidy;
 	}
 
 	/**
@@ -1069,9 +1129,9 @@ class F3 extends Base {
 	static function render($file) {
 		$file=self::subst($file);
 		if (is_file($view=self::fixslashes(self::$vars['GUI'].$file))) {
-			ob_start();
-			include $view;
-			return ob_get_clean();
+			$out=SandBox::grab($view);
+			return self::$vars['TIDY'] && extension_loaded('tidy')?
+				self::tidy($out):$out;
 		}
 		self::$vars['CONTEXT']=$view;
 		trigger_error(self::TEXT_Render);
@@ -1083,15 +1143,10 @@ class F3 extends Base {
 			@public
 	**/
 	static function profile() {
-		// Compute elapsed time
 		$stats=&self::$vars['STATS'];
-		if (!isset($stats['TIME']))
-			$stats['TIME']=array();
-		$stats['TIME']['start']=&$_SERVER['REQUEST_TIME'];
+		// Compute elapsed time
 		$stats['TIME']['elapsed']=microtime(TRUE)-$stats['TIME']['start'];
 		// Compute memory consumption
-		if (!isset($stats['MEMORY']))
-			$stats['MEMORY']=array();
 		$stats['MEMORY']['current']=memory_get_usage();
 		$stats['MEMORY']['peak']=memory_get_peak_usage();
 		return $stats;
@@ -1221,13 +1276,8 @@ class F3 extends Base {
 				ENT_COMPAT,self::$vars['ENCODING']);
 		self::$vars['ERROR']['trace']=nl2br(self::$vars['ERROR']['trace']);
 		$func=self::$vars['ONERROR'];
-		if ($func) {
-			if (is_string($func) &&
-				preg_match('/([\w\\\]+)->(\w+)/',$func,$match))
-				// Convert class->method syntax to callback
-				$func=array(new $match[1],$match[2]);
-			call_user_func($func);
-		}
+		if ($func)
+			self::dispatch($func);
 		else
 			echo self::subst(
 				'<html>'.
@@ -1407,6 +1457,8 @@ class F3 extends Base {
 			'EXEMPT'=>NULL,
 			// User interface folder
 			'GUI'=>$root,
+			// Server hostname
+			'HOSTNAME'=>$_SERVER['SERVER_NAME'],
 			// URL for hotlink redirection
 			'HOTLINK'=>NULL,
 			// Default language (auto-detect if null)
@@ -1423,6 +1475,9 @@ class F3 extends Base {
 			'PLUGINS'=>__DIR__,
 			// Prefix for method aliases
 			'PREFIX'=>__CLASS__,
+			// Server protocol
+			'PROTOCOL'=>'http'.
+				(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']!='off'?'s':''),
 			// Allow framework to proxy for plugins
 			'PROXY'=>FALSE,
 			// Stream handle for HTTP PUT method
@@ -1436,9 +1491,14 @@ class F3 extends Base {
 			// URL for spam redirection
 			'SPAM'=>NULL,
 			// Profiler statistics
-			'STATS'=>array('MEMORY'=>array('start'=>memory_get_usage())),
+			'STATS'=>array(
+				'MEMORY'=>array('start'=>memory_get_usage()),
+				'TIME'=>array('start'=>microtime(TRUE))
+			),
 			// Minimum script execution time
 			'THROTTLE'=>0,
+			// Tidy options
+			'TIDY'=>array(),
 			// Framework version
 			'VERSION'=>self::TEXT_AppName.' '.self::TEXT_Version
 		);
@@ -1809,6 +1869,27 @@ class Cache extends Base {
 
 }
 
+// Sandbox for isolating PHP functions
+class SandBox {
+
+	/**
+		Grab file contents and run PHP code in sandbox
+			@return mixed
+			@param $file string
+			@public
+	**/
+	static function grab($file) {
+		// Use framework symbol table to hide local variable
+		F3::set('FILE',F3::subst($file));
+		unset($file);
+		// Interpret PHP code
+		ob_start();
+		require F3::get('FILE');
+		return ob_get_clean();
+	}
+
+}
+
 //! F3 object mode
 class F3instance {
 
@@ -1825,18 +1906,35 @@ class F3instance {
 	}
 
 	/**
-		Render user interface; Workaround for PHP's require() scope
-		limitation (enables use of $this in views)
+		Grab file contents and run PHP code in sandbox;
+		Workaround for PHP's require() scope limitation
+			@return mixed
+			@param $file string
+			@public
+	**/
+	function grab($file) {
+		// Use framework symbol table to hide local variable
+		F3::set('FILE',F3::subst($file));
+		unset($file);
+		// Interpret PHP code
+		ob_start();
+		require F3::get('FILE');
+		return ob_get_clean();
+	}
+
+	/**
+		Render user interface; Enables use of $this in views
 			@return string
 			@param $file string
+			@param $opt boolean
 			@public
 	**/
 	function render($file) {
 		$file=F3::subst($file);
 		if (is_file($view=F3::fixslashes(F3::ref('GUI').$file))) {
-			ob_start();
-			include F3::fixslashes(F3::get('GUI').$file);
-			return ob_get_clean();
+			$out=$this->grab($view);
+			return F3::ref('TIDY') && extension_loaded('tidy')?
+				F3::tidy($out):$out;
 		}
 		$var=&F3::ref('CONTEXT');
 		$var=$view;
@@ -1871,8 +1969,7 @@ class F3instance {
 		$class=new ReflectionClass($this);
 		foreach ($class->getMethods() as $func)
 			if (in_array($func->name,$def)) {
-				$var=&F3::ref('CONTEXT');
-				$var=get_called_class().'->'.$func->name;
+				F3::set('CONTEXT',get_called_class().'->'.$func->name);
 				trigger_error(F3::TEXT_Conflict);
 			}
 	}
