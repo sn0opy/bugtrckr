@@ -3,7 +3,7 @@
 <div class="ticket">
 	<table class="ticket">
 		<tr>
-			<th>{@lng.STATUS}</th>
+			<th>{@lng.status}</th>
 			<td>{@ticket.state}</td>
 			<th>{@lng.created}</th>
 			<td>{@ticket.created}</td>

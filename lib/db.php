@@ -60,8 +60,8 @@ class DB extends Base {
 			$query->execute();
 		}
 		// Check SQLSTATE
-		if ($this->pdo->errorCode()!=PDO::ERR_NONE) {
-			$error=$this->pdo->errorinfo();
+		if ($query->errorCode()!=PDO::ERR_NONE) {
+			$error=$query->errorinfo();
 			trigger_error($error[2]);
 			return FALSE;
 		}
@@ -72,7 +72,6 @@ class DB extends Base {
 		if (!isset($stats[$this->dsn]['queries'][$cmd]))
 			$stats[$this->dsn]['queries'][$cmd]=0;
 		$stats[$this->dsn]['queries'][$cmd]++;
-
 		return $result;
 	}
 
@@ -174,7 +173,7 @@ class Axon extends Base {
 		SQL select statement wrapper
 			@return array
 			@param $fields string
-			@param $cond string
+			@param $cond mixed
 			@param $group string
 			@param $seq string
 			@param $limit int
@@ -183,14 +182,24 @@ class Axon extends Base {
 	**/
 	function select(
 		$fields=NULL,$cond=NULL,$group=NULL,$seq=NULL,$limit=0,$ofs=0) {
-		$rows=$this->db->sql(
-			'SELECT '.($fields?:'*').' FROM '.$this->table.
-				($cond?(' WHERE '.$cond):'').
-				($group?(' GROUP BY '.$group):'').
-				($seq?(' ORDER '.$seq):'').
-				($limit?(' LIMIT '.$limit):'').
-				($ofs?(' OFFSET '.$ofs):'').';'
-		);
+		$rows=is_array($cond)?
+			$this->db->sql(
+				'SELECT '.($fields?:'*').' FROM '.$this->table.
+					($cond?(' WHERE '.$cond[0]):'').
+					($group?(' GROUP BY '.$group):'').
+					($seq?(' ORDER '.$seq):'').
+					($limit?(' LIMIT '.$limit):'').
+					($ofs?(' OFFSET '.$ofs):'').';',
+				$cond[1]
+			):
+			$this->db->sql(
+				'SELECT '.($fields?:'*').' FROM '.$this->table.
+					($cond?(' WHERE '.$cond):'').
+					($group?(' GROUP BY '.$group):'').
+					($seq?(' ORDER '.$seq):'').
+					($limit?(' LIMIT '.$limit):'').
+					($ofs?(' OFFSET '.$ofs):'').';'
+			);
 		// Convert array elements to Axon objects
 		foreach ($rows as &$row)
 			$row=$this->factory($row);
@@ -200,7 +209,7 @@ class Axon extends Base {
 	/**
 		Retrieve all records that match criteria
 			@return array
-			@param $cond string
+			@param $cond mixed
 			@param $seq string
 			@param $limit int
 			@param $ofs int
@@ -217,7 +226,7 @@ class Axon extends Base {
 	/**
 		Retrieve first record that matches criteria
 			@return array
-			@param $cond string
+			@param $cond mixed
 			@param $seq string
 			@param $ofs int
 			@public
@@ -230,7 +239,7 @@ class Axon extends Base {
 	/**
 		Count records that match condition
 			@return int
-			@param $cond string
+			@param $cond mixed
 			@public
 	**/
 	function found($cond=NULL) {
@@ -261,7 +270,7 @@ class Axon extends Base {
 
 	/**
 		Hydrate Axon with first record that matches criteria
-			@param $cond string
+			@param $cond mixed
 			@param $seq string
 			@param $ofs int
 			@public
@@ -361,14 +370,15 @@ class Axon extends Base {
 	}
 
 	/**
-		Delete record
+		Delete record/s
+			@param $force boolean
 			@public
 	**/
-	function erase() {
+	function erase($force=FALSE) {
 		if (method_exists($this,'beforeErase') && !$this->beforeErase())
 			return;
 		$this->db->sql('DELETE FROM '.$this->table.
-			(($cond=$this->cond)?(' WHERE '.$cond):'').';');
+			(($cond=$this->cond)?(' WHERE '.$cond):($force?'':'FALSE')).';');
 		$this->reset();
 		if (method_exists($this,'afterErase'))
 			$this->afterErase();
