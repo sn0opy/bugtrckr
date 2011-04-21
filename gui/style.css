@@ -27,6 +27,7 @@ body
     padding: 10px;
     border-bottom: 1px solid #333;
     color: #FFF;
+    text-shadow: 1px 1px 1px #000;
 }
 
 #menu ul

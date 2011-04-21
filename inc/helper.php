@@ -39,15 +39,18 @@
             }
         }
 
-        public static function objectToArray($object)
+        public static function setTitle($subTitles)
         {
-            if(!is_object($object) && !is_array($object))
-                return $object;
+            $title = '';
+            $subTitles = (array) $subTitles;
 
-            if(is_object($object))
-                $object = get_object_vars($object);
+            foreach($subTitles as $sub)
+            {
+                $seperator = !empty($title) ? ' › ' : '';
+                $title .= $seperator .$sub;
+            }
             
-            return array_map('self::objectToArray', $object);
+            F3::set('title', $title.' - '.F3::get('title'));
         }
 
     }

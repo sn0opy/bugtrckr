@@ -276,11 +276,13 @@
             
             F3::set('tickets', $userTickets);
             F3::set('template', 'user.tpl.php');
+            helper::setTitle(array('{@lng.user}', $name));
             $this->tpserve();
         }
 
         function showUserRegister()
         {
+            helper::setTitle(array('{@lng.user}', '{@lng.registration}'));
             F3::set('template', 'userRegister.tpl.php');
             $this->tpserve();
         }
@@ -301,6 +303,7 @@
 
         function showUserLogin()
         {
+            helper::setTitle(array('{@lng.user}', '{@lng.login}'));
             $this->set('template', 'userLogin.tpl.php');
             $this->tpserve();
         }
@@ -341,12 +344,9 @@
 		{
 			$projects = Dao::getProjects('1 = 1');
 			foreach($projects as $i=>$project)
-			{
 				$projects[$i] = $project->toArray();
-			}
             
 			F3::set('projects', $projects);
-            #echo $this->render('main.tpl.php');
 			echo Template::serve('main.tpl.php');
 		}
 
