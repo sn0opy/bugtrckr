@@ -141,7 +141,7 @@
 		public function save()
 		{
 			$this->ax->load('hash = "' .$this->hash. '"');
-			$this->ax->hash = 2;//$this->hash;
+			$this->ax->hash = $this->hash;
 			$this->ax->title = $this->title;
 			$this->ax->description = $this->description;
 			$this->ax->owner = $this->owner;
