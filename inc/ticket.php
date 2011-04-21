@@ -16,9 +16,13 @@
 		private $category;
 		private $milestone;
 
+        private $ax;		
+
 		function __construct()
 		{
 			parent::__construct();
+
+            $this->ax = new Axon('Ticket');			
 		}
 
 		public function getId()
@@ -26,6 +30,11 @@
 			return $this->id;
 		}
 
+		public function setHash($hash)
+		{
+			$this->hash = $hash;
+		}
+		
 		public function getHash()
 		{
 			return $this->hash;
@@ -131,33 +140,23 @@
 		 */
 		public function save()
 		{
-			if ($this->id > 0)
-			{
-				$stat = F3::get('DB')->sql("UPDATE Ticket SET " .
-						"owner = $this->owner, " .
-                        "assigned = $this->assigned, " .
-						"state = $this->state, " .
-						"priority = $this->priority, " .
-						"milestone = $this->milestone ".
-						"WHERE id = $this->id");
-				return is_array($stat) ? $this->hash : 0;
-			}
-			else
-			{
+			$this->ax->load('hash = "' .$this->hash. '"');
+			$this->ax->hash = $this->hash;
+			$this->ax->title = $this->title;
+			$this->ax->description = $this->description;
+			$this->ax->owner = $this->owner;
+			$this->ax->assigned = $this->assigned;
+			$this->ax->type = $this->type;
+			$this->ax->state = $this->state;
+			$this->ax->priority = $this->priority;
+			$this->ax->category = $this->category;
+			$this->ax->milestone = $this->milestone;
+			$this->ax->time = isset($this->time) ? $this->time : time();
+			$this->ax->save();
 
-                $helper = new helper();
-                $hash = $helper->getFreeHash('Ticket');
-                
-				$stat = F3::get('DB')->sql("INSERT INTO Ticket " .
-						"(hash, title, description, owner, assigned, type, state, " .
-						"priority, category, milestone, created) VALUES " .
-						"('".$hash."', '$this->title', '$this->description',".
-						" $this->owner, $this->assigned, $this->type, $this->state," .
-						" $this->priority, '$this->category', $this->milestone, ".
-						time() .")");
+			if ($this->ax->_id <= 0)
+				throw new Exception();
 
-				return is_array($stat) ? $hash : 0;
-			}
 		}
 
 		/*
@@ -165,22 +164,23 @@
 		 */
 		public function load($stmt)
 		{
-			$result = F3::get('DB')->sql("SELECT * FROM Ticket WHERE $stmt");
 
-			if (is_array($result))
+			$this->ax->load($stmt);
+
+			if (!$this->ax->dry())
 			{
-				$this->id = $result[0]['id'];
-				$this->hash = $result[0]['hash'];
-				$this->title = $result[0]['title'];
-				$this->description = $result[0]['description'];
-				$this->created = $result[0]['created'];
-				$this->owner = $result[0]['owner'];
-                $this->assigned = $result[0]['assigned'];
-				$this->type = $result[0]['type'];
-				$this->state = $result[0]['state'];
-				$this->priority = $result[0]['priority'];
-				$this->category = $result[0]['category'];
-				$this->milestone = $result[0]['milestone'];
+				$this->id = $this->ax->id;
+				$this->hash = $this->ax->hash;
+				$this->title = $this->ax->title;
+				$this->description = $this->ax->description;
+				$this->created = $this->ax->created;
+				$this->owner = $this->ax->owner;
+                $this->assigned = $this->ax->assigned;
+				$this->type = $this->ax->type;
+				$this->state = $this->ax->state;
+				$this->priority = $this->ax->priority;
+				$this->category = $this->ax->category;
+				$this->milestone =  $this->ax->milestone;
 			}
 		}
 

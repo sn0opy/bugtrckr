@@ -106,6 +106,7 @@
 				$tickets[$i] = $ticket->toArray();
 			}
 
+
 			F3::set('milestones', $milestones);
 			F3::set('tickets', $tickets);
 			F3::set('pageTitle', '{@lng.tickets}');
@@ -154,6 +155,7 @@
 			$owner = F3::get('SESSION.userId');
 
 			$ticket = new Ticket();
+			$ticket->setHash($this->helper->getFreeHash('Ticket'));
 			$ticket->setTitle($post['title']);
 			$ticket->setDescription($post['description']);
 			$ticket->setOwner($owner);
@@ -164,20 +166,19 @@
 			$ticket->setCategory(1);
 			$ticket->setMilestone($post['milestone']);
 
-			$hash = $ticket->save();
-			
-			/* Redirect to the added Ticket */
-			if (!is_string($hash) && $hash == 0)
+			try 
+			{
+				$ticket->save();
+
+				Dao::addActivity("created Ticket ". $ticket->getTitle());
+				F3::set('PARAMS.hash', $ticket->getHash());
+				$this->showTicket();
+			}
+			catch (Exception $e)
 			{
 				F3::set('FAILURE', 'Failure while adding Ticket');
 				F3::set('pageTitle', 'Failure');
 				$this->tpserve();
-			}
-			else
-			{
-				Dao::addActivity("created Ticket ". $ticket->getTitle());
-				F3::set('PARAMS.hash', $hash);
-				$this->showTicket($hash);
 			}
 		}
 
