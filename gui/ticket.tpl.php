@@ -43,7 +43,7 @@
 	<h3>{@lng.description}</h3>
 
 	<p>
-		{nl2br(htmlentities(@ticket.description))}
+		{nl2br(@ticket.description)}
 	</p>
 </div>
 
