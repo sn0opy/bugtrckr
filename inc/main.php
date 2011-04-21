@@ -276,14 +276,14 @@
             
             F3::set('tickets', $userTickets);
             F3::set('template', 'user.tpl.php');
-            helper::setTitle(array('{@lng.user}', $name));
+            F3::set('pageTitle', '{@lng.user} › '.$name);
             $this->tpserve();
         }
 
         function showUserRegister()
         {
-            helper::setTitle(array('{@lng.user}', '{@lng.registration}'));
             F3::set('template', 'userRegister.tpl.php');
+            F3::set('pageTitle', '{@lng.user} › {@lng.registration}');
             $this->tpserve();
         }
 
@@ -303,8 +303,8 @@
 
         function showUserLogin()
         {
-            helper::setTitle(array('{@lng.user}', '{@lng.login}'));
             $this->set('template', 'userLogin.tpl.php');
+            F3::set('pageTitle', '{@lng.user} › {@lng.login}');
             $this->tpserve();
         }
 

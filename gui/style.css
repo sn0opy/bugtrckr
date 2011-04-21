@@ -49,9 +49,19 @@ body
     color: #FFF;
 }
 
-#menu li:hover
+#menu li:hover a
 {
     border-bottom: 3px solid #FFF;
+}
+
+#menu li:hover a.normLink
+{
+    border-bottom: none;
+}
+
+#menu li a.normLink:hover
+{
+    border-bottom: 1px solid #FFF;
 }
 
 #menu select

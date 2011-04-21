@@ -39,18 +39,4 @@
             }
         }
 
-        public static function setTitle($subTitles)
-        {
-            $title = '';
-            $subTitles = (array) $subTitles;
-
-            foreach($subTitles as $sub)
-            {
-                $seperator = !empty($title) ? ' › ' : '';
-                $title .= $seperator .$sub;
-            }
-            
-            F3::set('title', $title.' - '.F3::get('title'));
-        }
-
     }

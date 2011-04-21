@@ -3,7 +3,7 @@
 		<link 	ref="stylesheet" href="/{@BASE}gui/style.css" 
 				rel="stylesheet" typ="text/css" />
 
-		<title>{@title}</title>
+		<title>{@pageTitle} - {@title}</title>
 
 	</head>
 
@@ -50,10 +50,10 @@
 				</li>
                 <F3:check if="{@SESSION.userId}">
                     <F3:true>
-                        <li class="alignright">Eingeloggt als <a href="/{@BASE}user/{htmlentities(@SESSION.userName)}"><strong class="normalText">{htmlentities(@SESSION.userName)}</strong></a> [<a href="/{@BASE}user/logout" class="normalText">{@lng.logout}</a>]</li>
+                        <li class="alignright">Eingeloggt als <a href="/{@BASE}user/{htmlentities(@SESSION.userName)}" class="normLink"><strong class="normalText">{htmlentities(@SESSION.userName)}</strong></a> [<a href="/{@BASE}user/logout" class="normalText normLink">{@lng.logout}</a>]</li>
                     </F3:true>
                     <F3:false>
-                        <li class="alignright"><a href="/{@BASE}user/login" onclick="document.getElementById('login').style.display = 'block'; return false">{@lng.login}</a></li>
+                        <li class="alignright"><a href="/{@BASE}user/login" onclick="document.getElementById('login').style.display = 'block'; return false" class="normLink">{@lng.login}</a></li>
                     </F3:false>
                 </F3:check>
 			</ul>
