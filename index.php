@@ -18,8 +18,6 @@ $app->set('PROXY', 1);
 
 F3::set('DB', new DB('sqlite:' .$dbFile));
 
-require 'inc/mapping.inc.php';
-
 $app->route('GET /', 'main->start');
 $app->route('GET /roadmap', 'main->showRoadmap');
 $app->route('GET /timeline', 'main->showTimeline');
@@ -34,6 +32,7 @@ $app->route('GET /user/logout', 'main->logoutUser');
 $app->route('POST /user/login', 'main->loginUser');
 $app->route('POST /user/new', 'main->registerUser');
 $app->route('POST /ticket', 'main->addTicket');
+$app->route('POST /ticket/@hash', 'main->editTicket');
 $app->route('POST /milestone', 'main->addMilestone');
 $app->route('POST /project/select', 'main->selectProject');
 

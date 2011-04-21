@@ -128,5 +128,18 @@
                 $this->id = $this->ax->id;
                 $this->role = $this->ax->role;
             }
-        }
+		}
+
+		public function toArray()
+		{
+			$user = array();
+
+			$user['id'] = $this->id;
+			$user['name'] = $this->name;
+			$user['hash'] = $this->hash;
+			$user['email'] = $this->email;
+			$user['admin'] = $this->admin;
+
+			return $user;
+		}
 	}
