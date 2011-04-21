@@ -53,7 +53,7 @@
 
 <hr />
 
-<div> 
+<div class=""> 
 	<form method="POST" action="/{@BASE}ticket/{@ticket.hash}">
 
 		<div class="formRow">
