@@ -15,7 +15,7 @@
 
 		function start()
 		{
-            
+            F3::set('pageTitle', '{@lng.home}');
             F3::set('template', 'home.tpl.php');
 			$this->tpserve();
 		}
@@ -38,7 +38,7 @@
 				$road[$i]['milestone'] = $milestone->toArray();
 
 				/* Get all Tickets of this milestone */				
-				$road[$i]['tickets'] = Dao::getTickets("milestone = ". $milestone->getId());
+				$road[$i]['tickets'] = Dao::getTickets("milestone = ". $milestone->getId() . " AND state < 5");
 				foreach($road[$i]['tickets'] as $j=>$ticket)
 				{
 					$road[$i]['tickets'][$j] = $ticket->toArray();
@@ -48,6 +48,7 @@
 			}
 			
 			F3::set('road', $road);
+			F3::set('pageTitle', '{@lng.roadmap}');
 			F3::set('template', 'roadmap.tpl.php');
 			$this->tpserve();
 		}
@@ -70,6 +71,7 @@
 			}
 
 			F3::set('activities', $timeline);
+			F3::set('pageTitle', '{@lng.timeline}');
             F3::set('template', 'timeline.tpl.php');
 			$this->tpserve();
 		}
@@ -106,6 +108,7 @@
 
 			F3::set('milestones', $milestones);
 			F3::set('tickets', $tickets);
+			F3::set('pageTitle', '{@lng.tickets}');
             F3::set('template', 'tickets.tpl.php');
 			$this->tpserve();
 		}
@@ -137,6 +140,7 @@
 
 			F3::set('ticket', $ticket->toArray());
 			F3::set('milestone', $milestone->toArray());
+			F3::set('pageTitle', '{@lng.tickets} › '. $ticket->getTitle());
 			F3::set('template', 'ticket.tpl.php');
 			$this->tpserve();
 		}
@@ -167,6 +171,7 @@
 			if (!is_string($hash) && $hash == 0)
 			{
 				F3::set('FAILURE', 'Failure while adding Ticket');
+				F3::set('pageTitle', 'Failure');
 				$this->tpserve();
 			}
 			else
@@ -199,6 +204,7 @@
 			if (!is_string($hash) && $hash == 0)
 			{
 				F3::set('FAILURE', 'Failure while adding Ticket');
+				F3::set('pageTitle', 'Failure');
 				$this->tpserve();
 			}
 			else
@@ -230,6 +236,7 @@
 			if (!is_string($hash) && $hash == 0)
 			{
 				F3::set('FAILURE', 'Failure while adding Milestone');
+				F3::set('pageTitle', 'Failure');
 				$this->tpserve();
 			}
 			else
