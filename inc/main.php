@@ -8,7 +8,9 @@
             parent::__construct();
 
             $this->helper = new helper;
-            $this->helper->intlSupport();
+			$this->helper->intlSupport();
+
+			require_once 'inc/mapping.inc.php';
         }
 
 		function start()
@@ -113,13 +115,25 @@
 		 */
 		function showTicket()
 		{
-			$hash = F3::get('PARAMS["hash"]');
+			$hash = F3::get('PARAMS.hash');
 
 			$ticket = new Ticket();
 			$ticket->load("hash = '$hash'");
 
 			$milestone = new Milestone();
 			$milestone->load("id = ". $ticket->getMilestone());
+
+			if (true /* hasAccess('editTicket') */)
+			{
+				$users = Dao::getUsers("1 = 1");
+				
+				foreach($users as $i=>$user)
+				{
+					$users[$i] = $user->toArray();
+				}
+
+				F3::set('users', $users);
+			}
 
 			F3::set('ticket', $ticket->toArray());
 			F3::set('milestone', $milestone->toArray());
@@ -158,6 +172,38 @@
 			else
 			{
 				Dao::addActivity("created Ticket ". $ticket->getTitle());
+				F3::set('PARAMS.hash', $hash);
+				$this->showTicket($hash);
+			}
+		}
+
+		/**
+		 *
+		 */
+		function editTicket()
+		{
+			require_once 'ticket.php';
+
+			$post = F3::get('POST');
+			$hash = F3::get('PARAMS.hash');
+
+			$ticket = new Ticket();
+			$ticket->load("hash = '$hash'");
+
+			$ticket->setOwner($post['userId']);
+			$ticket->setState($post['state']);
+
+			$hash = $ticket->save();
+
+			/* Redirect to the changed Ticket */			
+			if (!is_string($hash) && $hash == 0)
+			{
+				F3::set('FAILURE', 'Failure while adding Ticket');
+				$this->tpserve();
+			}
+			else
+			{
+				Dao::addActivity("changed Ticket ". $ticket->getTitle());
 				F3::set('PARAMS["hash"]', $hash);
 				$this->showTicket($hash);
 			}

@@ -2,6 +2,9 @@
 
 F3::set('ticket_state', array(
 	'1' => F3::get('lng.new'),
+	'2' => F3::get('lng.assigned'),
+	'3' => F3::get('lng.inwork'),
+	'4' => F3::get('lng.testing'),
 	'5' => F3::get('lng.closed')
 ));
 

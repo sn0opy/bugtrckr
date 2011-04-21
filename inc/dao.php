@@ -76,6 +76,24 @@
 		/**
 		 *
 		 */
+		static function getUsers($stmt)
+		{
+			$result = array();
+
+			$users = F3::get('DB')->sql("SELECT id FROM User WHERE $stmt");
+
+			foreach($users as $i=>$user)
+			{
+				$result[$i] = new User();
+				$result[$i]->load("id = $user[id]");
+			}
+
+			return $result;
+		}
+
+		/**
+		 *
+		 */
 		static function addActivity($message)
 		{
 			$userId = F3::get('SESSION.userId');
