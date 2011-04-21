@@ -35,12 +35,12 @@
 									<F3:true>
 										<option value="{@project.hash}"
 												selected="selected">
-											{htmlentities(@project.name)}
+											{@project.name}
 										</option>
 									</F3:true>
 									<F3:false>
 										<option value="{@project.hash}">
-											{htmlentities(@project.name)}
+											{@project.name}
 										</option>
 									</F3:false>
 								</F3:check>
@@ -50,7 +50,7 @@
 				</li>
                 <F3:check if="{@SESSION.userId}">
                     <F3:true>
-                        <li class="alignright">Eingeloggt als <a href="/{@BASE}user/{htmlentities(@SESSION.userName)}" class="normLink"><strong class="normalText">{htmlentities(@SESSION.userName)}</strong></a> [<a href="/{@BASE}user/logout" class="normalText normLink">{@lng.logout}</a>]</li>
+                        <li class="alignright">Eingeloggt als <a href="/{@BASE}user/{@SESSION.userName}" class="normLink"><strong class="normalText">{@SESSION.userName}</strong></a> [<a href="/{@BASE}user/logout" class="normalText normLink">{@lng.logout}</a>]</li>
                     </F3:true>
                     <F3:false>
                         <li class="alignright"><a href="/{@BASE}user/login" onclick="document.getElementById('login').style.display = 'block'; return false" class="normLink">{@lng.login}</a></li>

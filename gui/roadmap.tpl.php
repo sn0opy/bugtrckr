@@ -35,15 +35,15 @@
 <F3:repeat group="{@road}" key="{@i}" value="{@item}">
 
 <div class="milestone">
-	<h3>{htmlentities(@item.milestone.name)}</h3>
+	<h3>{@item.milestone.name}</h3>
 	
-	<p>{nl2br(htmlentities(@item.milestone.description))}</p>
+	<p>{nl2br(@item.milestone.description)}</p>
 
 	<p class="info">{@item.ticketcount} {@lng.ticketsleft}</p>
 
 	<ul class="sublist">
 	<F3:repeat group="{@item.tickets}" key="{@j}" value="{@ticket}">
-		<li><a href="/{@BASE}ticket/{@ticket.hash}">{htmlentities(@ticket.title)}</a></li>
+		<li><a href="/{@BASE}ticket/{@ticket.hash}">{@ticket.title}</a></li>
 	</F3>
 	</ul>	
 

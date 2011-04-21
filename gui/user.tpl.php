@@ -3,7 +3,7 @@
 <h3>{@lng.informations}</h3>
 <div class="formRow">
     <div class="formLabel">{@lng.name}: </div>
-    <div class="formValue">{htmlentities(@user.name)}</div>
+    <div class="formValue">{@user.name}</div>
 </div>
 
 <h3>{@lng.tickets}:</h3>
@@ -21,12 +21,12 @@
 	<tr class="tr{@i%2}">
 		<td class="id">{@i+1}</td>
 		<td class="title">
-			<a href="/{@BASE}ticket/{@ticket.hash}">{htmlentities(@ticket.title)}</a>
+			<a href="/{@BASE}ticket/{@ticket.hash}">{@ticket.title}</a>
 		</td>
 		<td class="state">{@ticket.state}</td>
 		<td class="priority">{@ticket.priority}</td>
 		<td class="created">{@ticket.created}</td>
-		<td class="owner"><a href="/{@BASE}user/{@ticket.owner}">{htmlentities(@ticket.owner)}</a></td>
+		<td class="owner"><a href="/{@BASE}user/{@ticket.owner}">{@ticket.owner}</a></td>
 	</tr>
 	</F3:repeat>
 </table>
