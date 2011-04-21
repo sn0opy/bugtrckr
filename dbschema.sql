@@ -1,8 +1,8 @@
 --
 -- Ticket
 --
-CREATE TABLE Ticket (id INTEGER PRIMARY KEY AUTOINCREMENT, hash char(12) UNIQUE, title varchar(40), description text, created int, owner int, type int, state int, priority int, category varchar(40), milestone int);
-INSERT INTO Ticket (id, hash, title, description, created, owner, type, state, priority, category, milestone) VALUES (1, 'b026324c6904b2a9cb4b88d6d61c81d1', 'Example Ticket', 'This Ticket is just a little example', 1, 2, 1, 1, 3, 1, 1);
+CREATE TABLE Ticket (id INTEGER PRIMARY KEY AUTOINCREMENT, hash char(12) UNIQUE, title varchar(40), description text, created int, owner int, assigned int, type int, state int, priority int, category varchar(40), milestone int);
+INSERT INTO Ticket (id, hash, title, description, created, owner, type, state, priority, category, milestone) VALUES (1, 'b026324c6904b2a9cb4b88d6d61c81d1', 'Example Ticket', 'This Ticket is just a little example', 1, 1, 2, 1, 1, 3, 1, 1);
 --
 -- User
 --

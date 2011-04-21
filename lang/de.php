@@ -45,6 +45,7 @@ return array('lng' => array(
     'logout' => 'Ausloggen',
     'informations' => 'Informationen',
     'user' => 'Benutzer',
-    'noaccount' => 'Noch keinen Account?'
+    'noaccount' => 'Noch keinen Account?',
+    'assignedTo' => 'Zugewiesen'
 ));
 

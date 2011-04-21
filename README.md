@@ -12,3 +12,4 @@ REQUIREMENTS
 * SQLite
 * PDO
 * PDO SQLite
+* PHP Intl (recommended)

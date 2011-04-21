@@ -150,8 +150,6 @@
 		 */
 		function addTicket()
 		{
-			require_once 'ticket.php';
-
 			$post = F3::get('POST');
 			$owner = F3::get('SESSION.userId');
 
@@ -159,6 +157,7 @@
 			$ticket->setTitle($post['title']);
 			$ticket->setDescription($post['description']);
 			$ticket->setOwner($owner);
+            $ticket->setAssigned(1); // TODO: get nicklist of users 
 			$ticket->setType($post['type']);
 			$ticket->setState(1);
 			$ticket->setPriority($post['priority']);
@@ -195,7 +194,7 @@
 			$ticket = new Ticket();
 			$ticket->load("hash = '$hash'");
 
-			$ticket->setOwner($post['userId']);
+			$ticket->setAssigned($post['userId']);
 			$ticket->setState($post['state']);
 
 			$hash = $ticket->save();

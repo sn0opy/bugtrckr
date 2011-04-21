@@ -12,8 +12,8 @@
 		<tr>
 			<th>{@lng.priority}</th>
 			<td>{@ticket.priority}</td>
-			<th></th>
-			<td></td>
+			<th>{@lng.assignedTo}</th>
+			<td>{@ticket.assigned}</td>
 		</tr>
 
 		<tr>
@@ -57,11 +57,11 @@
 	<form method="POST" action="/{@BASE}ticket/{@ticket.hash}">
 
 		<div class="formRow">
-			<div class="formLabel">{@lng.owner}</div>
+			<div class="formLabel">{@lng.assignedTo}</div>
 			<div class="formValue">
 				<select name="userId" size="1">
 				<F3:repeat group="{@users}" value="{@user}">
-					<option value="{@user.id}">{@user.name}</option>
+                    <option value="{@user.id}">{@user.name}</option>
 				</F3:repeat>
 				</select>
 			</div>

@@ -9,6 +9,7 @@
 		private $description;
 		private $created;
 		private $owner;
+        private $assigned;
 		private $type;
 		private $state;
 		private $priority;
@@ -64,6 +65,16 @@
 		{
 			return $this->owner;
 		}
+
+        public function setAssigned($assigned)
+        {
+            $this->assigned = $assigned;
+        }
+
+        public function getAssigned()
+        {
+            return $this->assigned;
+        }
 
 		public function setType($type)
 		{
@@ -124,6 +135,7 @@
 			{
 				$stat = F3::get('DB')->sql("UPDATE Ticket SET " .
 						"owner = $this->owner, " .
+                        "assigned = $this->assigned, " .
 						"state = $this->state, " .
 						"priority = $this->priority, " .
 						"milestone = $this->milestone ".
@@ -137,10 +149,10 @@
                 $hash = $helper->getFreeHash('Ticket');
                 
 				$stat = F3::get('DB')->sql("INSERT INTO Ticket " .
-						"(hash, title, description, owner, type, state, " .
+						"(hash, title, description, owner, assigned, type, state, " .
 						"priority, category, milestone, created) VALUES " .
 						"('".$hash."', '$this->title', '$this->description',".
-						" $this->owner, $this->type, $this->state," .
+						" $this->owner, $this->assigned, $this->type, $this->state," .
 						" $this->priority, '$this->category', $this->milestone, ".
 						time() .")");
 
@@ -163,6 +175,7 @@
 				$this->description = $result[0]['description'];
 				$this->created = $result[0]['created'];
 				$this->owner = $result[0]['owner'];
+                $this->assigned = $result[0]['assigned'];
 				$this->type = $result[0]['type'];
 				$this->state = $result[0]['state'];
 				$this->priority = $result[0]['priority'];
@@ -188,6 +201,7 @@
 			$ticket['description'] = $this->description;
 			$ticket['created'] = date('d.m.Y H:i', $this->created);
 			$ticket['owner'] = Dao::getUserName($this->owner);
+            $ticket['assigned'] = Dao::getUserName($this->assigned);
 			$ticket['type'] = $ticket_type[$this->type];
 			$ticket['state'] = $ticket_state[$this->state];
 			$ticket['priority'] = $ticket_priority[$this->priority];
