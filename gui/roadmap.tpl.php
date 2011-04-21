@@ -1,9 +1,11 @@
-<h2>{@lng.roadmap}</h2>
+<h2 class="floatleft">{@lng.roadmap}</h2>
 
-<button type="button" onclick="document.getElementById('add').style.display = 'block'">
+<button type="button" class="floatright"
+        onclick="document.getElementById('add').style.display = 'block'">
 	{@lng.addmilestone}
 </button>
 
+{* Form for new milestones *}
 <div id="add">
     <h3 class="floatleft">{@lng.addmilestone}</h3>
 	<a class="closeButton" href="#" onclick="document.getElementById('add').style.display = 'none'">
@@ -30,23 +32,19 @@
 	</form>
 	<br class="clearfix" />
 </div>
-
+{* End form for new milestones *}
 
 <F3:repeat group="{@road}" key="{@i}" value="{@item}">
-
-<div class="milestone">
+<div class="milestone clearfix">
 	<h3>{@item.milestone.name}</h3>
 	
 	<p>{nl2br(@item.milestone.description)}</p>
-
 	<p class="info">{@item.ticketcount} {@lng.ticketsleft}</p>
 
 	<ul class="sublist">
-	<F3:repeat group="{@item.tickets}" key="{@j}" value="{@ticket}">
-		<li><a href="/{@BASE}ticket/{@ticket.hash}">{@ticket.title}</a></li>
-	</F3>
+        <F3:repeat group="{@item.tickets}" key="{@j}" value="{@ticket}">
+        <li><a href="/{@BASE}ticket/{@ticket.hash}">{@ticket.title}</a></li>
+        </F3>
 	</ul>	
-
 </div>
-
 </F3:repeat>

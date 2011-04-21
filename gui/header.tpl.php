@@ -1,10 +1,9 @@
+<!doctype html>
 <html>
 	<head>
-		<link 	ref="stylesheet" href="/{@BASE}gui/style.css" 
-				rel="stylesheet" typ="text/css" />
-
+        <meta charset="UTF-8" />
+		<link href="/{@BASE}gui/style.css" rel="stylesheet" type="text/css" />
 		<title>{@pageTitle} - {@title}</title>
-
 	</head>
 
 	<body>

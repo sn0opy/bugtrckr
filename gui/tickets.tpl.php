@@ -1,11 +1,11 @@
-<h2>{@lng.tickets}</h2>
+<h2 class="floatleft">{@lng.tickets}</h2>
 
-<button type="button"
+<button type="button" class="floatright"
 	onclick="document.getElementById('add').style.display = 'block'" >
 	{@lng.addticket}
 </button>
 
-{* Form for new Tickets *}
+{* Form for new tickets *}
 <div id="add">
     <h3 class="floatleft">{@lng.addticket}</h3>
     <a class="closeButton" href="#" onclick="document.getElementById('add').style.display = 'none'">
@@ -73,27 +73,32 @@
 	</form>
 	<br class="clearfix" />
 </div>
+{* End form for new tickets *}
 
 <table class="overview">
-	<tr>
-		<th><a href="/{@BASE}tickets/id">#</a></th>
-		<th><a href="/{@BASE}tickets/title">{@lng.title}</a></th>
-		<th><a href="/{@BASE}tickets/state">{@lng.status}</a></th>
-		<th><a href="/{@BASE}tickets/priority">{@lng.priority}</a></th>
-		<th><a href="/{@BASE}tickets/created">{@lng.created}</a></th>
-		<th>{@lng.owner}</th>
-	</tr>
+    <thead>
+        <tr>
+            <th><a href="/{@BASE}tickets/id">#</a></th>
+            <th><a href="/{@BASE}tickets/title">{@lng.title}</a></th>
+            <th><a href="/{@BASE}tickets/state">{@lng.status}</a></th>
+            <th><a href="/{@BASE}tickets/priority">{@lng.priority}</a></th>
+            <th><a href="/{@BASE}tickets/created">{@lng.created}</a></th>
+            <th>{@lng.owner}</th>
+        </tr>
+    </thead>
 
-	<F3:repeat group="{@tickets}" key="{@i}" value="{@ticket}">
-	<tr class="tr{@i%2}">
-		<td class="id">{@i+1}</td>
-		<td class="title">
-			<a href="/{@BASE}ticket/{@ticket.hash}">{@ticket.title}</a>
-		</td>
-		<td class="state">{@ticket.state}</td>
-		<td class="priority">{@ticket.priority}</td>
-		<td class="created">{@ticket.created}</td>
-		<td class="owner"><a href="/{@BASE}user/{@ticket.owner}">{@ticket.owner}</a></td>
-	</tr>
-	</F3:repeat>
+    <tbody>
+        <F3:repeat group="{@tickets}" key="{@i}" value="{@ticket}">
+        <tr class="tr{@i%2}">
+            <td class="id">{@i+1}</td>
+            <td class="title">
+                <a href="/{@BASE}ticket/{@ticket.hash}">{@ticket.title}</a>
+            </td>
+            <td class="state">{@ticket.state}</td>
+            <td class="priority">{@ticket.priority}</td>
+            <td class="created">{@ticket.created}</td>
+            <td class="owner"><a href="/{@BASE}user/{@ticket.owner}">{@ticket.owner}</a></td>
+        </tr>
+        </F3:repeat>
+    </tbody>
 </table>

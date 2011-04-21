@@ -38,7 +38,7 @@
 		</tr>
 	</table>
 
-	<hr noshade="noshade" />
+	<hr />
 
 	<h3>{@lng.description}</h3>
 
@@ -50,42 +50,40 @@
 
 <F3:check if="{@SESSION.userId > 0}">
 	<F3:true>
+    
+    <div class="editTicket">
+        <form method="POST" action="/{@BASE}ticket/{@ticket.hash}">
 
-<hr />
+            <div class="formRow">
+                <div class="formLabel">{@lng.assignedTo}</div>
+                <div class="formValue">
+                    <select name="userId" size="1">
+                    <F3:repeat group="{@users}" value="{@user}">
+                        <option value="{@user.id}">{@user.name}</option>
+                    </F3:repeat>
+                    </select>
+                </div>
+            </div>
 
-<div class=""> 
-	<form method="POST" action="/{@BASE}ticket/{@ticket.hash}">
+            <div class="formRow">
+                <div class="formLabel">{@lng.status}</div>
+                <div class="formValue">
+                    <select name="state" size="1">
+                    <F3:repeat group="{@ticket_state}" key="{@i}" value="{@state}">
+                        <option value="{@i}">{@state}</option>
+                    </F3:repeat>
+                    </select>
+                </div>
+            </div>
 
-		<div class="formRow">
-			<div class="formLabel">{@lng.assignedTo}</div>
-			<div class="formValue">
-				<select name="userId" size="1">
-				<F3:repeat group="{@users}" value="{@user}">
-                    <option value="{@user.id}">{@user.name}</option>
-				</F3:repeat>
-				</select>
-			</div>
-		</div>
+            <div class="formRow">
+                <div class="formLabel">&nbsp;</div>
+                <div class="formValue">
+                    <input type="submit" value="{@lng.submit}" />
+                </div>
+            </div>
 
-		<div class="formRow">
-			<div class="formLabel">{@lng.status}</div>
-			<div class="formValue">
-				<select name="state" size="1">
-				<F3:repeat group="{@ticket_state}" key="{@i}" value="{@state}">
-					<option value="{@i}">{@state}</option>
-				</F3:repeat>
-				</select>
-			</div>
-		</div>
-
-		<div class="formRow">
-			<div class="formLabel">&nbsp;</div>
-			<div class="formValue">
-				<input type="submit" value="{@lng.submit}" />
-			</div>
-		</div>
-
-	</form>
-</div>
+        </form>
+    </div>
 	</F3:true>
 </F3:check>
