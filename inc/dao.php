@@ -93,10 +93,30 @@
 			$activity->save();
 		}
 
-        static function getUserName($uid)
+        /**
+         *
+         */
+        static function getPermission($permission)
         {
-            $ax = new Axon('User');
-            $ax->load('id = ' .$uid);
-            return $ax->name;
+            $userId = F3::get('SESSION.userId');
+            $projectId = F3::get('SESSION.project');
+
+            $user = new User();
+            $user->load('id = ' .$userID);
+
+            $projPerm = new ProjectPermission();
+            $projPerm->load('userId = ' .$userId. ' AND projectId = ' .$projectId);
+
+            $role = new Role();
+            $role->load('id = ' .$projPerm->getRoleId());
+
+            $permissions = $role->toArray();
+            
+            if(in_array($permission, $permissions))
+                if($permissions[$permission] == true)
+                    return true;
+
+
+            return false;
         }
 	}

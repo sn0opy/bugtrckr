@@ -26,3 +26,11 @@ INSERT INTO Milestone (id, hash, name, description, finished, project) VALUES (1
 #
 CREATE TABLE Activity (id INTEGER PRIMARY KEY AUTOINCREMENT, hash char(12) UNIQUE, description text, user int, changed int, project int);
 INSERT INTO Activity (id, hash, description, user, changed, project) VALUES (1, 'b026324c6904b2a9cb4b88d6d61c81d1', 'Example Activity', 1, 1, 1);
+#
+# Role
+#
+CREATE TABLE Role ("id" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , "name" VARCHAR, "issuesAssigneable" BOOL, "proj_editProject" BOOL, "proj_manageMembers" BOOL, "iss_editIssues" BOOL, "iss_addIssues" BOOL, "iss_deleteIssues" BOOL, "iss_moveIssue" BOOL, "iss_editWatchers" BOOL, "iss_addWatchers" BOOL, "iss_viewWatchers" BOOL)
+#
+# ProjectPermission
+#
+CREATE TABLE ProjectPermission ("userId" INTEGER, "projectId" INTEGER, "roleId" INTEGER)

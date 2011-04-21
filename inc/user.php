@@ -9,6 +9,7 @@
         private $email;
         private $admin;
         private $name;
+        private $role;
 
         private $ax;
 
@@ -54,6 +55,11 @@
             $this->admin = $admin;
         }
 
+        public function setRole($role)
+        {
+            $this->role = $role;
+        }
+
         public function getId()
         {
             return $this->id;
@@ -89,6 +95,11 @@
             return $this->admin;
         }
 
+        public function getRole()
+        {
+            return $this->role;
+        }
+
         public function save()
         {
             $this->ax->load('hash = "' .$this->hash. '"');
@@ -98,12 +109,13 @@
             $this->ax->salt = $this->salt;
             $this->ax->email = $this->email;
             $this->ax->admin = $this->admin;
+            $this->ax->role = $this->role;
             $this->ax->save();
         }
 
-        public function load($smtm)
+        public function load($stmt)
         {
-            $this->ax->load($smtm);
+            $this->ax->load($stmt);
 
             if(!$this->ax->dry())
             {
@@ -114,6 +126,7 @@
                 $this->email = $this->ax->email;
                 $this->admin = $this->ax->admin;
                 $this->id = $this->ax->id;
+                $this->role = $this->ax->role;
             }
         }
 	}

@@ -71,11 +71,12 @@ class DB extends Base {
 					$query->execute();
 				}
 				// Check SQLSTATE
-				if ($this->pdo->errorCode()!=PDO::ERR_NONE) {
-					$error=$this->pdo->errorinfo();
-					trigger_error($error[2]);
-					return FALSE;
-				}
+				foreach (array($this->pdo,$query) as $obj)
+					if ($obj->errorCode()!=PDO::ERR_NONE) {
+						$error=$obj->errorinfo();
+						trigger_error($error[2]);
+						return FALSE;
+					}
 				$this->result=$query->fetchall(PDO::FETCH_ASSOC);
 				if ($ttl)
 					Cache::set($hash,$this->result,$ttl);
