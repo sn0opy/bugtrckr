@@ -147,4 +147,12 @@
             $ax->load('id = ' .$uid);
             return $ax->name;
         }
+
+        /*
+         *
+         */
+        static function getTicketCount($milestone)
+        {
+            return F3::get('DB')->sql('SELECT state, COUNT(*) AS `count` FROM `Ticket` WHERE milestone = ' .$milestone. ' GROUP BY state');
+        }
 	}

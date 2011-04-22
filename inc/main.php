@@ -36,17 +36,21 @@
 			foreach($milestones as $i=>$milestone)
 			{
 				$road[$i]['milestone'] = $milestone->toArray();
+                $road[$i]['ticketCount'] = Dao::getTicketCount($milestone->getId());
 
-				/* Get all Tickets of this milestone */				
-				$road[$i]['tickets'] = Dao::getTickets("milestone = ". $milestone->getId() . " AND state < 5");
-				foreach($road[$i]['tickets'] as $j=>$ticket)
-				{
-					$road[$i]['tickets'][$j] = $ticket->toArray();
-				}
+                $fullCount = 0;
+                foreach($road[$i]['ticketCount'] as $cnt)
+                    $fullCount += $cnt['count'];
 
-				$road[$i]['ticketcount'] = count($road[$i]['tickets']);
+                $road[$i]['fullTicketCount'] = $fullCount;
+
+                foreach($road[$i]['ticketCount'] as $j=>$cnt)
+                {
+                    $road[$i]['ticketCount'][$j]['percent'] = round($cnt['count'] * 100 / $fullCount);
+                    $road[$i]['ticketCount'][$j]['title'] = F3::get("ticket_state.".$road[$i]['ticketCount'][$j]['state']);
+                }
 			}
-			
+
 			F3::set('road', $road);
 			F3::set('pageTitle', '{@lng.roadmap}');
 			F3::set('template', 'roadmap.tpl.php');
