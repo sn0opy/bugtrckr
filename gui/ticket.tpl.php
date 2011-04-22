@@ -1,4 +1,4 @@
-<h2>{@ticket.title}</h2>
+<h2>{@lng.tickets} › {@ticket.title}</h2>
 
 <div class="ticket">
 	<table class="ticket">
@@ -13,7 +13,7 @@
 			<th>{@lng.priority}</th>
 			<td>{@ticket.priority}</td>
 			<th>{@lng.assignedTo}</th>
-			<td>{@ticket.assigned}</td>
+			<td><a href="/{@BASE}user/{@ticket.assigned}">{@ticket.assigned}</a></td>
 		</tr>
 
 		<tr>
@@ -77,7 +77,7 @@
             </div>
 
             <div class="formRow">
-                <div class="formLabel">&nbsp;</div>
+                <div class="formLabel"></div>
                 <div class="formValue">
                     <input type="submit" value="{@lng.submit}" />
                 </div>

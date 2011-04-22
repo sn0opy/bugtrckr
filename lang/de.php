@@ -46,6 +46,16 @@ return array('lng' => array(
     'informations' => 'Informationen',
     'user' => 'Benutzer',
     'noaccount' => 'Noch keinen Account?',
-    'assignedTo' => 'Zugewiesen'
+    'assignedTo' => 'Zugewiesen',
+    'issuesAssigneable' => 'Tickets können zugewiesen werden',
+    'proj_editProject' => "Projekt editieren",
+    'proj_manageMembers' => 'Benutzer editieren',
+    'iss_editIssues' => 'Tickets editieren',
+    'iss_addIssues' => 'Tickets erstellen',
+    'iss_deleteIssues' => 'Tickets löschen',
+    'iss_moveIssue' => 'Tickets verschieben',
+    'iss_editWatchers' => 'Beobachter editieren',
+    'iss_addWatchers' => 'Beobachter hinzufügen',
+    'iss_viewWatchers' => 'Beobachterliste ansehen'
 ));
 

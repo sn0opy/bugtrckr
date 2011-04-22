@@ -1,4 +1,4 @@
-<h2>{@lng.user}: {@user.name}</h2>
+<h2>{@lng.user} › {@user.name}</h2>
 
 <h3>{@lng.informations}</h3>
 <div class="formRow">
@@ -7,7 +7,7 @@
 </div>
 
 <h3>{@lng.tickets}:</h3>
-<table class="overview userTickets">
+<table class="overview">
     <thead>
 	<tr>
 		<th><a href="/{@BASE}tickets/id">#</a></th>

@@ -129,11 +129,13 @@
             $role->load('id = ' .$projPerm->getRoleId());
 
             $permissions = $role->toArray();
-            
+
+            if($user->getAdmin()) // admin has access to everything
+                return true;
+
             if(in_array($permission, $permissions))
                 if($permissions[$permission] == true)
                     return true;
-
 
             return false;
         }

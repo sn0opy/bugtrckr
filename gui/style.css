@@ -11,6 +11,26 @@ body
 	min-width: 900px;
 }
 
+a
+{
+    border-bottom: 1px dotted #333;
+}
+
+a:hover
+{
+    border-bottom: none;
+}
+
+h1 a, h2 a, h3 a
+{
+    border-bottom: none;
+}
+
+h3 a:hover
+{
+    border-bottom: 1px dotted #333;
+}
+
 /* 
  *	
  */
@@ -46,12 +66,13 @@ body
 #menu a
 {
     text-transform: uppercase;
+    border: none;
     color: #FFF;
 }
 
 #menu li:hover a
 {
-    border-bottom: 3px solid #FFF;
+    border-bottom: 2px solid #FFF;
 }
 
 #menu li:hover a.normLink
@@ -61,7 +82,7 @@ body
 
 #menu li a.normLink:hover
 {
-    border-bottom: 1px solid #FFF;
+    border-bottom: 1px dotted #FFF;
 }
 
 #menu select
@@ -195,11 +216,6 @@ a
 /* 
  *	
  */
-.userTickets
-{
-    width: 70% !important;
-}
-
 table.overview
 {
 	color: #222;
@@ -245,17 +261,12 @@ table.overview .tr1
 
 table.overview .id
 {
-	width: 5%;
-}
-
-table.overview .title
-{
-
+	width: 3%;
 }
 
 table.overview .state
 {
-	width: 6%;
+	width: 10%;
 }
 
 table.overview .priority
@@ -276,6 +287,11 @@ table.overview .owner
 /*
  *
  */
+ .milestone
+{
+    margin-bottom: 30px;
+}
+
 .milestone h3
 {
     background: #F3F3F3;
@@ -285,11 +301,17 @@ table.overview .owner
     border-radius: 3px;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
+    margin-bottom: 10px;
 }
 
 .milestone .meta
 {
     margin-left: 20px;
+}
+
+.milestoneTickets
+{
+    margin-top: 20px;
 }
 
 .percentBar
@@ -305,6 +327,7 @@ table.overview .owner
 {
     padding-top: 5px;
     padding-bottom: 5px;
+    line-height: 10px;
 }
 
 .percentBar .color1
@@ -330,6 +353,17 @@ table.overview .owner
 .percentBar .color5
 {
     background-color: #D2315D;
+}
+
+.percentBar .noTickets
+{
+    background-color: #EEE;
+}
+
+.hash
+{
+    font-size: 12pt;
+    color: #CCC;
 }
 
 /* 
@@ -373,9 +407,11 @@ table.ticket tr
 {
 }
 
-table.ticket th,td
+table th, table td
 {
 	padding: 2px;
+    line-height: 18px;
+    padding-left: 5px;
 }
 
 table.ticket th

@@ -56,9 +56,9 @@ class Template extends Base {
 					// Look-ahead group
 					'(?:'.
 						// Framework variable
-						'@\w+(?:\[[^\]]+\]|\.\w+)*(?:->\w+)?|'.
+						'@\w+(?:\[[^\]]+\]|\.\w+)*(?:->\w+)?\h*(?:\(.*\))?|'.
 						// Function
-						'@?\w+\h*(?=\(.*\))|'.
+						'\w+\h*\(.*\)|'.
 						// String
 						'\'[^\']*\'|"[^"]*"|'.
 						// Number
@@ -77,37 +77,37 @@ class Template extends Base {
 				$self=__CLASS__;
 				// Evaluate expression
 				$out=preg_replace_callback(
-					// Framework variable
-					'/@(\w+(?:\[[^\]]+\]|\.\w+)*)(?:->(\w+))?/',
-					function($var) use($self) {
-						// Retrieve variable contents
-						$val=$self::ref($var[1],FALSE);
-						if (isset($var[2]) && is_object($val))
-							// Use object property
-							$val=$val->$var[2];
-						if (is_string($val) && preg_match('/{.+}/',$val))
-							// Variable variable? Call recursively
-							$val=$self::resolve($val);
-						// Check syntax before replacing contents
-						return $self::stringify($val);
+					// Function
+					'/(?<!@)\b(\w+)\h*\(([^\)]*)\)/',
+					function($func) use($self) {
+						return is_callable($self::ref($func[1],FALSE))?
+							// Variable holds an anonymous function
+							call_user_func_array(
+								$self::ref($func[1],FALSE),
+								str_getcsv($func[2])):
+							($func[1].$func[2]=='array'?'NULL':
+							// Check if prohibited function
+							($self::allowed($func[1])?
+								$func[0]:var_export($func[0],TRUE)));
 					},
 					preg_replace_callback(
-						// Function
-						'/(@?)(\w+)\h*\(([^\)]*)\)/',
-						function($val) use($self) {
-							if ($val[1] &&
-								is_callable($self::ref($val[2],FALSE)))
-								// Variable holds an anonymous function
-								return call_user_func_array(
-									$self::ref($val[2],FALSE),
-									str_getcsv($val[3])
-								);
-							// Transform empty array to NULL
-							return ($val[2].trim($val[3]))=='array'?
-								'NULL':
-								// check if prohibited function
-								($self::allowed($val[2])?
-									$val[0]:var_export($val[0],TRUE));
+						// Framework variable
+						'/@(\w+(?:\[[^\]]+\]|\.\w+)*)(?:->(\w+))?'.
+							'\h*(?:\((.*?)\))?/',
+						function($var) use($self) {
+							// Retrieve variable contents
+							$val=$self::ref($var[1],FALSE);
+							if (isset($var[2]) && $var[2] && is_object($val))
+								// Not a closure; Use object property
+								$val=$val->$var[2];
+							if (is_string($val) && preg_match('/{.+}/',$val))
+								// Variable variable? Call recursively
+								$val=$self::resolve($val);
+							if (is_callable($val) && isset($var[3]))
+								// Anonymous function
+								$val=call_user_func_array(
+									$val,str_getcsv($var[3]));
+							return $self::stringify($val);
 						},
 						$expr[1]
 					)
@@ -120,16 +120,14 @@ class Template extends Base {
 	}
 
 	/**
-		Process <F3:include> directives
+		Retrieve template; Cache if necessary
 			@return string
 			@param $file string
-			@param $path string
 			@public
 	**/
-	static function embed($file,$path) {
-		if (!$file || !is_file($path.$file))
+	static function retrieve($file) {
+		if (!is_file($file=self::fixslashes(self::$vars['GUI']).$file))
 			return '';
-		$file=$path.$file;
 		$hash='tpl.'.self::hash($file);
 		$cached=Cache::cached($hash);
 		if (!isset(self::$vars['STATS']['TEMPLATES']))
@@ -151,20 +149,7 @@ class Template extends Base {
 			self::$vars['STATS']['TEMPLATES']
 				['loaded'][$file]=filesize($file);
 		}
-		// Search/replace <F3:include> regex pattern
-		$regex='/<(?:F3:)?include\h*href\h*=\h*"([^"]+)"\h*\/>/i';
-		return preg_match($regex,$text)?
-			// Call recursively if included file also has <F3:include>
-			preg_replace_callback(
-				$regex,
-				function($attr) use($path) {
-					$self=__CLASS__;
-					// Load file
-					return $self::embed($self::resolve($attr[1]),$path);
-				},
-				$text
-			):
-			$text;
+		return $text;
 	}
 
 	/**
@@ -175,164 +160,162 @@ class Template extends Base {
 			@param $path string
 			@public
 	**/
-	static function serve($file,$mime='text/html',$path=NULL) {
-		if (is_null($path))
-			$path=self::fixslashes(self::$vars['GUI']);
-		// Remove <F3::exclude> blocks
-		$text=preg_replace(
-			'/<(?:F3:)?exclude>.*?<\/(?:F3:)?exclude>/is','',
-			// Link <F3:include> files
-			self::embed($file,$path)
-		);
-		if (PHP_SAPI!='cli')
-			// Send HTTP header with appropriate character set
-			header(self::HTTP_Content.': '.$mime.'; '.
-				'charset='.self::$vars['ENCODING']);
-		if (!preg_match('/<.+>/s',$text))
-			// Plain text
-			return self::resolve($text);
-		// Initialize XML tree
-		$tree=new XMLtree('1.0',self::$vars['ENCODING']);
-		// Suppress errors caused by invalid HTML structures
-		$ishtml=preg_match('/text\/html|application\/xhtml+xml/',$mime);
-		libxml_use_internal_errors($ishtml);
-		// Populate XML tree
-		if ($ishtml) {
-			// HTML template; Keep track of existing tags so
-			// those added by libxml can be removed later
-			$tags=array(
-				'!DOCTYPE\s+html','[\/]?html','[\/]?head','[\/]?body'
-			);
-			$undef=array();
-			foreach ($tags as $tag) {
-				$regex='/<'.$tag.'[^>]*>\h*\v*/is';
-				if (!preg_match($regex,$text))
-					$undef[]=$regex;
-			}
-			$tree->loadHTML($text);
-		}
-		else
-			// XML template
-			$tree->loadXML($text,LIBXML_COMPACT|LIBXML_NOERROR);
-		// Prepare for XML tree traversal
-		$tree->fragment=$tree->createDocumentFragment();
-		$pass2=FALSE;
-		$time=microtime(TRUE);
-		$tree->traverse(
-			function() use($tree,&$pass2) {
-				$self=__CLASS__;
-				$node=&$tree->nodeptr;
-				$tag=$node->tagName;
-				$parent=$node->parentNode;
-				$next=$node;
-				// Node removal flag
-				$remove=FALSE;
-				if ($tag=='repeat') {
-					// Process <F3:repeat> directive
-					$inner=$tree->innerHTML($node);
-					if ($inner) {
-						// Analyze attributes
-						foreach ($node->attributes as $attr) {
-							$val=$self::fixbraces($attr->value);
-							preg_match(
-								'/{?(@\w+(\[[^\]]+\]|\.\w+)*)}?/',$val,$cap);
-							$name=$attr->name;
-							if (!$cap[1] || isset($cap[2]) && $cap[2] &&
-								$name!='group')
-								// Invalid attribute
-								break;
-							$regex='/'.preg_quote($cap[1]).'\b/';
-							if ($name=='key' || $name=='value')
-								${$name[0].'reg'}=$regex;
-							elseif ($name=='group') {
-								$gcap=$cap[1];
-								$gvar=$self::ref(substr($cap[1],1),FALSE);
-							}
-						}
-						if (isset($gvar) && is_array($gvar) && count($gvar)) {
-							ob_start();
-							// Iterate thru group elements
-							foreach (array_keys($gvar) as $key) {
-								$kstr=var_export($key,TRUE);
-								echo preg_replace($vreg,
-									// Replace index token
-									$gcap.'['.$kstr.']',
-									isset($kreg)?
-										// Replace key token
-										preg_replace($kreg,$kstr,$inner):
-										$inner
-								);
-							}
-							$block=ob_get_clean();
-							if (strlen($block)) {
-								$tree->fragment->appendXML($block);
-								// Insert fragment before current node
-								$next=$parent->
-									insertBefore($tree->fragment,$node);
-							}
-						}
-					}
-					$remove=TRUE;
-				}
-				elseif ($tag=='check' && !$pass2)
-					// Found <F3:check> directive
-					$pass2=TRUE;
-				if ($remove) {
-					// Find next node
-					if ($node->isSameNode($next))
-						$next=$node->nextSibling?
-							$node->nextSibling:$parent;
-					// Remove current node
-					$parent->removeChild($node);
-					// Replace with next node
-					$node=$next;
-				}
-			}
-		);
-		if ($pass2) {
-			// Template contains <F3:check> directive
-			$tree->traverse(
-				function() use($tree) {
-					$self=__CLASS__;
-					$node=&$tree->nodeptr;
-					$tag=$node->tagName;
-					$parent=$node->parentNode;
-					// Process <F3:check> directive
-					if ($tag=='check') {
-						$val=var_export(
-							(boolean)$self::resolve($self::fixbraces(
-								$node->getAttribute('if'))),TRUE);
-						ob_start();
-						foreach ($node->childNodes as $child)
-							if ($child->nodeType==XML_ELEMENT_NODE &&
-								preg_match('/'.$val.'/i',$child->tagName))
-									echo $tree->innerHTML($child)?:'';
-						$block=ob_get_clean();
-						if (strlen($block)) {
-							$tree->fragment->appendXML($block);
-							$parent->insertBefore($tree->fragment,$node);
-						}
-						// Remove current node
-						$parent->removeChild($node);
-						// Re-process parent node
-						$node=$parent;
-					}
-				}
-			);
-		}
-		return self::resolve(
-			$ishtml?
-				// Remove tags inserted by libxml
-				preg_replace($undef,'',
-					// Normalize empty HTML tags
-					preg_replace(
-						'/<((?:'.self::HTML_Tags.')\b.*?)\/?>/is','<\1/>',
-						$tree->saveHTML()
-					)
-				):
-				XMLdata::encode($tree->saveXML(),TRUE)
-		);
-	}
+	static function serve($file,$mime='text/html') {
+    if (PHP_SAPI!='cli')
+        // Send HTTP header with appropriate character set
+        header(self::HTTP_Content.': '.$mime.'; '.
+            'charset='.self::$vars['ENCODING']);
+    $text=self::retrieve($file);
+    if (!preg_match('/<.+>/s',$text))
+        // Plain text
+        return self::resolve($text);
+    // Initialize XML tree
+    $tree=new XMLtree('1.0',self::$vars['ENCODING']);
+    // Suppress errors caused by invalid HTML structures
+    $ishtml=preg_match('/text\/html|application\/xhtml+xml/',$mime);
+    libxml_use_internal_errors($ishtml);
+    // Populate XML tree
+    if ($ishtml) {
+        // HTML template; Keep track of existing tags so
+        // those added by libxml can be removed later
+        $tags=array(
+            '!DOCTYPE\s+html','[\/]?html','[\/]?head','[\/]?body'
+        );
+        $undef=array();
+        foreach ($tags as $tag)
+            if (!preg_match($regex='/<'.$tag.'[^>]*>\h*\v*/is',$text))
+                $undef[]=$regex;
+        $tree->loadHTML($text);
+    }
+    else
+        // XML template
+        $tree->loadXML($text,LIBXML_COMPACT|LIBXML_NOERROR);
+    // Prepare for XML tree traversal
+    $tree->fragment=$tree->createDocumentFragment();
+    $pass2=FALSE;
+    $tree->traverse(
+        function() use($tree,&$pass2) {
+            $self=__CLASS__;
+            $node=&$tree->nodeptr;
+            $tag=$node->tagName;
+            $parent=$node->parentNode;
+            $next=$node;
+            // Node removal flag
+            $remove=FALSE;
+            if ($tag=='repeat') {
+                // Process <F3:repeat> directive
+                $inner=$tree->innerHTML($node);
+                if ($inner) {
+                    // Analyze attributes
+                    foreach ($node->attributes as $attr) {
+                        $val=$self::fixbraces($attr->value);
+                        preg_match(
+                            '/{?(@\w+(\[[^\]]+\]|\.\w+)*)}?/',$val,$cap);
+                        $name=$attr->name;
+                        if (!$cap[1] || isset($cap[2]) && $cap[2] &&
+                            $name!='group')
+                            // Invalid attribute
+                            break;
+                        $regex='/'.preg_quote($cap[1]).'\b/';
+                        if ($name=='key' || $name=='value')
+                            ${$name[0].'reg'}=$regex;
+                        elseif ($name=='group') {
+                            $gcap=$cap[1];
+                            $gvar=$self::ref(substr($cap[1],1),FALSE);
+                        }
+                    }
+                    if (isset($gvar) && is_array($gvar) && count($gvar)) {
+                        ob_start();
+                        // Iterate thru group elements
+                        foreach (array_keys($gvar) as $key) {
+                            $kstr=var_export($key,TRUE);
+                            echo preg_replace($vreg,
+                                // Replace index token
+                                $gcap.'['.$kstr.']',
+                                isset($kreg)?
+                                    // Replace key token
+                                    preg_replace($kreg,$kstr,$inner):
+                                    $inner
+                            );
+                        }
+                        $block=ob_get_clean();
+                        if (strlen($block) &&
+                            $tree->fragment->appendXML($block))
+                            // Insert fragment before current node
+                            $next=$parent->
+                                insertBefore($tree->fragment,$node);
+                    }
+                }
+            }
+            elseif ($tag=='include') {
+                // Process <F3:include> directive
+                $block=$self::retrieve(
+                    $self::resolve($node->getAttribute('href')));
+                if (strlen($block) &&
+                    $tree->fragment->appendXML($block)) {
+                    $parent->insertBefore($tree->fragment,$node);
+                    $next=$parent;
+                }
+            }
+            elseif ($tag=='check' && !$pass2)
+                // Found <F3:check> directive
+                $pass2=TRUE;
+            if (preg_match('/include|exclude|repeat/',$tag))
+                $remove=TRUE;
+            if ($remove) {
+                // Find next node
+                if ($node->isSameNode($next))
+                    $next=$node->nextSibling?:$parent;
+                // Remove current node
+                $parent->removeChild($node);
+                // Replace with next node
+                $node=$next;
+            }
+        }
+    );
+    if ($pass2) {
+        // Template contains <F3:check> directive
+        $tree->traverse(
+            function() use($tree) {
+                $self=__CLASS__;
+                $node=&$tree->nodeptr;
+                $tag=$node->tagName;
+                $parent=$node->parentNode;
+                // Process <F3:check> directive
+                if ($tag=='check') {
+                    $val=var_export(
+                        (boolean)$self::resolve($self::fixbraces(
+                            $node->getAttribute('if'))),TRUE);
+                    ob_start();
+                    foreach ($node->childNodes as $child)
+                        if ($child->nodeType==XML_ELEMENT_NODE &&
+                            preg_match('/'.$val.'/i',$child->tagName))
+                                echo $tree->innerHTML($child)?:'';
+                    $block=ob_get_clean();
+                    if (strlen($block) &&
+                        $tree->fragment->appendXML($block))
+                        $parent->insertBefore($tree->fragment,$node);
+                    // Remove current node
+                    $parent->removeChild($node);
+                    // Re-process parent node
+                    $node=$parent;
+                }
+            }
+        );
+    }
+    return self::resolve(
+        $ishtml?
+            // Remove tags inserted by libxml
+            preg_replace($undef,'',
+                // Normalize empty HTML tags
+                preg_replace(
+                    '/<((?:'.self::HTML_Tags.')\b.*?)\/?>/is','<\1/>',
+                    $tree->saveHTML()
+                )
+            ):
+            XMLdata::encode($tree->saveXML(),TRUE)
+    );
+} 
 
 	/**
 		Allow PHP and user-defined functions to be used in templates

@@ -16,6 +16,8 @@ $app->set('LOCALES','lang/');
 $app->set('LANGUAGE', 'de'); // substr($_SERVER["HTTP_ACCEPT_LANGUAGE"], 0, 2);
 $app->set('PROXY', 1);
 
+$app->set('test123', 'test456');
+
 F3::set('DB', new DB('sqlite:' .$dbFile));
 
 $app->route('GET /', 'main->start');
@@ -28,6 +30,7 @@ $app->route('GET /user/@name', 'main->showUser');
 $app->route('GET /user/new', 'main->showUserRegister');
 $app->route('GET /user/login', 'main->showUserLogin');
 $app->route('GET /user/logout', 'main->logoutUser');
+$app->route('GET /milestone/@hash', 'main->showMilestone');
 
 $app->route('POST /user/login', 'main->loginUser');
 $app->route('POST /user/new', 'main->registerUser');

@@ -20,6 +20,49 @@
 			$this->tpserve();
 		}
 
+        /**
+         * 
+         */
+        function showMilestone()
+        {
+            $hash = F3::get('PARAMS.hash');
+            $ms = new Milestone();
+            $ms->load('hash = "' .$hash.'"');
+
+            $tickets = Dao::getTickets('milestone = ' .$ms->getId());
+
+            foreach($tickets as $i=>$ticket)
+				$tickets[$i] = $ticket->toArray();
+
+            $stats['ticketCount'] = Dao::getTicketCount($ms->getId());
+
+            $fullCount = 0;
+            foreach($stats['ticketCount'] as $cnt)
+                $fullCount += $cnt['count'];
+
+            $stats['fullTicketCount'] = $fullCount;
+
+            foreach($stats['ticketCount'] as $j=>$cnt)
+            {
+                $stats['ticketCount'][$j]['percent'] = round($cnt['count'] * 100 / $fullCount);
+                $stats['ticketCount'][$j]['title'] = F3::get("ticket_state.".$stats['ticketCount'][$j]['state']);
+
+                if($stats['ticketCount'][$j]['state'] == 5)
+                    $stats['openTickets'] = $fullCount - $stats['ticketCount'][$j]['count'];
+            }
+
+            $stats['openTickets'] = ($fullCount) ? $stats['openTickets'] : 0 ;
+
+            F3::set('tickets', $tickets);
+            F3::set('stats', $stats);
+            F3::set('milestone', $ms->toArray());
+            F3::set('pageTitle', '{@lng.milestone} › '. $ms->getName());
+            F3::set('template', 'milestone.tpl.php');
+            $this->tpserve();
+
+        }
+
+
 		/**
 		 *
 		 */
@@ -48,10 +91,17 @@
                 {
                     $road[$i]['ticketCount'][$j]['percent'] = round($cnt['count'] * 100 / $fullCount);
                     $road[$i]['ticketCount'][$j]['title'] = F3::get("ticket_state.".$road[$i]['ticketCount'][$j]['state']);
+
+                    if($road[$i]['ticketCount'][$j]['state'] == 5)
+                        $road[$i]['openTickets'] = $fullCount - $road[$i]['ticketCount'][$j]['count'];
                 }
+                
+                $road[$i]['openTickets'] = ($fullCount) ? $road[$i]['openTickets'] : 0 ;
+
 			}
 
 			F3::set('road', $road);
+            F3::set('today', date('Y-m-d', time()));
 			F3::set('pageTitle', '{@lng.roadmap}');
 			F3::set('template', 'roadmap.tpl.php');
 			$this->tpserve();
@@ -86,8 +136,8 @@
 		function showTickets()
 		{
 			/* Get ordering */
-			$order = F3::get('PARAMS["order"]') != NULL ? 
-					F3::get('PARAMS["order"]') : "id";
+			$order = F3::get('PARAMS.order') != NULL ?
+					F3::get('PARAMS.order') : "id";
 			
 			/* Get Project */
 			$project = F3::get('SESSION.project');
@@ -106,10 +156,7 @@
 				"ORDER BY $order");
 
 			foreach($tickets as $i=>$ticket)
-			{
 				$tickets[$i] = $ticket->toArray();
-			}
-
 
 			F3::set('milestones', $milestones);
 			F3::set('tickets', $tickets);
@@ -291,6 +338,9 @@
             $this->tpserve();
         }
 
+        /**
+         *
+         */
         function showUserRegister()
         {
             F3::set('template', 'userRegister.tpl.php');
@@ -298,6 +348,9 @@
             $this->tpserve();
         }
 
+        /**
+         *
+         */
         function registerUser()
         {
             $salt = $this->helper->randStr();
@@ -312,6 +365,9 @@
             $user->save();
         }
 
+        /**
+         *
+         */
         function showUserLogin()
         {
             $this->set('template', 'userLogin.tpl.php');
@@ -319,6 +375,9 @@
             $this->tpserve();
         }
 
+        /**
+         *
+         */
         function loginUser()
         {
             $user = new user();
@@ -341,6 +400,9 @@
             $this->tpserve();
         }
 
+        /**
+         *
+         */
         function logoutUser()
         {
             $this->set('SESSION.userName', NULL);
@@ -351,6 +413,9 @@
             $this->reroute('/'. F3::get('BASE'));  
         }
 
+        /**
+         * 
+         */
 		private function tpserve()
 		{
 			$projects = Dao::getProjects('1 = 1');

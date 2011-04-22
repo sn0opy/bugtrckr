@@ -147,6 +147,8 @@ class DB extends Base {
 		list($this->dsn,$this->user,$this->pw,$this->opt)=
 			array($this->subst($dsn),$user,$pw,$opt);
 		$this->backend=strstr($this->dsn,':',TRUE);
+		if (!isset(self::$vars['DB']))
+			self::$vars['DB']=$this;
 	}
 
 }

@@ -1,12 +1,27 @@
 <?php
 
+/**
+	PHP Fat-Free Framework
+
+	The contents of this file are subject to the terms of the GNU General
+	Public License Version 3.0. You may not use this file except in
+	compliance with the license. Any of the license terms and conditions
+	can be waived if you get permission from the copyright holder.
+
+	Copyright (c) 2009-2010 F3::Factory
+	Bong Cosca <bong.cosca@yahoo.com>
+
+		@package Base
+		@version 2.0.0
+**/
+
 //! Base structure
 class Base {
 
 	//@{ Framework details
 	const
 		TEXT_AppName='Fat-Free Framework',
-		TEXT_Version='2.0.0-b1';
+		TEXT_Version='2.0.0';
 	//@}
 
 	//@{ Locale-specific error/exception messages
@@ -28,7 +43,8 @@ class Base {
 		TEXT_HTTP='HTTP status code %s is invalid',
 		TEXT_Render='Unable to render %s - file does not exist',
 		TEXT_Form='The input handler for %s is invalid',
-		TEXT_Static='%s must be a static method';
+		TEXT_Static='%s must be a static method',
+		TEXT_Tags='PHP short tags are not supported by this server';
 	//@}
 
 	//@{ HTTP status codes (RFC 2616)
@@ -99,12 +115,6 @@ class Base {
 		HTTP_WebAuth='WWW-Authenticate';
 	//@}
 
-	//@{ Framework array variable sort options
-	const
-		SORT_Asc=1,
-		SORT_Desc=-1;
-	//@}
-
 	const
 		//! Framework-mapped PHP globals
 		PHP_Globals='GET|POST|COOKIE|REQUEST|SESSION|FILES|SERVER|ENV',
@@ -135,14 +145,13 @@ class Base {
 			@public
 	**/
 	static function stringify($val) {
-		return preg_replace('/\h+=>\h+/','=>',
+		return preg_replace('/\h+=>\h+/','=>',var_export(
 			is_object($val) && !method_exists($val,'__set_state')?
 				(method_exists($val,'__toString')?
-					var_export((string)$val,TRUE):
+					(string)$val:
 					('object('.get_class($val).')'.
 						(($vars=get_object_vars($val))?
-							('{'.self::csv($vars).'}'):''))):
-				var_export($val,TRUE));
+							('{'.self::csv($vars).'}'):''))):$val,TRUE));
 	}
 
 	/**
@@ -667,75 +676,6 @@ class F3 extends Base {
 	}
 
 	/**
-		Retrieve values from a specified column of a multi-dimensional
-		framework array variable
-			@return array
-			@param $key string
-			@param $col mixed
-			@public
-	**/
-	static function pick($key,$col) {
-		$rows=self::ref($key);
-		if (!is_array($rows)) {
-			trigger_error(sprintf(self::TEXT_NotArray,$key));
-			return FALSE;
-		}
-		return array_map(
-			function($row) use($col) {
-				return $row[$col];
-			},
-			$rows
-		);
-	}
-
-	/**
-		Sort a multi-dimensional framework array variable on a specified
-		column
-			@return array
-			@param $key string
-			@param $col mixed
-			@param $order integer
-			@param $flag boolean
-			@public
-	**/
-	static function sort($key,$col,$order=self::SORT_Asc,$flag=TRUE) {
-		$val=&self::ref($key,TRUE);
-		if (!is_array($val)) {
-			trigger_error(sprintf(self::TEXT_NotArray,$key));
-			return FALSE;
-		}
-		usort(
-			$val,
-			function($val1,$val2) use($col,$order) {
-				$self=__CLASS__;
-				list($v1,$v2)=array($val1[$col],$val2[$col]);
-				return $order*(((is_int($v1) || is_float($v1)) &&
-					(is_int($v2) || is_float($v2)))?
-					$self::sign($v1-$v2):strcmp($v1,$v2));
-			}
-		);
-	}
-
-	/**
-		Rotate a two-dimensional framework array variable
-			@return array
-			@param $key string
-			@param $flag boolean
-			@public
-	**/
-	static function transpose($key) {
-		$rows=&self::ref($key,TRUE);
-		if (!is_array($rows)) {
-			trigger_error(sprintf(self::TEXT_NotArray,$key));
-			return FALSE;
-		}
-		foreach ($rows as $keyx=>$cols)
-			foreach ($cols as $keyy=>$valy)
-				$result[$keyy][$keyx]=$valy;
-		$rows=$result;
-	}
-
-	/**
 		Send HTTP status header; Return text equivalent of status code
 			@return mixed
 			@param $code int
@@ -1144,7 +1084,8 @@ class F3 extends Base {
 	static function render($file) {
 		$file=self::subst($file);
 		if (is_file($view=self::fixslashes(self::$vars['GUI'].$file))) {
-			$out=SandBox::grab($view);
+			$sandbox=new F3instance;
+			$out=$sandbox->grab($view);
 			return self::$vars['TIDY'] && extension_loaded('tidy')?
 				self::tidy($out):$out;
 		}
@@ -1220,29 +1161,31 @@ class F3 extends Base {
 	**/
 	static function error($code,$str='',array $trace=NULL) {
 		$prior=self::$vars['ERROR'];
-		// Generate internal server error if code is zero
-		if (!$code)
-			$code=500;
-		elseif ($code==404)
+		$out='';
+		if ($code==404)
+			// No stack trace needed
 			$str=self::subst(
 				sprintf(self::TEXT_NotFound,$_SERVER['REQUEST_URI']));
-		$out='';
-		if (is_null($trace))
-			$trace=debug_backtrace();
-		$class=NULL;
-		$line=0;
-		if (is_array($trace)) {
-			// Stringify the stack trace
-			ob_start();
-			foreach ($trace as $nexus) {
-				// Remove stack trace noise
-				if (self::$vars['DEBUG']<2 && $nexus['file']==__FILE__ ||
-					isset($nexus['function']) &&
-					preg_match('/^(call_user_func(?:_array)?|'.
-						'trigger_error|{.+}|'.__FUNCTION__.'|__)/',
-							$nexus['function']))
-					continue;
-				if ($code!=404)
+		else {
+			// Generate internal server error if code is zero
+			if (!$code)
+				$code=500;
+			if (is_null($trace))
+				$trace=debug_backtrace();
+			$class=NULL;
+			$line=0;
+			if (is_array($trace)) {
+				// Stringify the stack trace
+				ob_start();
+				foreach ($trace as $nexus) {
+					// Remove stack trace noise
+					if (!isset($nexus['file']) || self::$vars['DEBUG']<2 &&
+						$nexus['file']==__FILE__ ||
+						isset($nexus['function']) &&
+						preg_match('/^(call_user_func(?:_array)?|'.
+							'trigger_error|{.+}|'.__FUNCTION__.'|__)/',
+								$nexus['function']))
+						continue;
 					echo '#'.$line.' '.
 						(isset($nexus['line'])?
 							(self::fixslashes($nexus['file']).':'.
@@ -1255,9 +1198,10 @@ class F3 extends Base {
 								isset($nexus['args'])?
 								(self::csv($nexus['args'])):'').')'):'').
 							"\n";
-				$line++;
+					$line++;
+				}
+				$out=ob_get_clean();
 			}
-			$out=ob_get_clean();
 		}
 		if (PHP_SAPI!='cli' && !headers_sent())
 			// Remove all pending headers
@@ -1303,78 +1247,11 @@ class F3 extends Base {
 	}
 
 	/**
-		Execute shutdown function
-			@public
-	**/
-	static function stop() {
-		$error=error_get_last();
-		if ($error && !self::$vars['QUIET'] && in_array($error['type'],
-			array(E_ERROR,E_PARSE,E_CORE_ERROR,E_COMPILE_ERROR)))
-			// Display error
-			self::error(500,$error['message'],array($error));
-		if (isset(self::$vars['UNLOAD'])) {
-			ob_end_flush();
-			if (PHP_SAPI!='cli')
-				header(self::HTTP_Connect.': close');
-			call_user_func(self::$vars['UNLOAD']);
-		}
-	}
-
-	/**
-		Intercept instantiation of objects in undefined classes
-			@param $class string
-			@public
-	**/
-	static function autoload($class) {
-		// Prepend plugins folder
-		foreach (explode('|',self::$vars['PLUGINS'].'|'.
-			self::$vars['AUTOLOAD']) as $auto) {
-			$path=realpath($auto);
-			if (!$path)
-				continue;
-			// Allow namespaced classes
-			$file=self::fixslashes($path.'/'.$class).'.php';
-			// Case-insensitive check for file presence
-			$glob=glob(dirname($file).'/*.php',GLOB_NOSORT);
-			if (!$glob)
-				continue;
-			$fkey=array_search(strtolower($file),
-				array_map('strtolower',$glob));
-			if (is_int($fkey) && !in_array($glob[$fkey],
-				array_map('self::fixslashes',get_included_files()))) {
-				require $glob[$fkey];
-				// Verify that the class was loaded
-				if (class_exists($class,FALSE)) {
-					$loaded=&self::$vars['LOADED'];
-					$lower=strtolower($class);
-					if (!isset($loaded[$lower])) {
-						$loaded[$lower]=array_map(
-							'strtolower',get_class_methods($class));
-						if (in_array('onload',$loaded[$lower])) {
-							// Execute onload method
-							$method=new ReflectionMethod($class,'onload');
-							if ($method->isStatic())
-								call_user_func(array($class,'onload'));
-							else
-								trigger_error(sprintf(self::TEXT_Static,
-									$class.'::onload'));
-						}
-					}
-					return;
-				}
-			}
-		}
-		if (count(spl_autoload_functions())==1)
-			// No other registered autoload functions exist
-			trigger_error(sprintf(self::TEXT_Class,$class));
-	}
-
-	/**
 		Create function aliases for framework methods
 			@param $prefix string
 			@public
 	**/
-	static function alias($prefix) {
+	static function alias($prefix='') {
 		foreach (get_class_methods(__CLASS__) as $func)
 			if (!function_exists($func) && $func[0]!='_')
 				eval('function '.$prefix.'_'.$func.'() {'.
@@ -1479,8 +1356,6 @@ class F3 extends Base {
 			'ONERROR'=>NULL,
 			// Plugins folder
 			'PLUGINS'=>__DIR__,
-			// Prefix for method aliases
-			'PREFIX'=>__CLASS__,
 			// Server protocol
 			'PROTOCOL'=>'http'.
 				(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']!='off'?'s':''),
@@ -1539,8 +1414,83 @@ class F3 extends Base {
 		// Initialize autoload stack and shutdown sequence
 		spl_autoload_register(__CLASS__.'::autoload');
 		register_shutdown_function(__CLASS__.'::stop');
-		// Create aliases for framework methods
-		self::alias(__CLASS__);
+	}
+
+	/**
+		Execute shutdown function
+			@public
+	**/
+	static function stop() {
+		$error=error_get_last();
+		if ($error && !self::$vars['QUIET'] && in_array($error['type'],
+			array(E_ERROR,E_CORE_ERROR,E_COMPILE_ERROR)))
+			// Display error
+			self::error(500,$error['message'],array($error));
+		if (isset(self::$vars['UNLOAD'])) {
+			ob_end_flush();
+			if (PHP_SAPI!='cli')
+				header(self::HTTP_Connect.': close');
+			call_user_func(self::$vars['UNLOAD']);
+		}
+	}
+
+	/**
+		onLoad event handler (static class initializer)
+			@public
+	**/
+	static function loadstatic($class) {
+		$loaded=&self::$vars['LOADED'];
+		$lower=strtolower($class);
+		if (!isset($loaded[$lower])) {
+			$loaded[$lower]=
+				array_map('strtolower',get_class_methods($class));
+			if (in_array('onload',$loaded[$lower])) {
+				// Execute onload method
+				$method=new ReflectionMethod($class,'onload');
+				if ($method->isStatic())
+					call_user_func(array($class,'onload'));
+				else
+					trigger_error(sprintf(self::TEXT_Static,
+						$class.'::onload'));
+			}
+		}
+	}
+
+	/**
+		Intercept instantiation of objects in undefined classes
+			@param $class string
+			@public
+	**/
+	static function autoload($class) {
+		$list=array_map('self::fixslashes',get_included_files());
+		// Support both namespace mapping styles: NS_class and NS/class
+		foreach (array(str_replace('\\','_',$class),$class) as $style)
+			// Prepend plugins folder
+			foreach (explode('|',self::$vars['PLUGINS'].'|'.
+				self::$vars['AUTOLOAD']) as $auto) {
+				$path=realpath($auto);
+				if (!$path)
+					continue;
+				$file=self::fixslashes($path.'/'.$style).'.php';
+				$glob=glob(dirname($file).'/*.php',GLOB_NOSORT);
+				if ($glob) {
+					// Case-insensitive check for file presence
+					$fkey=array_search(strtolower($file),
+						array_map('strtolower',$glob));
+					if (is_int($fkey) && !in_array($glob[$fkey],$list)) {
+						require $glob[$fkey];
+						// Verify that the class was loaded
+						if (class_exists($class,FALSE)) {
+							// Run onLoad event handler if defined
+							self::loadstatic($class);
+							return;
+						}
+					}
+				}
+			}
+		if (count(spl_autoload_functions())==1)
+			// No other registered autoload functions exist
+			trigger_error(sprintf(self::TEXT_Class,$class));
 	}
 
 	/**
@@ -1552,9 +1502,10 @@ class F3 extends Base {
 			@public
 	**/
 	static function __callStatic($func,array $args) {
-		if (self::$vars['PROXY'])
-			foreach (glob(self::fixslashes(self::$vars['PLUGINS'].
-				'/*.php',GLOB_NOSORT)) as $file) {
+		if (self::$vars['PROXY'] &&
+			$glob=glob(self::fixslashes(
+				self::$vars['PLUGINS'].'/*.php',GLOB_NOSORT)))
+			foreach ($glob as $file) {
 				$class=strstr(basename($file),'.php',TRUE);
 				// Prevent recursive calls
 				$found=FALSE;
@@ -1570,23 +1521,9 @@ class F3 extends Base {
 					}
 				if ($found)
 					continue;
-				$loaded=&self::$vars['LOADED'];
-				$lower=strtolower($class);
-				if (!isset($loaded[$lower])) {
-					$loaded[$lower]=array_map(
-						'strtolower',get_class_methods($class));
-					// Execute onload method if defined
-					if (in_array('onload',$loaded[$lower])) {
-						// Execute onload method
-						$method=new ReflectionMethod($class,'onload');
-						if ($method->isStatic())
-							call_user_func(array($class,'onload'));
-						else
-							trigger_error(sprintf(self::TEXT_Static,
-								$class.'::onload'));
-					}
-				}
-				if (in_array($func,$loaded[$class]))
+				// Run onLoad event handler if defined
+				self::loadstatic($class);
+				if (in_array($func,self::$vars['LOADED'][$class]))
 					// Proxy for plugin
 					return call_user_func_array(array($class,$func),$args);
 			}
@@ -1866,27 +1803,6 @@ class Cache extends Base {
 
 }
 
-// Sandbox for isolating PHP functions
-class SandBox {
-
-	/**
-		Grab file contents and run PHP code in sandbox
-			@return mixed
-			@param $file string
-			@public
-	**/
-	static function grab($file) {
-		// Use framework symbol table to hide local variable
-		F3::set('FILE',F3::subst($file));
-		unset($file);
-		// Interpret PHP code
-		ob_start();
-		require F3::get('FILE');
-		return ob_get_clean();
-	}
-
-}
-
 //! F3 object mode
 class F3instance {
 
@@ -1903,8 +1819,7 @@ class F3instance {
 	}
 
 	/**
-		Grab file contents and run PHP code in sandbox;
-		Workaround for PHP's require() scope limitation
+		Grab file contents and run PHP code in sandbox
 			@return mixed
 			@param $file string
 			@public
@@ -1913,27 +1828,15 @@ class F3instance {
 		// Use framework symbol table to hide local variable
 		F3::set('FILE',F3::subst($file));
 		unset($file);
+		if (!ini_get('short_open_tag') &&
+			preg_match('/<\?(?!php)/',file_get_contents(F3::get('FILE')))) {
+			trigger_error(F3::TEXT_Tags);
+			return;
+		}
 		// Interpret PHP code
 		ob_start();
 		require F3::get('FILE');
 		return ob_get_clean();
-	}
-
-	/**
-		Render user interface; Enables use of $this in views
-			@return string
-			@param $file string
-			@param $opt boolean
-			@public
-	**/
-	function render($file) {
-		$file=F3::subst($file);
-		if (is_file($view=F3::fixslashes(F3::ref('GUI').$file))) {
-			$out=$this->grab($view);
-			return F3::ref('TIDY') && extension_loaded('tidy')?
-				F3::tidy($out):$out;
-		}
-		trigger_error(sprintf(F3::TEXT_Render,$view));
 	}
 
 	/**

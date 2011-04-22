@@ -46,7 +46,7 @@
 				<select name="priority" size="1">
 					<option value="1">1 - {@lng.veryhigh}</option>
 					<option value="2">2 - {@lng.high}</option>
-					<option value="3">3 - {@lng.normal}</option>
+					<option value="3" selected="selected">3 - {@lng.normal}</option>
 					<option value="4">4 - {@lng.low}</option>
 					<option value="5">5 - {@lng.verylow}</option>
 				</select>
@@ -65,7 +65,7 @@
 		</div>
 
 		<div class="formRow">
-			<div class="formLabel">&nbsp;</div>
+			<div class="formLabel"></div>
 			<div class="formValue">
 				<input type="submit" value="{@lng.submit}" />
 			</div>
