@@ -74,11 +74,11 @@
                         <div class="formValue"><input type="password" name="password" /></div>
                     </div>
                     <div class="formRow">
-                        <div class="formLabel">&nbsp;</div>
+                        <div class="formLabel"> </div>
                         <div class="formValue"><a href="/{@BASE}user/new">{@lng.noaccount}</a></div>
                     </div>
                     <div class="formRow">
-                        <div class="formLabel">&nbsp;</div>
+                        <div class="formLabel"> </div>
                         <div class="formValue"><input type="submit" value="{@lng.login}" /></div>
                     </div>
                 </form>

@@ -19,7 +19,7 @@
                 <div class="formValue"><input type="text" name="email" /></div>
             </div>
             <div class="formRow">
-                <div class="formLabel">&nbsp;</div>
+                <div class="formLabel"> </div>
                 <div class="formValue"><input type="submit" value="{@lng.submit}" /></div>
             </div>
         </form>
