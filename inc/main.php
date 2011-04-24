@@ -10,6 +10,15 @@
             $this->helper = new helper;
 			$this->helper->intlSupport();
 
+            if(F3::get('SESSION.userId'))
+            {
+                $user = new user();
+                $user->load('id = ' .F3::get('SESSION.userId'));
+
+                if($user->getLastProject() > 0)
+                    F3::set('SESSION.project', $user->getLastProject());
+            }
+
 			require_once 'inc/mapping.inc.php';
         }
 
@@ -308,8 +317,15 @@
 			$project = new Project();
 			$project->load("hash = '$post[project]'");
 
-			F3::set('SESSION.project', $project->getId());
+            if(F3::get('SESSION.userId'))
+            {
+                $user = new User();
+                $user->load('id = ' .F3::get('SESSION.userId'));
+                $user->setLastProject($project->getId());
+                $user->save();
+            }
 
+			F3::set('SESSION.project', $project->getId());
 			F3::reroute($url);
 		}
 

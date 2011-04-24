@@ -6,9 +6,9 @@ INSERT INTO Ticket (id, hash, title, description, created, owner, type, state, p
 --
 -- User
 --
-CREATE TABLE User (id integer PRIMARY KEY AUTOINCREMENT, name varchar(45), hash varchar(12) UNIQUE, password varchar, salt varchar, email varchar, admin bool);
-INSERT INTO User (id, name, hash, password, salt, email, admin) VALUES (1, 'adm', 'b026324c6904b2a9cb4b88d6d61c81d1', 1, 1, 'admin@bugtrckr', 1);
-INSERT INTO User (id, name, hash, password, salt, email, admin) VALUES (2, 'johndoe', '26ab0db90d72e28ad0ba1e22ee510510', 2, 2, 'johndoe@bugtrckr', 0);
+CREATE TABLE User (id integer PRIMARY KEY AUTOINCREMENT, name varchar(45), hash varchar(12) UNIQUE, password varchar, salt varchar, email varchar, admin bool, lastProject int);
+INSERT INTO User (id, name, hash, password, salt, email, admin) VALUES (1, 'adm', 'b026324c6904b2a9cb4b88d6d61c81d1', 1, 1, 'admin@bugtrckr', 1, 0);
+INSERT INTO User (id, name, hash, password, salt, email, admin) VALUES (2, 'johndoe', '26ab0db90d72e28ad0ba1e22ee510510', 2, 2, 'johndoe@bugtrckr', 0, 0);
 --
 -- Project
 --

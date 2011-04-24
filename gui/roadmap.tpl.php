@@ -8,7 +8,7 @@
 {* Form for new milestones *}
 <div id="add">
     <h3 class="floatleft">{@lng.addmilestone}</h3>
-	<a class="closeButton" href="#" onclick="document.getElementById('add').style.display = 'none'">
+	<a class="closeButton" href="#" onclick="document.getElementById('add').style.display = 'none'; return false">
 		X
 	</a>
 
@@ -26,7 +26,7 @@
 			<div class="formValue"><input type="date" name="finished" value="{@today}" /></div>
 		</div>
 		<div class="formRow">
-			<div class="formLabel"></div>
+			<div class="formLabel"> </div>
 			<div class="formValue"><input type="submit" value="{@lng.submit}" /></div>
 		</div>
 	</form>

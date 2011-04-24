@@ -1,4 +1,4 @@
-<h2>{@lng.milestone} › {@milestone.name} <span class="hash">(#{@milestone.hash})</span></h2>
+<h2>{@lng.milestone} › {@milestone.name} <span class="hash">#{@milestone.hash}</span></h2>
 
 <F3:check if="{@stats.fullTicketCount}">
     <F3:true>

@@ -10,6 +10,7 @@
         private $admin;
         private $name;
         private $role;
+        private $lastProject;
 
         private $ax;
 
@@ -60,6 +61,11 @@
             $this->role = $role;
         }
 
+        public function setLastProject($lastProject)
+        {
+            $this->lastProject = $lastProject;
+        }
+
         public function getId()
         {
             return $this->id;
@@ -100,6 +106,11 @@
             return $this->role;
         }
 
+        public function getLastProject()
+        {
+            return $this->lastProject;
+        }
+
         public function save()
         {
             $this->ax->load('hash = "' .$this->hash. '"');
@@ -110,6 +121,7 @@
             $this->ax->email = $this->email;
             $this->ax->admin = $this->admin;
             $this->ax->role = $this->role;
+            $this->ax->lastProject = $this->lastProject;
             $this->ax->save();
         }
 
@@ -127,6 +139,7 @@
                 $this->admin = $this->ax->admin;
                 $this->id = $this->ax->id;
                 $this->role = $this->ax->role;
+                $this->lastProject = $this->ax->lastProject;
             }
 		}
 
@@ -139,6 +152,7 @@
 			$user['hash'] = $this->hash;
 			$user['email'] = $this->email;
 			$user['admin'] = $this->admin;
+            $user['lastProject'] = $this->lastProject;
 
 			return $user;
 		}

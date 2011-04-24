@@ -8,7 +8,7 @@
 {* Form for new tickets *}
 <div id="add">
     <h3 class="floatleft">{@lng.addticket}</h3>
-    <a class="closeButton" href="#" onclick="document.getElementById('add').style.display = 'none'">
+    <a class="closeButton" href="#" onclick="document.getElementById('add').style.display = 'none'; return false;">
 		X
 	</a>
 
