@@ -79,8 +79,9 @@
     <thead>
         <tr>
             <th><a href="/{@BASE}tickets/id">#</a></th>
-            <th><a href="/{@BASE}tickets/title">{@lng.title}</a></th>
-            <th><a href="/{@BASE}tickets/state">{@lng.status}</a></th>
+			<th><a href="/{@BASE}tickets/title">{@lng.title}</a></th>
+			<th><a href="/{@BASE}tickets/type">{@lng.type}</a></th>
+			<th><a href="/{@BASE}tickets/state">{@lng.status}</a></th>
             <th><a href="/{@BASE}tickets/priority">{@lng.priority}</a></th>
             <th><a href="/{@BASE}tickets/created">{@lng.created}</a></th>
             <th>{@lng.owner}</th>
@@ -93,7 +94,8 @@
             <td class="id">{@i+1}</td>
             <td class="title">
                 <a href="/{@BASE}ticket/{@ticket.hash}">{@ticket.title}</a>
-            </td>
+			</td>
+			<td class="type">{@ticket.type}</td>
             <td class="state">{@ticket.state}</td>
             <td class="priority">{@ticket.priority}</td>
             <td class="created">{@ticket.created}</td>

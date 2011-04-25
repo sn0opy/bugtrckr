@@ -262,7 +262,13 @@ table.overview .tr1
 table.overview .id
 {
 	width: 3%;
+
 }
+table.overview .state
+{
+	width: 5%;
+}
+
 
 table.overview .state
 {

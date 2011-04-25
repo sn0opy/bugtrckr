@@ -66,13 +66,16 @@
 		 */
 		public function save()
 		{
-			$id = F3::get('DB')->sql("SELECT max(id)+1 as next FROM Activity");
-			$stat = F3::get('DB')->sql("INSERT INTO Activity " .
-					"(hash, description, user, changed, project) VALUES " .
-					"('". md5($id[0]['next']) ."', '$this->description', " .
-					"$this->user, " . time() . ", $this->project)");
+			$this->ax->load('hash = "'. $this->hash .'"');
+			$this->ax->hash = $this->hash;
+			$this->ax->description = $this->description;
+			$this->ax->user = $this->user;
+			$this->ax->changed = $this->changed;
+			$this->ax->project = $this->project;
+			$this->ax->save();
 
-			return is_array($stat) ? md5($id[0]['next']) : 0;
+			if ($this->ax->_id <= 0)
+				throw new Exception();
 		}
 
 		/**
@@ -80,17 +83,19 @@
 		 */
 		public function load($stmt)
 		{
-			$result = F3::get('DB')->sql("SELECT * FROM Activity WHERE $stmt");
+			$this->ax->load($stmt);
 
-			if (is_array($result))
+			if (!t$his->ax->dry())
 			{
-				$this->id = $result[0]['id'];
-				$this->hash = $result[0]['hash'];
-				$this->description = $result[0]['description'];
-				$this->user = $result[0]['user'];
-				$this->changed = $result[0]['changed'];
-				$this->project = $result[0]['project'];
+				$this->id = $this->ax->id;
+				$this->hash = $this->ax->hash;
+				$this->description = $this->ax->description;
+				$this->user = $this->ax->user;
+				$this->changed = $this->ax->changed;
+				$this->project = $this->ax->project;
 			}
+			else
+				throw new Exception();
 		}
 
 		/**

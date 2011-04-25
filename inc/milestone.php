@@ -10,9 +10,13 @@
 		private $finished;
 		private $project;
 
+		private $ax;
+
 		public function __construct()
 		{
 			parent::__construct();
+
+			$this->ax = new Axon('Milestone');
 		}
 
 
@@ -71,24 +75,16 @@
 		 */
 		public function save()
 		{
-			if ($this->id > 0)
-			{
-				$stat = F3::get('DB')->sql("UPDATE Milestone SET " .
-						"finished = $finished" .
-						"WHERE id = $this->id");
-
-				return is_array($stat) ? $this->hash : 0;
-			}
-			else
-			{
-				$id = F3::get('DB')->sql("SELECT max(id)+1 as next FROM Milestone");
-				$stat = F3::get('DB')->sql("INSERT INTO Milestone ".
-						"(hash, name, description, finished, project) VALUES ".
-						"('". md5($id[0]['next']) ."', '$this->name', ".
-						"'$this->description', $this->finished, $this->project)");
-
-				return is_array($stat) ? md5($id[0]['next']) : 0;
-			}
+			$this->ax->load('Hash = "' . $this->hash .'"');
+			$this->ax->hash = $this->hash;
+			$this->ax->name = $this->name;
+			$this->ax->description = $this->description;
+			$this->ax->finished = $this->finished;
+			$this->ax->project = $this->project;
+			$this->ax->save();
+		
+			if ($this->ax->_id <= 0)
+				throw new Exception();
 		}
 
 		/**
@@ -96,17 +92,19 @@
 		 */
 		public function load($stmt)
 		{
-			$result = F3::get('DB')->sql("SELECT * FROM Milestone WHERE $stmt");
+			$this->ax->load($stmt);
 
-			if (is_array($result))
+			if (!$this->ax->dry())
 			{
-				$this->id = $result[0]['id'];
-				$this->hash = $result[0]['hash'];
-				$this->name = $result[0]['name'];
-				$this->description = $result[0]['description'];
-				$this->finished = $result[0]['finished'];
-				$this->project = $result[0]['project'];
+				$this->id = $this->ax->id;
+				$this->hash = $this->ax->hash;
+				$this->name = $this->ax->name;
+				$this->description = $this->ax->description;
+				$this->finished = $this->finished;
+				$this->project = $this->project;
 			}
+			else
+				throw new Exception();
 		}
 
 		/**

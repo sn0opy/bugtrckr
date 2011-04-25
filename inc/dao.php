@@ -10,10 +10,19 @@
 			$result = array();
 			$milestones = F3::get('DB')->sql("SELECT id FROM Milestone WHERE $stmt");
 
+			/* Selecting Milestones failed */
+			if ($milestone == NULL)
+				throw new Exception();
+
+			/* Get Milestones data */
 			foreach($milestones as $i=>$milestone)
 			{
-				$result[$i] = new Milestone();
-				$result[$i]->load("id = $milestone[id]");
+				try {
+					$result[$i] = new Milestone();
+					$result[$i]->load("id = $milestone[id]");
+				} catch (Exception $e) {
+					throw $e;
+				}
 			}
 
 			return $result;
@@ -28,10 +37,19 @@
 
 			$tickets = F3::get('DB')->sql("SELECT id FROM Ticket WHERE $stmt");
 
+			/* Selecting Tickets failed */
+			if ($tickets == NULL)
+				throw new Exception();
+
+			/* Get Tickets data */
 			foreach($tickets as $i=>$ticket)
 			{
-				$result[$i] = new Ticket();
-				$result[$i]->load("id = $ticket[id]");
+				try {
+					$result[$i] = new Ticket();
+					$result[$i]->load("id = $ticket[id]");
+				} catch (Exception $e) {
+					throw $e;
+				}
 			}
 
 			return $result;
@@ -46,10 +64,19 @@
 
 			$activities = F3::get('DB')->sql("SELECT id FROM Activity WHERE $stmt");
 
+			/* Selecting Activities failed */
+			if ($activities == NULL)
+				throw new Exception();
+
+			/* Get Activities data */
 			foreach($activities as $i=>$activity)
 			{
-				$result[$i] = new Activity();
-				$result[$i]->load("id = $activity[id]");
+				try {
+					$result[$i] = new Activity();
+					$result[$i]->load("id = $activity[id]");
+				} catch (Exception $e) {
+					throw $e;
+				}
 			}
 
 			return $result;
@@ -64,10 +91,19 @@
 
 			$projects = F3::get('DB')->sql("SELECT id FROM Project WHERE $stmt");
 
+			/* Selecting Projects failed */
+			if ($projects == NULL)
+				throw new Exception();
+
+			/* Get Projects data */
 			foreach($projects as $i=>$project)
 			{
-				$result[$i] = new Project();
-				$result[$i]->load("id = $project[id]");
+				try {
+					$result[$i] = new Project();
+					$result[$i]->load("id = $project[id]");
+				} catch (Exception $e) {
+					throw $e;
+				}
 			}
 
 			return $result;
@@ -82,10 +118,19 @@
 
 			$users = F3::get('DB')->sql("SELECT id FROM User WHERE $stmt");
 
+			/* Selecting Users failed */
+			if ($users == NULL)
+				throw new Exception();
+
+			/* Get Users data */ 
 			foreach($users as $i=>$user)
 			{
-				$result[$i] = new User();
-				$result[$i]->load("id = $user[id]");
+				try {
+					$result[$i] = new User();
+					$result[$i]->load("id = $user[id]");
+				} catch (Exception $e) {
+					throw $e;
+				}
 			}
 
 			return $result;
@@ -99,16 +144,20 @@
 			$userId = F3::get('SESSION.userId');
 			$projectId = F3::get('SESSION.project');
 
-			$user = new User();
-			$user->load("id = $userId");
+			try {
+				$user = new User();
+				$user->load("id = $userId");
 
-			$activity = new Activity();
+				$activity = new Activity();
 
-			$activity->setDescription($user->getName() ." $message");
-			$activity->setProject($projectId);
-			$activity->setUser($userId);
+				$activity->setDescription($user->getName() ." $message");
+				$activity->setProject($projectId);
+				$activity->setUser($userId);
 
-			$activity->save();
+				$activity->save();
+			} catch (Exception $e) {
+				return $e;
+			}
 		}
 
         /**
@@ -119,14 +168,18 @@
             $userId = F3::get('SESSION.userId');
             $projectId = F3::get('SESSION.project');
 
-            $user = new User();
-            $user->load('id = ' .$userID);
+			try {
+        	    $user = new User();
+            	$user->load('id = ' .$userID);
 
-            $projPerm = new ProjectPermission();
-            $projPerm->load('userId = ' .$userId. ' AND projectId = ' .$projectId);
+         	   $projPerm = new ProjectPermission();
+            	$projPerm->load('userId = ' .$userId. ' AND projectId = ' .$projectId);
 
-            $role = new Role();
-            $role->load('id = ' .$projPerm->getRoleId());
+	            $role = new Role();
+				$role->load('id = ' .$projPerm->getRoleId());
+			} catch (Exception $e) {
+				throw $e;
+			}
 
             $permissions = $role->toArray();
 

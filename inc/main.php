@@ -38,7 +38,12 @@
             $ms = new Milestone();
             $ms->load('hash = "' .$hash.'"');
 
-            $tickets = Dao::getTickets('milestone = ' .$ms->getId());
+			try {
+				$tickets = Dao::getTickets('milestone = ' .$ms->getId());
+			} catch (Exception $e) {
+				$this->tpfail("Failure while open Tickets");
+				return ;
+			}
 
             foreach($tickets as $i=>$ticket)
 				$tickets[$i] = $ticket->toArray();
@@ -82,9 +87,15 @@
 			/* Get Project */
 			$project = F3::get('SESSION.project');
 
-			/* Get Milestones */				
-			$milestones = Dao::getMilestones("project = $project");
+			/* Get Milestones */
+			try {			
+				$milestones = Dao::getMilestones("project = $project");
+			} catch (Exception $e) {
+				$this->tpfail("Failure while open Milestones");
+				return ;
+			}
 
+			/*  */
 			foreach($milestones as $i=>$milestone)
 			{
 				$road[$i]['milestone'] = $milestone->toArray();
@@ -126,7 +137,12 @@
 			/* Get Project */
 			$project = F3::get('SESSION.project');
 
-			$activities = Dao::getActivities("project = $project");
+			try {
+				$activities = Dao::getActivities("project = $project");
+			} catch (Exception $e) {
+				$this->tpfail("Failure while open Activities");
+				return ;
+			}
 
 			foreach($activities as $activity)
 			{
@@ -135,7 +151,8 @@
 
 			F3::set('activities', $timeline);
 			F3::set('pageTitle', '{@lng.timeline}');
-            F3::set('template', 'timeline.tpl.php');
+			F3::set('template', 'timeline.tpl.php');
+
 			$this->tpserve();
 		}
 
@@ -152,7 +169,12 @@
 			$project = F3::get('SESSION.project');
 
 			/* Get Milestones of the Project */
-			$milestones = Dao::getMilestones("project = $project");
+			try {
+				$milestones = Dao::getMilestones("project = $project");
+			} catch (Exception $e) {
+				$this->tpfail("Failure while open Milestones");
+				return ;
+			}
 
 			foreach($milestones as $i=>$milestone)
 			{
@@ -160,9 +182,14 @@
 			}
 
 			/* Get Data from DB */
-			$tickets = Dao::getTickets("milestone IN " .
-				"(SELECT id FROM Milestone WHERE project = $project)" .
-				"ORDER BY $order");
+			try {
+				$tickets = Dao::getTickets("milestone IN " .
+					"(SELECT id FROM Milestone WHERE project = $project)" .
+					"ORDER BY $order");
+			} catch (Exception $e) {
+				$this->tpfail("Failure while open Tickets");
+				return ;
+			}
 
 			foreach($tickets as $i=>$ticket)
 				$tickets[$i] = $ticket->toArray();
@@ -181,13 +208,18 @@
 		{
 			$hash = F3::get('PARAMS.hash');
 
-			$ticket = new Ticket();
-			$ticket->load("hash = '$hash'");
+			try {
+				$ticket = new Ticket();
+				$ticket->load("hash = '$hash'");
 
-			$milestone = new Milestone();
-			$milestone->load("id = ". $ticket->getMilestone());
+				$milestone = new Milestone();
+				$milestone->load("id = ". $ticket->getMilestone());
+			} catch (Exception $e) {
+				$this->tpfail("Can't open Ticket");
+				return ;
+			}
 
-			if (true /* hasAccess('editTicket') */)
+			if (Dao::getPermission('iss_editIssue'))
 			{
 				$users = Dao::getUsers("1 = 1");
 				
@@ -211,6 +243,9 @@
 		 */
 		function addTicket()
 		{
+			if (!Dao::getPermission("iss_addIssues"))
+				$this->tpdeny();
+
 			$post = F3::get('POST');
 			$owner = F3::get('SESSION.userId');
 
@@ -226,19 +261,14 @@
 			$ticket->setCategory(1);
 			$ticket->setMilestone($post['milestone']);
 
-			try 
-			{
+			try {
 				$ticket->save();
 
 				Dao::addActivity("created Ticket ". $ticket->getTitle());
 				F3::set('PARAMS.hash', $ticket->getHash());
 				$this->showTicket();
-			}
-			catch (Exception $e)
-			{
-				F3::set('FAILURE', 'Failure while adding Ticket');
-				F3::set('pageTitle', 'Failure');
-				$this->tpserve();
+			} catch (Exception $e) {
+				$this->tpfail("Failure while saving Ticket");	
 			}
 		}
 
@@ -247,32 +277,30 @@
 		 */
 		function editTicket()
 		{
+			if (!Dao::getPermission("iss_editIssues"))
+				$this->tpdeny();
+
 			require_once 'ticket.php';
 
 			$post = F3::get('POST');
 			$hash = F3::get('PARAMS.hash');
 
-			$ticket = new Ticket();
-			$ticket->load("hash = '$hash'");
+			try {
+				$ticket = new Ticket();
+				$ticket->load("hash = '$hash'");
 
-			$ticket->setAssigned($post['userId']);
-			$ticket->setState($post['state']);
+				$ticket->setAssigned($post['userId']);
+				$ticket->setState($post['state']);
 
-			$hash = $ticket->save();
-
-			/* Redirect to the changed Ticket */			
-			if (!is_string($hash) && $hash == 0)
-			{
-				F3::set('FAILURE', 'Failure while adding Ticket');
-				F3::set('pageTitle', 'Failure');
-				$this->tpserve();
+				$hash = $ticket->save();
+			} catch (Exception $e) {
+				$this->tpfail("Failure while saving Ticket");
+				return ;
 			}
-			else
-			{
-				Dao::addActivity("changed Ticket ". $ticket->getTitle());
-				F3::set('PARAMS["hash"]', $hash);
-				$this->showTicket($hash);
-			}
+
+			Dao::addActivity("changed Ticket ". $ticket->getTitle());
+			F3::set('PARAMS["hash"]', $hash);
+			$this->showTicket($hash);
 		}
 
 		/**
@@ -280,6 +308,10 @@
 		 */
 		function addMilestone()
 		{
+			/* Is the user allowed to add Milestones? */
+			if (!Dao::getPermission("proj_editProject"))
+				$this->tpdeny();
+
 			require_once 'milestone.php';
 
 			$post = F3::get('POST');
@@ -291,19 +323,17 @@
 			$milestone->setFinished($post['finished']);
 			$milestone->setProject($project);
 
-			$hash = $milestone->save();
+			/* Save Milestone */
+			try {
+				$hash = $milestone->save();
 
-			if (!is_string($hash) && $hash == 0)
-			{
-				F3::set('FAILURE', 'Failure while adding Milestone');
-				F3::set('pageTitle', 'Failure');
-				$this->tpserve();
-			}
-			else
-			{
 				Dao::addActivity("created Milestone ". $milestone->getName());
-				$this->showRoadmap();
+			} catch (Exception $e) {
+				$this->tpfail("Failure while saving Milesonte");
+				return ;
 			}
+
+			$this->showRoadmap();
 		}
 
 		/**
@@ -314,16 +344,21 @@
 			$post = F3::get('POST');
 			$url = F3::get('SERVER.HTTP_REFERER');
 
-			$project = new Project();
-			$project->load("hash = '$post[project]'");
+			try {
+				$project = new Project();
+				$project->load("hash = '$post[project]'");
 
-            if(F3::get('SESSION.userId'))
-            {
-                $user = new User();
-                $user->load('id = ' .F3::get('SESSION.userId'));
-                $user->setLastProject($project->getId());
-                $user->save();
-            }
+        	    if(F3::get('SESSION.userId'))
+           		{
+              		$user = new User();
+               		$user->load('id = ' .F3::get('SESSION.userId'));
+                	$user->setLastProject($project->getId());
+                	$user->save();
+				}
+			} catch (Exception $e) {
+				$this->tpfail("Failure while changing Project");
+				return ;
+			}
 
 			F3::set('SESSION.project', $project->getId());
 			F3::reroute($url);
@@ -439,6 +474,26 @@
 				$projects[$i] = $project->toArray();
             
 			F3::set('projects', $projects);
+			echo Template::serve('main.tpl.php');
+		}
+
+		/**
+		 *
+		 */
+		private function tpdeny()
+		{
+			F3::set('FAILURE', 'You are not allowed to do this.');			
+			F3::set('template', 'error404.tpl.php');
+			echo Template::serve('main.tpl.php');
+		}
+
+		/**
+		 *
+		 */
+		private function tpfail($msg)
+		{
+			F3::set('FAILURE', $msg);
+			F3::set('template', 'error404.tpl.php');
 			echo Template::serve('main.tpl.php');
 		}
 

@@ -164,7 +164,6 @@
 		 */
 		public function load($stmt)
 		{
-
 			$this->ax->load($stmt);
 
 			if (!$this->ax->dry())
@@ -182,6 +181,8 @@
 				$this->category = $this->ax->category;
 				$this->milestone =  $this->ax->milestone;
 			}
+			else
+				throw new Exception();
 		}
 
 
@@ -194,7 +195,7 @@
 			$ticket_state = F3::get('ticket_state');
 			$ticket_type = F3::get('ticket_type');
 			$ticket_priority = F3::get('ticket_priority');
-
+			
 			$ticket['id'] = $this->id;
 			$ticket['hash'] = $this->hash;
 			$ticket['title'] = $this->title;
