@@ -152,11 +152,11 @@
 			$this->ax->category = $this->category;
 			$this->ax->milestone = $this->milestone;
 			$this->ax->time = isset($this->time) ? $this->time : time();
+
 			$this->ax->save();
 
-			if ($this->ax->_id <= 0)
+			if ($this->ax->_id != NULL && $this->ax->_id <= 0)
 				throw new Exception();
-
 		}
 
 		/*
@@ -165,7 +165,7 @@
 		public function load($stmt)
 		{
 			$this->ax->load($stmt);
-
+			
 			if (!$this->ax->dry())
 			{
 				$this->id = $this->ax->id;

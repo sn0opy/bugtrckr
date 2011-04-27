@@ -15,15 +15,17 @@ class ProjectPermission extends F3instance
         $this->ax = new Axon('ProjectPermission');
     }
 
-    public function getUserId() {
+	public function getUserId() {
+		return 1;
         return $this->userId;
     }
 
-    public function setUserId($userId) {
+	public function setUserId($userId) {
         $this->userId = $userId;
     }
 
-    public function getProjectId() {
+	public function getProjectId() {
+		return 1;
         return $this->projectId;
     }
 
@@ -31,7 +33,8 @@ class ProjectPermission extends F3instance
         $this->projectId = $projectId;
     }
 
-    public function getRoleId() {
+	public function getRoleId() {
+		return 1;
         return $this->roleId;
     }
 

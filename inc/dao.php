@@ -11,7 +11,7 @@
 			$milestones = F3::get('DB')->sql("SELECT id FROM Milestone WHERE $stmt");
 
 			/* Selecting Milestones failed */
-			if ($milestone == NULL)
+			if ($milestones == NULL)
 				throw new Exception();
 
 			/* Get Milestones data */
@@ -147,9 +147,10 @@
 			try {
 				$user = new User();
 				$user->load("id = $userId");
-
+				
 				$activity = new Activity();
 
+				$activity->setHash($this->helper->getFreeHash('Activity'));
 				$activity->setDescription($user->getName() ." $message");
 				$activity->setProject($projectId);
 				$activity->setUser($userId);
@@ -170,13 +171,14 @@
 
 			try {
         	    $user = new User();
-            	$user->load('id = ' .$userID);
+            	$user->load('id = ' .$userId);
 
-         	   $projPerm = new ProjectPermission();
+         		$projPerm = new ProjectPermission();
             	$projPerm->load('userId = ' .$userId. ' AND projectId = ' .$projectId);
 
 	            $role = new Role();
 				$role->load('id = ' .$projPerm->getRoleId());
+
 			} catch (Exception $e) {
 				throw $e;
 			}

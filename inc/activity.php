@@ -9,15 +9,24 @@
 		private $project;
 		private $changed;
 
+		private $ax;
+
 		function __construct()
 		{
 			parent::__construct();
-		}
 
+			$this->ax = new Axon('Activity');
+		}
+		 
 
 		public function getId()
 		{
 			return $this->id;
+		}
+
+		public function setHash($hash)
+		{
+			$this->hash = $hash;
 		}
 
 		public function getHash()
@@ -74,7 +83,7 @@
 			$this->ax->project = $this->project;
 			$this->ax->save();
 
-			if ($this->ax->_id <= 0)
+			if ($this->ax->_id != NULL && $this->ax->_id <= 0)
 				throw new Exception();
 		}
 

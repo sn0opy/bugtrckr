@@ -42,6 +42,7 @@
 				$tickets = Dao::getTickets('milestone = ' .$ms->getId());
 			} catch (Exception $e) {
 				$this->tpfail("Failure while open Tickets");
+				var_dump($e);
 				return ;
 			}
 
@@ -92,6 +93,7 @@
 				$milestones = Dao::getMilestones("project = $project");
 			} catch (Exception $e) {
 				$this->tpfail("Failure while open Milestones");
+				var_dump($e);
 				return ;
 			}
 
@@ -141,6 +143,7 @@
 				$activities = Dao::getActivities("project = $project");
 			} catch (Exception $e) {
 				$this->tpfail("Failure while open Activities");
+				var_dump($e);
 				return ;
 			}
 
@@ -167,12 +170,13 @@
 			
 			/* Get Project */
 			$project = F3::get('SESSION.project');
-
+			
 			/* Get Milestones of the Project */
 			try {
 				$milestones = Dao::getMilestones("project = $project");
 			} catch (Exception $e) {
 				$this->tpfail("Failure while open Milestones");
+				var_dump($e);
 				return ;
 			}
 
@@ -188,6 +192,7 @@
 					"ORDER BY $order");
 			} catch (Exception $e) {
 				$this->tpfail("Failure while open Tickets");
+				var_dump($e);
 				return ;
 			}
 
@@ -216,6 +221,7 @@
 				$milestone->load("id = ". $ticket->getMilestone());
 			} catch (Exception $e) {
 				$this->tpfail("Can't open Ticket");
+				var_dump($e);
 				return ;
 			}
 
@@ -268,7 +274,9 @@
 				F3::set('PARAMS.hash', $ticket->getHash());
 				$this->showTicket();
 			} catch (Exception $e) {
-				$this->tpfail("Failure while saving Ticket");	
+				$this->tpfail("Failure while saving Ticket");
+				var_dump($e);				
+				return ;
 			}
 		}
 
@@ -292,12 +300,13 @@
 				$ticket->setAssigned($post['userId']);
 				$ticket->setState($post['state']);
 
-				$hash = $ticket->save();
+				$ticket->save();
 			} catch (Exception $e) {
 				$this->tpfail("Failure while saving Ticket");
+				var_dump($e);
 				return ;
 			}
-
+	 
 			Dao::addActivity("changed Ticket ". $ticket->getTitle());
 			F3::set('PARAMS["hash"]', $hash);
 			$this->showTicket($hash);
@@ -330,6 +339,7 @@
 				Dao::addActivity("created Milestone ". $milestone->getName());
 			} catch (Exception $e) {
 				$this->tpfail("Failure while saving Milesonte");
+				var_dump($e);
 				return ;
 			}
 
@@ -357,6 +367,7 @@
 				}
 			} catch (Exception $e) {
 				$this->tpfail("Failure while changing Project");
+				var_dump($e);
 				return ;
 			}
 

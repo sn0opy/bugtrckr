@@ -83,7 +83,7 @@
 			$this->ax->project = $this->project;
 			$this->ax->save();
 		
-			if ($this->ax->_id <= 0)
+			if ($this->ax->_id != NULL && $this->ax->_id <= 0)
 				throw new Exception();
 		}
 

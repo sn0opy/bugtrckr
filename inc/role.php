@@ -161,7 +161,7 @@ class Role extends F3instance
         $this->ax->save();
     }
 
-    public function load()
+    public function load($stmt)
     {
         $this->ax->load($stmt);
 
