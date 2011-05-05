@@ -1,1 +1,1 @@
-<h2>{@lng.error} 404</h2>
+<h2>{{@lng.error}} 404</h2>

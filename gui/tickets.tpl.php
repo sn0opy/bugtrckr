@@ -1,64 +1,63 @@
-<h2 class="floatleft">{@lng.tickets}</h2>
+<h2 class="floatleft">{{@lng.tickets}}</h2>
 
 <button type="button" class="floatright"
 	onclick="document.getElementById('add').style.display = 'block'" >
-	{@lng.addticket}
+	{{@lng.addticket}}
 </button>
 
-{* Form for new tickets *}
 <div id="add">
-    <h3 class="floatleft">{@lng.addticket}</h3>
+    <h3 class="floatleft">{{@lng.addticket}}</h3>
     <a class="closeButton" href="#" onclick="document.getElementById('add').style.display = 'none'; return false;">
 		X
 	</a>
 
-	<form method="POST" action="/{@BASE}ticket/">
+	<form method="POST" action="/{{@BASE}}ticket/">
 		<div class="formRow">
-			<div class="formLabel">{@lng.title}</div>
+			<div class="formLabel">{{@lng.title}}</div>
 			<div class="formValue"><input type="text" name="title" /></div>
 		</div>
 
 		<div class="formRow">
-			<div class="formLabel">{@lng.description}</div>
+			<div class="formLabel">{{@lng.description}}</div>
 			<div class="formValue">
 				<textarea name="description"></textarea>
 			</div>
 		</div>
 
 		<div class="formRow">
-			<div class="formLabel">{@lng.category}</div>
+			<div class="formLabel">{{@lng.category}}</div>
 			<div class="formValue"><input type="text" name="category" /></div>
 		</div>
 
 		<div class="formRow">
-			<div class="formLabel">{@lng.type}</div>
+			<div class="formLabel">{{@lng.type}}</div>
 			<div class="formValue">
 				<select name="type" size="1">
-					<option value="1">{@lng.bug}</option>
-					<option value="2">{@lng.feature}</option>
+					<option value="1">{{@lng.bug}}</option>
+					<option value="2">{{@lng.feature}}</option>
 				</select>
 			</div>
 		</div>
 
 		<div class="formRow">
-			<div class="formLabel">{@lng.priority}</div>
+			<div class="formLabel">{{@lng.priority}}</div>
 			<div class="formValue">
 				<select name="priority" size="1">
-					<option value="1">1 - {@lng.veryhigh}</option>
-					<option value="2">2 - {@lng.high}</option>
-					<option value="3" selected="selected">3 - {@lng.normal}</option>
-					<option value="4">4 - {@lng.low}</option>
-					<option value="5">5 - {@lng.verylow}</option>
+					<option value="1">1 - {{@lng.veryhigh}}</option>
+					<option value="2">2 - {{@lng.high}}</option>
+					<option value="3" selected="selected">3 - {{@lng.normal}}</option>
+					<option value="4">4 - {{@lng.low}}</option>
+					<option value="5">5 - {{@lng.verylow}}</option>
 				</select>
 			</div>
 		</div>
 
 		<div class="formRow">
-			<div class="formLabel">{@lng.milestone}</div>
+			<div class="formLabel">{{@lng.milestone}}</div>
 			<div class="formValue">
 				<select name="milestone" size="1">
-				<F3:repeat group="{@milestones}" value="{@milestone}">
-					<option value="{@milestone.id}">{@milestone.name}</option>
+				<F3:repeat group="{{@milestones}}" value="{{@milestone}}">
+					<option value="{{@milestone.id}}">{{@milestone.name}}</option>
 				</F3:repeat>
 				</select>
 			</div>
@@ -67,39 +66,38 @@
 		<div class="formRow">
 			<div class="formLabel"></div>
 			<div class="formValue">
-				<input type="submit" value="{@lng.submit}" />
+				<input type="submit" value="{{@lng.submit}}" />
 			</div>
 		</div>
 	</form>
 	<br class="clearfix" />
 </div>
-{* End form for new tickets *}
 
 <table class="overview">
     <thead>
         <tr>
-            <th><a href="/{@BASE}tickets/id">#</a></th>
-			<th><a href="/{@BASE}tickets/title">{@lng.title}</a></th>
-			<th><a href="/{@BASE}tickets/type">{@lng.type}</a></th>
-			<th><a href="/{@BASE}tickets/state">{@lng.status}</a></th>
-            <th><a href="/{@BASE}tickets/priority">{@lng.priority}</a></th>
-            <th><a href="/{@BASE}tickets/created">{@lng.created}</a></th>
-            <th>{@lng.owner}</th>
+            <th><a href="/{{@BASE}}tickets/id">#</a></th>
+			<th><a href="/{{@BASE}}tickets/title">{{@lng.title}}</a></th>
+			<th><a href="/{{@BASE}}tickets/type">{{@lng.type}}</a></th>
+			<th><a href="/{{@BASE}}tickets/state">{{@lng.status}}</a></th>
+            <th><a href="/{{@BASE}}tickets/priority">{{@lng.priority}}</a></th>
+            <th><a href="/{{@BASE}}tickets/created">{{@lng.created}}</a></th>
+            <th>{{@lng.owner}}</th>
         </tr>
     </thead>
 
     <tbody>
-        <F3:repeat group="{@tickets}" key="{@i}" value="{@ticket}">
-        <tr class="tr{@i%2}">
-            <td class="id">{@i+1}</td>
+        <F3:repeat group="{{@tickets}}" key="{{@i}}" value="{{@ticket}}">
+        <tr class="tr{{@i%2}}">
+            <td class="id">{{@i+1}}</td>
             <td class="title">
-                <a href="/{@BASE}ticket/{@ticket.hash}">{@ticket.title}</a>
+                <a href="/{{@BASE}}ticket/{{@ticket.hash}}">{{@ticket.title}}</a>
 			</td>
-			<td class="type">{@ticket.type}</td>
-            <td class="state">{@ticket.state}</td>
-            <td class="priority">{@ticket.priority}</td>
-            <td class="created">{@ticket.created}</td>
-            <td class="owner"><a href="/{@BASE}user/{@ticket.owner}">{@ticket.owner}</a></td>
+			<td class="type">{{@ticket.type}}</td>
+            <td class="state">{{@ticket.state}}</td>
+            <td class="priority">{{@ticket.priority}}</td>
+            <td class="created">{{@ticket.created}}</td>
+            <td class="owner"><a href="/{{@BASE}}user/{{@ticket.owner}}">{{@ticket.owner}}</a></td>
         </tr>
         </F3:repeat>
     </tbody>

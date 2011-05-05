@@ -1,26 +1,26 @@
-<h2>{@lng.registration}</h2>
+<h2>{{@lng.registration}}</h2>
 
-<F3:check if="{@SESSION.userId}">
+<F3:check if="{{@SESSION.userId}}">
     <F3:true>
-        <p>{@lng.alreadyLoggedIn}</p>
+        <p>{{@lng.alreadyLoggedIn}}</p>
     </F3:true>
     <F3:false>
-        <form action="/{@BASE}user/new" method="post">
+        <form action="/{{@BASE}}user/new" method="post">
             <div class="formRow">
-                <div class="formLabel">{@lng.name}: </div>
+                <div class="formLabel">{{@lng.name}}: </div>
                 <div class="formValue"><input type="text" name="name" /></div>
             </div>
             <div class="formRow">
-                <div class="formLabel">{@lng.password}: </div>
+                <div class="formLabel">{{@lng.password}}: </div>
                 <div class="formValue"><input type="password" name="password" /></div>
             </div>
             <div class="formRow">
-                <div class="formLabel">{@lng.email}: </div>
+                <div class="formLabel">{{@lng.email}}: </div>
                 <div class="formValue"><input type="text" name="email" /></div>
             </div>
             <div class="formRow">
                 <div class="formLabel"> </div>
-                <div class="formValue"><input type="submit" value="{@lng.submit}" /></div>
+                <div class="formValue"><input type="submit" value="{{@lng.submit}}" /></div>
             </div>
         </form>
     </F3:false>

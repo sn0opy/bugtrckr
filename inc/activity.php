@@ -94,7 +94,7 @@
 		{
 			$this->ax->load($stmt);
 
-			if (!t$his->ax->dry())
+			if(!$this->ax->dry())
 			{
 				$this->id = $this->ax->id;
 				$this->hash = $this->ax->hash;

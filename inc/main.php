@@ -24,7 +24,7 @@
 
 		function start()
 		{
-            F3::set('pageTitle', '{@lng.home}');
+            F3::set('pageTitle', '{{@lng.home}}');
             F3::set('template', 'home.tpl.php');
 			$this->tpserve();
 		}
@@ -71,7 +71,7 @@
             F3::set('tickets', $tickets);
             F3::set('stats', $stats);
             F3::set('milestone', $ms->toArray());
-            F3::set('pageTitle', '{@lng.milestone} › '. $ms->getName());
+            F3::set('pageTitle', '{{@lng.milestone}} › '. $ms->getName());
             F3::set('template', 'milestone.tpl.php');
             $this->tpserve();
 
@@ -124,7 +124,7 @@
 
 			F3::set('road', $road);
             F3::set('today', date('Y-m-d', time()));
-			F3::set('pageTitle', '{@lng.roadmap}');
+			F3::set('pageTitle', '{{@lng.roadmap}}');
 			F3::set('template', 'roadmap.tpl.php');
 			$this->tpserve();
 		}
@@ -153,7 +153,7 @@
 			}
 
 			F3::set('activities', $timeline);
-			F3::set('pageTitle', '{@lng.timeline}');
+			F3::set('pageTitle', '{{@lng.timeline}}');
 			F3::set('template', 'timeline.tpl.php');
 
 			$this->tpserve();
@@ -201,7 +201,7 @@
 
 			F3::set('milestones', $milestones);
 			F3::set('tickets', $tickets);
-			F3::set('pageTitle', '{@lng.tickets}');
+			F3::set('pageTitle', '{{@lng.tickets}}');
             F3::set('template', 'tickets.tpl.php');
 			$this->tpserve();
 		}
@@ -239,7 +239,7 @@
 
 			F3::set('ticket', $ticket->toArray());
 			F3::set('milestone', $milestone->toArray());
-			F3::set('pageTitle', '{@lng.tickets} › '. $ticket->getTitle());
+			F3::set('pageTitle', '{{@lng.tickets}} › '. $ticket->getTitle());
 			F3::set('template', 'ticket.tpl.php');
 			$this->tpserve();
 		}
@@ -396,7 +396,7 @@
             
             F3::set('tickets', $userTickets);
             F3::set('template', 'user.tpl.php');
-            F3::set('pageTitle', '{@lng.user} › '.$name);
+            F3::set('pageTitle', '{{@lng.user}} › '.$name);
             $this->tpserve();
         }
 
@@ -406,7 +406,7 @@
         function showUserRegister()
         {
             F3::set('template', 'userRegister.tpl.php');
-            F3::set('pageTitle', '{@lng.user} › {@lng.registration}');
+            F3::set('pageTitle', '{{@lng.user}} › {@lng.registration}');
             $this->tpserve();
         }
 
@@ -433,7 +433,7 @@
         function showUserLogin()
         {
             $this->set('template', 'userLogin.tpl.php');
-            F3::set('pageTitle', '{@lng.user} › {@lng.login}');
+            F3::set('pageTitle', '{{@lng.user}} › {@lng.login}');
             $this->tpserve();
         }
 

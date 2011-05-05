@@ -145,7 +145,7 @@ class DB extends Base {
 						'SET NAMES '.self::$vars['MYSQL']):array()
 			);
 		list($this->dsn,$this->user,$this->pw,$this->opt)=
-			array($this->subst($dsn),$user,$pw,$opt);
+			array($this->resolve($dsn),$user,$pw,$opt);
 		$this->backend=strstr($this->dsn,':',TRUE);
 		if (!isset(self::$vars['DB']))
 			self::$vars['DB']=$this;
@@ -200,7 +200,15 @@ class Axon extends Base {
 				$axon->empty=FALSE;
 		}
 		return $axon;
+	}
 
+	/**
+		Return current record contents as an array
+			@return array
+			@public
+	**/
+	function cast() {
+		return $this->fields;
 	}
 
 	/**
@@ -266,7 +274,7 @@ class Axon extends Base {
 			@public
 	**/
 	function findone($cond=NULL,$seq=NULL,$ofs=0) {
-		list($result)=$this->find($cond,$seq,1,$ofs)?:NULL;
+		list($result)=$this->find($cond,$seq,1,$ofs)?:array(NULL);
 		return $result;
 	}
 
@@ -277,9 +285,11 @@ class Axon extends Base {
 			@public
 	**/
 	function found($cond=NULL) {
-		list($result)=$this->select(
-			'COUNT(*) AS found',$cond)?:array('found'=>0);
-		return $result['found'];
+		$this->def('_found','COUNT(*)');
+		list($result)=$this->find($cond);
+		$found=$result->_found;
+		$this->undef('_found');
+		return $found;
 	}
 
 	/**
@@ -304,17 +314,19 @@ class Axon extends Base {
 
 	/**
 		Hydrate Axon with first record that matches criteria
+			@return mixed
 			@param $cond mixed
 			@param $seq string
 			@param $ofs int
 			@public
 	**/
 	function load($cond=NULL,$seq=NULL,$ofs=0) {
-		if (method_exists($this,'beforeLoad') && !$this->beforeLoad())
-			return;
 		if ($ofs>-1) {
 			$this->ofs=0;
-			if ($axon=$this->findOne($cond,$seq,$ofs)?:NULL) {
+			if ($axon=$this->findone($cond,$seq,$ofs)) {
+				if (method_exists($this,'beforeLoad') &&
+					!$this->beforeLoad())
+					return;
 				// Hydrate Axon
 				foreach ($axon->fields as $field=>$val) {
 					$this->fields[$field]=$val;
@@ -326,17 +338,18 @@ class Axon extends Base {
 						$this->adhoc[$field][1]=$val[1];
 				list($this->empty,$this->cond,$this->seq,$this->ofs)=
 					array(FALSE,$cond,$seq,$ofs);
-				return;
+				if (method_exists($this,'afterLoad'))
+					$this->afterLoad();
+				return $this;
 			}
 		}
 		$this->reset();
-		if (method_exists($this,'afterLoad'))
-			$this->afterLoad();
+		return FALSE;
 	}
 
 	/**
 		Hydrate Axon with nth record relative to current position
-			@return bool
+			@return mixed
 			@param $ofs int
 			@public
 	**/
@@ -345,8 +358,25 @@ class Axon extends Base {
 			trigger_error(self::TEXT_AxonEmpty);
 			return FALSE;
 		}
-		$this->load($this->cond,$this->seq,$this->ofs+$ofs);
-		return TRUE;
+		return $this->load($this->cond,$this->seq,$this->ofs+$ofs);
+	}
+
+	/**
+		Return next record
+			@return array
+			@public
+	**/
+	function next() {
+		return $this->skip();
+	}
+
+	/**
+		Return previous record
+			@return array
+			@public
+	**/
+	function prev() {
+		return $this->skip(-1);
 	}
 
 	/**
@@ -391,9 +421,10 @@ class Axon extends Base {
 				$cond.=($cond?' AND ':'').$pkey.'=:c_'.$pkey;
 				$bind[':c_'.$pkey]=array($val,$this->db->type($val));
 			}
-			$this->db->exec(
-				'UPDATE '.$this->table.' SET '.$set.
-					($cond?(' WHERE '.$cond):'').';',$bind);
+			if ($set)
+				$this->db->exec(
+					'UPDATE '.$this->table.' SET '.$set.
+						($cond?(' WHERE '.$cond):'').';',$bind);
 		}
 		if ($this->pkeys)
 			// Update primary keys with new values
@@ -474,7 +505,7 @@ class Axon extends Base {
 	**/
 	function sync($table,$db=NULL,$freq=60) {
 		if (!$db) {
-			if (isset(self::$vars['DB']))
+			if (isset(self::$vars['DB']) && is_a(self::$vars['DB'],'DB'))
 				$db=self::$vars['DB'];
 			else {
 				trigger_error(self::TEXT_AxonConnect);
