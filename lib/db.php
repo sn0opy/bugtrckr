@@ -26,6 +26,44 @@ class DB extends Base {
 		$dsn,$user,$pw,$opt;
 
 	/**
+		Force PDO instantiation
+			@public
+	**/
+	function instantiate() {
+		$this->pdo=new PDO($this->dsn,$this->user,$this->pw,$this->opt);
+	}
+
+	/**
+		Begin SQL transaction
+			@public
+	**/
+	function begin() {
+		if (!$this->pdo)
+			self::instantiate();
+		$this->pdo->beginTransaction();
+	}
+
+	/**
+		Rollback SQL transaction
+			@public
+	**/
+	function rollback() {
+		if (!$this->pdo)
+			self::instantiate();
+		$this->pdo->rollback();
+	}
+
+	/**
+		Commit SQL transaction
+			@public
+	**/
+	function commit() {
+		if (!$this->pdo)
+			self::instantiate();
+		$this->pdo->commit();
+	}
+
+	/**
 		Process SQL statement(s)
 			@return array
 			@param $cmd mixed
@@ -35,7 +73,7 @@ class DB extends Base {
 	**/
 	function exec($cmds,array $args=NULL,$ttl=0) {
 		if (!$this->pdo)
-			$this->pdo=new PDO($this->dsn,$this->user,$this->pw,$this->opt);
+			self::instantiate();
 		$stats=&self::ref('STATS');
 		if (!isset($stats[$this->dsn]))
 			$stats[$this->dsn]=array(
@@ -47,7 +85,7 @@ class DB extends Base {
 			$cmds=array($cmds);
 			$args=array($args);
 		}
-		else
+		elseif (!$this->pdo->inTransaction())
 			$this->pdo->beginTransaction();
 		foreach (array_combine($cmds,$args) as $cmd=>$arg) {
 			$hash='sql.'.self::hash($cmd);
@@ -67,17 +105,22 @@ class DB extends Base {
 						if (is_array($value))
 							$query->bindvalue($key,$value[0],$value[1]);
 						else
-							$query->bindvalue($key,$value,$this->type($value));
+							$query->bindvalue($key,$value,
+								$this->type($value));
 					$query->execute();
 				}
 				// Check SQLSTATE
 				foreach (array($this->pdo,$query) as $obj)
 					if ($obj->errorCode()!=PDO::ERR_NONE) {
+						$this->pdo->rollback();
 						$error=$obj->errorinfo();
 						trigger_error($error[2]);
 						return FALSE;
 					}
-				$this->result=$query->fetchall(PDO::FETCH_ASSOC);
+				$this->result=preg_match(
+					'/^\s*(?:INSERT|UPDATE|DELETE)\s/i',$cmd)?
+						$query->rowCount():
+						$query->fetchall(PDO::FETCH_ASSOC);
 				if ($ttl)
 					Cache::set($hash,$this->result,$ttl);
 				// Gather real queries for profiler
@@ -86,7 +129,7 @@ class DB extends Base {
 				$stats[$this->dsn]['queries'][$cmd]++;
 			}
 		}
-		if ($batch)
+		if ($batch && !$this->pdo->inTransaction())
 			$this->pdo->commit();
 		return $this->result;
 	}
@@ -130,9 +173,10 @@ class DB extends Base {
 			@param $user string
 			@param $pw string
 			@param $opt array
+			@param $force boolean
 			@public
 	**/
-	function __construct($dsn,$user=NULL,$pw=NULL,$opt=NULL) {
+	function __construct($dsn,$user=NULL,$pw=NULL,$opt=NULL,$force=FALSE) {
 		if (!isset(self::$vars['MYSQL']))
 			// Default MySQL character set
 			self::$vars['MYSQL']='utf8';
@@ -149,6 +193,8 @@ class DB extends Base {
 		$this->backend=strstr($this->dsn,':',TRUE);
 		if (!isset(self::$vars['DB']))
 			self::$vars['DB']=$this;
+		if ($force)
+			$this->pdo=new PDO($this->dsn,$this->user,$this->pw,$this->opt);
 	}
 
 }

@@ -20,6 +20,7 @@ class Template extends Base {
 
 	//@{ Locale-specific error/exception messages
 	const
+		TEXT_Render='Template %s cannot be rendered',
 		TEXT_Recursive='Recursive <include %s> detected';
 	//@}
 
@@ -36,8 +37,11 @@ class Template extends Base {
 	**/
 	static function serve($file,$mime='text/html') {
 		$file=self::resolve(self::fixslashes(self::$vars['GUI']).$file);
-		if (!is_file($file))
+		if (!is_file($file)) {
+			if (!self::$includes)
+				trigger_error(sprintf(self::TEXT_Render,$file));
 			return '';
+		}
 		if (in_array($file,self::$includes)) {
 			trigger_error(sprintf(self::TEXT_Recursive,$file));
 			return '';
@@ -47,16 +51,29 @@ class Template extends Base {
 			// Send HTTP header with appropriate character set
 			header(self::HTTP_Content.': '.$mime.'; '.
 				'charset='.self::$vars['ENCODING']);
-		$doc=new F3markup;
-		$text=$doc->file($file);
+		$hash='php.'.self::hash($file);
+		$cached=Cache::cached($hash);
+		if ($cached && filemtime($file)<$cached)
+			// Retrieve PHP-compiled template from cache
+			$text=Cache::get($hash);
+		else {
+			// Parse raw template
+			$doc=new F3markup;
+			$text=$doc->load(file_get_contents($file));
+			// Save PHP-compiled template to cache
+			Cache::set($hash,$text);
+		}
 		ob_start();
 		if (ini_get('allow_url_include'))
+			// Render in-memory
 			require 'data:text/plain,'.urlencode($text);
 		else {
+			// Save PHP-equivalent file in temporary folder
 			self::folder(self::$vars['TEMP']);
-			$temp=tempnam(self::$vars['TEMP'],
-				$_SERVER['SERVER_NAME'].'.tpl.');
-			file_put_contents($temp,$text);
+			$temp=self::$vars['TEMP'].$_SERVER['SERVER_NAME'].'.'.$hash;
+			if (!$cached || !is_file($temp))
+				file_put_contents($temp,$text);
+			// Render
 			require $temp;
 		}
 		$out=ob_get_clean();
@@ -71,7 +88,8 @@ class F3markup extends Base {
 
 	//@{ Locale-specific error/exception messages
 	const
-		TEXT_Attribute='Missing attribute in <%s> directive';
+		TEXT_AttribMissing='Missing attribute: %s',
+		TEXT_AttribInvalid='Invalid attribute: %s';
 	//@}
 
 	private
@@ -89,21 +107,24 @@ class F3markup extends Base {
 	**/
 	function expr($str,$echo=FALSE) {
 		$self=$this;
-		$syms=$this->syms;
+		$syms=&$this->syms;
 		return preg_replace_callback(
-				'/{{(.+?)}}/',
-				function($expr) use($self,$syms,$echo) {
+				'/{{(.+?)}}/s',
+				function($expr) use(&$syms,$self,$echo) {
 					$out=preg_replace_callback(
 						'/(?!\w)@(\w+(?:\[[^\]]+\]|\.\w+)*(?:->\w+)?'.
 						'\h*(?:\(([^\)]*?)\))?)/',
-						function($var) use($syms) {
+						function($var) use(&$syms) {
 							$self=__CLASS__;
-							if ($syms)
-								foreach ($syms as $sym)
-									if (preg_match('/^'.preg_quote($sym).'\b/',
-										$mix=$self::remix($var[1])))
-										return '$_'.$mix;
-							return 'F3::get('.var_export($var[1],TRUE).')';
+							preg_match('/^(\w+)\b(.*)/',$var[1],$match);
+							if (in_array($match[1],$syms))
+								return '$_'.$self::remix($var[1]);
+							$str='F3::get('.var_export($var[1],TRUE).')';
+							if (!$match[2]) {
+								$syms[]=$match[1];
+								$str='($_'.$match[1].'='.$str.')';
+							}
+							return $str;
 						},
 						$expr[1]
 					);
@@ -111,6 +132,33 @@ class F3markup extends Base {
 				},
 			$str
 		);
+	}
+
+	/**
+		Return TRUE if all mandatory attributes are present
+			@return boolean
+			@param $key string
+			@param $node array
+			@param $attr array
+			@public
+	**/
+	function isdef($key,array $tag,array $attrs) {
+		$ok=TRUE;
+		foreach ($attrs as $attr)
+			if (!isset($tag['@attrib'][$attr])) {
+				$ok=FALSE;
+				break;
+			}
+		if ($ok)
+			return TRUE;
+		$out='<'.$key;
+		if (isset($tag['@attrib']))
+			foreach ($tag['@attrib'] as $akey=>$aval)
+				$out.=' '.$akey.'="'.htmlspecialchars($aval).'"';
+		$out.='>';
+		trigger_error(sprintf(self::TEXT_AttribMissing,$out));
+		return FALSE;
+
 	}
 
 	/**
@@ -128,37 +176,74 @@ class F3markup extends Base {
 				else
 					switch ($nkey) {
 						case 'include':
-							if (!isset($nval['@attrib']['href'])) {
-								trigger_error(sprintf(
-									self::TEXT_Attribute,$nkey));
+							// <include> directive
+							if (!$this->isdef($nkey,$nval,array('href')))
 								return;
-							}
 							$hvar=$nval['@attrib']['href'];
 							$out.='<?php echo Template::serve('.
 								var_export($hvar,TRUE).'); ?>';
 							break;
-						case 'repeat':
-							if (!isset($nval['@attrib']['group']) ||
-								!isset($nval['@attrib']['value'])) {
-								trigger_error(sprintf(
-									self::TEXT_Attribute,$nkey));
+						case 'loop':
+							// <loop> directive
+							if (!$this->isdef($nkey,$nval,
+								array('counter','from','to')))
 								return;
-							}
+							$cvar=preg_replace('/{{@(.+?)}}/','\1',
+								$nval['@attrib']['counter']);
 							foreach ($nval['@attrib'] as $akey=>$aval) {
 								${$akey[0].'att'}=$aval;
+								${$akey[0].'str'}=$this->expr($aval);
+								// Syntax check
+								if (${$akey[0].'str'}==$aval) {
+									trigger_error(sprintf(
+										self::TEXT_AttribInvalid,
+										$akey.'="'.addslashes($aval).'"'));
+									return;
+								}
+							}
+							unset($nval['@attrib']);
+							$this->syms[]=$cvar;
+							$out.='<?php for ('.
+								'$_'.$cvar.'='.(float)$fstr.';'.
+								'$_'.$cvar.'<'.(float)$tstr.';'.
+								'$_'.$cvar.'+='.(float)
+									(isset($satt)?$sstr:'1').'): ?>'.
+								$this->build($nval).
+								'<?php endfor; ?>';
+							unset($this->syms
+								[array_search($cvar,$this->syms)]);
+							break;
+						case 'repeat':
+							// <repeat> directive
+							if (!$this->isdef($nkey,$nval,
+								array('group','value')))
+								return;
+							$gval=$nval['@attrib']['group'];
+							$gstr=$this->expr($gval);
+							// Syntax check
+							if ($gstr==$gval) {
+								trigger_error(sprintf(
+									self::TEXT_AttribInvalid,
+									'group="'.addslashes($gval).'"'));
+								return;
+							}
+							unset($nval['@attrib']['group']);
+							foreach ($nval['@attrib'] as $akey=>$aval) {
 								${$akey[0].'var'}=
 									preg_replace('/{{@(.+?)}}/','\1',$aval);
-								${$akey[0].'str'}=
-									var_export(${$akey[0].'var'},TRUE);
+								// Syntax check
+								if (${$akey[0].'var'}==$aval) {
+									trigger_error(sprintf(
+										self::TEXT_AttribInvalid,
+										$akey.'="'.addslashes($aval).'"'));
+									return;
+								}
 							}
 							unset($nval['@attrib']);
 							if (isset($kvar))
 								$this->syms[]=$kvar;
 							$this->syms[]=$vvar;
-							$found=FALSE;
-							$out.='<?php foreach ('.
-								($found?('$_'.$gvar):
-								('('.$this->expr($gatt).')')).'?:array() as '.
+							$out.='<?php foreach (('.$gstr.'?:array()) as '.
 								(isset($kvar)?('$_'.$kvar.'=>'):'').
 									'$_'.$vvar.'): ?>'.
 								$this->build($nval).
@@ -170,43 +255,34 @@ class F3markup extends Base {
 								[array_search($vvar,$this->syms)]);
 							break;
 						case 'check':
-							if (!isset($nval['@attrib']['if'])) {
+							// <check> directive
+							if (!$this->isdef($nkey,$nval,array('if')))
+								return;
+							$ival=$nval['@attrib']['if'];
+							$cond=$this->expr($ival);
+							// Syntax check
+							if ($cond==$ival) {
 								trigger_error(sprintf(
-									self::TEXT_Attribute,$nkey));
+									self::TEXT_AttribInvalid,
+									'if="'.addslashes($ival).'"'));
 								return;
 							}
-							$ivar=$nval['@attrib']['if'];
-							$out.='<?php if ('.$this->expr($ivar).'): ?>'.
+							$out.='<?php if ('.$cond.'): ?>'.
 								$this->build($nval).
 								'<?php endif; ?>';
 							break;
 						case 'true':
+							// <true> block of <check> directive
 							$out.=$this->build($nval);
 							break;
 						case 'false':
+							// <false> block of <check> directive
 							$out.='<?php else: ?>'.$this->build($nval);
 							break;
 					}
 		}
 		else
 			$out.=preg_match('/<\?php/',$node)?$node:$this->expr($node,TRUE);
-		return $out;
-	}
-
-	/**
-		Load markup from file
-			@return string
-			@param $file string
-			@public
-	**/
-	function file($file) {
-		$hash='tpl.'.self::hash($file);
-		$cached=Cache::cached($hash);
-		if ($cached && filemtime($file)<$cached)
-			// Retrieve from cache
-			return Cache::get($hash);
-		$out=$this->load(file_get_contents($file));
-		Cache::set($hash,$out);
 		return $out;
 	}
 
@@ -218,7 +294,7 @@ class F3markup extends Base {
 	**/
 	function load($text) {
 		// Remove PHP tags and alternative exclude-tokens
-		$text=preg_replace('/<\?php.+?\?>|{{\*.+?\*}}/s','',trim($text));
+		$text=preg_replace('/<\?php.+?\?>|{{\*.+?\*}}/is','',trim($text));
 		// Define root node
 		$node=&$this->tree;
 		// Define stack and depth variables
@@ -230,7 +306,7 @@ class F3markup extends Base {
 		$temp='';
 		while ($ptr<$len) {
 			if (preg_match('/^<(\/?)'.
-				'(?:F3+:)?(include|exclude|repeat|check|true|false)\b'.
+				'(?:F3+:)?(include|exclude|loop|repeat|check|true|false)\b'.
 				'(.*?)(\/?)>/is',substr($text,$ptr),$match)) {
 				if (strlen($temp))
 					$node[]=$temp;
@@ -260,10 +336,10 @@ class F3markup extends Base {
 					if ($match[3]) {
 						// Process attributes
 						preg_match_all('/\s+(\w+\b)\s*='.
-							'\s*([\'"])([^\'"]+)\2/s',$match[3],$attr,
+							'\s*(?:"(.+?)"|\'(.+?)\')/s',$match[3],$attr,
 							PREG_SET_ORDER);
 						foreach ($attr as $kv)
-							$node['@attrib'][$kv[1]]=$kv[3];
+							$node['@attrib'][$kv[1]]=$kv[2]?:$kv[3];
 					}
 					if ($match[4])
 						// Empty tag
@@ -292,6 +368,7 @@ class F3markup extends Base {
 			@public
 	**/
 	function __construct() {
+		$this->syms=explode('|',self::PHP_Globals);
 	}
 
 }

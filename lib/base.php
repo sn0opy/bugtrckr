@@ -245,11 +245,13 @@ class Base {
 		foreach (preg_split('/\[\h*[\'"]?|[\'"]?\h*\]|\.|(->)/',
 			$key,NULL,PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE) as $fix) {
 			if ($out) {
-				if ($fix=='->')
+				if ($fix=='->') {
 					$obj=TRUE;
+					continue;
+				}
 				elseif ($obj) {
-					$fix='->'.$fix;
 					$obj=FALSE;
+					$fix='->'.$fix;
 				}
 				else
 					$fix='['.var_export($fix,TRUE).']';
@@ -998,7 +1000,7 @@ class F3 extends Base {
 				preg_replace(
 					'/(?:{{)?@(\w+\b)(?:}})?/i',
 					// Valid URL characters (RFC 1738)
-					'(?P<\1>[\w\-\.!~\*\'"(),\h]+\b)',
+					'(?P<\1>[\w\-\.!~\*\'"(),\h]+)',
 					// Wildcard character in URI
 					str_replace('\*','(.*)',preg_quote($uri,'/'))
 				).'\/?(?:\?.*)?$/i',
@@ -1290,12 +1292,17 @@ class F3 extends Base {
 			$class=NULL;
 			$line=0;
 			if (is_array($trace)) {
+				$plugins=is_array($plugins=glob(self::$vars['PLUGINS'].'*'))?
+					array_map('self::fixslashes',$plugins):array();
 				// Stringify the stack trace
 				ob_start();
 				foreach ($trace as $nexus) {
 					// Remove stack trace noise
 					if (self::$vars['DEBUG']<3 && (!isset($nexus['file']) ||
-						self::$vars['DEBUG']<2 && $nexus['file']==__FILE__ ||
+						self::$vars['DEBUG']<2 &&
+						(strrchr(basename($nexus['file']),'.')=='.tmp' ||
+						in_array(self::fixslashes(
+							$nexus['file']),$plugins)) ||
 						isset($nexus['function']) &&
 						preg_match('/^(call_user_func(?:_array)?|'.
 							'trigger_error|{.+}|'.__FUNCTION__.'|__)/',
@@ -1468,7 +1475,7 @@ class F3 extends Base {
 			// Custom error handler
 			'ONERROR'=>NULL,
 			// Plugins folder
-			'PLUGINS'=>__DIR__,
+			'PLUGINS'=>__DIR__.'/',
 			// Server protocol
 			'PROTOCOL'=>'http'.
 				(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']!='off'?'s':''),
