@@ -25,19 +25,7 @@
             } while(!$ax->dry());
             return $hash;
         }
-
-        public function intlSupport()
-        {
-            // check if intl module is loaded, otherwise use own fallback
-            if(!extension_loaded('intl'))
-            {
-                if(!$this->exists('lng'))
-                {
-                    $locale = include $this->get('LOCALES').$this->get('LANGUAGE').'.php';
-                    $this->set('lng', $locale['lng']);
-                }
-            }
-        }
+        
 
         public static function setTitle($subTitles)
         {

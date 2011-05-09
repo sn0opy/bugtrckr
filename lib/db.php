@@ -66,7 +66,7 @@ class DB extends Base {
 	/**
 		Process SQL statement(s)
 			@return array
-			@param $cmd mixed
+			@param $cmds mixed
 			@param $args array
 			@param $ttl int
 			@public
