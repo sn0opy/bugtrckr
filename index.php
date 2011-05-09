@@ -16,6 +16,7 @@ $app->set('LOCALES','lang/');
 $app->set('LANGUAGE', 'de'); // substr($_SERVER["HTTP_ACCEPT_LANGUAGE"], 0, 2);
 $app->set('PROXY', 1);
 
+
 $app->set('test123', 'test456');
 
 F3::set('DB', new DB('sqlite:' .$dbFile));
@@ -40,3 +41,4 @@ $app->route('POST /milestone', 'main->addMilestone');
 $app->route('POST /project/select', 'main->selectProject');
 
 $app->run();
+
