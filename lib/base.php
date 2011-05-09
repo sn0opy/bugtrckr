@@ -132,8 +132,10 @@ class Base {
 		$null;
 
 	private static
-		// Functions allowed in template
-		$funcs=array();
+		//! Functions allowed in template
+		$funcs=array(),
+		//! Read-only framework variables
+		$readonly='BASE|MAXSIZE|PROTOCOL|ROOT|ROUTES|STATS|VERSION';
 
 	/**
 		Convert Windows double-backslashes to slashes; Also for
@@ -153,10 +155,11 @@ class Base {
 			@public
 	**/
 	static function stringify($val) {
-		return preg_replace('/\h+=>\h+/','=>',var_export(
+		return preg_replace('/\h+=>\h+/','=>',
 			is_object($val) && !method_exists($val,'__set_state')?
 				(method_exists($val,'__toString')?
-					(string)$val:('#'.get_class($val).'#')):$val,TRUE));
+					var_export((string)$val,TRUE):
+					('object:'.get_class($val))):var_export($val,TRUE));
 	}
 
 	/**
@@ -286,7 +289,10 @@ class Base {
 		// Traverse array
 		$matches=preg_split('/\[\h*[\'"]?|[\'"]?\h*\]|\.|(->)/',
 			$key,NULL,PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
-		if ($set)
+		if ($set &&
+			// Read-only framework variables
+			!preg_match('/^('.self::$readonly.')\b/',
+				$matches[0]))
 			$var=&self::$vars;
 		else
 			$var=self::$vars;
@@ -348,14 +354,18 @@ class Base {
 					preg_replace_callback(
 						// Framework variable
 						'/(?!\w)@(\w+(?:\[[^\]]+\]|\.\w+)*(?:->\w+)?)'.
-							'\h*(?:\(([^\)]*?)\))?/',
+							'\h*(\(([^\)]*)\))?(?:\/\/(.+))?/',
 						function($var) use($self) {
 							// Retrieve variable contents
 							$val=$self::ref($var[1],FALSE);
 							if (isset($var[2]) && is_callable($val))
 								// Anonymous function
 								$val=call_user_func_array(
-									$val,str_getcsv($var[2]));
+									$val,str_getcsv($var[3]));
+							if (isset($var[4]) && class_exists('ICU'))
+								// ICU-formatted string
+								$val=call_user_func_array('ICU::format',
+									array($val,str_getcsv($var[4])));
 							return $self::stringify($val);
 						},
 						$expr[1]
@@ -555,29 +565,9 @@ class F3 extends Base {
 					ENT_COMPAT,self::$vars['ENCODING'],FALSE);
 		}
 		$var=$val;
-		if (preg_match('/LANGUAGE|LOCALES/',$key) &&
-			extension_loaded('intl')) {
-			// Determine language
-			if (!self::$vars['LANGUAGE'])
-				// Auto-detect
-				self::$vars['LANGUAGE']=
-					isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])?
-						Locale::acceptFromHTTP(
-							$_SERVER['HTTP_ACCEPT_LANGUAGE']):
-						Locale::getDefault();
-			Locale::setDefault(self::$vars['LANGUAGE']);
-			// Build up language list; add English as fallback
-			$list=array($def=Locale::getDefault(),
-				Locale::getPrimaryLanguage($def),'en');
-			foreach (array_reverse(array_unique($list)) as $language) {
-				$file=self::fixslashes(self::$vars['LOCALES']).
-					$language.'.php';
-				if (is_file($file) && ($trans=require_once $file) &&
-					is_array($trans))
-					// Combine dictionaries and assign key/value pairs
-					self::mset($trans);
-			}
-		}
+		if (preg_match('/LANGUAGE|LOCALES/',$key) && class_exists('ICU'))
+			// Load appropriate dictionaries
+			ICU::load();
 		elseif ($key=='PREFIX')
 			self::alias($val);
 		// Initialize cache if explicitly defined
@@ -610,10 +600,8 @@ class F3 extends Base {
 		}
 		$name=self::remix($key);
 		$val=self::ref($name,FALSE);
-		if (is_string($val) && extension_loaded('intl') &&
-			$msg=msgfmt_create(Locale::getDefault(),$val))
-			// Format string according to locale rules
-			return $msg->format(is_array($args)?$args:array($args));
+		if (is_string($val))
+			return class_exists('ICU')?ICU::format($val,$args):$val;
 		if (is_null($val)) {
 			// Attempt to retrieve from cache
 			$hash='var.'.self::hash($name);
@@ -691,6 +679,65 @@ class F3 extends Base {
 	}
 
 	/**
+		Return true if framework variable is an array
+			@return boolean
+			@param $var string
+			@public
+	**/
+	static function is_array($var) {
+		if (is_array(self::ref(self::remix($var),FALSE)))
+			return TRUE;
+		trigger_error(sprintf(self::TEXT_NotArray,$name));
+		return FALSE;
+	}
+
+	/**
+		Add element to the end of framework array variable
+			@param $var string
+			@param $val mixed
+			@public
+	**/
+	static function push($var,$val) {
+		if (self::is_array($name=self::remix($var)))
+			array_push($ref=&self::ref($name),$val);
+	}
+
+	/**
+		Remove last element of framework array variable and
+		return the element
+			@return mixed
+			@param $var string
+			@public
+	**/
+	static function pop($var) {
+		return self::is_array($name=self::remix($var))?
+			array_pop($ref=&self::ref($name)):FALSE;
+	}
+
+	/**
+		Add element to the beginning of framework array variable
+			@param $var string
+			@param $val mixed
+			@public
+	**/
+	static function unshift($var,$val) {
+		if (self::is_array($name=self::remix($var)))
+			array_unshift($ref=&self::ref($name),$val);
+	}
+
+	/**
+		Remove first element of framework array variable and
+		return the element
+			@return mixed
+			@param $var string
+			@public
+	**/
+	static function shift($var) {
+		return self::is_array($name=self::remix($var))?
+			array_shift($ref=&self::ref($name)):FALSE;
+	}
+
+	/**
 		Determine if framework variable has been cached
 			@return mixed
 			@param $key string
@@ -764,7 +811,7 @@ class F3 extends Base {
 					}
 					else
 						// Key-value pair
-						$ptr[$match[2]]=$match[3];
+						$ptr[trim($match[2])]=$match[3];
 				}
 			}
 			ob_start();
@@ -865,7 +912,7 @@ class F3 extends Base {
 		$uri=self::resolve($uri);
 		if (PHP_SAPI!='cli' && !headers_sent()) {
 			// HTTP redirect
-			self::status($_SERVER['REQUEST_METHOD']!='GET'?303:301);
+			self::status($_SERVER['REQUEST_METHOD']=='GET'?301:303);
 			header(self::HTTP_Location.': '.self::$vars['BASE'].$uri);
 			die;
 		}
@@ -882,10 +929,11 @@ class F3 extends Base {
 			@public
 	**/
 	static function route($pattern,$funcs,$ttl=0,$hotlink=TRUE) {
-		list($methods,$route)=explode(' ',$pattern,2);
+		list($methods,$uri)=
+			preg_split('/\s+/',$pattern,2,PREG_SPLIT_NO_EMPTY);
 		foreach (explode('|',$methods) as $method)
 			// Use pattern and HTTP methods as route indexes
-			self::$vars['ROUTES'][$route][strtoupper($method)]=
+			self::$vars['ROUTES'][$uri][strtoupper($method)]=
 				// Save handler, cache timeout and hotlink permission
 				array($funcs,$ttl,$hotlink);
 	}
@@ -1232,7 +1280,7 @@ class F3 extends Base {
 	**/
 	static function mock($pattern,array $params=NULL) {
 		// Override PHP globals
-		list($method,$uri)=explode(' ',$pattern,2);
+		list($method,$uri)=preg_split('/\s+/',$pattern,2,PREG_SPLIT_NO_EMPTY);
 		$query=explode('&',parse_url($uri,PHP_URL_QUERY));
 		foreach ($query as $pair)
 			if (strpos($pair,'=')) {
@@ -1460,8 +1508,6 @@ class F3 extends Base {
 			'EXEMPT'=>NULL,
 			// User interface folder
 			'GUI'=>$root,
-			// Server hostname
-			'HOSTNAME'=>$_SERVER['SERVER_NAME'],
 			// URL for hotlink redirection
 			'HOTLINK'=>NULL,
 			// Default language (auto-detect if null)
@@ -1937,17 +1983,40 @@ class F3instance {
 			@public
 	**/
 	function grab($file) {
-		// Use framework symbol table to hide local variable
-		F3::set('FILE',F3::resolve($file));
-		unset($file);
-		if (!ini_get('short_open_tag') &&
-			preg_match('/<\?(?!php)/',file_get_contents(F3::get('FILE')))) {
-			trigger_error(F3::TEXT_Tags);
-			return;
-		}
-		// Interpret PHP code
+		$file=F3::resolve($file);
 		ob_start();
-		require F3::get('FILE');
+		if (!ini_get('short_open_tag')) {
+			$text=preg_replace_callback(
+				'/<\?(?:\s|\s*(=?))(.+?)\?>/s',
+				function($tag) {
+					return '<?php '.($tag[1]?'echo ':'').trim($tag[2]).' ?>';
+				},
+				$orig=file_get_contents($file)
+			);
+			if (ini_get('allow_url_fopen') && ini_get('allow_url_include'))
+				// Stream wrap
+				$file='data:text/plain,'.urlencode($text);
+			elseif ($text!=$orig) {
+				// Save re-tagged file in temporary folder
+				F3::folder($ref=F3::ref('TEMP'));
+				$temp=$ref.$_SERVER['SERVER_NAME'].'.php.'.F3::hash($file);
+				if (!is_file($temp)) {
+					// Create semaphore
+					$hash='sem.'.F3::hash($file);
+					$cached=Cache::cached($hash);
+					while ($cached)
+						// Locked by another process
+						usleep(mt_rand(0,1000));
+					Cache::set($hash,TRUE);
+					file_put_contents($temp,$text,LOCK_EX);
+					// Remove semaphore
+					Cache::clear($hash);
+				}
+				$file=$temp;
+			}
+		}
+		// Render
+		require $file;
 		return ob_get_clean();
 	}
 

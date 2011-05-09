@@ -64,15 +64,25 @@ class Template extends Base {
 			Cache::set($hash,$text);
 		}
 		ob_start();
-		if (ini_get('allow_url_include'))
-			// Render in-memory
+		if (ini_get('allow_url_fopen') && ini_get('allow_url_include'))
+			// Stream wrap
 			require 'data:text/plain,'.urlencode($text);
 		else {
 			// Save PHP-equivalent file in temporary folder
 			self::folder(self::$vars['TEMP']);
 			$temp=self::$vars['TEMP'].$_SERVER['SERVER_NAME'].'.'.$hash;
-			if (!$cached || !is_file($temp))
-				file_put_contents($temp,$text);
+			if (!$cached || !is_file($temp)) {
+				// Create semaphore
+				$hash='sem.'.self::hash($file);
+				$cached=Cache::cached($hash);
+				while ($cached)
+					// Locked by another process
+					usleep(mt_rand(0,1000));
+				Cache::set($hash,TRUE);
+				file_put_contents($temp,$text,LOCK_EX);
+				// Remove semaphore
+				Cache::clear($hash);
+			}
 			// Render
 			require $temp;
 		}
@@ -95,7 +105,7 @@ class F3markup extends Base {
 	private
 		//! Parsed markup string
 		$tree=array(),
-		//! Symbol table for <repeat> variables
+		//! Symbol table for repeat/loop blocks
 		$syms=array();
 
 	/**
@@ -112,14 +122,17 @@ class F3markup extends Base {
 				'/{{(.+?)}}/s',
 				function($expr) use(&$syms,$self,$echo) {
 					$out=preg_replace_callback(
-						'/(?!\w)@(\w+(?:\[[^\]]+\]|\.\w+)*(?:->\w+)?'.
-						'\h*(?:\(([^\)]*?)\))?)/',
+						'/(?!\w)@(\w+(?:\[[^\]]+\]|\.\w+)*(?:->\w+)?)'.
+						'\h*(\([^\)]*\))?(?:\/\/(.+))?/',
 						function($var) use(&$syms) {
 							$self=__CLASS__;
 							preg_match('/^(\w+)\b(.*)/',$var[1],$match);
 							if (in_array($match[1],$syms))
 								return '$_'.$self::remix($var[1]);
-							$str='F3::get('.var_export($var[1],TRUE).')';
+							$str='F3::get('.var_export($var[1],TRUE).
+								(isset($var[2])?$var[2]:'').
+								(isset($var[3])?(',array('.$var[3].')'):
+								NULL).')';
 							if (!$match[2]) {
 								$syms[]=$match[1];
 								$str='($_'.$match[1].'='.$str.')';
@@ -138,8 +151,8 @@ class F3markup extends Base {
 		Return TRUE if all mandatory attributes are present
 			@return boolean
 			@param $key string
-			@param $node array
-			@param $attr array
+			@param $tag array
+			@param $attrs array
 			@public
 	**/
 	function isdef($key,array $tag,array $attrs) {
@@ -162,7 +175,7 @@ class F3markup extends Base {
 	}
 
 	/**
-		Build markup string
+		Reassemble markup string and insert appropriate PHP code
 			@return string
 			@param $node mixed
 			@public
@@ -293,8 +306,9 @@ class F3markup extends Base {
 			@public
 	**/
 	function load($text) {
-		// Remove PHP tags and alternative exclude-tokens
-		$text=preg_replace('/<\?php.+?\?>|{{\*.+?\*}}/is','',trim($text));
+		// Remove PHP code and alternative exclude-tokens
+		$text=preg_replace(
+			'/<\?(?:php)?.+?\?>|{{\*.+?\*}}/is','',trim($text));
 		// Define root node
 		$node=&$this->tree;
 		// Define stack and depth variables
