@@ -32,8 +32,7 @@
 							<F3:repeat group="{{@projects}}" value="{{@project}}">
 								<F3:check if="{{@project.id == @SESSION.project}}">
 									<F3:true>
-										<option value="{{@project.hash}}"
-												selected="selected">
+										<option value="{{@project.hash}}" selected="selected">
 											{{@project.name}}
 										</option>
 									</F3:true>

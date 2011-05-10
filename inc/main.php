@@ -7,6 +7,8 @@
         function  __construct() {
             parent::__construct();
 
+            $this->helper = new helper();
+            
             if(F3::get('SESSION.userId'))
             {
                 $user = new user();

@@ -9,6 +9,7 @@ body
 	color: #333;
 	font: 10pt Helvetica;
 	min-width: 900px;
+    background: url(img/bg.png);
 }
 
 a
@@ -36,7 +37,7 @@ h3 a:hover
  */
 #head
 {
-	background: #068;
+	background: #068 url(img/headBg.png);
 	height:	50px;
     font: 10pt Georgia;
 }

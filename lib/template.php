@@ -133,7 +133,9 @@ class F3markup extends Base {
 								(isset($var[2])?$var[2]:'').
 								(isset($var[3])?(',array('.$var[3].')'):
 								NULL).')';
-							if (!$match[2]) {
+							if (!$match[2] &&
+								!preg_match('/('.$self::PHP_Globals.')\b/',
+									$match[1])) {
 								$syms[]=$match[1];
 								$str='($_'.$match[1].'='.$str.')';
 							}
@@ -382,7 +384,6 @@ class F3markup extends Base {
 			@public
 	**/
 	function __construct() {
-		$this->syms=explode('|',self::PHP_Globals);
 	}
 
 }
