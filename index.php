@@ -1,5 +1,18 @@
 <?php
 
+/**
+ * index.php
+ * 
+ * to recieve globally different data from the DB
+ * 
+ * @package Index
+ * @author Sascha Ohms
+ * @author Phillipp Hirsch
+ * @copyright Copyright 2011, Bugtrckr-Team
+ * @license http://www.gnu.org/licenses/lgpl.txt
+ *   
+**/
+
 session_start();
 
 $app = require(__DIR__.'/lib/base.php');
@@ -13,10 +26,8 @@ $app->set('EXTEND', true);
 $app->set('GUI','gui/');
 $app->set('AUTOLOAD', 'inc/');
 $app->set('LOCALES','lang/');
-$app->set('LANGUAGE', 'de'); // substr($_SERVER["HTTP_ACCEPT_LANGUAGE"], 0, 2);
+$app->set('LANGUAGE', 'de'); // TODO: remove this line when english localization is done too
 $app->set('PROXY', 1);
-
-$app->set('test123', 'test456');
 
 F3::set('DB', new DB('sqlite:' .$dbFile));
 
@@ -31,6 +42,7 @@ $app->route('GET /user/new', 'main->showUserRegister');
 $app->route('GET /user/login', 'main->showUserLogin');
 $app->route('GET /user/logout', 'main->logoutUser');
 $app->route('GET /milestone/@hash', 'main->showMilestone');
+$app->route('GET /project/settings', 'main->showProjectSettings');
 
 $app->route('POST /user/login', 'main->loginUser');
 $app->route('POST /user/new', 'main->registerUser');

@@ -9,7 +9,7 @@ body
 	color: #333;
 	font: 10pt Helvetica;
 	min-width: 900px;
-    background: url(img/bg.png);
+    background: #FFF;
 }
 
 a
@@ -44,7 +44,7 @@ h3 a:hover
 
 #menu
 {
-    background: #068;
+    background: #068 url(img/headBg.png);
     padding: 10px;
     border-bottom: 1px solid #333;
     color: #FFF;
@@ -252,12 +252,12 @@ table.overview tr:hover
 
 table.overview .tr0
 {
-	background: #DDD;
+	background: #FAFAFA;
 }
 
 table.overview .tr1
 {
-	background:	#FFF;
+	background:	#EEE;
 }
 
 table.overview .id

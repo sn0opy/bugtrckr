@@ -17,3 +17,13 @@ Features:
 * SQLite
 * PDO
 * PDO SQLite
+
+## Bugtrckr-Team
+* Sascha 'sn0opy' Ohms 
+* Phillip 'hanspolo' Hirsch
+
+## License & Copyright
+Copyright 2011, Bugtrckr-Team
+
+This project is licensed under the LGPL
+http://www.gnu.org/licenses/lgpl.txt

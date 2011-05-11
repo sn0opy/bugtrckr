@@ -2,7 +2,7 @@
 
     class helper extends F3instance {
         
-        public function randStr($length = 5)
+        public static function randStr($length = 5)
         {
             return substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, $length);
         }
@@ -16,7 +16,7 @@
         }
 
 
-        public function getFreeHash($table, $length = 12)
+        public static function getFreeHash($table, $length = 12)
         {
             $ax = new Axon($table);
             do {
@@ -39,6 +39,17 @@
             }
             
             F3::set('title', $title.' - '.F3::get('title'));
+        }
+        
+        public static function isProjectAdmin()
+        {
+            $userID = F3::get('SESSION.userId');
+            $projectID = F3::get('SESSION.project');
+            
+            if(in_array($userID, Dao::getProjectAdmins($projectID)) && isset($projectID))
+                return 0;
+            
+            return 0;
         }
 
     }

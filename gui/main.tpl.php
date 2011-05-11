@@ -25,7 +25,13 @@
                         <li><a href="/{{@BASE}}user/new">{{@lng.registration}}</a></li>
                     </F3:false>
                 </F3:check>
-
+{{@currProjIsAdmin}}
+                <F3::check if="{{@currProjIsAdmin == 1}}">
+                    <F3:true>
+                        <li><a href="/{{@BASE}}project/settings">{{@lng.settings}}</a></li>
+                    </F3:true>
+                </F3::check>
+                
 				<li>
 					<form method="POST" action="/{{@BASE}}project/select">
 						<select name="project" size="1" onclick="submit()">

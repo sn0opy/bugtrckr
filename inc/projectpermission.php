@@ -1,5 +1,18 @@
 <?php
 
+/**
+ * projectpermission.php
+ * 
+ * Getter / setter class for project permissions
+ * 
+ * @package ProjectPermission
+ * @author Sascha Ohms
+ * @author Phillipp Hirsch
+ * @copyright Copyright 2011, Bugtrckr-Team
+ * @license http://www.gnu.org/licenses/lgpl.txt
+ *   
+**/
+
 class ProjectPermission extends F3instance
 {
     private $userId;

@@ -27,8 +27,12 @@ INSERT INTO Activity (id, hash, description, user, changed, project) VALUES (1, 
 --
 -- Role
 --
-CREATE TABLE Role ("id" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , "name" VARCHAR, "issuesAssigneable" BOOL, "proj_editProject" BOOL, "proj_manageMembers" BOOL, "iss_editIssues" BOOL, "iss_addIssues" BOOL, "iss_deleteIssues" BOOL, "iss_moveIssue" BOOL, "iss_editWatchers" BOOL, "iss_addWatchers" BOOL, "iss_viewWatchers" BOOL);
+CREATE TABLE Role (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR, issuesAssigneable BOOL, proj_editProject BOOL, proj_manageMembers BOOL, iss_editIssues BOOL, iss_addIssues BOOL, iss_deleteIssues BOOL, iss_moveIssue BOOL, iss_editWatchers BOOL, iss_addWatchers BOOL, iss_viewWatchers BOOL);
 --
 -- ProjectPermission
 --
-CREATE TABLE ProjectPermission ("userId" INTEGER, "projectId" INTEGER, "roleId" INTEGER);
+CREATE TABLE ProjectPermission (userId INTEGER, projectId INTEGER, roleId INTEGER);
+--
+-- ProjectAdmins
+--
+CREATE TABLE ProjectAdmins (id INTEGER PRIMARY KEY AUTOINCREMENT, userID INTEGER, projectID INTEGER);

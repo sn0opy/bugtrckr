@@ -1,5 +1,18 @@
 <?php
 
+/**
+ * role.php
+ * 
+ * Getter / setter class for roles
+ * 
+ * @package Role
+ * @author Sascha Ohms
+ * @author Phillipp Hirsch
+ * @copyright Copyright 2011, Bugtrckr-Team
+ * @license http://www.gnu.org/licenses/lgpl.txt
+ *   
+**/
+
 class Role extends F3instance
 {
     private $id;
