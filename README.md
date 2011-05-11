@@ -20,7 +20,7 @@ Features:
 
 ## Bugtrckr-Team
 * Sascha 'sn0opy' Ohms 
-* Phillip 'hanspolo' Hirsch
+* Phillipp 'hanspolo' Hirsch
 
 ## License & Copyright
 Copyright 2011, Bugtrckr-Team
