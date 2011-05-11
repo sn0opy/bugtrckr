@@ -17,6 +17,8 @@ class Role extends F3instance
 {
     private $id;
     private $name;
+    private $hash;
+    private $projectId;
     private $issuesAssigneable;
     private $proj_editProject;
     private $proj_manageMembers;
@@ -35,6 +37,26 @@ class Role extends F3instance
         parent::__construct();
 
         $this->ax = new Axon('Role');
+    }
+    
+    public function getHash()
+    {
+        return $this->hash;
+    }
+    
+    public function setHash($hash)
+    {
+        $this->hash = $hash;
+    }
+    
+    public function getProjectId()
+    {
+        $this->projectId;
+    }
+    
+    public function setProjectId($projectId)
+    {
+        $this->projectId = $projectId;
     }
     
     public function getId()
@@ -161,6 +183,8 @@ class Role extends F3instance
     {
         $this->ax->id = $this->id;
         $this->ax->name = $this->name;
+        $this->ax->hash = $this->hash;
+        $this->ax->projectId = $this->projectId;
         $this->ax->issuesAssigneable = $this->issuesAssigneable;
         $this->ax->proj_editProject = $this->proj_editProject;
         $this->ax->proj_manageMembers = $this->proj_manageMembers;
@@ -182,6 +206,8 @@ class Role extends F3instance
         {
             $this->id = $this->ax->id;
             $this->name = $this->ax->name;
+            $this->hash = $this->ax->hash;
+            $this->projectId = $this->ax->projectId;
             $this->issuesAssigneable = $this->ax->issuesAssigneable;
             $this->proj_editProject = $this->ax->proj_editProject;
             $this->proj_manageMembers = $this->ax->proj_manageMembers;
@@ -201,6 +227,8 @@ class Role extends F3instance
 
         $permission['id'] = $this->id;
         $permission['name'] = $this->name;
+        $permission['hash'] = $this->hash;
+        $permission['projectId'] = $this->projectId;
         $permission['issuesAssigneable'] = $this->issuesAssigneable;
         $permission['proj_editProject'] = $this->proj_editProject;
         $permission['proj_manageMembers'] = $this->proj_manageMembers;

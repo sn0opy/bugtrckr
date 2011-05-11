@@ -156,16 +156,25 @@ class user extends F3instance
         }
     }
 
-    public function toArray()
+    /**
+     *
+     * @param bool $safe just to remove sensitive data from the array if not needed
+     * @return type 
+     */
+    public function toArray($safe = 0)
     {
         $user = array();
 
-        $user['id'] = $this->id;
         $user['name'] = $this->name;
         $user['hash'] = $this->hash;
-        $user['email'] = $this->email;
         $user['admin'] = $this->admin;
         $user['lastProject'] = $this->lastProject;
+        
+        if(!$safe) 
+        {
+            $user['email'] = $this->email;
+            $user['id'] = $this->id;
+        }
 
         return $user;
     }

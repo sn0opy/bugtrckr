@@ -14,10 +14,40 @@
 **/
 
 class Dao extends F3instance
-{        
+{  
+
+    /**
+     *
+     * @param string $stmt
+     * @return array 
+     * @static
+     */
+    static function getRoles($stmt)
+    {
+        $result = array();
+        $roles = F3::get('DB')->sql("SELECT id FROM Role WHERE $stmt");
+
+        /* Selecting role failed */
+        if ($roles == NULL)
+            throw new Exception();
+
+        /* Get Milestones data */
+        foreach($roles as $i=>$role)
+        {
+            try {
+                $result[$i] = new Role();
+                $result[$i]->load("id = $role[id]");
+            } catch (Exception $e) {
+                throw $e;
+            }
+        }
+
+        return $result;
+    }
+    
     /**
      * returns all milestones by a given WHERE-statement
-     * @
+     * 
      * @param type $stmt
      * @return array 
      * @static
@@ -215,14 +245,14 @@ class Dao extends F3instance
 
             $projPerm = new ProjectPermission();
             $projPerm->load('userId = ' .$userId. ' AND projectId = ' .$projectId);
-
+            
             $role = new Role();
             $role->load('id = ' .$projPerm->getRoleId());
-
+            
         } catch (Exception $e) {
             throw $e;
         }
-
+                
         $permissions = $role->toArray();
 
         if($user->getAdmin()) // admin has access to everything
@@ -259,6 +289,29 @@ class Dao extends F3instance
     static function getTicketCount($milestone)
     {
         return F3::get('DB')->sql('SELECT state, COUNT(*) AS `count` FROM `Ticket` WHERE milestone = ' .$milestone. ' GROUP BY state');
+    }
+    
+    /**
+     * Returns array with all members of a given project
+     * 
+     * @param int $project 
+     * @return array
+     * @static
+     */
+    static function getProjectMembers($project)
+    {
+        
+        $results = F3::get('DB')->sql('SELECT userId, roleId FROM ProjectPermission WHERE projectId = ' .$project);
+     
+        $user = new User();        
+        foreach($results as $key=>$row) 
+        {
+            $user->load('id = ' .$row['userId']);
+            $members[$key] = $user->toArray(true);
+            $members[$key]['role'] = $row['roleId'];
+        }
+        
+        return $members;
     }
     
     /**

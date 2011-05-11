@@ -12,8 +12,8 @@ INSERT INTO User (id, name, hash, password, salt, email, admin) VALUES (2, 'john
 --
 -- Project
 --
-CREATE TABLE Project (id INTEGER PRIMARY KEY AUTOINCREMENT, hash char(12) UNIQUE, name varchar);
-INSERT INTO Project (id, hash, name) VALUES (1, 'b026324c6904b2a9cb4b88d6d61c81d1', 'Example Project');
+CREATE TABLE Project (id INTEGER PRIMARY KEY AUTOINCREMENT, hash CHAR(12) UNIQUE, name VARCHAR, description TEXT, public BOOL);
+INSERT INTO Project (id, hash, name) VALUES (1, 'b026324c6904', 'Example Project', 'Just a sample project', 1);
 --
 -- Milestone
 --
@@ -27,11 +27,11 @@ INSERT INTO Activity (id, hash, description, user, changed, project) VALUES (1, 
 --
 -- Role
 --
-CREATE TABLE Role (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR, issuesAssigneable BOOL, proj_editProject BOOL, proj_manageMembers BOOL, iss_editIssues BOOL, iss_addIssues BOOL, iss_deleteIssues BOOL, iss_moveIssue BOOL, iss_editWatchers BOOL, iss_addWatchers BOOL, iss_viewWatchers BOOL);
+CREATE TABLE Role (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE , projectId INTEGER, hash VARCHAR(12), name VARCHAR, "issuesAssigneable" BOOL, "proj_editProject" BOOL, "proj_manageMembers" BOOL, "iss_editIssues" BOOL, "iss_addIssues" BOOL, "iss_deleteIssues" BOOL, "iss_moveIssue" BOOL, "iss_editWatchers" BOOL, "iss_addWatchers" BOOL, "iss_viewWatchers" BOOL);--
 --
 -- ProjectPermission
 --
-CREATE TABLE ProjectPermission (userId INTEGER, projectId INTEGER, roleId INTEGER);
+CREATE TABLE ProjectPermission (id INTEGER PRIMARY KEY AUTOINCREMENT, userId INTEGER, projectId INTEGER, roleId INTEGER);
 --
 -- ProjectAdmins
 --

@@ -44,6 +44,7 @@ return array('lng' => array(
     'ticketsleft' => 'Ticket/s übrig',
     'addticket' => 'Ticket hinzufügen',
     'milestone' => 'Meilenstein',
+    'milestones' => 'Meilensteine',
     'registration' => 'Registrieren',
     'timeline' => 'Zeitachse',
     'home' => 'Start',
@@ -71,6 +72,16 @@ return array('lng' => array(
     'iss_addWatchers' => 'Beobachter hinzufügen',
     'iss_viewWatchers' => 'Beobachterliste ansehen',
     'settings' => 'Einstellungen',
-    'project' => 'Projekt'
+    'project' => 'Projekt',
+    'noAccess' => 'Du hast keinen Zugriff zu dieser Seite.',
+    'members' => 'Mitglieder',
+    'projectname' => 'Projektname',
+    'projectdescription' => 'Prohjektbeschreibung',
+    'publicproject' => 'Öffentliches Projekt',
+    'dosettings' => 'Einstellungen vornehmen',
+    'roles' => 'Rollen',
+    'role' => 'Rolle',
+    'addrole' => 'Rolle hinzufügen',
+    'save' => 'Speichern'
 ));
 

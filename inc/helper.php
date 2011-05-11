@@ -40,17 +40,6 @@
             
             F3::set('title', $title.' - '.F3::get('title'));
         }
-        
-        public static function isProjectAdmin()
-        {
-            $userID = F3::get('SESSION.userId');
-            $projectID = F3::get('SESSION.project');
-            
-            if(in_array($userID, Dao::getProjectAdmins($projectID)) && isset($projectID))
-                return 0;
-            
-            return 0;
-        }
 
     }
 

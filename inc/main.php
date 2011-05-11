@@ -25,7 +25,6 @@ class main extends F3instance
 
             if($user->getLastProject() > 0) {
                 F3::set('SESSION.project', $user->getLastProject());
-                F3::set('currProjIsAdmin', helper::isProjectAdmin());
             }
         }
 
@@ -382,20 +381,102 @@ class main extends F3instance
 
         F3::set('SESSION.project', $project->getId());
         F3::reroute($url);
-    }
-
+    }    
+    
     /**
      * 
      */
     function showProjectSettings()
-    {        
-        if(in_array(F3::get('SESSION.userId'), Dao::getProjectAdmins(F3::get('SESSION.project'))))
-            F3::set('isAdmin', true);
-        else
-            F3::set('isAdmin', false);
+    {    
+        $project = F3::get('SESSION.project');
+        $proj = new Project;
+        $proj->load('id = ' .$project);
         
+        $roles = Dao::getRoles('projectId = ' .$project);
+        
+        foreach($roles as $i => $role)
+            $roles[$i] = $role->toArray();
+
+        F3::set('projRoles', $roles);
+        F3::set('projMembers', Dao::getProjectMembers($project));
+        F3::set('projDetails', $proj->toArray());        
         F3::set('template', 'projectSettings.tpl.php');
         F3::set('pageTitle', '{{@lng.project}} › {{@lng.settings}}');
+        $this->tpserve();
+    }
+    
+    /**
+     * 
+     */
+    function projectSetRole()
+    {
+        $projectId = F3::get('SESSION.project');
+        
+        $user = new user();
+        $user->load('hash = "'.F3::get('POST.user').'"');
+        $userId = $user->getId();
+        
+        $role = new Role();
+        $role->load('hash = "'.F3::get('POST.role').'"');
+        $roleId = $role->getId();
+        
+        $perms = new ProjectPermission();
+        $perms->load('projectId = ' .$projectId. ' AND userId = ' .$userId);
+        $perms->setRoleId($roleId);
+        $perms->save();
+        
+        F3::reroute('/'.F3::get('BASE').'project/settings');
+    }
+    
+    /**
+     * 
+     */
+    function showProjectSettingsRole()
+    {
+        $roleHash = F3::get('PARAMS.hash');
+        $role = new role();
+        $role->load('hash = "' .$roleHash. '"');
+        F3::set('roleData', $role->toArray());        
+        
+        F3::set('template', 'projectSettingsRole.tpl.php');
+        F3::set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.role}} › {{@roleData.name}}');
+        $this->tpserve();
+    }
+    
+    /**
+     * 
+     */
+    function addEditRole()
+    {
+        $roleHash = F3::get('POST.hash') ? F3::get('POST.hash') : helper::getFreeHash('Role');
+        
+        $role = new role();
+        $role->load('hash = "' .$roleHash. '"');
+        $role->setName(F3::get('POST.name'));
+        $role->setHash($roleHash);
+        $role->setProjectId(F3::get('SESSION.project'));
+        $role->setIss_addIssues(F3::get('POST.iss_addIssues'));
+        $role->setProj_editProject(F3::get('POST.proj_editProject'));
+        $role->setProj_manageMembers(F3::get('POST.proj_manageMembers'));
+        $role->setIss_editIssues(F3::get('POST.iss_editIssues'));
+        $role->setIss_addIssues(F3::get('POST.iss_addIssues'));
+        $role->setIss_deleteIssues(F3::get('POST.iss_deleteIssues'));
+        $role->setIss_moveIssue(F3::get('POST.iss_moveIssue'));
+        $role->setIss_editWatchers(F3::get('POST.iss_editWatchers'));
+        $role->setIss_addWatchers(F3::get('POST.iss_addWatchers'));
+        $role->setIss_viewWatchers(F3::get('POST.iss_viewWatchers'));
+        $role->save();
+        
+        F3::reroute('/'.F3::get('BASE').'project/settings/role/'. $roleHash);
+    }
+    
+    /**
+     * 
+     */
+    function showAddRole()
+    {
+        F3::set('template', 'projectSettingsRoleAdd.tpl.php');
+        F3::set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.addrole}}');
         $this->tpserve();
     }
 

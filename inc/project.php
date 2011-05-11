@@ -17,6 +17,8 @@ class Project extends F3instance
     private $id;
     private $hash;
     private $name;
+    private $public;
+    private $description;
 
     function __construct()
     {
@@ -32,6 +34,26 @@ class Project extends F3instance
     public function getHash()
     {
         return $this->hash;
+    }
+    
+    public function getDescription()
+    {
+        return $this->description;
+    }
+    
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+    
+    public function getPublic()
+    {
+        return $this->public;
+    }
+    
+    public function setPublic($public)
+    {
+        $this->public = $public;
     }
 
     public function setName($name)
@@ -57,13 +79,14 @@ class Project extends F3instance
             return is_array($stat) ? $this->hash : 0;
         }
         else
-        {
+        {            
+            $hash = helper::getFreeHash('Project');
             $id = F3::get('DB')->sql("SELECT max(id)+1 as next FROM Project");
             $stat = F3::get('DB')->sql("INSERT INTO Project " .
-                    "(hash, name) VALUES " .
-                    "('". md5($id[0]['next']) ."', '$this->name')");
+                    "(hash, name, description, public) VALUES " .
+                    "('". $hash ."', '" .$this->name. "', '" .$this->description. "', ". $this->public. ")");
 
-            return is_array($stat) ? md5($id[0]['next']) : 0;
+            return is_array($stat) ? $hash : 0;
         }
     }
 
@@ -80,6 +103,8 @@ class Project extends F3instance
             $this->id = $ax->id;
             $this->hash = $ax->hash;
             $this->name = $ax->name;
+            $this->description = $ax->description;
+            $this->public = $ax->public;
         }
     }
 
@@ -94,6 +119,8 @@ class Project extends F3instance
         $project['id'] = $this->id;
         $project['hash'] = $this->hash;
         $project['name'] = $this->name;
+        $project['description'] = $this->description;
+        $project['public'] = $this->public;
 
         return $project;
     }
