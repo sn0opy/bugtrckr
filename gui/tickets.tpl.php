@@ -1,10 +1,12 @@
 <h2 class="floatleft">{{@lng.tickets}}</h2>
 
-<button type="button" class="floatright"
-	onclick="document.getElementById('add').style.display = 'block'" >
-	{{@lng.addticket}}
-</button>
-
+<F3:check if="{{@getPermission('iss_addIssues')}}">
+    <button type="button" class="floatright"
+        onclick="document.getElementById('add').style.display = 'block'" >
+        {{@lng.addticket}}
+    </button>
+</F3:check>
+    
 <div class="add" id="add">
     <h3 class="floatleft">{{@lng.addticket}}</h3>
     <a class="closeButton" href="#" onclick="document.getElementById('add').style.display = 'none'; return false;">

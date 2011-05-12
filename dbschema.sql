@@ -28,8 +28,12 @@ INSERT INTO Activity (id, hash, description, user, changed, project) VALUES (1, 
 --
 -- Role
 --
+<<<<<<< HEAD
+CREATE TABLE Role (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE , projectId INTEGER, hash VARCHAR(12), name VARCHAR, "issuesAssigneable" BOOL, "proj_editProject" BOOL, "proj_manageMembers" BOOL, proj_manageRoles BOOL, "iss_editIssues" BOOL, "iss_addIssues" BOOL, "iss_deleteIssues" BOOL, "iss_moveIssue" BOOL, "iss_editWatchers" BOOL, "iss_addWatchers" BOOL, "iss_viewWatchers" BOOL);--
+=======
 CREATE TABLE Role (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE , projectId INTEGER, hash VARCHAR(12), name VARCHAR, "issuesAssigneable" BOOL, "proj_editProject" BOOL, "proj_manageMembers" BOOL, "iss_editIssues" BOOL, "iss_addIssues" BOOL, "iss_deleteIssues" BOOL, "iss_moveIssue" BOOL, "iss_editWatchers" BOOL, "iss_addWatchers" BOOL, "iss_viewWatchers" BOOL);
 --
+>>>>>>> 3865d3842e0cf1faa3fc1f2c9d58aee31eaf89cc
 --
 -- ProjectPermission
 --
@@ -38,3 +42,6 @@ CREATE TABLE ProjectPermission (userId INTEGER, projectId INTEGER, roleId INTEGE
 -- ProjectAdmins
 --
 CREATE TABLE ProjectAdmins (id INTEGER PRIMARY KEY AUTOINCREMENT, userID INTEGER, projectID INTEGER);
+
+
+alter table role add proj_manageRoles bool; -- 12.05. 18:20

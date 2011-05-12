@@ -1,37 +1,5 @@
 <h2 class="floatleft">{{@lng.roadmap}}</h2>
 
-<button type="button" class="floatright"
-        onclick="document.getElementById('add').style.display = 'block'">
-	{{@lng.addmilestone}}
-</button>
-
-<div class="add" id="add">
-    <h3 class="floatleft">{{@lng.addmilestone}}</h3>
-	<a class="closeButton" href="#" onclick="document.getElementById('add').style.display = 'none'; return false">
-		X
-	</a>
-
-	<form method="post" action="/{{@BASE}}milestone">
-		<div class="formRow">
-			<div class="formLabel">{{@lng.name}}</div>
-			<div class="formValue"><input type="text" name="name" /></div>
-		</div>
-		<div class="formRow">
-			<div class="formLabel">{{@lng.description}}</div>
-			<div class="formValue"><textarea name="description"></textarea></div>
-		</div>
-		<div class="formRow">
-			<div class="formLabel">{{@lng.finisheddate}}</div>
-			<div class="formValue"><input type="date" name="finished" value="{{@today}}" /></div>
-		</div>
-		<div class="formRow">
-			<div class="formLabel"> </div>
-			<div class="formValue"><input type="submit" value="{{@lng.submit}}" /></div>
-		</div>
-	</form>
-	<br class="clearfix" />
-</div>
-
 <F3:repeat group="{{@road}}" key="{{@i}}" value="{{@item}}">
 <div class="milestone clearfix">
 	<h3><a href="/{{@BASE}}milestone/{{@item.milestone.hash}}">{{@item.milestone.name}}</a></h3>

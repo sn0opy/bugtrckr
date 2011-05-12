@@ -10,8 +10,6 @@
                 </ul>
             </div>
             
-            <br class="clearfix" />
-
             <div class="tabContent" id="tabContent_1">
                 {{* Settings *}}
                 <F3:check if="{{@getPermission('proj_editProject')}}">
@@ -79,7 +77,7 @@
                                         <form action="/{{@BASE}}project/settings/member/setrole" method="post">
                                             <input type="hidden" name="user" value="{{@member.hash}}" />
                                             <select name="role">
-                                            <F3:repeat group="{{@projRoles}}" value="{{@role}}" key="{{@j}}">
+                                            <F3:repeat group="{{@projRoles}}" value="{{@role}}">
                                                 <F3:check if="{{@member.role == @role.id}}">
                                                     <F3:true>
                                                         <option selected="selected" value="{{@role.hash}}">{{@role.name}}</option>
@@ -97,6 +95,24 @@
                                 </F3:repeat>
                             </tbody>
                         </table>
+                        
+                        <form action="#" method="post">
+                            <p class="addUser">
+                                <select name="name">
+                                    <F3:repeat group="{{@users}}" value="{{@user}}">
+                                        <option value="{{@user.hash}}">{{@user.name}}</option>
+                                    </F3:repeat>
+                                </select>
+                                {{@lng.asRole}}
+                                <select name="role">
+                                    <F3:repeat group="{{@projRoles}}" value="{{@role}}">
+                                        <option value="{{@role.hash}}">{{@role.name}}</option>
+                                    </F3:repeat>
+                                </select>
+                                
+                                <input type="submit" value="{{@lng.add}}" />
+                            </p>
+                        </form>
                     </F3:true>
                     <F3:false>
                         <div class="error">{{@lng.noAccess}}</div>

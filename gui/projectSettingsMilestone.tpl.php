@@ -21,6 +21,15 @@
                 <textarea name="description">{{@msData.description}}</textarea>
             </div>
         </div>
+        
+        <div class="formRow">
+            <div class="formLabel">
+                {{@lng.finisheddate}}
+            </div>
+            <div class="formValue">
+                <input type="date" name="finished" value="{{@msData.finished}}" />
+            </div>
+        </div>
 
         <input type="submit" value="{{@lng.save}}" />
     </form>

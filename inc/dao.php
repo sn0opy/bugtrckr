@@ -175,7 +175,7 @@ class Dao extends F3instance
      * @return array 
      * @static
      */
-    static function getUsers($stmt)
+    static function getUsers($stmt = '1=1') // it's dirty, we know ...
     {
         $result = array();
 
@@ -195,7 +195,6 @@ class Dao extends F3instance
                 throw $e;
             }
         }
-
         return $result;
     }
 

@@ -19,6 +19,15 @@
                 <textarea name="description"></textarea>
             </div>
         </div>
+        
+        <div class="formRow">
+            <div class="formLabel">
+                {{@lng.finisheddate}}
+            </div>
+            <div class="formValue">
+                <input type="date" name="finished" value="{{@today}}" />
+            </div>
+        </div>
 
         <input type="submit" value="{{@lng.save}}" />
     </form>

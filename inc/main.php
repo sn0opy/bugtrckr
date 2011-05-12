@@ -130,7 +130,6 @@ class main extends F3instance
         }
 
         F3::set('road', $road);
-        F3::set('today', date('Y-m-d', time()));
         F3::set('pageTitle', '{{@lng.roadmap}}');
         F3::set('template', 'roadmap.tpl.php');
         $this->tpserve();
@@ -375,6 +374,13 @@ class main extends F3instance
 		foreach($milestones as $i => $milestone)
             $milestones[$i] = $milestone->toArray();
         
+        $users = Dao::getUsers();
+        F3::set('users2', $users[1]);
+        
+        foreach($users as $i => $user)
+            $users[$i] = $user->toArray();
+        
+        F3::set('users', $users);
         F3::set('projMilestones', $milestones);
         F3::set('projRoles', $roles);
         F3::set('projMembers', Dao::getProjectMembers($project));
@@ -545,6 +551,7 @@ class main extends F3instance
      */
     function showAddMilestone()
     {
+        F3::set('today', date('Y-m-d', time()));
         F3::set('template', 'projectSettingsMilestoneAdd.tpl.php');
         F3::set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.addmilestone}}');
         $this->tpserve();
