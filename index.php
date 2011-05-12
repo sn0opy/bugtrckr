@@ -18,7 +18,6 @@ session_start();
 $app = require(__DIR__.'/lib/base.php');
 
 require 'inc/config.inc.php';
-require 'inc/main.php';
 
 $app->set('CACHE', false);
 $app->set('DEBUG', 3);
@@ -33,7 +32,13 @@ F3::set('DB', new DB('sqlite:' .$dbFile));
 
 // Template functions
 $app->set('getPermission', function($permission) {
-    return Dao::getPermission($permission);
+    return true;
+});
+
+F3::set('getUserName', function($id) {
+    $user = new user();
+    $user->load('id = '.$id);
+    return $user->name;
 });
 
 $app->route('GET /', 'main->start');
@@ -63,6 +68,8 @@ $app->route('POST /project/settings/member/setrole', 'main->projectSetRole');
 $app->route('POST /project/settings/role/edit', 'main->addEditRole');
 $app->route('POST /project/settings/main/edit', 'main->projectEditMain');
 $app->route('POST /project/settings/milestone/edit', 'main->addEditMilestone');
+
+require 'inc/mapping.inc.php';
 
 $app->run();
 

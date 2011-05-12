@@ -7,14 +7,14 @@
  * 
  * @package i18n
  * @author Sascha Ohms
- * @author Phillipp Hirsch
+ * @author Philipp Hirsch
  * @copyright Copyright 2011, Bugtrckr-Team
  * @license http://www.gnu.org/licenses/lgpl.txt
  *   
 **/
 
 F3::set('ticket_state', array(
-	'1' => F3::get('lng.new'),
+	'1' => '{{@lng.new}}',
 	'2' => F3::get('lng.assigned'),
 	'3' => F3::get('lng.inwork'),
 	'4' => F3::get('lng.testing'),

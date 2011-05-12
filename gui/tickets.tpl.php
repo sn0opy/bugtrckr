@@ -6,7 +6,7 @@
         {{@lng.addticket}}
     </button>
 </F3:check>
-    
+
 <div class="add" id="add">
     <h3 class="floatleft">{{@lng.addticket}}</h3>
     <a class="closeButton" href="#" onclick="document.getElementById('add').style.display = 'none'; return false;">
@@ -59,7 +59,7 @@
 			<div class="formValue">
 				<select name="milestone" size="1">
 				<F3:repeat group="{{@milestones}}" value="{{@milestone}}">
-					<option value="{{@milestone.id}}">{{@milestone.name}}</option>
+                    <option value="{{@milestone->id}}">{{@milestone->name}}</option>
 				</F3:repeat>
 				</select>
 			</div>
@@ -93,13 +93,13 @@
         <tr class="tr{{@i%2}}">
             <td class="id">{{@i+1}}</td>
             <td class="title">
-                <a href="/{{@BASE}}ticket/{{@ticket.hash}}">{{@ticket.title}}</a>
+                <a href="/{{@BASE}}ticket/{{@ticket->hash}}">{{@ticket->title}}</a>
 			</td>
-			<td class="type">{{@ticket.type}}</td>
-            <td class="state">{{@ticket.state}}</td>
-            <td class="priority">{{@ticket.priority}}</td>
-            <td class="created">{{@ticket.created}}</td>
-            <td class="owner"><a href="/{{@BASE}}user/{{@ticket.owner}}">{{@ticket.owner}}</a></td>
+			<td class="type">{{@ticket->type}}</td>
+            <td class="state">{{@ticket->state}}</td>
+            <td class="priority">{{@ticket->priority}}</td>
+            <td class="created">{{date('d.m.Y H:i', @ticket->created)}}</td>
+            <td class="owner"><a href="/{{@BASE}}user/{{@ticket->owner}}">{{@ticket->name}}</a></td>
         </tr>
         </F3:repeat>
     </tbody>
