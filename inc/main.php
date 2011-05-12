@@ -132,7 +132,6 @@ class main extends F3instance
         }
 
         F3::set('road', $road);
-        F3::set('today', date('Y-m-d', time()));
         F3::set('pageTitle', '{{@lng.roadmap}}');
         F3::set('template', 'roadmap.tpl.php');
         $this->tpserve();
@@ -324,40 +323,6 @@ class main extends F3instance
     /**
      *
      */
-    function addMilestone()
-    {
-        /* Is the user allowed to add Milestones? */
-        if (!Dao::getPermission("proj_editProject"))
-            $this->tpdeny();
-
-        require_once 'milestone.php';
-
-        $post = F3::get('POST');
-        $project = F3::get('SESSION.project');
-
-        $milestone = new Milestone();
-        $milestone->setName($post['name']);
-        $milestone->setDescription($post['description']);
-        $milestone->setFinished($post['finished']);
-        $milestone->setProject($project);
-
-        /* Save Milestone */
-        try {
-            $hash = $milestone->save();
-
-            Dao::addActivity("created Milestone ". $milestone->getName());
-        } catch (Exception $e) {
-            $this->tpfail("Failure while saving Milesonte");
-            var_dump($e);
-            return ;
-        }
-
-        $this->showRoadmap();
-    }
-
-    /**
-     *
-     */
     function selectProject()
     {
         $url = F3::get('SERVER.HTTP_REFERER');
@@ -400,6 +365,13 @@ class main extends F3instance
         foreach($milestones as $i => $milestone)
             $milestones[$i] = $milestone->toArray();
         
+        $users = Dao::getUsers();
+        F3::set('users2', $users[1]);
+        
+        foreach($users as $i => $user)
+            $users[$i] = $user->toArray();
+        
+        F3::set('users', $users);
         F3::set('projMilestones', $milestones);
         F3::set('projRoles', $roles);
         F3::set('projMembers', Dao::getProjectMembers($project));
@@ -505,6 +477,7 @@ class main extends F3instance
         $milestone->setHash($msHash);
         $milestone->setDescription(F3::get('POST.description'));
         $milestone->setProject(F3::get('SESSION.project'));
+        $milestone->setFinished(F3::get('POST.finished'));
         $milestone->save();
                 
         F3::reroute('/'.F3::get('BASE').'project/settings/milestone/'. $msHash);
@@ -525,6 +498,7 @@ class main extends F3instance
      */
     function showAddMilestone()
     {
+        F3::set('today', date('Y-m-d', time()));
         F3::set('template', 'projectSettingsMilestoneAdd.tpl.php');
         F3::set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.addmilestone}}');
         $this->tpserve();

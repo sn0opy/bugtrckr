@@ -85,6 +85,8 @@ return array('lng' => array(
     'role' => 'Rolle',
     'addrole' => 'Rolle hinzufügen',
     'save' => 'Speichern',
-    'addmilestone' => 'Meilenstein hinzufügen'
+    'addmilestone' => 'Meilenstein hinzufügen',
+    'add' => 'Hinzufügen',
+    'asRole' => 'als'
 ));
 

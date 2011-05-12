@@ -4,10 +4,17 @@
 	padding: 0px;
 }
 
+@font-face
+{
+    font-family: OpenSans;
+    src: url('misc/opensans.ttf');
+}
+
 body
 {
 	color: #333;
-	font: 10pt Helvetica;
+	font-size: 10pt;
+    font-family: OpenSans;
 	min-width: 900px;
     background: #FFF;
 }
@@ -150,9 +157,25 @@ h3 a:hover
     margin-top: 20px;
 }
 
+.tabs
+{
+    border-bottom: 1px solid #CCC;
+}
+
 .tabs a
 {
     border: none;
+    margin-right: 5px;
+    border-top: 1px solid #CCC;
+    border-left: 1px solid #CCC;
+    border-right: 1px solid #CCC;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.addUser
+{
+    margin-top: 20px;
 }
 
 .tabs ul
@@ -164,18 +187,17 @@ h3 a:hover
 .tabs li
 {
     display: inline;
-    padding: 10px;
-    padding-bottom: 5px;
-    margin-right: 5px;
-    border-top: 1px solid #CCC;
-    border-left: 1px solid #CCC;
-    border-right: 1px solid #CCC;
 }
 
 .tabs .active
 {
     background: #FFF;
     font-weight: bold;
+}
+
+.tabs .active a
+{
+    border-bottom: 1px solid #FFF;
 }
 
 .tabs li:hover
@@ -185,8 +207,6 @@ h3 a:hover
 
 .tabContent
 {
-    border-top: 1px solid #CCC;
-    margin-top: -8px;
     padding: 10px; 
 }
 
