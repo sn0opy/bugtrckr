@@ -22,7 +22,7 @@
 
 	<body>
         <div id="head">
-            <h1>{{@title}}</h1>
+   			<h1>{{@title}}</h1>
         </div>
         <div id="menu">
             <ul>
@@ -35,7 +35,7 @@
                         <li><a href="/{{@BASE}}project/settings">{{@lng.settings}}</a></li>
                     </F3:true>
                 </F3:check>
-                <F3:check if="{{@SESSION.userId}}">
+                <F3:check if="{{@SESSION.user}}">
                     <F3:false>
                         <li><a href="/{{@BASE}}user/new">{{@lng.registration}}</a></li>
                     </F3:false>
@@ -47,7 +47,7 @@
 							<F3:repeat group="{{@projects}}" value="{{@project}}">
 								<F3:check if="{{@project.id == @SESSION.project}}">
 									<F3:true>
-										<option value="{{@project.hash}}" selected="selected">
+										<option value="{{@projec.hash}}" selected="selected">
 											{{@project.name}}
 										</option>
 									</F3:true>
@@ -61,9 +61,9 @@
 						</select>
 					</form>
 				</li>
-                <F3:check if="{{@SESSION.userId}}">
+                <F3:check if="{{@SESSION.user}}">
                     <F3:true>
-                        <li class="alignright">Eingeloggt als <a href="/{{@BASE}}user/{{@SESSION.userName}}" class="normLink"><strong class="normalText">{{@SESSION.userName}}</strong></a> [<a href="/{{@BASE}}user/logout" class="normalText normLink">{{@lng.logout}}</a>]</li>
+                        <li class="alignright">Eingeloggt als <a href="/{{@BASE}}user/{{@SESSION.user.name}}" class="normLink"><strong class="normalText">{{@SESSION.user.name}}</strong></a> [<a href="/{{@BASE}}user/logout" class="normalText normLink">{{@lng.logout}}</a>]</li>
                     </F3:true>
                     <F3:false>
                         <li class="alignright"><a href="/{{@BASE}}user/login" onclick="document.getElementById('login').style.display = 'block'; return false" class="normLink">{{@lng.login}}</a></li>
