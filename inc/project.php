@@ -74,8 +74,7 @@ class Project extends F3instance
      *
      */
     public function save()
-    {
-        
+    {        
         $this->ax->id = $this->id;
         $this->ax->name = $this->name;
         $this->ax->hash = $this->hash;

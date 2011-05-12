@@ -31,7 +31,7 @@ CREATE TABLE Role (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE , projec
 --
 -- ProjectPermission
 --
-CREATE TABLE ProjectPermission (id INTEGER PRIMARY KEY AUTOINCREMENT, userId INTEGER, projectId INTEGER, roleId INTEGER);
+CREATE TABLE ProjectPermission (userId INTEGER, projectId INTEGER, roleId INTEGER, PRIMARY KEY (userId, projectId));
 --
 -- ProjectAdmins
 --
