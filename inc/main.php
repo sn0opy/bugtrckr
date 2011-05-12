@@ -478,6 +478,8 @@ class main extends F3instance
         $role->setIss_addIssues(F3::get('POST.iss_addIssues'));
         $role->setProj_editProject(F3::get('POST.proj_editProject'));
         $role->setProj_manageMembers(F3::get('POST.proj_manageMembers'));
+        $role->setproj_manageMilestones(F3::get('POST.proj_manageMilestones'));
+        $role->setProj_manageRoles(F3::get('POST.proj_manageRoles'));
         $role->setIss_editIssues(F3::get('POST.iss_editIssues'));
         $role->setIss_addIssues(F3::get('POST.iss_addIssues'));
         $role->setIss_deleteIssues(F3::get('POST.iss_deleteIssues'));
@@ -534,8 +536,8 @@ class main extends F3instance
     function projectEditMain()
     {
         $project = new Project();
-        $project->load('id = ' .F3::get('SESSION.project'));
-        $project->setName('"'.F3::get('POST.name').'"');
+        $project->load('id = ' . F3::get('SESSION.project'));
+        $project->setName(F3::get('POST.name'));
         $project->setPublic(F3::get('POST.public'));
         $project->setDescription(F3::get('POST.description'));
         $project->save();

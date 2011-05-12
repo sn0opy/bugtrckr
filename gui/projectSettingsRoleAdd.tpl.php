@@ -37,6 +37,24 @@
             <input type="checkbox" name="proj_manageMembers" />
         </div>
     </div>
+    
+    <div class="formRow">
+        <div class="formLabel">
+            {{@lng.proj_manageMilestones}}
+        </div>
+        <div class="formValue">
+            <input type="checkbox" name="proj_manageMilestones" />
+        </div>
+    </div>
+    
+    <div class="formRow">
+        <div class="formLabel">
+            {{@lng.proj_manageRoles}}
+        </div>
+        <div class="formValue">
+            <input type="checkbox" name="proj_manageRoles" />
+        </div>
+    </div>
 
     <div class="formRow">
         <div class="formLabel">

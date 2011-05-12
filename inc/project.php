@@ -19,10 +19,14 @@ class Project extends F3instance
     private $name;
     private $public;
     private $description;
+    
+    private $ax;
 
     function __construct()
     {
         parent::__construct();
+        
+        $this->ax = new Axon('Project');
     }
 
 
@@ -71,23 +75,13 @@ class Project extends F3instance
      */
     public function save()
     {
-        if ($this->id > 0)
-        {
-            $stat = F3::get('DB')->sql("UPDATE Project SET name = $this->name " .
-                    "WHERE id = $this->id");
-
-            return is_array($stat) ? $this->hash : 0;
-        }
-        else
-        {            
-            $hash = helper::getFreeHash('Project');
-            $id = F3::get('DB')->sql("SELECT max(id)+1 as next FROM Project");
-            $stat = F3::get('DB')->sql("INSERT INTO Project " .
-                    "(hash, name, description, public) VALUES " .
-                    "('". $hash ."', '" .$this->name. "', '" .$this->description. "', ". $this->public. ")");
-
-            return is_array($stat) ? $hash : 0;
-        }
+        
+        $this->ax->id = $this->id;
+        $this->ax->name = $this->name;
+        $this->ax->hash = $this->hash;
+        $this->ax->description = $this->description;
+        $this->ax->public = $this->public;
+        $this->ax->save();    
     }
 
     /**
@@ -95,16 +89,15 @@ class Project extends F3instance
      */
     public function load($stmt)
     {
-        $ax = new Axon('Project');
-        $ax->load($stmt);
+        $this->ax->load($stmt);
 
-        if (!$ax->dry())
+        if (!$this->ax->dry())
         {
-            $this->id = $ax->id;
-            $this->hash = $ax->hash;
-            $this->name = $ax->name;
-            $this->description = $ax->description;
-            $this->public = $ax->public;
+            $this->id = $this->ax->id;
+            $this->hash = $this->ax->hash;
+            $this->name = $this->ax->name;
+            $this->description = $this->ax->description;
+            $this->public = $this->ax->public;
         }
     }
 

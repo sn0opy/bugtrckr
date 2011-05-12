@@ -63,6 +63,38 @@
 
     <div class="formRow">
         <div class="formLabel">
+            {{@lng.proj_manageMilestones}}
+        </div>
+        <div class="formValue">
+            <check if="{{@roleData.proj_manageMilestones}}">
+                <true>
+                    <input type="checkbox" name="proj_manageMilestones" checked="checked" />
+                </true>
+                <false>
+                    <input type="checkbox" name="proj_manageMilestones" />
+                </false>
+            </check>
+        </div>
+    </div>
+    
+    <div class="formRow">
+        <div class="formLabel">
+            {{@lng.proj_manageRoles}}
+        </div>
+        <div class="formValue">
+            <check if="{{@roleData.proj_manageRoles}}">
+                <true>
+                    <input type="checkbox" name="proj_manageRoles" checked="checked" />
+                </true>
+                <false>
+                    <input type="checkbox" name="proj_manageRoles" />
+                </false>
+            </check>
+        </div>
+    </div>
+    
+    <div class="formRow">
+        <div class="formLabel">
             {{@lng.iss_editIssues}}
         </div>
         <div class="formValue">
