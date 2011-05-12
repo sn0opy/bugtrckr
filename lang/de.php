@@ -1,5 +1,18 @@
 <?php
 
+/**
+ * de.php
+ * 
+ * i81n language file - german
+ * 
+ * @package i18n
+ * @author Sascha Ohms
+ * @author Phillipp Hirsch
+ * @copyright Copyright 2011, Bugtrckr-Team
+ * @license http://www.gnu.org/licenses/lgpl.txt
+ *   
+**/
+
 return array('lng' => array(
     'id' => 'Id',
     'title' => 'Titel',
@@ -31,12 +44,13 @@ return array('lng' => array(
     'ticketsleft' => 'Ticket/s übrig',
     'addticket' => 'Ticket hinzufügen',
     'milestone' => 'Meilenstein',
+    'milestones' => 'Meilensteine',
     'registration' => 'Registrieren',
     'timeline' => 'Zeitachse',
     'home' => 'Start',
     'tickets' => 'Tickets',
     'roadmap' => 'Roadmap',
-    'footer' => '©2011 Sn0opy &amp; Hanspolo',
+    'footer' => '©2011 Bugtrckr-Team',
     'error' => 'Fehler',
     'password' => 'Passwort',
     'email' => 'E-Mail',
@@ -48,14 +62,29 @@ return array('lng' => array(
     'noaccount' => 'Noch keinen Account?',
     'assignedTo' => 'Zugewiesen',
     'issuesAssigneable' => 'Tickets können zugewiesen werden',
-    'proj_editProject' => "Projekt editieren",
-    'proj_manageMembers' => 'Benutzer editieren',
-    'iss_editIssues' => 'Tickets editieren',
+    'proj_editProject' => "Projekt bearbeiten",
+    'proj_manageMembers' => 'Benutzer bearbeiten',
+    'proj_manageMilestones' => 'Meilensteine bearbeiten',
+    'proj_manageRoles' => 'Rollen bearbeiten',
+    'iss_editIssues' => 'Tickets bearbeiten',
     'iss_addIssues' => 'Tickets erstellen',
     'iss_deleteIssues' => 'Tickets löschen',
     'iss_moveIssue' => 'Tickets verschieben',
-    'iss_editWatchers' => 'Beobachter editieren',
+    'iss_editWatchers' => 'Beobachter bearbeiten',
     'iss_addWatchers' => 'Beobachter hinzufügen',
-    'iss_viewWatchers' => 'Beobachterliste ansehen'
+    'iss_viewWatchers' => 'Beobachterliste ansehen',
+    'settings' => 'Einstellungen',
+    'project' => 'Projekt',
+    'noAccess' => 'Du hast keinen Zugriff auf diesen Bereich.',
+    'members' => 'Mitglieder',
+    'projectname' => 'Projektname',
+    'projectdescription' => 'Prohjektbeschreibung',
+    'publicproject' => 'Öffentliches Projekt',
+    'dosettings' => 'Einstellungen vornehmen',
+    'roles' => 'Rollen',
+    'role' => 'Rolle',
+    'addrole' => 'Rolle hinzufügen',
+    'save' => 'Speichern',
+    'addmilestone' => 'Meilenstein hinzufügen'
 ));
 

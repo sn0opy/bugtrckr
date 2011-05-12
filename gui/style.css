@@ -9,6 +9,7 @@ body
 	color: #333;
 	font: 10pt Helvetica;
 	min-width: 900px;
+    background: #FFF;
 }
 
 a
@@ -36,14 +37,14 @@ h3 a:hover
  */
 #head
 {
-	background: #068;
+	background: #068 url(img/headBg.png);
 	height:	50px;
     font: 10pt Georgia;
 }
 
 #menu
 {
-    background: #068;
+    background: #068 url(img/headBg.png);
     padding: 10px;
     border-bottom: 1px solid #333;
     color: #FFF;
@@ -124,6 +125,80 @@ h3 a:hover
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
     width: 500px;
+}
+
+.error 
+{
+    padding: 5px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    background: #FFB3B3;
+    border: 1px solid #F66;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+}
+
+.projectText
+{
+    width: 400px;
+    height: 150px;
+}
+
+.tabbed 
+{
+    margin-top: 20px;
+}
+
+.tabs a
+{
+    border: none;
+}
+
+.tabs ul
+{
+    list-style-type: none;
+    margin-left: 40px;
+}
+
+.tabs li
+{
+    display: inline;
+    padding: 10px;
+    padding-bottom: 5px;
+    margin-right: 5px;
+    border-top: 1px solid #CCC;
+    border-left: 1px solid #CCC;
+    border-right: 1px solid #CCC;
+}
+
+.tabs .active
+{
+    background: #FFF;
+    font-weight: bold;
+}
+
+.tabs li:hover
+{
+    background: #FFF;
+}
+
+.tabContent
+{
+    border-top: 1px solid #CCC;
+    margin-top: -8px;
+    padding: 10px; 
+}
+
+#tabContent_2, #tabContent_3, #tabContent_4
+{ 
+    display: none; 
+}  
+
+.roleSettings .formLabel
+{
+    width: 200px;
+    margin-bottom: 10px;
 }
 
 .alignright
@@ -251,12 +326,12 @@ table.overview tr:hover
 
 table.overview .tr0
 {
-	background: #DDD;
+	background: #FAFAFA;
 }
 
 table.overview .tr1
 {
-	background:	#FFF;
+	background:	#EEE;
 }
 
 table.overview .id
@@ -425,7 +500,7 @@ table.ticket th
     text-align: left;
 }
 
-#add, #login
+.add, #login
 {
 	background: #EEE;
     border: 1px solid #BBB;
@@ -444,18 +519,18 @@ table.ticket th
     text-shadow: none;
 }
 
-#add a, #login a
+.add a, #login a
 {
     color: #333 !important;
     text-transform: none;
 }
 
-#add input, #add textarea
+.add input, .add textarea
 {
     width: 400px;
 }
 
-#add textarea
+.add textarea
 {
     height: 120px;
 }

@@ -4,6 +4,20 @@
         <meta charset="UTF-8" />
 		<link href="/{{@BASE}}gui/style.css" rel="stylesheet" type="text/css" />
 		<title>{{@pageTitle}} - {{@title}}</title>
+        
+        <script type="text/javascript" src="/{{@BASE}}gui/js/jquery.js"></script>
+        <script type="text/javascript">
+        $(document).ready(function() {              
+            $("a.tab").click(function() {
+                $(".active").removeClass("active");  
+                $(this).parent().addClass("active");  
+                $(".tabContent").hide();  
+                var content_show = $(this).attr("title");  
+                $("#"+content_show).show();  
+                return false;
+            });  
+        }); 
+        </script>
 	</head>
 
 	<body>
@@ -26,14 +40,19 @@
                     </F3:false>
                 </F3:check>
 
+                <F3:check if="{{1==1}}">
+                    <F3:true>
+                        <li><a href="/{{@BASE}}project/settings">{{@lng.settings}}</a></li>
+                    </F3:true>
+                </F3:check>
+                
 				<li>
 					<form method="POST" action="/{{@BASE}}project/select">
 						<select name="project" size="1" onclick="submit()">
 							<F3:repeat group="{{@projects}}" value="{{@project}}">
 								<F3:check if="{{@project.id == @SESSION.project}}">
 									<F3:true>
-										<option value="{{@project.hash}}"
-												selected="selected">
+										<option value="{{@project.hash}}" selected="selected">
 											{{@project.name}}
 										</option>
 									</F3:true>

@@ -36,30 +36,38 @@ class Template extends Base {
 			@public
 	**/
 	static function serve($file,$mime='text/html') {
-		$file=self::resolve(self::fixslashes(self::$vars['GUI']).$file);
-		if (!is_file($file)) {
+		$file=self::resolve($file);
+		$found=FALSE;
+		foreach (preg_split('/\||;/',self::$vars['GUI'],0,
+			PREG_SPLIT_NO_EMPTY) as $gui) {
+			if (is_file($view=self::fixslashes($gui.$file))) {
+				$found=TRUE;
+				break;
+			}
+		}
+		if (!$found) {
 			if (!self::$includes)
 				trigger_error(sprintf(self::TEXT_Render,$file));
 			return '';
 		}
-		if (in_array($file,self::$includes)) {
+		if (in_array($view,self::$includes)) {
 			trigger_error(sprintf(self::TEXT_Recursive,$file));
 			return '';
 		}
-		self::$includes[]=$file;
+		self::$includes[]=$view;
 		if (PHP_SAPI!='cli')
 			// Send HTTP header with appropriate character set
 			header(self::HTTP_Content.': '.$mime.'; '.
 				'charset='.self::$vars['ENCODING']);
-		$hash='php.'.self::hash($file);
+		$hash='tpl.'.self::hash($view);
 		$cached=Cache::cached($hash);
-		if ($cached && filemtime($file)<$cached)
+		if ($cached && filemtime($view)<$cached)
 			// Retrieve PHP-compiled template from cache
 			$text=Cache::get($hash);
 		else {
 			// Parse raw template
 			$doc=new F3markup;
-			$text=$doc->load(file_get_contents($file));
+			$text=$doc->load(file_get_contents($view));
 			// Save PHP-compiled template to cache
 			Cache::set($hash,$text);
 		}
@@ -74,7 +82,7 @@ class Template extends Base {
 			$temp=self::$vars['TEMP'].$_SERVER['SERVER_NAME'].'.'.$hash;
 			if (!$cached || !is_file($temp)) {
 				// Create semaphore
-				$hash='sem.'.self::hash($file);
+				$hash='sem.'.self::hash($view);
 				$cached=Cache::cached($hash);
 				while ($cached)
 					// Locked by another process
@@ -89,7 +97,7 @@ class Template extends Base {
 			require $temp;
 		}
 		$out=ob_get_clean();
-		unset(self::$includes[array_search($file,self::$includes)]);
+		unset(self::$includes[array_search($view,self::$includes)]);
 		return $out;
 	}
 
@@ -131,11 +139,16 @@ class F3markup extends Base {
 							preg_match('/^(\w+)\b(.*)/',$var[1],$match);
 							if (in_array($match[1],$syms))
 								return '$_'.$self::remix($var[1]);
-							$str='F3::get('.var_export($var[1],TRUE).
-								(isset($var[2])?$var[2]:'').
-								(isset($var[3])?(',array('.$var[3].')'):
-								NULL).')';
-							if (!$match[2]) {
+							$str='F3::get('.var_export($var[1],TRUE).')';
+							if (isset($var[2]) && $var[2])
+								$str='call_user_func_array('.$str.','.
+									'array'.$var[2].')';
+							elseif (isset($var[3]))
+								$str=str_replace(')',
+									',array('.$var[3].'))',$str);
+							if (!$match[2] &&
+								!preg_match('/('.$self::PHP_Globals.')\b/',
+									$match[1])) {
 								$syms[]=$match[1];
 								$str='($_'.$match[1].'='.$str.')';
 							}
@@ -188,7 +201,8 @@ class F3markup extends Base {
 			foreach ($node as $nkey=>$nval)
 				if (is_int($nkey))
 					$out.=$this->build($nval);
-				else
+				else {
+					$count=count($this->syms);
 					switch ($nkey) {
 						case 'include':
 							// <include> directive
@@ -225,8 +239,6 @@ class F3markup extends Base {
 									(isset($satt)?$sstr:'1').'): ?>'.
 								$this->build($nval).
 								'<?php endfor; ?>';
-							unset($this->syms
-								[array_search($cvar,$this->syms)]);
 							break;
 						case 'repeat':
 							// <repeat> directive
@@ -263,11 +275,6 @@ class F3markup extends Base {
 									'$_'.$vvar.'): ?>'.
 								$this->build($nval).
 								'<?php endforeach; ?>';
-							if (isset($kvar))
-								unset($this->syms
-									[array_search($kvar,$this->syms)]);
-							unset($this->syms
-								[array_search($vvar,$this->syms)]);
 							break;
 						case 'check':
 							// <check> directive
@@ -295,6 +302,9 @@ class F3markup extends Base {
 							$out.='<?php else: ?>'.$this->build($nval);
 							break;
 					}
+					// Reset scope
+					$this->syms=array_slice($this->syms,0,$count);
+				}
 		}
 		else
 			$out.=preg_match('/<\?php/',$node)?$node:$this->expr($node,TRUE);
@@ -384,7 +394,6 @@ class F3markup extends Base {
 			@public
 	**/
 	function __construct() {
-		$this->syms=explode('|',self::PHP_Globals);
 	}
 
 }

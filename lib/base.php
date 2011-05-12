@@ -135,7 +135,7 @@ class Base {
 		//! Functions allowed in template
 		$funcs=array(),
 		//! Read-only framework variables
-		$readonly='BASE|MAXSIZE|PROTOCOL|ROOT|ROUTES|STATS|VERSION';
+		$readonly='BASE|MAXSIZE|PROTOCOL|ROUTES|STATS|VERSION';
 
 	/**
 		Convert Windows double-backslashes to slashes; Also for

@@ -5,7 +5,7 @@
 	{{@lng.addmilestone}}
 </button>
 
-<div id="add">
+<div class="add" id="add">
     <h3 class="floatleft">{{@lng.addmilestone}}</h3>
 	<a class="closeButton" href="#" onclick="document.getElementById('add').style.display = 'none'; return false">
 		X

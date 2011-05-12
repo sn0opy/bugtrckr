@@ -1,5 +1,18 @@
 <?php
 
+/**
+ * mapping.inc.php
+ * 
+ * Replacing values with their full names
+ * 
+ * @package i18n
+ * @author Sascha Ohms
+ * @author Phillipp Hirsch
+ * @copyright Copyright 2011, Bugtrckr-Team
+ * @license http://www.gnu.org/licenses/lgpl.txt
+ *   
+**/
+
 F3::set('ticket_state', array(
 	'1' => F3::get('lng.new'),
 	'2' => F3::get('lng.assigned'),

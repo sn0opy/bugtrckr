@@ -50,7 +50,7 @@ class DB extends Base {
 	function rollback() {
 		if (!$this->pdo)
 			self::instantiate();
-		$this->pdo->rollback();
+            $this->pdo->rollback();
 	}
 
 	/**
@@ -112,7 +112,8 @@ class DB extends Base {
 				// Check SQLSTATE
 				foreach (array($this->pdo,$query) as $obj)
 					if ($obj->errorCode()!=PDO::ERR_NONE) {
-						$this->pdo->rollback();
+                        if ($this->pdo->inTransaction())
+                            $this->rollback();
 						$error=$obj->errorinfo();
 						trigger_error($error[2]);
 						return FALSE;
