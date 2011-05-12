@@ -13,8 +13,6 @@
  *   
 **/
 
-require_once F3::get('BASE').'inc/models.php';
-
 class main extends F3instance
 {
     function  __construct() {
@@ -40,9 +38,6 @@ class main extends F3instance
         $this->tpserve();
     }
 
-    /**
-     * 
-     */
     function showMilestone()
     {
         $hash = F3::get('PARAMS.hash');
@@ -51,7 +46,7 @@ class main extends F3instance
 		$milestone->load('hash = "' . $hash .'"');
 
 		$ticket = new Ticket();
-		$tickets = $ticket->find('milestone = ' . $milestone->getId());
+		$tickets = $ticket->find('milestone = ' . $milestone->id);
 
 /*
         try {
@@ -87,17 +82,14 @@ class main extends F3instance
 */
         F3::set('tickets', $tickets);
 //        F3::set('stats', $stats);
-        F3::set('milestone', $ms->toArray());
-        F3::set('pageTitle', '{{@lng.milestone}} › '. $ms->getName());
+        F3::set('milestone', $milestone);
+        F3::set('pageTitle', '{{@lng.milestone}} › '. $milestone->name);
         F3::set('template', 'milestone.tpl.php');
         $this->tpserve();
 
     }
 
 
-    /**
-     *
-     */
     function showRoadmap()
     {
         $road = array();
@@ -225,17 +217,18 @@ class main extends F3instance
     {
         $hash = F3::get('PARAMS.hash');
 
-        try {
-            $ticket = new Ticket();
-            $ticket->load("hash = '$hash'");
+        $ticket = new Ticket();
+        $ticket->load(array('hash = :hash', array(':hash' => $hash)));
 
-            $milestone = new Milestone();
-            $milestone->load("id = ". $ticket->getMilestone());
-        } catch (Exception $e) {
-            $this->tpfail("Can't open ticket", $e);
+        $milestone = new Milestone();
+        $milestone->load(array("id = :id", array(':id' => $ticket->milestone)));
+
+		if (!$ticket->id || !$milestone->id)
+		{
+            $this->tpfail("Can't open ticket");
             return ;
         }
-
+/*
         if (Dao::getPermission('iss_editIssue'))
         {
 			try {
@@ -252,10 +245,11 @@ class main extends F3instance
 
             F3::set('users', $users);
         }
+*/
 
-        F3::set('ticket', $ticket->toArray());
-        F3::set('milestone', $milestone->toArray());
-        F3::set('pageTitle', '{{@lng.tickets}} › '. $ticket->getTitle());
+        F3::set('ticket', $ticket);
+        F3::set('milestone', $milestone);
+        F3::set('pageTitle', '{{@lng.tickets}} › '. $ticket->title);
         F3::set('template', 'ticket.tpl.php');
         $this->tpserve();
     }
@@ -268,31 +262,32 @@ class main extends F3instance
         if (!Dao::getPermission("iss_addIssues"))
             $this->tpdeny();
 
-        $post = F3::get('POST');
-        $owner = F3::get('SESSION.userId');
+        $owner = F3::get('SESSION.user');
 
         $ticket = new Ticket();
-        $ticket->setHash(helper::getFreeHash('Ticket'));
-        $ticket->setTitle($post['title']);
-        $ticket->setDescription($post['description']);
-        $ticket->setOwner($owner);
-        $ticket->setAssigned(0); // do not assign to anyone
-        $ticket->setType($post['type']);
-        $ticket->setState(1);
-        $ticket->setPriority($post['priority']);
-        $ticket->setCategory(1);
-        $ticket->setMilestone($post['milestone']);
+        $ticket->hash = helper::getFreeHash('Ticket');
+        $ticket->title = F3::get('POST.title');
+        $ticket->description = F3::get('POST.description');
+        $ticket->owner = $owner->id;
+        $ticket->assigned = 0; // do not assign to anyone
+        $ticket->type = F3::get('POST.type');
+        $ticket->state = 1;
+        $ticket->priority = F3::get('POST.priority');
+        $ticket->category = 1;
+        $ticket->milestone = F3::get('POST.milestone');
 
-        try {
-            $ticket->save();
+        $ticket->save();
 
-            Dao::addActivity("created Ticket ". $ticket->getTitle());
-            F3::set('PARAMS.hash', $ticket->getHash());
-            $this->showTicket();
-        } catch (Exception $e) {
-            $this->tpfail("Failure while saving Ticket", $e);
+		if (!$ticket->id)
+		{       
+            $this->tpfail("Failure while saving Ticket");
             return ;
         }
+
+        Dao::addActivity('created Ticket ' . $ticket->title);
+
+        F3::set('PARAMS.hash', $ticket->hash);
+        $this->showTicket();
     }
 
     /**
@@ -300,28 +295,25 @@ class main extends F3instance
      */
     function editTicket()
     {
-        if (!Dao::getPermission("iss_editIssues"))
-            $this->tpdeny();
-
         require_once 'ticket.php';
 
-        $post = F3::get('POST');
         $hash = F3::get('PARAMS.hash');
 
-        try {
-            $ticket = new Ticket();
-            $ticket->load("hash = '$hash'");
+        $ticket = new Ticket();
+        $ticket->load('hash = :hash', array(':hash' => $hash));
 
-            $ticket->setAssigned($post['userId']);
-            $ticket->setState($post['state']);
+        $ticket->assigned = F3::get('POST.userId');
+        $ticket->state = F3::get('POST.state');
 
-            $ticket->save();
-        } catch (Exception $e) {
-            $this->tpfail("Failure while saving Ticket", $e);
+        $ticket->save();
+
+		if (!$ticket->id)
+        {
+            $this->tpfail("Failure while saving Ticket");
             return ;
         }
 
-        Dao::addActivity("changed Ticket ". $ticket->getTitle());
+        Dao::addActivity('changed Ticket '. $ticket->title);
         F3::set('PARAMS["hash"]', $hash);
         $this->showTicket($hash);
     }
@@ -333,22 +325,22 @@ class main extends F3instance
     {
         $url = F3::get('SERVER.HTTP_REFERER');
 
-        try {
-            $project = new Project();
-            $project->load("hash = '" .F3::get('POST.project'). "'");
+        $project = new Project();
+        $project->load('hash = :hash', array(':hash' => F3::get('POST.project')));
 
-            if(F3::get('SESSION.userId'))
-            {
-                $user = new User();
-                $user->load('id = ' .F3::get('SESSION.userId'));
-                $user->setLastProject($project->getId());
-                $user->save();
-            }
-        } catch (Exception $e) {
-            $this->tpfail("Failure while changing Project", $e);
+		if (!$project->id)
+		{
+            $this->tpfail("Failure while changing Project");
             return ;
-        }
+		}
 
+        if(F3::get('SESSION.user'))
+        {
+                $user = F3::get('SESSION.user');
+                $user->lastProject = $project->id;
+                $user->save();
+        }
+		
         F3::set('SESSION.project', $project->getId());
         F3::reroute($url);
     }    
@@ -358,42 +350,31 @@ class main extends F3instance
      */
     function showProjectSettings()
     {    
-        $project = F3::get('SESSION.project');
+        $projectId = F3::get('SESSION.project');
 
-		try {
-    	    $proj = new Project;
-       		$proj->load('id = ' .$project);
-        
-      		$roles = Dao::getRoles('projectId = ' . $project);
-        } catch (Exception $e) {
-            $this->tpfail("Failure while open Project", $e);
+    	$project = new Project;
+       	$project->load('id = :id', array(':id' => $projectId));
+       
+		$role = new Role(); 
+      	$roles = $role->find('projectId = :id', array(':id', $projectId));
+
+		$milestone = new Milestone();
+		$milestones = $milestone->find('project = :id', array(':id', $projectId));
+
+		$user = new User();
+		$users = $user->find('');
+
+		if (!$project->id || !$roles || !$milestones || !$users)
+        {
+            $this->tpfail("Failure while open Project");
             return ;
         }
-
-        foreach($roles as $i => $role)
-            $roles[$i] = $role->toArray();
-
-		try {
- 	    	$milestones = Dao::getMilestones('project = '.F3::get('SESSION.project'));        
-		} catch (Exception $e) {
-            $this->tpfail("Failure while getting Milestones", $e);
-            return ;
-        }
-
-		foreach($milestones as $i => $milestone)
-            $milestones[$i] = $milestone->toArray();
-        
-        $users = Dao::getUsers();
-        F3::set('users2', $users[1]);
-        
-        foreach($users as $i => $user)
-            $users[$i] = $user->toArray();
         
         F3::set('users', $users);
         F3::set('projMilestones', $milestones);
         F3::set('projRoles', $roles);
-        F3::set('projMembers', Dao::getProjectMembers($project));
-        F3::set('projDetails', $proj->toArray());        
+        F3::set('projMembers', Dao::getProjectMembers($projectId));
+        F3::set('projDetails', $project);        
         F3::set('template', 'projectSettings.tpl.php');
         F3::set('pageTitle', '{{@lng.project}} › {{@lng.settings}}');
         $this->tpserve();
@@ -406,33 +387,30 @@ class main extends F3instance
     {
         $projectId = F3::get('SESSION.project');
         
-		try {
-        	$user = new user();
-        	$user->load('hash = "'.F3::get('POST.user').'"');
-        	$userId = $user->getId();
-		} catch (Exception $e) {
-            $this->tpfail("Failure while getting User", $e);
+       	$user = new user();
+       	$user->load('hash = :hash', array(':hash', F3::get('POST.user')));
+
+		if (!$user->id)
+		{
+            $this->tpfail("Failure while getting User");
             return ;
         }
 
-		try {
-    		$role = new Role();
-        	$role->load('hash = "'.F3::get('POST.role').'"');
-        	$roleId = $role->getId();
-		} catch (Exception $e) {
-            $this->tpfail("Failure while getting Role", $e);
+  		$role = new Role();
+       	$role->load('hash = :hash', array(':hash', F3::get('POST.role')));
+		
+		if (!$role->id)
+		{
+            $this->tpfail("Failure while getting Role");
             return ;
         }
 
-        try {
-	  	    $perms = new ProjectPermission();
-	        $perms->load('projectId = ' .$projectId. ' AND userId = ' .$userId);
-	        $perms->setRoleId($roleId);
- 		    $perms->save();
-		} catch (Exception $e) {
-            $this->tpfail("Failure while saving Permissions", $e);
-            return ;
-        }
+  	    $perms = new ProjectPermission();
+        $perms->load('projectId = :proj AND userId = :user',
+						array(	':proj' => $projectId,
+								':user' => $user->id));
+        $perms->roleId = $role->id;
+	    $perms->save();
         
         F3::reroute('/'.F3::get('BASE').'project/settings');
     }
@@ -444,11 +422,12 @@ class main extends F3instance
     {
         $roleHash = F3::get('PARAMS.hash');
 
-		try {
-	        $role = new role();
-    	    $role->load('hash = "' .$roleHash. '"');
-		} catch (Exception $e) {
-            $this->tpfail("Failure while getting Role", $e);
+		$role = new role();
+    	$role->load('hash = :hash', array(':hash' => $roleHash));
+		
+		if (!$role->id)
+		{
+            $this->tpfail("Failure while getting Role");
             return ;
         }
 
@@ -466,16 +445,16 @@ class main extends F3instance
     {
         $msHash = F3::get('PARAMS.hash');
 
-		try {
-        	$milestone = new Milestone();
-        	$milestone->load('hash = "' .$msHash. '"');
-		} catch (Exception $e) {
-            $this->tpfail("Failure while getting Milestone", $e);
+       	$milestone = new Milestone();
+        $milestone->load('hash = :hash', array(':hash' => $msHash));
+
+		if (!$milestone->id)
+		{
+            $this->tpfail("Failure while getting Milestone");
             return ;
         }
 
         F3::set('msData', $milestone->toArray());        
-        
         F3::set('template', 'projectSettingsMilestone.tpl.php');
         F3::set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.milestone}} › {{@msData.name}}');
         $this->tpserve();        
@@ -488,31 +467,31 @@ class main extends F3instance
     {
         $roleHash = F3::get('POST.hash') ? F3::get('POST.hash') : helper::getFreeHash('Role');
         
-		try {
-	        $role = new role();
-			if (F3::exists('POST.hash'))
-	       		$role->load('hash = "' .$roleHash. '"');
+	    $role = new role();
+		if (F3::exists('POST.hash'))
+	    	$role->load('hash = :hash', array(':hash' => $roleHash));
 
-	        $role->setName(F3::get('POST.name'));
-	        $role->setHash($roleHash);
-    	    $role->setIssuesAssigneable(F3::get('POST.issuesAssigneable'));
-        	$role->setProjectId(F3::get('SESSION.project'));
-        	$role->setIss_addIssues(F3::get('POST.iss_addIssues'));
-        	$role->setProj_editProject(F3::get('POST.proj_editProject'));
-        	$role->setProj_manageMembers(F3::get('POST.proj_manageMembers'));
-        	$role->setproj_manageMilestones(F3::get('POST.proj_manageMilestones'));
-        	$role->setProj_manageRoles(F3::get('POST.proj_manageRoles'));
-        	$role->setIss_editIssues(F3::get('POST.iss_editIssues'));
-        	$role->setIss_addIssues(F3::get('POST.iss_addIssues'));
-        	$role->setIss_deleteIssues(F3::get('POST.iss_deleteIssues'));
-        	$role->setIss_moveIssue(F3::get('POST.iss_moveIssue'));
-        	$role->setIss_editWatchers(F3::get('POST.iss_editWatchers'));
-        	$role->setIss_addWatchers(F3::get('POST.iss_addWatchers'));
-        	$role->setIss_viewWatchers(F3::get('POST.iss_viewWatchers'));
+	        $role->name = F3::get('POST.name');
+	        $role->hash = $roleHash;
+    	    $role->issuesAssigneable = F3::get('POST.issuesAssigneable');
+        	$role->projectId = F3::get('SESSION.project');
+        	$role->iss_addIssues = F3::get('POST.iss_addIssues');
+        	$role->proj_editProject = F3::get('POST.proj_editProject');
+        	$role->proj_manageMembers = F3::get('POST.proj_manageMembers');
+        	$role->proj_manageMilestones = F3::get('POST.proj_manageMilestones');
+        	$role->proj_manageRoles = F3::get('POST.proj_manageRoles');
+        	$role->iss_editIssues = F3::get('POST.iss_editIssues');
+        	$role->iss_addIssues = F3::get('POST.iss_addIssues');
+        	$role->iss_deleteIssues = F3::get('POST.iss_deleteIssues');
+        	$role->iss_moveIssue = F3::get('POST.iss_moveIssue');
+        	$role->iss_editWatchers = F3::get('POST.iss_editWatchers');
+        	$role->iss_addWatchers = F3::get('POST.iss_addWatchers');
+        	$role->iss_viewWatchers = F3::get('POST.iss_viewWatchers');
         	$role->save();
 
-		} catch (Exception $e) {
-            $this->tpfail("Failure while saving Role", $e);
+		if (!$role->id)
+		{
+            $this->tpfail("Failure while saving Role");
             return ;
         }
 
@@ -526,19 +505,20 @@ class main extends F3instance
     {
         $msHash = F3::get('POST.hash') ? F3::get('POST.hash') : helper::getFreeHash('Milestone');
         
-		try {
-	        $milestone = new Milestone();
+        $milestone = new Milestone();
 		    
-			if (F3::exists('POST.hash'))
-    	    	$milestone->load('hash = "' .$msHash. '"');
+		if (F3::exists('POST.hash'))
+    	   	$milestone->load('hash = "' .$msHash. '"');
 
-	        $milestone->setName(F3::get('POST.name'));
-	        $milestone->setHash($msHash);
-	        $milestone->setDescription(F3::get('POST.description'));
-	        $milestone->setProject(F3::get('SESSION.project'));
-	        $milestone->save();
-		} catch (Exception $e) {
-            $this->tpfail("Failure while saving Milestone", $e);
+	    $milestone->name = F3::get('POST.name');
+        $milestone->hash = $msHash;
+        $milestone->description = F3::get('POST.description');
+        $milestone->project = F3::get('SESSION.project');
+        $milestone->save();
+
+		if (!$milestone->id)
+		{
+            $this->tpfail("Failure while saving Milestone");
             return ;
         }
 
@@ -571,15 +551,16 @@ class main extends F3instance
      */
     function projectEditMain()
     {
-		try {
-	        $project = new Project();
-	        $project->load('id = ' . F3::get('SESSION.project'));
-	        $project->setName(F3::get('POST.name'));
-	        $project->setPublic(F3::get('POST.public'));
-	        $project->setDescription(F3::get('POST.description'));
-	        $project->save();
-		} catch (Exception $e) {
-            $this->tpfail("Failure while saving Project", $e);
+        $project = new Project();
+        $project->load('id = :id', array(':id' => $this->get('SESSION.project')));
+        $project->name = $this->get('POST.name');
+        $project->public = $this->get('POST.public');
+        $project->description = $this->get('POST.description');
+        $project->save();
+        
+		if (!$project->id)
+		{    
+			$this->tpfail("Failure while saving Project");
             return ;
         }
 
@@ -592,27 +573,28 @@ class main extends F3instance
     function showUser()
     {
         $name = F3::get('PARAMS.name');
-        $result = F3::get('DB')->sql('SELECT * FROM User WHERE name = :name', array(':name' => $name));
+		$user = new User();
+		$user->load('name = :name', array(':name' => $name));
 
-        if(!$result) 
-            F3::set('FAILURE', 'User not found.');
-        else
-            F3::set('user', $result[0]);
+        if(!$user)
+		{
+	    	$this->tpfail("User not found", $e);
+            return ;	
+		}
 
+		$ticket = new Ticket();
+		$tickets = $ticket->find('owner = :owner', array(':owner' => $user->id));
 
-		try {
-        	$userTickets = Dao::getTickets('owner = ' .F3::get('user.id'));
-		} catch (Exception $e) {
-            $this->tpfail("Failure while getting User's infos", $e);
+		if (!$tickets)
+		{
+            $this->tpfail("Failure while getting User's infos");
             return ;
         }
 
-        foreach($userTickets as $i => $userTicket)
-            $userTickets[$i] = $userTicket->toArray();
-
-        F3::set('tickets', $userTickets);
-        F3::set('template', 'user.tpl.php');
-        F3::set('pageTitle', '{{@lng.user}} › '.$name);
+        $this->set('user', $user);
+        $this->set('tickets', $tickets);
+        $this->set('template', 'user.tpl.php');
+        $this->set('pageTitle', '{{@lng.user}} › '.$name);
         $this->tpserve();
     }
 
@@ -621,8 +603,8 @@ class main extends F3instance
      */
     function showUserRegister()
     {
-        F3::set('template', 'userRegister.tpl.php');
-        F3::set('pageTitle', '{{@lng.user}} › {@lng.registration}');
+        $this->set('template', 'userRegister.tpl.php');
+        $this->set('pageTitle', '{{@lng.user}} › {@lng.registration}');
         $this->tpserve();
     }
 
@@ -633,21 +615,22 @@ class main extends F3instance
     {
         $salt = helper::randStr();
 
-		try {
-	        $user = new user();
-	        $user->setName(F3::get('POST.name'));
-	        $user->setEmail(F3::get('POST.email'));
-    	    $user->setPassword(helper::salting($salt, F3::get('POST.password')));
-        	$user->setSalt($salt);
-        	$user->setHash(helper::getFreeHash('User'));
-        	$user->setAdmin(0);
-        	$user->save();
-		} catch (Exception $e) {
-            $this->tpfail("Failure while saving User", $e);
+	    $user = new user();
+	    $user->name = $this->get('POST.name');
+	    $user->email = $this->get('POST.email');
+    	$user->password = helper::salting($salt, F3::get('POST.password'));
+        $user->salt = $salt;
+       	$user->hash = helper::getFreeHash('User');
+       	$user->admin = 0;
+       	$user->save();
+       
+		if (!$user->id)
+		{	
+    		$this->tpfail("Failure while saving User");
             return ;
-        }
+		}
 
-		F3::set('SESSION.SUCCESS', 'User registred successfully');
+		$this->set('SESSION.SUCCESS', 'User registred successfully');
     	$this->reroute('/'. F3::get('BASE'));
 	}
 
@@ -657,7 +640,7 @@ class main extends F3instance
     function showUserLogin()
     {
         $this->set('template', 'userLogin.tpl.php');
-        F3::set('pageTitle', '{{@lng.user}} › {@lng.login}');
+        $this->set('pageTitle', '{{@lng.user}} › {@lng.login}');
         $this->tpserve();
     }
 
@@ -666,30 +649,22 @@ class main extends F3instance
      */
     function loginUser()
     {
-		try {
-	        $user = new user();
-     		$user->load('email = "' .$this->get('POST.email'). '"'); // get salt
-    	    $salt = $user->getSalt();
+		$user = new User();
+		$user->load('email = :email', array(':email' => $this->get('POST.email')));
+		$user->load('email = :email AND password = :password',
+					array(	':email' => $this->get('POST.email'),
+							':password' => helper::salting($user->salt, $this->get('POST.password'))));
 
-	        $user->load("email = '" .$this->get('POST.email'). "' AND password = '" . helper::salting($salt, $this->get('POST.password')). "'");
+		if (!$user)
+		{
+			$this->set('FAILURE', 'Login failed.');
+            $this->reroute('/'. $this->get('BASE') .'user/login');
+		}
 
-		} catch (Exception $e) {
-            $this->tpfail("Failure while login User", $e);
-            return ;
-        }
+		$this->set('SESSION.user', $user);
+		F3::set('SESSION.SUCCESS', 'Login successful');
+        $this->reroute('/'. F3::get('BASE'));
 
-        if(!$user->getId()) {
-            $this->set('FAILURE', 'Login failed.');
-            $this->reroute('/'. F3::get('BASE') .'user/login');
-        } else {
-            $this->set('SESSION.userName', $user->getName());
-            $this->set('SESSION.userPassword', $user->getPassword());
-            $this->set('SESSION.userHash', $user->getHash());
-            $this->set('SESSION.userId', $user->getId());
-		
-			F3::set('SESSION.SUCCESS', 'Login successful');
-            $this->reroute('/'. F3::get('BASE'));
-        }
     }
 
     /**
@@ -712,14 +687,14 @@ class main extends F3instance
      */
     private function tpserve()
     {
-/*		try {
-        	$projects = Dao::getProjects('1 = 1');
-     		foreach($projects as $i=>$project)
-        	    $projects[$i] = $project->toArray();
-		} catch (Exception $e) {
-            $this->tpfail("Failure while loading Projects", $e);
-            return ;
-        }*/
+		$project = new Project();
+        $projects = $project->find('1 = 1');
+		
+		if (!$projects)
+		{
+        	$this->tpfail("Failure while loading Projects");
+        	return ;
+        }
 
         F3::set('projects', $projects);
         echo Template::serve('main.tpl.php');
@@ -738,11 +713,8 @@ class main extends F3instance
     /**
      *
      */
-    private function tpfail($msg, &$e)
+    private function tpfail($msg)
     {
-		if (F3::get('DEBUG') > 0)
-			$msg .= ": " . print_r($e);
-
         F3::set('FAILURE', $msg);
         F3::set('template', 'error404.tpl.php');
         echo Template::serve('main.tpl.php');

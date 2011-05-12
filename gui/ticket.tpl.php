@@ -48,7 +48,7 @@
 </div>
 
 
-<F3:check if="{{@SESSION.userId > 0}}">
+<F3:check if="{{@SESSION.user}}">
 	<F3:true>
     
     <div class="editTicket">
