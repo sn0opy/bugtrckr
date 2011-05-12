@@ -44,10 +44,10 @@ class main extends F3instance
     function showMilestone()
     {
         $hash = F3::get('PARAMS.hash');
-        $ms = new Milestone();
-        $ms->load('hash = "' .$hash.'"');
 
         try {
+	 	    $ms = new Milestone();
+	        $ms->load('hash = "' .$hash.'"');
             $tickets = Dao::getTickets('milestone = ' .$ms->getId());
         } catch (Exception $e) {
             $this->tpfail("Failure while open Tickets", $e);

@@ -8,7 +8,8 @@ INSERT INTO Ticket (id, hash, title, description, created, owner, assigned, type
 --
 CREATE TABLE User (id integer PRIMARY KEY AUTOINCREMENT, name VARCHAR(45), hash varchar(12) UNIQUE, password varchar, salt varchar, email varchar, admin bool, lastProject int);
 INSERT INTO User (id, name, hash, password, salt, email, admin, lastProject) VALUES (1, 'adm', 'Ub026324c690', 1, 1, 'admin@bugtrckr', 1, 0);
-INSERT INTO User (id, name, hash, password, salt, email, admin, lastProject) VALUES (2, 'johndoe', 'b0db90d72e28', 2, 2, 'johndoe@bugtrckr', 0, 0);
+INSERT INTO User (id, name, hash, password, salt, email, admin, lastProject) VALUES (2, 'guest', '', 1, 1, 'guest', 1, 0);
+INSERT INTO User (id, name, hash, password, salt, email, admin, lastProject) VALUES (10, 'johndoe', 'b0db90d72e28', 2, 2, 'johndoe@bugtrckr', 0, 0);
 --
 -- Project
 --
