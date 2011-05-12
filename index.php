@@ -21,7 +21,7 @@ require 'inc/config.inc.php';
 require 'inc/main.php';
 
 $app->set('CACHE', true);
-$app->set('DEBUG', 2);
+$app->set('DEBUG', 3);
 $app->set('EXTEND', true);
 $app->set('GUI','gui/');
 $app->set('AUTOLOAD', 'inc/');
