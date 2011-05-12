@@ -13,6 +13,8 @@
  *   
 **/
 
+require_once F3::get('BASE').'inc/models.php';
+
 class main extends F3instance
 {
     function  __construct() {
@@ -45,6 +47,13 @@ class main extends F3instance
     {
         $hash = F3::get('PARAMS.hash');
 
+		$milestone = new Milestone();
+		$milestone->load('hash = "' . $hash .'"');
+
+		$ticket = new Ticket();
+		$tickets = $ticket->find('milestone = ' . $milestone->getId());
+
+/*
         try {
 	 	    $ms = new Milestone();
 	        $ms->load('hash = "' .$hash.'"');
@@ -58,8 +67,8 @@ class main extends F3instance
             $tickets[$i] = $ticket->toArray();
 
         $stats['ticketCount'] = Dao::getTicketCount($ms->getId());
-
-        $fullCount = 0;
+*/
+/*        $fullCount = 0;
         foreach($stats['ticketCount'] as $cnt)
             $fullCount += $cnt['count'];
 
@@ -75,9 +84,9 @@ class main extends F3instance
         }
 
         $stats['openTickets'] = ($fullCount) ? $stats['openTickets'] : 0 ;
-
+*/
         F3::set('tickets', $tickets);
-        F3::set('stats', $stats);
+//        F3::set('stats', $stats);
         F3::set('milestone', $ms->toArray());
         F3::set('pageTitle', '{{@lng.milestone}} › '. $ms->getName());
         F3::set('template', 'milestone.tpl.php');
@@ -703,14 +712,14 @@ class main extends F3instance
      */
     private function tpserve()
     {
-		try {
+/*		try {
         	$projects = Dao::getProjects('1 = 1');
      		foreach($projects as $i=>$project)
         	    $projects[$i] = $project->toArray();
 		} catch (Exception $e) {
             $this->tpfail("Failure while loading Projects", $e);
             return ;
-        }
+        }*/
 
         F3::set('projects', $projects);
         echo Template::serve('main.tpl.php');

@@ -1,15 +1,60 @@
 <?php
 
-	class Activity extends Axon {}
+	require_once F3::get('BASE').'lib/db.php';
 
-	class Milestone extends Axon {}
+	class Activity extends Axon
+	{
+		public function __construct()
+		{
+			$this->sync('Activity');
+		}
 
-	class Project extends Axon {}
+	}
 
-	class ProjectPermissions extends Axon {}
+	class Milestone extends Axon 
+	{
+		public function __construct()
+		{
+			$this->sync('Milestone');		
+		}
+	}
 
-	class Role extends Axon {}
+	class Project extends Axon 
+	{
+		public function __construct()
+		{
+			$this->sync('Project');			
+		}
+	}
 
-	class Ticket extends Axon {}
+	class ProjectPermissions extends Axon
+	{
+		public function __construct()
+		{
+			$this->sync('ProjectPermissions');
+		}
+	}
 
-	class User extends Axon {}
+	class Role extends Axon 
+	{
+		public function __construct()
+		{
+			$this->sync('Role');
+		}
+	}
+
+	class Ticket extends Axon 
+	{
+		public function __construct()
+		{
+			$this->sync('Ticket');
+		}
+	}
+
+	class User extends Axon 
+	{
+		public function __construct()
+		{
+			$this->sync('User');
+		}
+	}

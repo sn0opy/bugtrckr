@@ -1,13 +1,15 @@
-<h2>{{@lng.milestone}} › {{@milestone.name}} <span class="hash">#{{@milestone.hash}}</span></h2>
+<h2>{{@lng.milestone}} › {{@milestone->name}} <span class="hash">#{{@milestone->hash}}</span></h2>
 
 <F3:check if="{{@stats.fullTicketCount}}">
     <F3:true>
         <table class="percentBar">
             <tr>
+<!--
             <F3:repeat group="{{@stats.ticketCount}}" value="{{@tickCnt}}">
                 <td width="{{@tickCnt.percent}}%" title="{{@tickCnt.title}}"
                     class="color{{@tickCnt.state}}">{{@tickCnt.count}}</td>
             </F3:repeat>
+-->
             </tr>
         </table>
     </F3:true>
@@ -19,9 +21,10 @@
         </table>
     </F3:false>
 </F3:check>
+<!--
 <p class="info">{{@stats.openTickets}} {{@lng.ticketsleft}}</p>
 <p>{{nl2br(@milestone.description)}}</p>
-
+-->
 <div class="milestoneTickets">
     <h3>{{@lng.tickets}}:</h3>
     <table class="overview">
@@ -41,12 +44,12 @@
             <tr class="tr{{@i%2}}">
                 <td class="id">{{@i+1}}</td>
                 <td class="title">
-                    <a href="/{{@BASE}}ticket/{{@ticket.hash}}">{{@ticket.title}}</a>
+                    <a href="/{{@BASE}}ticket/{{@ticket->hash}}">{{@ticket->title}}</a>
                 </td>
-                <td class="state">{{@ticket.state}}</td>
-                <td class="priority">{{@ticket.priority}}</td>
-                <td class="created">{{@ticket.created}}</td>
-                <td class="owner"><a href="/{{@BASE}}user/{{@ticket.owner}}">{{@ticket.owner}}</a></td>
+                <td class="state">{{@ticket->state}}</td>
+                <td class="priority">{{@ticket->priority}}</td>
+                <td class="created">{{@ticket->created}}</td>
+                <td class="owner"><a href="/{{@BASE}}user/{{@ticket->owner}}">{{@ticket->owner}}</a></td>
             </tr>
             </F3:repeat>
         </tbody>
