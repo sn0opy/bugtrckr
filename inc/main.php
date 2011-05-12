@@ -649,14 +649,14 @@ class main extends F3instance
     private function tpserve()
     {
 		$project = new Project();
-        $projects = $project->find('1 = 1');
+        $projects = $project->find();
 		
 		if (!$projects)
 		{
         	$this->tpfail("Failure while loading Projects");
         	return ;
         }
-
+        
         F3::set('projects', $projects);
         echo Template::serve('main.tpl.php');
     }

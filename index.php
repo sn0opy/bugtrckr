@@ -35,12 +35,6 @@ $app->set('getPermission', function($permission) {
     return true;
 });
 
-F3::set('getUserName', function($id) {
-    $user = new user();
-    $user->load('id = '.$id);
-    return $user->name;
-});
-
 $app->route('GET /', 'main->start');
 $app->route('GET /roadmap', 'main->showRoadmap');
 $app->route('GET /timeline', 'main->showTimeline');

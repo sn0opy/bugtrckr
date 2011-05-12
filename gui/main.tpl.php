@@ -39,31 +39,19 @@
                     <F3:false>
                         <li><a href="/{{@BASE}}user/new">{{@lng.registration}}</a></li>
                     </F3:false>
-                </F3:check>
-                
+                </F3:check>                
 				<li>
-					<form method="POST" action="/{{@BASE}}project/select">
+					<form method="post" action="/{{@BASE}}project/select">
 						<select name="project" size="1" onclick="submit()">
 							<F3:repeat group="{{@projects}}" value="{{@project}}">
-								<F3:check if="{{@project.id == @SESSION.project}}">
-									<F3:true>
-										<option value="{{@projec.hash}}" selected="selected">
-											{{@project.name}}
-										</option>
-									</F3:true>
-									<F3:false>
-										<option value="{{@project.hash}}">
-											{{@project.name}}
-										</option>
-									</F3:false>
-								</F3:check>
+                                <option value="{{@project->hash}}" {{(@project->id == @SESSION.project)?'selected="selected"':''}}>{{@project->name}}</option>
 							</F3:repeat>
 						</select>
 					</form>
 				</li>
                 <F3:check if="{{@SESSION.user}}">
                     <F3:true>
-                        <li class="alignright">Eingeloggt als <a href="/{{@BASE}}user/{{@SESSION.user.name}}" class="normLink"><strong class="normalText">{{@SESSION.user.name}}</strong></a> [<a href="/{{@BASE}}user/logout" class="normalText normLink">{{@lng.logout}}</a>]</li>
+                        <li class="alignright">Eingeloggt als <a href="/{{@BASE}}user/{{@SESSION.user->name}}" class="normLink"><strong class="normalText">{{@SESSION.user->name}}</strong></a> [<a href="/{{@BASE}}user/logout" class="normalText normLink">{{@lng.logout}}</a>]</li>
                     </F3:true>
                     <F3:false>
                         <li class="alignright"><a href="/{{@BASE}}user/login" onclick="document.getElementById('login').style.display = 'block'; return false" class="normLink">{{@lng.login}}</a></li>
