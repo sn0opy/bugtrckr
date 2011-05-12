@@ -127,6 +127,19 @@ h3 a:hover
     width: 500px;
 }
 
+#success
+{
+	background: #AFA;
+	border:	solid 1px #5F4;
+	color:	#0F0;
+    margin: 0 auto;
+    padding: 5px;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    width: 500px;
+}
+
 .error 
 {
     padding: 5px;
