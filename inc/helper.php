@@ -8,7 +8,7 @@
         }
         
 
-        public function salting($salt, $pass)
+        public static function salting($salt, $pass)
         {
             $salt = md5($salt);
             $pw = md5($pass);
