@@ -1543,7 +1543,7 @@ class F3 extends Base {
 				'TIME'=>array('start'=>microtime(TRUE))
 			),
 			// Temporary folder
-			'TEMP'=>sys_get_temp_dir(),
+			'TEMP'=>self::fixslashes(realpath(sys_get_temp_dir())).'/',
 			// Minimum script execution time
 			'THROTTLE'=>0,
 			// Tidy options

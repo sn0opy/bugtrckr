@@ -110,6 +110,14 @@
                         </div>
                     </F3:true>
                     <F3:false>
+						<F3:check if="{{@SESSION.SUCCESS}}">
+							<F3:true>
+							<div id="success">
+								<p>{{@SESSION.SUCCESS}}</p>
+							</div>
+							</F3:true>
+						</F3:check>
+
                         <F3:include href="{{@template}}" />
                     </F3:false>
                 </F3:check>

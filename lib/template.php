@@ -78,6 +78,7 @@ class Template extends Base {
 		else {
 			// Save PHP-equivalent file in temporary folder
 			self::folder(self::$vars['TEMP']);
+
 			$temp=self::$vars['TEMP'].$_SERVER['SERVER_NAME'].'.'.$hash;
 			if (!$cached || !is_file($temp)) {
 				// Create semaphore
@@ -91,6 +92,7 @@ class Template extends Base {
 				// Remove semaphore
 				Cache::clear($hash);
 			}
+
 			// Render
 			require $temp;
 		}

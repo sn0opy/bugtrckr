@@ -20,7 +20,7 @@ $app = require(__DIR__.'/lib/base.php');
 require 'inc/config.inc.php';
 require 'inc/main.php';
 
-$app->set('CACHE', true);
+$app->set('CACHE', false);
 $app->set('DEBUG', 3);
 $app->set('EXTEND', true);
 $app->set('GUI','gui/');
@@ -65,3 +65,5 @@ $app->route('POST /project/settings/main/edit', 'main->projectEditMain');
 $app->route('POST /project/settings/milestone/edit', 'main->addEditMilestone');
 
 $app->run();
+
+F3::clear('SESSION.SUCCESS');

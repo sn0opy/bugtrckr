@@ -74,7 +74,7 @@ class Project extends F3instance
      *
      */
     public function save()
-    {        
+    {
         $this->ax->id = $this->id;
         $this->ax->name = $this->name;
         $this->ax->hash = $this->hash;
@@ -88,7 +88,8 @@ class Project extends F3instance
      */
     public function load($stmt)
     {
-        $this->ax->load($stmt);
+	    if (!$this->ax->load($stmt))
+			throw new Exception();
 
         if (!$this->ax->dry())
         {
