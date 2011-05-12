@@ -1,6 +1,6 @@
 <h2>{{@lng.role}} › {{@lng.addrole}}</h2>
 
-<div class="rolSettings">
+<div class="roleSettings">
 <form action="/{{@BASE}}project/settings/role/edit" method="post">
     <div class="formRow">
         <div class="formLabel">
@@ -8,6 +8,15 @@
         </div>
         <div class="formValue">
             <input type="text" name="name" />
+        </div>
+    </div>
+
+    <div class="formRow">
+        <div class="formLabel">
+            {{@lng.issuesAssigneable}}
+        </div>
+        <div class="formValue">
+            <input type="checkbox" name="issuesAssigneable" />
         </div>
     </div>
     

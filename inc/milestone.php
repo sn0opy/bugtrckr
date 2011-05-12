@@ -41,6 +41,11 @@ class Milestone extends F3instance
     {
         return $this->hash;
     }
+    
+    public function setHash($hash)
+    {
+        $this->hash = $hash;
+    }
 
     public function setName($name)
     {
@@ -87,7 +92,6 @@ class Milestone extends F3instance
      */
     public function save()
     {
-        $this->ax->load('Hash = "' . $this->hash .'"');
         $this->ax->hash = $this->hash;
         $this->ax->name = $this->name;
         $this->ax->description = $this->description;
@@ -106,17 +110,16 @@ class Milestone extends F3instance
     {
         $this->ax->load($stmt);
 
-        if (!$this->ax->dry())
+        if(!$this->ax->dry())
         {
             $this->id = $this->ax->id;
             $this->hash = $this->ax->hash;
             $this->name = $this->ax->name;
             $this->description = $this->ax->description;
-            $this->finished = $this->finished;
-            $this->project = $this->project;
+            $this->finished = $this->ax->finished;
+            $this->project = $this->ax->project;
         }
-        else
-            throw new Exception();
+        // TODO: exception removed which causes some weird errors while adding milestones
     }
 
     /**

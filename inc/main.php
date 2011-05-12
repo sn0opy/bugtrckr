@@ -392,11 +392,15 @@ class main extends F3instance
         $proj = new Project;
         $proj->load('id = ' .$project);
         
-        $roles = Dao::getRoles('projectId = ' .$project);
-        
+        $roles = Dao::getRoles('projectId = ' .$project);        
         foreach($roles as $i => $role)
             $roles[$i] = $role->toArray();
 
+        $milestones = Dao::getMilestones('project = '.F3::get('SESSION.project'));        
+        foreach($milestones as $i => $milestone)
+            $milestones[$i] = $milestone->toArray();
+        
+        F3::set('projMilestones', $milestones);
         F3::set('projRoles', $roles);
         F3::set('projMembers', Dao::getProjectMembers($project));
         F3::set('projDetails', $proj->toArray());        
@@ -446,6 +450,21 @@ class main extends F3instance
     /**
      * 
      */
+    function showProjectSettingsMilestone()
+    {
+        $msHash = F3::get('PARAMS.hash');
+        $milestone = new Milestone();
+        $milestone->load('hash = "' .$msHash. '"');
+        F3::set('msData', $milestone->toArray());        
+        
+        F3::set('template', 'projectSettingsMilestone.tpl.php');
+        F3::set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.milestone}} › {{@msData.name}}');
+        $this->tpserve();        
+    }
+    
+    /**
+     * 
+     */
     function addEditRole()
     {
         $roleHash = F3::get('POST.hash') ? F3::get('POST.hash') : helper::getFreeHash('Role');
@@ -454,6 +473,7 @@ class main extends F3instance
         $role->load('hash = "' .$roleHash. '"');
         $role->setName(F3::get('POST.name'));
         $role->setHash($roleHash);
+        $role->setIssuesAssigneable(F3::get('POST.issuesAssigneable'));
         $role->setProjectId(F3::get('SESSION.project'));
         $role->setIss_addIssues(F3::get('POST.iss_addIssues'));
         $role->setProj_editProject(F3::get('POST.proj_editProject'));
@@ -473,11 +493,53 @@ class main extends F3instance
     /**
      * 
      */
+    function addEditMilestone()
+    {
+        $msHash = F3::get('POST.hash') ? F3::get('POST.hash') : helper::getFreeHash('Milestone');
+        
+        $milestone = new Milestone();        
+        $milestone->load('hash = "' .$msHash. '"');
+        $milestone->setName(F3::get('POST.name'));
+        $milestone->setHash($msHash);
+        $milestone->setDescription(F3::get('POST.description'));
+        $milestone->setProject(F3::get('SESSION.project'));
+        $milestone->save();
+                
+        F3::reroute('/'.F3::get('BASE').'project/settings/milestone/'. $msHash);
+    }
+    
+    /**
+     * 
+     */
     function showAddRole()
     {
         F3::set('template', 'projectSettingsRoleAdd.tpl.php');
         F3::set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.addrole}}');
         $this->tpserve();
+    }
+    
+    /**
+     * 
+     */
+    function showAddMilestone()
+    {
+        F3::set('template', 'projectSettingsMilestoneAdd.tpl.php');
+        F3::set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.addmilestone}}');
+        $this->tpserve();
+    }
+    
+    /**
+     * 
+     */
+    function projectEditMain()
+    {
+        $project = new Project();
+        $project->load('id = ' .F3::get('SESSION.project'));
+        $project->setName('"'.F3::get('POST.name').'"');
+        $project->setPublic(F3::get('POST.public'));
+        $project->setDescription(F3::get('POST.description'));
+        $project->save();
+        F3::reroute('/'.F3::get('BASE').'project/settings');
     }
 
     /**

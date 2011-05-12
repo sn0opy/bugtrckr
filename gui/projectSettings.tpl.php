@@ -11,42 +11,45 @@
             </div>
             
             <br class="clearfix" />
-            
+
             <div class="tabContent" id="tabContent_1">
                 {{* Settings *}}
-                <div class="formRow">
-                    <div class="formLabel">
-                        {{@lng.projectname}}
+                <form action="/{{@BASE}}project/settings/main/edit" method="post">
+                    <div class="formRow">
+                        <div class="formLabel">
+                            {{@lng.projectname}}
+                        </div>
+                        <div class="formValue">
+                           <input type="text" name="name" value="{{@projDetails.name}}" />
+                        </div>
                     </div>
-                    <div class="formValue">
-                       <input type="text" name="projectname" value="{{@projDetails.name}}" />
-                    </div>
-                </div>
 
-                <div class="formRow">
-                    <div class="formLabel">
-                        {{@lng.projectdescription}}
+                    <div class="formRow">
+                        <div class="formLabel">
+                            {{@lng.projectdescription}}
+                        </div>
+                        <div class="formValue">
+                           <textarea name="description" class="projectText">{{@projDetails.description}}</textarea>
+                        </div>
                     </div>
-                    <div class="formValue">
-                       <textarea name="projectdescription" class="projectText">{{@projDetails.description}}</textarea>
-                    </div>
-                </div>
 
-                <div class="formRow">
-                    <div class="formLabel">
-                        {{@lng.publicproject}}
+                    <div class="formRow">
+                        <div class="formLabel">
+                            {{@lng.publicproject}}
+                        </div>
+                        <div class="formValue">
+                            <F3:check if="{{@projDetails.public}}">
+                                <F3:true>
+                                    <input type="checkbox" name="public" checked="checked" />
+                                </F3:true>                                
+                                <F3:false>
+                                    <input type="checkbox" name="public" />
+                                </F3:false>
+                            </F3:check>                           
+                        </div>
                     </div>
-                    <div class="formValue">
-                        <F3:check if="{{@projDetails.public}}">
-                            <F3:true>
-                                <input type="checkbox" name="publicproject" checked="checked" />
-                            </F3:true>                                
-                            <F3:false>
-                                <input type="checkbox" name="publicproject" />
-                            </F3:false>
-                        </F3:check>                           
-                    </div>
-                </div>
+                    <input type="submit" value="{{@lng.save}}" />
+                </form>
             </div>
             <div class="tabContent" id="tabContent_2">
                 {{* members *}}
@@ -88,6 +91,23 @@
             </div>
             <div class="tabContent" id="tabContent_3">
                 {{* milestones *}}
+                <table class="overview">
+                    <thead>
+                        <tr>
+                            <th><a href="#">{{@lng.milestone}}</a></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <F3:repeat group="{{@projMilestones}}" key="{{@i}}" value="{{@milestone}}">
+                        <tr class="tr{{@i%2}}">
+                            <td class="title">
+                                <a href="/{{@BASE}}project/settings/milestone/{{@milestone.hash}}">{{@milestone.name}}</a>
+                            </td>
+                        </tr>
+                        </F3:repeat>
+                    </tbody>
+                </table>
+                <a href="/{{@BASE}}project/settings/milestone/add">{{@lng.addmilestone}}</a>
             </div>
 
             <div class="tabContent" id="tabContent_4">

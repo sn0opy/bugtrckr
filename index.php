@@ -50,6 +50,8 @@ $app->route('GET /milestone/@hash', 'main->showMilestone');
 $app->route('GET /project/settings', 'main->showProjectSettings');
 $app->route('GET /project/settings/role/@hash', 'main->showProjectSettingsRole');
 $app->route('GET /project/settings/role/add', 'main->showAddRole');
+$app->route('GET /project/settings/milestone/@hash', 'main->showProjectSettingsMilestone');
+$app->route('GET /project/settings/milestone/add', 'main->showAddMilestone');
 
 $app->route('POST /user/login', 'main->loginUser');
 $app->route('POST /user/new', 'main->registerUser');
@@ -59,5 +61,7 @@ $app->route('POST /milestone', 'main->addMilestone');
 $app->route('POST /project/select', 'main->selectProject');
 $app->route('POST /project/settings/member/setrole', 'main->projectSetRole');
 $app->route('POST /project/settings/role/edit', 'main->addEditRole');
+$app->route('POST /project/settings/main/edit', 'main->projectEditMain');
+$app->route('POST /project/settings/milestone/edit', 'main->addEditMilestone');
 
 $app->run();

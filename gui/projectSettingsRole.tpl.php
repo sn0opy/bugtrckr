@@ -1,15 +1,31 @@
 <h2>{{@lng.role}} › {{@roleData.name}} <span class="hash">#{{@roleData.hash}}</span></h2>
 
-<div class="rolSettings">
+<div class="roleSettings">
 <form action="/{{@BASE}}project/settings/role/edit" method="post">
     <input type="hidden" name="hash" value="{{@roleData.hash}}" />
-
+    
     <div class="formRow">
         <div class="formLabel">
             {{@lng.name}}
         </div>
         <div class="formValue">
             <input type="text" name="name" value="{{@roleData.name}}" />
+        </div>
+    </div>
+    
+    <div class="formRow">
+        <div class="formLabel">
+            {{@lng.issuesAssigneable}}
+        </div>
+        <div class="formValue">
+            <check if="{{@roleData.issuesAssigneable}}">
+                <true>
+                    <input type="checkbox" name="issuesAssigneable" checked="checked" />
+                </true>
+                <false>
+                    <input type="checkbox" name="issuesAssigneable" />
+                </false>
+            </check>
         </div>
     </div>
     
