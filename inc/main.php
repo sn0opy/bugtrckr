@@ -287,7 +287,7 @@ class main extends F3instance
         $url = F3::get('SERVER.HTTP_REFERER');
 
         $project = new Project();
-        $project->load('hash = :hash', array(':hash' => F3::get('POST.project')));
+        $project->load(array('hash = :hash', array(':hash' => F3::get('POST.project'))));
 
 		if (!$project->id)
 		{
@@ -297,9 +297,9 @@ class main extends F3instance
 
         if(F3::get('SESSION.user'))
         {
-                $user = F3::get('SESSION.user');
-                $user->lastProject = $project->id;
-                $user->save();
+            $user = F3::get('SESSION.user');
+            $user->lastProject = $project->id;
+            $user->save();
         }
 		
         F3::set('SESSION.project', $project->getId());
@@ -626,8 +626,9 @@ class main extends F3instance
 		}
 
 		$this->set('SESSION.user', $user);
+        $this->get('SESSION.user')->hash;
 		F3::set('SESSION.SUCCESS', 'Login successful');
-        $this->reroute('/'. F3::get('BASE'));
+        #$this->reroute('/'. F3::get('BASE'));
 
     }
 

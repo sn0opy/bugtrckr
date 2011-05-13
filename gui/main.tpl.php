@@ -49,7 +49,7 @@
 						</select>
 					</form>
 				</li>
-                <F3:check if="{{@SESSION.user}}">
+                <F3:check if="{{1==1}}">
                     <F3:true>
                         <li class="alignright">Eingeloggt als <a href="/{{@BASE}}user/{{@SESSION.user->name}}" class="normLink"><strong class="normalText">{{@SESSION.user->name}}</strong></a> [<a href="/{{@BASE}}user/logout" class="normalText normLink">{{@lng.logout}}</a>]</li>
                     </F3:true>

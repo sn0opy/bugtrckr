@@ -16,7 +16,6 @@
 session_start();
 
 $app = require(__DIR__.'/lib/base.php');
-
 require 'inc/config.inc.php';
 
 $app->set('CACHE', false);
@@ -34,7 +33,7 @@ F3::set('DB', new DB('sqlite:' .$dbFile));
 $app->set('getPermission', function($permission) {
     return true; // TODO
 });
-
+        
 $app->route('GET /', 'main->start');
 $app->route('GET /roadmap', 'main->showRoadmap');
 $app->route('GET /timeline', 'main->showTimeline');
