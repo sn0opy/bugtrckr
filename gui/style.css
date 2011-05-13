@@ -187,6 +187,11 @@ h3 a:hover
     padding-right: 10px;
 }
 
+td.manageMember input, td.manageMember select
+{
+    margin-right: 10px;
+}
+
 .addUser
 {
     margin-top: 20px;

@@ -15,6 +15,13 @@
 
 class main extends F3instance
 {
+    private $helper;
+    
+    function __construct()
+    {
+        $this->helper = new helper();
+    }
+    
     function start()
     {
         $this->set('pageTitle', '{{@lng.home}}');
@@ -320,15 +327,97 @@ class main extends F3instance
         $this->tpserve();
     }
     
+    function projectAddMember()
+    {
+        if(!$this->helper->getPermission('proj_manageMembers'))
+        {
+            $this->tpfail('You are not allowed to add new members.');
+            return;
+        }
+        
+        $projectId = $this->get('SESSION.project');
+        $userHash = $this->get('POST.member');
+        $roleHash = $this->get('POST.role');
+        
+		$role = new Role(); 
+      	$role->load(array('hash = :hash', array(':hash' => $roleHash)));
+        
+        if($role->dry())
+        {
+            $this->tpfail('Failure while getting role.');
+            return;
+        }
+        
+        $user = new User();
+        $user->load(array('hash = :hash', array(':hash' => $userHash)));
+        
+        if($user->dry())
+        {
+            $this->tpfail('Failure while getting user.');
+            return;
+        }
+        
+        $projPerms = new ProjectPermission();
+        $projPerms->load(array('userId = :userId AND projectId = :projectId',  
+                            array(':userId' => $user->id, ':projectId' => $projectId)));
+        
+        if(!$projPerms->dry())
+        {
+            $this->tpfail('User already exists in this project.');
+            return;
+        }
+        
+        $projPerms->userId = $user->id;
+        $projPerms->roleId = $role->id;
+        $projPerms->projectId = $projectId;
+        $projPerms->save();
+        
+        $this->reroute('/'.$this->get('BASE').'project/settings');
+    }
+    
+    function projectDelMember()
+    {
+        if(!$this->helper->getPermission('proj_manageMembers'))
+        {
+            $this->tpfail('You are not allowed to add new members.');
+            return;
+        }
+        
+        $userHash = $this->get('POST.user');
+        $projectId = $this->get('SESSION.project');
+        
+        $user = new User();
+        $user->load(array('hash = :hash', array(':hash' => $userHash)));
+                
+        if($user->dry())
+        {
+            $this->tpfail('Failure while getting user.');
+            return;
+        }        
+        
+        $projPerms = new ProjectPermission();
+        $projPerms->load('userId = '.$user->id.' AND projectId = '.$projectId);
+        $projPerms->erase();
+        
+        $this->set('SESSION.SUCCESS', 'Member has been removed from the project.');
+        $this->reroute('/'.$this->get('BASE').'project/settings');        
+    }
+    
     /**
      * 
      */
     function projectSetRole()
     {
+        if(!$this->helper->getPermission('proj_manageMembers'))
+        {
+            $this->tpfail('You are not allowed to edit members.');
+            return;
+        }
+        
         $projectId = $this->get('SESSION.project');
         
        	$user = new user();
-       	$user->load(array('hash = :hash', array(':hash', $this->get('POST.user'))));
+       	$user->load(array('hash = :hash', array(':hash' => $this->get('POST.user'))));
 
 		if (!$user->id)
 		{
@@ -337,18 +426,24 @@ class main extends F3instance
         }
 
   		$role = new Role();
-       	$role->load('hash = :hash', array(':hash', $this->get('POST.role')));
+       	$role->load(array('hash = :hash', array(':hash' => $this->get('POST.role'))));
 		
 		if (!$role->id)
 		{
             $this->tpfail("Failure while getting Role");
             return ;
         }
+        
+        if($role->projectId != $projectId)
+        {
+            $this->tpfail("Role does not belong to this project.");
+            return;
+        }
 
   	    $perms = new ProjectPermission();
-        $perms->load('projectId = :proj AND userId = :user',
+        $perms->load(array('projectId = :proj AND userId = :user',
 						array(	':proj' => $projectId,
-								':user' => $user->id));
+								':user' => $user->id)));
         $perms->roleId = $role->id;
 	    $perms->save();
         
@@ -656,6 +751,6 @@ class main extends F3instance
     {
         $this->set('FAILURE', $msg);
         $this->set('template', 'error404.tpl.php');
-        echo Template::serve('main.tpl.php');
+        $this->tpserve();
     }
 }

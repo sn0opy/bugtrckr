@@ -62,27 +62,33 @@
                         <F3:repeat group="{{@projMembers}}" key="{{@i}}" value="{{@member}}">
                         <tr class="tr{{@i%2}}">
                             <td class="title">
-                                <a href="/{{@BASE}}user/{{@member->name}}">{{@member->name}}</a>
+                                <a href="/{{@BASE}}user/{{@member->name}}">{{@member->name}} {{@member->role}}</a>
                             </td>
-                            <td class="type">
-                                <form action="/{{@BASE}}project/settings/member/setrole" method="post">
-                                    <input type="hidden" name="user" value="{{@member->hash}}" />
-                                    <select name="role">
-                                    <F3:repeat group="{{@projRoles}}" value="{{@role}}">
-                                        <option value="{{@role->hash}}" {{@member->role == @role->id}}>{{@role->name}}</option>
-                                    </F3:repeat>
-                                    </select>
-                                    <input type="submit" value="Ändern" />
-                                </form>
+                            <td class="type manageMember">
+                                <p>
+                                    <form action="/{{@BASE}}project/settings/member/setrole" method="post" class="floatleft">
+                                        <input type="hidden" name="user" value="{{@member->hash}}" />
+                                        <select name="role" class="floatleft">
+                                        <F3:repeat group="{{@projRoles}}" value="{{@role}}">
+                                            <option value="{{@role->hash}}" {{(@member->roleId == @role->id)?'selected="selected"':''}}>{{@role->name}}</option>
+                                        </F3:repeat>
+                                        </select>
+                                        <input type="submit" value="Ändern" />
+                                    </form>
+                                    <form action="/{{@BASE}}project/setttings/member/delete" method="post" class="floatleft">
+                                        <input type="hidden" name="user" value="{{@member->hash}}" />
+                                        <input type="submit" value="{{@lng.delete}}" />
+                                    </form>
+                                </p>
                             </td>
                         </tr>
                         </F3:repeat>
                     </tbody>
                 </table>
 
-                <form action="#" method="post">
+                <form action="/{{@BASE}}project/settings/member/add" method="post">
                     <p class="addUser">
-                        <select name="name">
+                        <select name="member">
                             <F3:repeat group="{{@users}}" value="{{@user}}">
                                 <option value="{{@user->hash}}">{{@user->name}}</option>
                             </F3:repeat>

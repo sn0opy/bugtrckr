@@ -87,6 +87,7 @@ return array('lng' => array(
     'save' => 'Speichern',
     'addmilestone' => 'Meilenstein hinzufügen',
     'add' => 'Hinzufügen',
-    'asRole' => 'als'
+    'asRole' => 'als',
+    'delete' => 'Entfernen'
 ));
 

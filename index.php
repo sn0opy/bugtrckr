@@ -62,6 +62,8 @@ $app->route('POST /project/settings/member/setrole', 'main->projectSetRole');
 $app->route('POST /project/settings/role/edit', 'main->addEditRole');
 $app->route('POST /project/settings/main/edit', 'main->projectEditMain');
 $app->route('POST /project/settings/milestone/edit', 'main->addEditMilestone');
+$app->route('POST /project/settings/member/add', 'main->projectAddMember');
+$app->route('POST /project/setttings/member/delete', 'main->projectDelMember');
 
 require 'inc/mapping.inc.php';
 
