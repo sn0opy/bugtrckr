@@ -314,16 +314,19 @@ class main extends F3instance
         $projectId = F3::get('SESSION.project');
 
     	$project = new Project;
-       	$project->load('id = :id', array(':id' => $projectId));
+       	$project->load(array('id = :id', array(':id' => $projectId)));
        
 		$role = new Role(); 
-      	$roles = $role->find('projectId = :id', array(':id', $projectId));
+      	$roles = $role->find('projectId = '.$projectId);
 
+        $projPerms = new user_perms();
+        $projPerms = $projPerms->find('projectId = '.$projectId);
+        
 		$milestone = new Milestone();
-		$milestones = $milestone->find('project = :id', array(':id', $projectId));
+		$milestones = $milestone->find('project = '.$projectId);
 
 		$user = new User();
-		$users = $user->find('');
+		$users = $user->find();
 
 		if (!$project->id || !$roles || !$milestones || !$users)
         {
@@ -334,7 +337,7 @@ class main extends F3instance
         F3::set('users', $users);
         F3::set('projMilestones', $milestones);
         F3::set('projRoles', $roles);
-        F3::set('projMembers', Dao::getProjectMembers($projectId));
+        F3::set('projMembers', $projPerms);
         F3::set('projDetails', $project);        
         F3::set('template', 'projectSettings.tpl.php');
         F3::set('pageTitle', '{{@lng.project}} › {{@lng.settings}}');
@@ -513,7 +516,7 @@ class main extends F3instance
     function projectEditMain()
     {
         $project = new Project();
-        $project->load('id = :id', array(':id' => $this->get('SESSION.project')));
+        $project->load(array('id = :id', array(':id' => $this->get('SESSION.project'))));
         $project->name = $this->get('POST.name');
         $project->public = $this->get('POST.public');
         $project->description = $this->get('POST.description');
