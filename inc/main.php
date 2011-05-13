@@ -481,7 +481,7 @@ class main extends F3instance
         $msHash = $this->get('PARAMS.hash');
 
        	$milestone = new Milestone();
-        $milestone->load('hash = :hash', array(':hash' => $msHash));
+        $milestone->load(array('hash = :hash', array(':hash' => $msHash)));
 
 		if (!$milestone->id)
 		{
@@ -489,7 +489,7 @@ class main extends F3instance
             return ;
         }
 
-        $this->set('msData', $milestone->toArray());        
+        $this->set('msData', $milestone);        
         $this->set('template', 'projectSettingsMilestone.tpl.php');
         $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.milestone}} › {{@msData.name}}');
         $this->tpserve();        
@@ -542,20 +542,22 @@ class main extends F3instance
         
         $milestone = new Milestone();
 		    
-		if (F3::exists('POST.hash'))
-    	   	$milestone->load('hash = "' .$msHash. '"');
+		if (F3::exists('POST.hash')) 
+        {
+            $milestone->load('hash = "' .$msHash. '"');
+            if($milestone->dry())
+            {
+                $this->tpfail('Failure while editing milestone.');
+                return;
+            }
+        }
 
 	    $milestone->name = $this->get('POST.name');
         $milestone->hash = $msHash;
         $milestone->description = $this->get('POST.description');
         $milestone->project = $this->get('SESSION.project');
+        $milestone->finished = $this->get('POST.finished');
         $milestone->save();
-
-		if (!$milestone->id)
-		{
-            $this->tpfail("Failure while saving Milestone");
-            return ;
-        }
 
         $this->reroute('/'.$this->get('BASE').'project/settings/milestone/'. $msHash);
     }
