@@ -7,7 +7,7 @@
  * 
  * @package Index
  * @author Sascha Ohms
- * @author Phillipp Hirsch
+ * @author Philipp Hirsch
  * @copyright Copyright 2011, Bugtrckr-Team
  * @license http://www.gnu.org/licenses/lgpl.txt
  *   
@@ -31,7 +31,8 @@ F3::set('DB', new DB('sqlite:' .$dbFile));
 
 // Template functions
 $app->set('getPermission', function($permission) {
-    return true; // TODO
+    $helper = new helper();
+    return $helper->getPermission($permission);
 });
         
 $app->route('GET /', 'main->start');
@@ -66,4 +67,4 @@ require 'inc/mapping.inc.php';
 
 $app->run();
 
-F3::clear('SESSION.SUCCESS');
+$app->clear('SESSION.SUCCESS');

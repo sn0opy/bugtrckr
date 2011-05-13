@@ -3,7 +3,7 @@
 <h3>{{@lng.informations}}</h3>
 <div class="formRow">
     <div class="formLabel">{{@lng.name}}: </div>
-    <div class="formValue">{{@user.name}}</div>
+    <div class="formValue">{{@user->name}}</div>
 </div>
 
 <h3>{{@lng.tickets}}:</h3>
@@ -28,8 +28,8 @@
             </td>
             <td class="state">{{@ticket->state}}</td>
             <td class="priority">{{@ticket->priority}}</td>
-            <td class="created">{{@ticket->created}}</td>
-            <td class="owner"><a href="/{{@BASE}}user/{{@ticket->owner}}">{{@ticket->owner}}</a></td>
+            <td class="created">{{date('d.m.Y H:i', @ticket->created)}}</td>
+            <td class="owner"><a href="/{{@BASE}}user/{{@ticket->name}}">{{@ticket->name}}</a></td>
         </tr>
         </F3:repeat>
     </tbody>

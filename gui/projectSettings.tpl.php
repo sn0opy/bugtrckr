@@ -7,7 +7,7 @@
             <li><a href="#" title="tabContent_4" class="tab">{{@lng.roles}}</a></li>
         </ul>
     </div>
-
+    
     <div class="tabContent" id="tabContent_1">
         {{* Settings *}}
         <F3:check if="{{@getPermission('proj_editProject')}}">

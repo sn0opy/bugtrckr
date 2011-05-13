@@ -17,15 +17,15 @@ class main extends F3instance
 {
     function start()
     {
-        F3::set('pageTitle', '{{@lng.home}}');
-        F3::set('template', 'home.tpl.php');
+        $this->set('pageTitle', '{{@lng.home}}');
+        $this->set('template', 'home.tpl.php');
         $this->tpserve();
     }
     
     function showTickets()
     {
-        $order = F3::get('PARAMS.order') ? F3::get('PARAMS.order') : "id";
-        $project = F3::get('SESSION.project');
+        $order = $this->get('PARAMS.order') ? $this->get('PARAMS.order') : "id";
+        $project = $this->get('SESSION.project');
         
         $milestones = new Milestone();
         $milestones = $milestones->find('project = ' .$project);
@@ -37,16 +37,16 @@ class main extends F3instance
         $tickets = new user_ticket();
         $tickets = $tickets->find('milestone IN (' .$string. '0)');
         
-        F3::set('milestones', $milestones);
-        F3::set('tickets', $tickets);
-        F3::set('pageTitle', '{{@lng.tickets}}');
-        F3::set('template', 'tickets.tpl.php');
+        $this->set('milestones', $milestones);
+        $this->set('tickets', $tickets);
+        $this->set('pageTitle', '{{@lng.tickets}}');
+        $this->set('template', 'tickets.tpl.php');
         $this->tpserve();
     }
     
     function showMilestone()
     {
-        $hash = F3::get('PARAMS.hash');
+        $hash = $this->get('PARAMS.hash');
 
 		$milestone = new Milestone();
 		$milestone->load('hash = "' . $hash .'"');
@@ -78,7 +78,7 @@ class main extends F3instance
         foreach($stats['ticketCount'] as $j=>$cnt)
         {
             $stats['ticketCount'][$j]['percent'] = round($cnt['count'] * 100 / $fullCount);
-            $stats['ticketCount'][$j]['title'] = F3::get("ticket_state.".$stats['ticketCount'][$j]['state']);
+            $stats['ticketCount'][$j]['title'] = $this->get("ticket_state.".$stats['ticketCount'][$j]['state']);
 
             if($stats['ticketCount'][$j]['state'] == 5)
                 $stats['openTickets'] = $fullCount - $stats['ticketCount'][$j]['count'];
@@ -86,59 +86,54 @@ class main extends F3instance
 
         $stats['openTickets'] = ($fullCount) ? $stats['openTickets'] : 0 ;
 */
-        F3::set('tickets', $tickets);
-//        F3::set('stats', $stats);
-        F3::set('milestone', $milestone);
-        F3::set('pageTitle', '{{@lng.milestone}} › '. $milestone->name);
-        F3::set('template', 'milestone.tpl.php');
+        $this->set('tickets', $tickets);
+//        $this->set('stats', $stats);
+        $this->set('milestone', $milestone);
+        $this->set('pageTitle', '{{@lng.milestone}} › '. $milestone->name);
+        $this->set('template', 'milestone.tpl.php');
         $this->tpserve();
 
     }
 
 
     function showRoadmap()
-    {
-        $road = array();
+    {        
+        $ms = array();
+        $fullCount = 0;
+        
+        $helper = new helper();
 
-        /* Get Project */
-        $project = F3::get('SESSION.project');
+        $milestones = new Milestone();
+        $milestones = $milestones->find('project = '.$this->get('SESSION.project'));
 
-        /* Get Milestones */
-        try {			
-            $milestones = Dao::getMilestones("project = $project");
-       	} catch (Exception $e) {
-            $this->tpfail("Failure while open Milestones", $e);
-            return ;
-        }
+        foreach($milestones as $milestone)
+        { 
+            $ticket = new Ticket();
+            $ticket->find('milestone = '.$milestone->id);
+            
+            $ms[$milestone->id]['infos'] = $milestone;
+            $ms[$milestone->id]['ticketCount'] = $helper->getTicketCount($milestone->id);
+            
+            $ms[$milestone->id]['fullTicketCount'] = 0;
+            foreach($ms[$milestone->id]['ticketCount'] as $cnt)
+                $ms[$milestone->id]['fullTicketCount'] += $cnt['count'];
 
-        /*  */
-        foreach($milestones as $i=>$milestone)
-        {
-            $road[$i]['milestone'] = $milestone->toArray();
-            $road[$i]['ticketCount'] = Dao::getTicketCount($milestone->getId());
-
-            $fullCount = 0;
-            foreach($road[$i]['ticketCount'] as $cnt)
-                $fullCount += $cnt['count'];
-
-            $road[$i]['fullTicketCount'] = $fullCount;
-
-            foreach($road[$i]['ticketCount'] as $j=>$cnt)
+            $ms[$milestone->id]['openTickets'] = 0;
+            foreach($ms[$milestone->id]['ticketCount'] as $j => $cnt)
             {
-                $road[$i]['ticketCount'][$j]['percent'] = round($cnt['count'] * 100 / $fullCount);
-                $road[$i]['ticketCount'][$j]['title'] = F3::get("ticket_state.".$road[$i]['ticketCount'][$j]['state']);
+                $ms[$milestone->id]['ticketCount'][$j]['percent'] = round($cnt['count'] * 100 / $ms[$milestone->id]['fullTicketCount']);
+                $ms[$milestone->id]['ticketCount'][$j]['title'] = $this->get("ticket_state.".$ms[$milestone->id]['ticketCount'][$j]['state']);
 
-                if($road[$i]['ticketCount'][$j]['state'] == 5)
-                    $road[$i]['openTickets'] = $fullCount - $road[$i]['ticketCount'][$j]['count'];
+                if($ms[$milestone->id]['ticketCount'][$j]['state'] != 5)
+                     $ms[$milestone->id]['openTickets'] += $ms[$milestone->id]['ticketCount'][$j]['count'];
+
+ 
             }
-
-            $road[$i]['openTickets'] = ($fullCount) ? $road[$i]['openTickets'] : 0 ;
-
         }
 
-        F3::set('road', $road);
-        F3::set('pageTitle', '{{@lng.roadmap}}');
-        F3::set('template', 'roadmap.tpl.php');
+        $this->set('road', $ms);
+        $this->set('pageTitle', '{{@lng.roadmap}}');
+        $this->set('template', 'roadmap.tpl.php');
         $this->tpserve();
     }
 
@@ -150,7 +145,7 @@ class main extends F3instance
         $timeline = array();
 
         /* Get Project */
-        $project = F3::get('SESSION.project');
+        $project = $this->get('SESSION.project');
 
         try {
             $activities = Dao::getActivities("project = $project");
@@ -164,9 +159,9 @@ class main extends F3instance
             $timeline[] = $activity->toArray();
         }
 
-        F3::set('activities', $timeline);
-        F3::set('pageTitle', '{{@lng.timeline}}');
-        F3::set('template', 'timeline.tpl.php');
+        $this->set('activities', $timeline);
+        $this->set('pageTitle', '{{@lng.timeline}}');
+        $this->set('template', 'timeline.tpl.php');
 
         $this->tpserve();
     }
@@ -176,7 +171,7 @@ class main extends F3instance
      */
     function showTicket()
     {
-        $hash = F3::get('PARAMS.hash');
+        $hash = $this->get('PARAMS.hash');
 
         $ticket = new Ticket();
         $ticket->load(array('hash = :hash', array(':hash' => $hash)));
@@ -204,14 +199,14 @@ class main extends F3instance
                 $users[$i] = $user->toArray();
             }
 
-            F3::set('users', $users);
+            $this->set('users', $users);
         }
 */
 
-        F3::set('ticket', $ticket);
-        F3::set('milestone', $milestone);
-        F3::set('pageTitle', '{{@lng.tickets}} › '. $ticket->title);
-        F3::set('template', 'ticket.tpl.php');
+        $this->set('ticket', $ticket);
+        $this->set('milestone', $milestone);
+        $this->set('pageTitle', '{{@lng.tickets}} › '. $ticket->title);
+        $this->set('template', 'ticket.tpl.php');
         $this->tpserve();
     }
 
@@ -220,22 +215,22 @@ class main extends F3instance
      */
     function addTicket()
     {
-        if (!Dao::getPermission("iss_addIssues"))
-            $this->tpdeny();
+        //if (!Dao::getPermission("iss_addIssues"))
+        //    $this->tpdeny();
 
-        $owner = F3::get('SESSION.user');
+        $owner = $this->get('SESSION.user');
 
         $ticket = new Ticket();
         $ticket->hash = helper::getFreeHash('Ticket');
-        $ticket->title = F3::get('POST.title');
-        $ticket->description = F3::get('POST.description');
+        $ticket->title = $this->get('POST.title');
+        $ticket->description = $this->get('POST.description');
         $ticket->owner = $owner->id;
         $ticket->assigned = 0; // do not assign to anyone
-        $ticket->type = F3::get('POST.type');
+        $ticket->type = $this->get('POST.type');
         $ticket->state = 1;
-        $ticket->priority = F3::get('POST.priority');
+        $ticket->priority = $this->get('POST.priority');
         $ticket->category = 1;
-        $ticket->milestone = F3::get('POST.milestone');
+        $ticket->milestone = $this->get('POST.milestone');
 
         $ticket->save();
 
@@ -245,9 +240,9 @@ class main extends F3instance
             return ;
         }
 
-        Dao::addActivity('created Ticket ' . $ticket->title);
+        //Dao::addActivity('created Ticket ' . $ticket->title);
 
-        F3::set('PARAMS.hash', $ticket->hash);
+        $this->set('PARAMS.hash', $ticket->hash);
         $this->showTicket();
     }
 
@@ -256,15 +251,13 @@ class main extends F3instance
      */
     function editTicket()
     {
-        require_once 'ticket.php';
-
-        $hash = F3::get('PARAMS.hash');
+        $hash = $this->get('PARAMS.hash');
 
         $ticket = new Ticket();
         $ticket->load('hash = :hash', array(':hash' => $hash));
 
-        $ticket->assigned = F3::get('POST.userId');
-        $ticket->state = F3::get('POST.state');
+        $ticket->assigned = $this->get('POST.userId');
+        $ticket->state = $this->get('POST.state');
 
         $ticket->save();
 
@@ -274,8 +267,8 @@ class main extends F3instance
             return ;
         }
 
-        Dao::addActivity('changed Ticket '. $ticket->title);
-        F3::set('PARAMS["hash"]', $hash);
+        //Dao::addActivity('changed Ticket '. $ticket->title);
+        $this->set('PARAMS["hash"]', $hash);
         $this->showTicket($hash);
     }
 
@@ -284,10 +277,10 @@ class main extends F3instance
      */
     function selectProject()
     {
-        $url = F3::get('SERVER.HTTP_REFERER');
+        $url = $this->get('SERVER.HTTP_REFERER');
 
         $project = new Project();
-        $project->load(array('hash = :hash', array(':hash' => F3::get('POST.project'))));
+        $project->load(array('hash = :hash', array(':hash' => $this->get('POST.project'))));
 
 		if (!$project->id)
 		{
@@ -295,15 +288,15 @@ class main extends F3instance
             return ;
 		}
 
-        if(F3::get('SESSION.user'))
+        if($this->get('SESSION.user'))
         {
-            $user = F3::get('SESSION.user');
+            $user = $this->get('SESSION.user');
             $user->lastProject = $project->id;
             $user->save();
         }
 		
-        F3::set('SESSION.project', $project->id);
-        F3::reroute($url);
+        $this->set('SESSION.project', $project->id);
+        $this->reroute($url);
     }    
     
     /**
@@ -311,7 +304,7 @@ class main extends F3instance
      */
     function showProjectSettings()
     {    
-        $projectId = F3::get('SESSION.project');
+        $projectId = $this->get('SESSION.project');
 
     	$project = new Project;
        	$project->load(array('id = :id', array(':id' => $projectId)));
@@ -334,13 +327,13 @@ class main extends F3instance
             return ;
         }
         
-        F3::set('users', $users);
-        F3::set('projMilestones', $milestones);
-        F3::set('projRoles', $roles);
-        F3::set('projMembers', $projPerms);
-        F3::set('projDetails', $project);        
-        F3::set('template', 'projectSettings.tpl.php');
-        F3::set('pageTitle', '{{@lng.project}} › {{@lng.settings}}');
+        $this->set('users', $users);
+        $this->set('projMilestones', $milestones);
+        $this->set('projRoles', $roles);
+        $this->set('projMembers', $projPerms);
+        $this->set('projDetails', $project);        
+        $this->set('template', 'projectSettings.tpl.php');
+        $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}}');
         $this->tpserve();
     }
     
@@ -349,10 +342,10 @@ class main extends F3instance
      */
     function projectSetRole()
     {
-        $projectId = F3::get('SESSION.project');
+        $projectId = $this->get('SESSION.project');
         
        	$user = new user();
-       	$user->load('hash = :hash', array(':hash', F3::get('POST.user')));
+       	$user->load(array('hash = :hash', array(':hash', $this->get('POST.user'))));
 
 		if (!$user->id)
 		{
@@ -361,7 +354,7 @@ class main extends F3instance
         }
 
   		$role = new Role();
-       	$role->load('hash = :hash', array(':hash', F3::get('POST.role')));
+       	$role->load('hash = :hash', array(':hash', $this->get('POST.role')));
 		
 		if (!$role->id)
 		{
@@ -376,7 +369,7 @@ class main extends F3instance
         $perms->roleId = $role->id;
 	    $perms->save();
         
-        F3::reroute('/'.F3::get('BASE').'project/settings');
+        $this->reroute('/'.$this->get('BASE').'project/settings');
     }
     
     /**
@@ -384,7 +377,7 @@ class main extends F3instance
      */
     function showProjectSettingsRole()
     {
-        $roleHash = F3::get('PARAMS.hash');
+        $roleHash = $this->get('PARAMS.hash');
 
 		$role = new role();
     	$role->load('hash = :hash', array(':hash' => $roleHash));
@@ -395,10 +388,10 @@ class main extends F3instance
             return ;
         }
 
-        F3::set('roleData', $role->toArray());        
+        $this->set('roleData', $role->toArray());        
         
-        F3::set('template', 'projectSettingsRole.tpl.php');
-        F3::set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.role}} › {{@roleData.name}}');
+        $this->set('template', 'projectSettingsRole.tpl.php');
+        $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.role}} › {{@roleData.name}}');
         $this->tpserve();
     }
     
@@ -407,7 +400,7 @@ class main extends F3instance
      */
     function showProjectSettingsMilestone()
     {
-        $msHash = F3::get('PARAMS.hash');
+        $msHash = $this->get('PARAMS.hash');
 
        	$milestone = new Milestone();
         $milestone->load('hash = :hash', array(':hash' => $msHash));
@@ -418,9 +411,9 @@ class main extends F3instance
             return ;
         }
 
-        F3::set('msData', $milestone->toArray());        
-        F3::set('template', 'projectSettingsMilestone.tpl.php');
-        F3::set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.milestone}} › {{@msData.name}}');
+        $this->set('msData', $milestone->toArray());        
+        $this->set('template', 'projectSettingsMilestone.tpl.php');
+        $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.milestone}} › {{@msData.name}}');
         $this->tpserve();        
     }
     
@@ -429,28 +422,28 @@ class main extends F3instance
      */
     function addEditRole()
     {
-        $roleHash = F3::get('POST.hash') ? F3::get('POST.hash') : helper::getFreeHash('Role');
+        $roleHash = $this->get('POST.hash') ? $this->get('POST.hash') : helper::getFreeHash('Role');
         
 	    $role = new role();
 		if (F3::exists('POST.hash'))
 	    	$role->load('hash = :hash', array(':hash' => $roleHash));
 
-	        $role->name = F3::get('POST.name');
+	        $role->name = $this->get('POST.name');
 	        $role->hash = $roleHash;
-    	    $role->issuesAssigneable = F3::get('POST.issuesAssigneable');
-        	$role->projectId = F3::get('SESSION.project');
-        	$role->iss_addIssues = F3::get('POST.iss_addIssues');
-        	$role->proj_editProject = F3::get('POST.proj_editProject');
-        	$role->proj_manageMembers = F3::get('POST.proj_manageMembers');
-        	$role->proj_manageMilestones = F3::get('POST.proj_manageMilestones');
-        	$role->proj_manageRoles = F3::get('POST.proj_manageRoles');
-        	$role->iss_editIssues = F3::get('POST.iss_editIssues');
-        	$role->iss_addIssues = F3::get('POST.iss_addIssues');
-        	$role->iss_deleteIssues = F3::get('POST.iss_deleteIssues');
-        	$role->iss_moveIssue = F3::get('POST.iss_moveIssue');
-        	$role->iss_editWatchers = F3::get('POST.iss_editWatchers');
-        	$role->iss_addWatchers = F3::get('POST.iss_addWatchers');
-        	$role->iss_viewWatchers = F3::get('POST.iss_viewWatchers');
+    	    $role->issuesAssigneable = $this->get('POST.issuesAssigneable');
+        	$role->projectId = $this->get('SESSION.project');
+        	$role->iss_addIssues = $this->get('POST.iss_addIssues');
+        	$role->proj_editProject = $this->get('POST.proj_editProject');
+        	$role->proj_manageMembers = $this->get('POST.proj_manageMembers');
+        	$role->proj_manageMilestones = $this->get('POST.proj_manageMilestones');
+        	$role->proj_manageRoles = $this->get('POST.proj_manageRoles');
+        	$role->iss_editIssues = $this->get('POST.iss_editIssues');
+        	$role->iss_addIssues = $this->get('POST.iss_addIssues');
+        	$role->iss_deleteIssues = $this->get('POST.iss_deleteIssues');
+        	$role->iss_moveIssue = $this->get('POST.iss_moveIssue');
+        	$role->iss_editWatchers = $this->get('POST.iss_editWatchers');
+        	$role->iss_addWatchers = $this->get('POST.iss_addWatchers');
+        	$role->iss_viewWatchers = $this->get('POST.iss_viewWatchers');
         	$role->save();
 
 		if (!$role->id)
@@ -459,7 +452,7 @@ class main extends F3instance
             return ;
         }
 
-        F3::reroute('/'.F3::get('BASE').'project/settings/role/'. $roleHash);
+        $this->reroute('/'.$this->get('BASE').'project/settings/role/'. $roleHash);
     }
     
     /**
@@ -467,17 +460,17 @@ class main extends F3instance
      */
     function addEditMilestone()
     {
-        $msHash = F3::get('POST.hash') ? F3::get('POST.hash') : helper::getFreeHash('Milestone');
+        $msHash = $this->get('POST.hash') ? $this->get('POST.hash') : helper::getFreeHash('Milestone');
         
         $milestone = new Milestone();
 		    
 		if (F3::exists('POST.hash'))
     	   	$milestone->load('hash = "' .$msHash. '"');
 
-	    $milestone->name = F3::get('POST.name');
+	    $milestone->name = $this->get('POST.name');
         $milestone->hash = $msHash;
-        $milestone->description = F3::get('POST.description');
-        $milestone->project = F3::get('SESSION.project');
+        $milestone->description = $this->get('POST.description');
+        $milestone->project = $this->get('SESSION.project');
         $milestone->save();
 
 		if (!$milestone->id)
@@ -486,7 +479,7 @@ class main extends F3instance
             return ;
         }
 
-        F3::reroute('/'.F3::get('BASE').'project/settings/milestone/'. $msHash);
+        $this->reroute('/'.$this->get('BASE').'project/settings/milestone/'. $msHash);
     }
     
     /**
@@ -494,8 +487,8 @@ class main extends F3instance
      */
     function showAddRole()
     {
-        F3::set('template', 'projectSettingsRoleAdd.tpl.php');
-        F3::set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.addrole}}');
+        $this->set('template', 'projectSettingsRoleAdd.tpl.php');
+        $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.addrole}}');
         $this->tpserve();
     }
     
@@ -504,9 +497,9 @@ class main extends F3instance
      */
     function showAddMilestone()
     {
-        F3::set('today', date('Y-m-d', time()));
-        F3::set('template', 'projectSettingsMilestoneAdd.tpl.php');
-        F3::set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.addmilestone}}');
+        $this->set('today', date('Y-m-d', time()));
+        $this->set('template', 'projectSettingsMilestoneAdd.tpl.php');
+        $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.addmilestone}}');
         $this->tpserve();
     }
     
@@ -528,7 +521,7 @@ class main extends F3instance
             return ;
         }
 
-        F3::reroute('/'.F3::get('BASE').'project/settings');
+        $this->reroute('/'.$this->get('BASE').'project/settings');
     }
 
     /**
@@ -536,9 +529,10 @@ class main extends F3instance
      */
     function showUser()
     {
-        $name = F3::get('PARAMS.name');
-		$user = new User();
-		$user->load('name = :name', array(':name' => $name));
+        $name = $this->get('PARAMS.name');
+		
+        $user = new User();
+		$user->load(array('name = :name', array(':name' => $name)));
 
         if(!$user)
 		{
@@ -546,8 +540,8 @@ class main extends F3instance
             return ;	
 		}
 
-		$ticket = new Ticket();
-		$tickets = $ticket->find('owner = :owner', array(':owner' => $user->id));
+		$ticket = new User_ticket();
+		$tickets = $ticket->find('owner = '.$user->id);
 
 		if (!$tickets)
 		{
@@ -582,7 +576,7 @@ class main extends F3instance
 	    $user = new user();
 	    $user->name = $this->get('POST.name');
 	    $user->email = $this->get('POST.email');
-    	$user->password = helper::salting($salt, F3::get('POST.password'));
+    	$user->password = helper::salting($salt, $this->get('POST.password'));
         $user->salt = $salt;
        	$user->hash = helper::getFreeHash('User');
        	$user->admin = 0;
@@ -595,7 +589,7 @@ class main extends F3instance
 		}
 
 		$this->set('SESSION.SUCCESS', 'User registred successfully');
-    	$this->reroute('/'. F3::get('BASE'));
+    	$this->reroute('/'. $this->get('BASE'));
 	}
 
     /**
@@ -614,22 +608,20 @@ class main extends F3instance
     function loginUser()
     {
 		$user = new User();
-		$user->load('email = :email', array(':email' => $this->get('POST.email')));
-		$user->load('email = :email AND password = :password',
+		$user->load(array('email = :email', array(':email' => $this->get('POST.email'))));
+		$user->load(array('email = :email AND password = :password',
 					array(	':email' => $this->get('POST.email'),
-							':password' => helper::salting($user->salt, $this->get('POST.password'))));
-
-		if (!$user)
+							':password' => helper::salting($user->salt, $this->get('POST.password')))));
+		
+        if (!$user)
 		{
 			$this->set('FAILURE', 'Login failed.');
             $this->reroute('/'. $this->get('BASE') .'user/login');
 		}
 
-		$this->set('SESSION.user', $user);
-        $this->get('SESSION.user')->hash;
-		F3::set('SESSION.SUCCESS', 'Login successful');
-        #$this->reroute('/'. F3::get('BASE'));
-
+		$this->set('SESSION.user', array('name' => $user->name, 'id' => $user->id, 'admin' => $user->admin, 'hash' => $user->hash));
+        $this->set('SESSION.SUCCESS', 'Login successful');
+        $this->reroute('/'. $this->get('BASE'));
     }
 
     /**
@@ -643,8 +635,8 @@ class main extends F3instance
         $this->set('SESSION.userId', NULL);
         session_destroy();
 
-		F3::set('SESSION.SUCCESS', 'User logged out');
-        $this->reroute('/'. F3::get('BASE'));  
+		$this->set('SESSION.SUCCESS', 'User logged out');
+        $this->reroute('/'. $this->get('BASE'));  
     }
 
     /**
@@ -661,7 +653,7 @@ class main extends F3instance
         	return ;
         }
         
-        F3::set('projects', $projects);
+        $this->set('projects', $projects);
         echo Template::serve('main.tpl.php');
     }
 
@@ -679,8 +671,8 @@ class main extends F3instance
      */
     private function tpfail($msg)
     {
-        F3::set('FAILURE', $msg);
-        F3::set('template', 'error404.tpl.php');
+        $this->set('FAILURE', $msg);
+        $this->set('template', 'error404.tpl.php');
         echo Template::serve('main.tpl.php');
     }
 }

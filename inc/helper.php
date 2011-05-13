@@ -41,5 +41,43 @@
             F3::set('title', $title.' - '.F3::get('title'));
         }
 
+        /**
+         * Checks whether the user has access to $permission
+         * 
+         * @param string $permission Permission is a predefined string stored in the db
+         * @return bool
+         * @static
+         */
+        public function getPermission($permission)
+        {
+            $userId = $this->get('SESSION.user->id');
+            $projectId = $this->get('SESSION.project');
+
+            if($userId) {
+                $user = new User();
+                $user->load('id = '.$userId);
+
+                $projPerm = new ProjectPermission();
+                $permissions = $projPerm->load('userId = ' .$userId. ' AND projectId = ' .$projectId);
+
+                $role = new Role();
+                $role->load('id = ' .$projPerm->roleId);
+
+                if($user->admin) // admin has access to everything
+                    return true;
+
+                if(in_array($permission, $permissions))
+                    if($permissions[$permission] == true)
+                        return true;
+
+            }
+            
+            return false;
+        }
+        
+        public function getTicketCount($milestone)
+        {
+            return $this->get('DB')->sql('SELECT state, COUNT(*) AS `count` FROM `Ticket` WHERE milestone = ' .$milestone. ' GROUP BY state');
+        }
     }
 

@@ -136,19 +136,20 @@ h3 a:hover
 
 #success
 {
-	background: #AFA;
-	border:	solid 1px #5F4;
-	color:	#0F0;
-    margin: 0 auto;
+	background: #D6FFD6;
+	border:	solid 1px #00D600;
+    color: #060;
     padding: 5px;
     border-radius: 3px;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
-    width: 500px;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 .error 
 {
+    color: #600;
     padding: 5px;
     margin-top: 5px;
     margin-bottom: 5px;
