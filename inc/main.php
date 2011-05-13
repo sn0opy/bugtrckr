@@ -302,7 +302,7 @@ class main extends F3instance
             $user->save();
         }
 		
-        F3::set('SESSION.project', $project->getId());
+        F3::set('SESSION.project', $project->id);
         F3::reroute($url);
     }    
     
