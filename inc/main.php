@@ -458,7 +458,7 @@ class main extends F3instance
         $roleHash = $this->get('PARAMS.hash');
 
 		$role = new role();
-    	$role->load('hash = :hash', array(':hash' => $roleHash));
+    	$role->load(array('hash = :hash', array(':hash' => $roleHash)));
 		
 		if (!$role->id)
 		{
@@ -466,10 +466,9 @@ class main extends F3instance
             return ;
         }
 
-        $this->set('roleData', $role->toArray());        
-        
+        $this->set('roleData', $role);  
         $this->set('template', 'projectSettingsRole.tpl.php');
-        $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.role}} › {{@roleData.name}}');
+        $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.role}} › {{@roleData->name}}');
         $this->tpserve();
     }
     
@@ -491,7 +490,7 @@ class main extends F3instance
 
         $this->set('msData', $milestone);        
         $this->set('template', 'projectSettingsMilestone.tpl.php');
-        $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.milestone}} › {{@msData.name}}');
+        $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.milestone}} › {{@msData->name}}');
         $this->tpserve();        
     }
     
@@ -502,33 +501,34 @@ class main extends F3instance
     {
         $roleHash = $this->get('POST.hash') ? $this->get('POST.hash') : helper::getFreeHash('Role');
         
-	    $role = new role();
-		if (F3::exists('POST.hash'))
-	    	$role->load('hash = :hash', array(':hash' => $roleHash));
-
-	        $role->name = $this->get('POST.name');
-	        $role->hash = $roleHash;
-    	    $role->issuesAssigneable = $this->get('POST.issuesAssigneable');
-        	$role->projectId = $this->get('SESSION.project');
-        	$role->iss_addIssues = $this->get('POST.iss_addIssues');
-        	$role->proj_editProject = $this->get('POST.proj_editProject');
-        	$role->proj_manageMembers = $this->get('POST.proj_manageMembers');
-        	$role->proj_manageMilestones = $this->get('POST.proj_manageMilestones');
-        	$role->proj_manageRoles = $this->get('POST.proj_manageRoles');
-        	$role->iss_editIssues = $this->get('POST.iss_editIssues');
-        	$role->iss_addIssues = $this->get('POST.iss_addIssues');
-        	$role->iss_deleteIssues = $this->get('POST.iss_deleteIssues');
-        	$role->iss_moveIssue = $this->get('POST.iss_moveIssue');
-        	$role->iss_editWatchers = $this->get('POST.iss_editWatchers');
-        	$role->iss_addWatchers = $this->get('POST.iss_addWatchers');
-        	$role->iss_viewWatchers = $this->get('POST.iss_viewWatchers');
-        	$role->save();
-
-		if (!$role->id)
-		{
-            $this->tpfail("Failure while saving Role");
-            return ;
+	    $role = new role();        
+		if (F3::exists('POST.hash')) {
+	    	$role->load(array('hash = :hash', array(':hash' => $roleHash)));
+            
+            if($role->dry())
+            {
+                $this->tpfail('Failure while editing role.');
+                return;
+            }
         }
+
+        $role->name = $this->get('POST.name');
+        $role->hash = $roleHash;
+        $role->issuesAssigneable = $this->get('POST.issuesAssigneable');
+        $role->projectId = $this->get('SESSION.project');
+        $role->iss_addIssues = $this->get('POST.iss_addIssues');
+        $role->proj_editProject = $this->get('POST.proj_editProject');
+        $role->proj_manageMembers = $this->get('POST.proj_manageMembers');
+        $role->proj_manageMilestones = $this->get('POST.proj_manageMilestones');
+        $role->proj_manageRoles = $this->get('POST.proj_manageRoles');
+        $role->iss_editIssues = $this->get('POST.iss_editIssues');
+        $role->iss_addIssues = $this->get('POST.iss_addIssues');
+        $role->iss_deleteIssues = $this->get('POST.iss_deleteIssues');
+        $role->iss_moveIssue = $this->get('POST.iss_moveIssue');
+        $role->iss_editWatchers = $this->get('POST.iss_editWatchers');
+        $role->iss_addWatchers = $this->get('POST.iss_addWatchers');
+        $role->iss_viewWatchers = $this->get('POST.iss_viewWatchers');
+        $role->save();
 
         $this->reroute('/'.$this->get('BASE').'project/settings/role/'. $roleHash);
     }
@@ -540,8 +540,7 @@ class main extends F3instance
     {
         $msHash = $this->get('POST.hash') ? $this->get('POST.hash') : helper::getFreeHash('Milestone');
         
-        $milestone = new Milestone();
-		    
+        $milestone = new Milestone();		    
 		if (F3::exists('POST.hash')) 
         {
             $milestone->load('hash = "' .$msHash. '"');
