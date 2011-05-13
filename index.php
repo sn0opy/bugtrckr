@@ -23,7 +23,7 @@ $app->set('CACHE', false);
 $app->set('DEBUG', 3);
 $app->set('EXTEND', true);
 $app->set('GUI','gui/');
-$app->set('AUTOLOAD', 'inc/');
+$app->set('AUTOLOAD', 'inc/|inc/models/');
 $app->set('LOCALES','lang/');
 $app->set('LANGUAGE', 'de'); // TODO: remove this line when english localization is done too
 $app->set('PROXY', 1);
@@ -32,7 +32,7 @@ F3::set('DB', new DB('sqlite:' .$dbFile));
 
 // Template functions
 $app->set('getPermission', function($permission) {
-    return true;
+    return true; // TODO
 });
 
 $app->route('GET /', 'main->start');
