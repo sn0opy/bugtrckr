@@ -47,47 +47,33 @@ class main extends F3instance
     function showMilestone()
     {
         $hash = $this->get('PARAMS.hash');
+        
+        $helper = new helper();
 
 		$milestone = new Milestone();
 		$milestone->load('hash = "' . $hash .'"');
 
-		$ticket = new Ticket();
-		$tickets = $ticket->find('milestone = ' . $milestone->id);
+        $ticket = new Ticket();
+        $tickets = $ticket->find('milestone = '.$milestone->id);
+        
+        $ms['ticketCount'] = $helper->getTicketCount($milestone->id);
 
-/*
-        try {
-	 	    $ms = new Milestone();
-	        $ms->load('hash = "' .$hash.'"');
-            $tickets = Dao::getTickets('milestone = ' .$ms->getId());
-        } catch (Exception $e) {
-            $this->tpfail("Failure while open Tickets", $e);
-            return ;
-        }
+        $ms['fullTicketCount'] = 0;
+        foreach($ms['ticketCount'] as $cnt)
+            $ms['fullTicketCount'] += $cnt['count'];
 
-        foreach($tickets as $i=>$ticket)
-            $tickets[$i] = $ticket->toArray();
-
-        $stats['ticketCount'] = Dao::getTicketCount($ms->getId());
-*/
-/*        $fullCount = 0;
-        foreach($stats['ticketCount'] as $cnt)
-            $fullCount += $cnt['count'];
-
-        $stats['fullTicketCount'] = $fullCount;
-
-        foreach($stats['ticketCount'] as $j=>$cnt)
+        $ms['openTickets'] = 0;
+        foreach($ms['ticketCount'] as $j => $cnt)
         {
-            $stats['ticketCount'][$j]['percent'] = round($cnt['count'] * 100 / $fullCount);
-            $stats['ticketCount'][$j]['title'] = $this->get("ticket_state.".$stats['ticketCount'][$j]['state']);
+            $ms['ticketCount'][$j]['percent'] = round($cnt['count'] * 100 / $ms['fullTicketCount']);
+            $ms['ticketCount'][$j]['title'] = $this->get("ticket_state.".$ms['ticketCount'][$j]['state']);
 
-            if($stats['ticketCount'][$j]['state'] == 5)
-                $stats['openTickets'] = $fullCount - $stats['ticketCount'][$j]['count'];
+            if($ms['ticketCount'][$j]['state'] != 5)
+                 $ms['openTickets'] += $ms['ticketCount'][$j]['count'];
         }
-
-        $stats['openTickets'] = ($fullCount) ? $stats['openTickets'] : 0 ;
-*/
+            
         $this->set('tickets', $tickets);
-//        $this->set('stats', $stats);
+        $this->set('stats', $ms);
         $this->set('milestone', $milestone);
         $this->set('pageTitle', '{{@lng.milestone}} › '. $milestone->name);
         $this->set('template', 'milestone.tpl.php');
@@ -108,9 +94,6 @@ class main extends F3instance
 
         foreach($milestones as $milestone)
         { 
-            $ticket = new Ticket();
-            $ticket->find('milestone = '.$milestone->id);
-            
             $ms[$milestone->id]['infos'] = $milestone;
             $ms[$milestone->id]['ticketCount'] = $helper->getTicketCount($milestone->id);
             

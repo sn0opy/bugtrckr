@@ -1,5 +1,18 @@
 <?php
 
+/**
+ * helper.php
+ * 
+ * helper functions
+ * 
+ * @package Helper
+ * @author Sascha Ohms
+ * @author Philipp Hirsch
+ * @copyright Copyright 2011, Bugtrckr-Team
+ * @license http://www.gnu.org/licenses/lgpl.txt
+ *   
+*/
+
     class helper extends F3instance {
         
         public static function randStr($length = 5)

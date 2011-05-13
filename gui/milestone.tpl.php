@@ -4,12 +4,10 @@
     <F3:true>
         <table class="percentBar">
             <tr>
-<!--
             <F3:repeat group="{{@stats.ticketCount}}" value="{{@tickCnt}}">
                 <td width="{{@tickCnt.percent}}%" title="{{@tickCnt.title}}"
                     class="color{{@tickCnt.state}}">{{@tickCnt.count}}</td>
             </F3:repeat>
--->
             </tr>
         </table>
     </F3:true>
@@ -21,10 +19,10 @@
         </table>
     </F3:false>
 </F3:check>
-<!--
+
 <p class="info">{{@stats.openTickets}} {{@lng.ticketsleft}}</p>
-<p>{{nl2br(@milestone.description)}}</p>
--->
+<p>{{nl2br(@milestone->description)}}</p>
+
 <div class="milestoneTickets">
     <h3>{{@lng.tickets}}:</h3>
     <table class="overview">
@@ -48,7 +46,7 @@
                 </td>
                 <td class="state">{{@ticket->state}}</td>
                 <td class="priority">{{@ticket->priority}}</td>
-                <td class="created">{{@ticket->created}}</td>
+                <td class="created">{{date('d.m.Y H:i', @ticket->created)}}</td>
                 <td class="owner"><a href="/{{@BASE}}user/{{@ticket->owner}}">{{@ticket->owner}}</a></td>
             </tr>
             </F3:repeat>

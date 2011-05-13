@@ -3,7 +3,7 @@
 /**
  * index.php
  * 
- * to recieve globally different data from the DB
+ * Routes, settings anonymous functions
  * 
  * @package Index
  * @author Sascha Ohms

@@ -1,5 +1,18 @@
 <?php
 
+/**
+ * user_ticket.php
+ * 
+ * wrapper class for Axon (table is a VIEW)
+ * 
+ * @package User_Ticket
+ * @author Sascha Ohms
+ * @author Philipp Hirsch
+ * @copyright Copyright 2011, Bugtrckr-Team
+ * @license http://www.gnu.org/licenses/lgpl.txt
+ *   
+*/
+
 	class User_ticket extends Axon 
 	{
 		public function __construct()
