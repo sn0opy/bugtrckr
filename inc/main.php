@@ -163,8 +163,8 @@ class main extends F3instance
     {
         $hash = $this->get('PARAMS.hash');
 
-        $ticket = new Ticket();
-        $ticket->load(array('hash = :hash', array(':hash' => $hash)));
+        $ticket = new User_ticket();
+        $ticket = $ticket->findone('tickethash = "'. $hash.'"');
 
         $milestone = new Milestone();
         $milestone->load(array("id = :id", array(':id' => $ticket->milestone)));
@@ -174,24 +174,6 @@ class main extends F3instance
             $this->tpfail("Can't open ticket");
             return ;
         }
-/*
-        if (Dao::getPermission('iss_editIssue'))
-        {
-			try {
-            	$users = Dao::getUsers("1 = 1");
-        	} catch (Exception $e) {
-           		$this->tpfail("Can't get Permissions", $e);
-           		return ;
-        	}
-
-            foreach($users as $i=>$user)
-            {
-                $users[$i] = $user->toArray();
-            }
-
-            $this->set('users', $users);
-        }
-*/
 
         $this->set('ticket', $ticket);
         $this->set('milestone', $milestone);
@@ -205,35 +187,33 @@ class main extends F3instance
      */
     function addTicket()
     {
-        //if (!Dao::getPermission("iss_addIssues"))
-        //    $this->tpdeny();
-
-        $owner = $this->get('SESSION.user');
-
-        $ticket = new Ticket();
-        $ticket->hash = helper::getFreeHash('Ticket');
+        if(!$this->helper->getPermission('iss_addIssues'))
+        {
+            $this->tpfail('You are not allowed to add tickets.');
+            return;
+        }
+        
+        $ticket = new Ticket();        
+        $ticket->hash = $this->helper->getFreeHash('Ticket');
         $ticket->title = $this->get('POST.title');
         $ticket->description = $this->get('POST.description');
-        $ticket->owner = $owner->id;
+        $ticket->owner = $this->get('SESSION.user.id');
         $ticket->assigned = 0; // do not assign to anyone
         $ticket->type = $this->get('POST.type');
         $ticket->state = 1;
+        $ticket->created = time();
         $ticket->priority = $this->get('POST.priority');
         $ticket->category = 1;
         $ticket->milestone = $this->get('POST.milestone');
-
         $ticket->save();
 
-		if (!$ticket->id)
+		if (!$ticket->_id)
 		{       
             $this->tpfail("Failure while saving Ticket");
             return ;
         }
-
-        //Dao::addActivity('created Ticket ' . $ticket->title);
-
-        $this->set('PARAMS.hash', $ticket->hash);
-        $this->showTicket();
+        
+        $this->reroute('/'.$this->get('BASE').'ticket/'.$ticket->hash);
     }
 
     /**
