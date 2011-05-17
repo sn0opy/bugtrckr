@@ -43,8 +43,8 @@ class main extends F3instance
         
         $tickets = new user_ticket();
         $tickets = $tickets->find('milestone IN (' .$string. '0)');
-        
-        $this->set('milestones', $milestones);
+
+		$this->set('milestones', $milestones);
         $this->set('tickets', $tickets);
         $this->set('pageTitle', '{{@lng.tickets}}');
         $this->set('template', 'tickets.tpl.php');
@@ -162,12 +162,12 @@ class main extends F3instance
     function showTicket()
     {
         $hash = $this->get('PARAMS.hash');
-
+		
         $ticket = new Ticket();
         $ticket->load(array('hash = :hash', array(':hash' => $hash)));
-
+		
         $milestone = new Milestone();
-        $milestone->load(array("id = :id", array(':id' => $ticket->milestone)));
+        $milestone->load(array('id = :id', array(':id' => $ticket->milestone)));
 
 		if (!$ticket->id || !$milestone->id)
 		{
@@ -269,8 +269,10 @@ class main extends F3instance
     {
         $url = $this->get('SERVER.HTTP_REFERER');
 
+		$projectId = $this->get('POST.project');
+
         $project = new Project();
-        $project->load(array('hash = :hash', array(':hash' => $this->get('POST.project'))));
+        $project->load("hash = '$projectId'");//array('hash = :hash', array(':hash' => $this->get('POST.project'))));
 
 		if (!$project->id)
 		{
@@ -278,9 +280,10 @@ class main extends F3instance
             return ;
 		}
 
-        if($this->get('SESSION.user'))
+        if($this->get('SESSION.user.id'))
         {
-            $user = $this->get('SESSION.user');
+            $user = new User();
+			$user->load("id = ".$this->get('SESSION.user.id'));
             $user->lastProject = $project->id;
             $user->save();
         }
@@ -613,20 +616,14 @@ class main extends F3instance
         $user = new User();
 		$user->load(array('name = :name', array(':name' => $name)));
 
-        if(!$user)
+        if(!$user->id)
 		{
-	    	$this->tpfail("User not found", $e);
+	    	$this->tpfail("User not found");
             return ;	
 		}
 
 		$ticket = new User_ticket();
 		$tickets = $ticket->find('owner = '.$user->id);
-
-		if (!$tickets)
-		{
-            $this->tpfail("Failure while getting User's infos");
-            return ;
-        }
 
         $this->set('user', $user);
         $this->set('tickets', $tickets);
@@ -660,8 +657,8 @@ class main extends F3instance
        	$user->hash = helper::getFreeHash('User');
        	$user->admin = 0;
        	$user->save();
-       
-		if (!$user->id)
+
+		if (!$user->_id)
 		{	
     		$this->tpfail("Failure while saving User");
             return ;
