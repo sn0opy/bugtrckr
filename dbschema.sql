@@ -43,8 +43,4 @@ CREATE TABLE ProjectAdmins (id INTEGER PRIMARY KEY AUTOINCREMENT, userID INTEGER
 -- VIEWS
 --
 CREATE VIEW user_perms as SELECT * FROM user, projectpermission WHERE user.id = projectpermission.userId;
-CREATE VIEW user_ticket as SELECT * FROM user, ticket WHERE user.id = ticket.owner;
-
-
-
-alter table role add proj_manageRoles bool; -- 12.05. 18:20
+CREATE VIEW user_ticket AS SELECT user.hash as userhash, ticket.hash as tickethash, * FROM user, ticket WHERE user.id = ticket.owner; -- modified: 13.5. 19:30

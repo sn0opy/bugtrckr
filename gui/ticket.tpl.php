@@ -1,4 +1,4 @@
-<h2>{{@lng.tickets}} › {{@ticket.title}} <span class="hash">#{{@ticket.hash}}</span></h2>
+<h2>{{@lng.tickets}} › {{@ticket->title}} <span class="hash">#{{@ticket->tickethash}}</span></h2>
 
 <div class="ticket">
 	<table class="ticket">
@@ -13,12 +13,14 @@
 			<th>{{@lng.priority}}</th>
 			<td>{{@ticket->priority}}</td>
 			<th>{{@lng.assignedTo}}</th>
-			<td><a href="/{{@BASE}}user/{{@ticket.assigned}}">{{@ticket->assigned}}</a></td>
+
+			<td><a href="/{{@BASE}}user/{{@ticket->assigned}}">{{@ticket->assigned}}</a></td>
 		</tr>
 
 		<tr>
 			<th>{{@lng.owner}}</th>
-			<td><a href="/{{@BASE}}user/{{@ticket->owner}}">{{@ticket->owner}}</a></td>
+
+			<td><a href="/{{@BASE}}user/{{@ticket->name}}">{{@ticket->name}}</a></td>
 			<th></th>
 			<td></td>
 		</tr>
@@ -47,7 +49,7 @@
 	</p>
 </div>
 
-
+{{* this wont work yet, f3 update needed *}}
 <F3:check if="{{@SESSION.user}}">
 	<F3:true>
     
