@@ -38,9 +38,55 @@ CREATE TABLE ProjectPermission (userId INTEGER, projectId INTEGER, roleId INTEGE
 --
 CREATE TABLE ProjectAdmins (id INTEGER PRIMARY KEY AUTOINCREMENT, userID INTEGER, projectID INTEGER);
 
+--
+-- Priority
+--
+CREATE TABLE Priority
+(
+	id INTEGER PRIMARY KEY,
+	name VARCHAR(20),
+	lang VARCHAR(5)
+);
+
+INSERT INTO Priority (id, name, lang) VALUES (1, 'Sehr hoch', 'de');
+INSERT INTO Priority (id, name, lang) VALUES (2, 'hoch', 'de');
+INSERT INTO Priority (id, name, lang) VALUES (3, 'normal', 'de');
+INSERT INTO Priority (id, name, lang) VALUES (4, 'niedrig', 'de');
+INSERT INTO Priority (id, name, lang) VALUES (5, 'sehr niedrig', 'de');
+
+--
+-- Status
+--
+CREATE TABLE Status
+(
+	id INTEGER PRIMARY KEY,
+	name VARCHAR(20),
+	lang VARCHAR(5)
+);
+
+INSERT INTO Status (id, name, lang) VALUES (1, 'Neu', 'de');
+INSERT INTO Status (id, name, lang) VALUES (2, 'Zugewiesen', 'de');
+INSERT INTO Status (id, name, lang) VALUES (3, 'in Bearbeitung', 'de');
+INSERT INTO Status (id, name, lang) VALUES (4, 'Test', 'de');
+INSERT INTO Status (id, name, lang) VALUES (5, 'Geschlossen', 'de');
+
+--
+-- Type
+--
+CREATE TABLE Type
+(
+	id INTEGER PRIMARY KEY,
+	name VARCHAR(20),
+	lang VARCHAR(5)
+);
+
+INSERT INTO Type (id, name, lang) VALUES (1, 'Bug', 'de');
+INSERT INTO Type (id, name, lang) VALUES (2, 'Feature', 'de');
+
 
 --
 -- VIEWS
 --
 CREATE VIEW user_perms as SELECT * FROM user, projectpermission WHERE user.id = projectpermission.userId;
-CREATE VIEW user_ticket AS SELECT user.hash as userhash, ticket.hash as ticket_hash, * FROM user, ticket WHERE user.id = ticket.owner; -- modified: 13.5. 19:30
+CREATE VIEW user_ticket AS SELECT user.hash as userhash, ticket.hash as tickethash, * FROM user, ticket WHERE user.id = ticket.owner; -- modified: 13.5. 19:30
+CREATE VIEW displayableticket AS SELECT priority.name as priorityname, status.name as statusname, type.name as typename, user.hash as userhash, user.name as username, ticket.hash as tickethash, * FROM user, ticket, status, priority, type WHERE user.id = ticket.owner AND ticket.state = status.id AND ticket.priority = priority.id AND type.id = ticket.type;

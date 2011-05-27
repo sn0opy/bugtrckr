@@ -93,11 +93,11 @@
         <tr class="tr{{@i%2}}">
             <td class="id">{{@i+1}}</td>
             <td class="title">
-                <a href="/{{@BASE}}ticket/{{@ticket->ticket_hash}}">{{@ticket->title}}</a>
+                <a href="/{{@BASE}}ticket/{{@ticket->tickethash}}">{{@ticket->title}}</a>
 			</td>
-			<td class="type">{{@ticket->type}}</td>
-            <td class="state">{{@ticket->state}}</td>
-            <td class="priority">{{@ticket->priority}}</td>
+			<td class="type">{{@ticket->typename}}</td>
+            <td class="state">{{@ticket->statusname}}</td>
+            <td class="priority">{{@ticket->priorityname}}</td>
             <td class="created">{{date('d.m.Y H:i', @ticket->created)}}</td>
             <td class="owner"><a href="/{{@BASE}}user/{{@ticket->name}}">{{@ticket->name}}</a></td>
         </tr>

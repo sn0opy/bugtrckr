@@ -4,14 +4,14 @@
 	<table class="ticket">
 		<tr>
 			<th>{{@lng.status}}</th>
-			<td>{{@ticket->state}}</td>
+			<td>{{@ticket->statusname}}</td>
 			<th>{{@lng.created}}</th>
 			<td>{{@ticket->created}}</td>
 		</tr>
 
 		<tr>
 			<th>{{@lng.priority}}</th>
-			<td>{{@ticket->priority}}</td>
+			<td>{{@ticket->priorityname}}</td>
 			<th>{{@lng.assignedTo}}</th>
 
 			<td><a href="/{{@BASE}}user/{{@ticket->assigned}}">{{@ticket->assigned}}</a></td>
@@ -54,7 +54,7 @@
 	<F3:true>
     
     <div class="editTicket">
-        <form method="POST" action="/{{@BASE}}ticket/{{@ticket->hash}}">
+        <form method="POST" action="/{{@BASE}}ticket/{{@ticket->tickethash}}">
 
             <div class="formRow">
                 <div class="formLabel">{{@lng.assignedTo}}</div>

@@ -41,8 +41,8 @@ class main extends F3instance
         foreach($milestones as $ms)
             $string .= $ms->id.',';
         
-        $tickets = new user_ticket();
-        $tickets = $tickets->find('milestone IN (' .$string. '0)');
+        $tickets = new DisplayableTicket();
+        $tickets = $tickets->find('milestone IN (' .$string. '0) ORDER BY '. $order);
 
 		$this->set('milestones', $milestones);
         $this->set('tickets', $tickets);
@@ -60,7 +60,7 @@ class main extends F3instance
 		$milestone = new Milestone();
 		$milestone->load('hash = "' . $hash .'"');
 
-        $ticket = new Ticket();
+        $ticket = new DisplayableTicket();
         $tickets = $ticket->find('milestone = '.$milestone->id);
         
         $ms['ticketCount'] = $helper->getTicketCount($milestone->id);
@@ -163,7 +163,7 @@ class main extends F3instance
     {
         $hash = $this->get('PARAMS.hash');
 
-        $ticket = new User_ticket();
+        $ticket = new DisplayableTicket();
         $ticket = $ticket->findone('tickethash = "'. $hash.'"');
 
         $milestone = new Milestone();
