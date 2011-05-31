@@ -32,7 +32,11 @@
                         <li><a href="/{{@BASE}}tickets">{{@lng.tickets}}</a></li>
                         <li><a href="/{{@BASE}}roadmap">{{@lng.roadmap}}</a></li>
                         <li><a href="/{{@BASE}}timeline">{{@lng.timeline}}</a></li>
-                        <li><a href="/{{@BASE}}project/settings">{{@lng.settings}}</a></li>
+                        <F3:check if="{{@SESSION.user}}">
+                            <F3:true>
+                                <li><a href="/{{@BASE}}project/settings">{{@lng.settings}}</a></li>
+                            </F3:true>
+                        </F3:check>
                     </F3:true>
                 </F3:check>
                 <F3:check if="{{@SESSION.user}}">
