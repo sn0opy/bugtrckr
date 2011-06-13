@@ -1,7 +1,7 @@
 --
 -- Ticket
 --
-CREATE TABLE Ticket (id INTEGER PRIMARY KEY AUTOINCREMENT, hash VARCHAR(12) UNIQUE, title varchar(40), description text, created int, owner int, assigned int, type int, state int, priority int, category varchar(40), milestone int);
+CREATE TABLE Ticket (id INTEGER PRIMARY KEY AUTOINCREMENT, hash VARCHAR(12) UNIQUE, title varchar(40), description text, created int, owner int, assigned int, type int, state int, priority int, category int, milestone int);
 INSERT INTO Ticket (id, hash, title, description, created, owner, assigned, type, state, priority, category, milestone) VALUES (1, 'b026324c6904b2a9cb4b88d6d61c81d1', 'Example Ticket', 'This Ticket is just a little example', 1, 1, 2, 1, 1, 3, 1, 1);
 --
 -- User
@@ -83,10 +83,28 @@ CREATE TABLE Type
 INSERT INTO Type (id, name, lang) VALUES (1, 'Bug', 'de');
 INSERT INTO Type (id, name, lang) VALUES (2, 'Feature', 'de');
 
+--
+-- Category
+--
+CREATE TABLE Category
+(
+    id INTEGER PRIMARY KEY,
+    name VARCHAR(20)
+);
+
+INSERT INTO Category (id, name) VALUES (1, 'Test');
+INSERT INTO Category (id, name) VALUES (2, 'Test2');
 
 --
 -- VIEWS
 --
 CREATE VIEW user_perms as SELECT * FROM user, projectpermission WHERE user.id = projectpermission.userId;
 CREATE VIEW user_ticket AS SELECT user.hash as userhash, ticket.hash as tickethash, * FROM user, ticket WHERE user.id = ticket.owner; -- modified: 13.5. 19:30
-CREATE VIEW displayableticket AS SELECT priority.name as priorityname, status.name as statusname, type.name as typename, user.hash as userhash, user.name as username, ticket.hash as tickethash, * FROM user, ticket, status, priority, type WHERE user.id = ticket.owner AND ticket.state = status.id AND ticket.priority = priority.id AND type.id = ticket.type;
+CREATE VIEW displayableticket AS 
+    SELECT priority.name as priorityname, status.name as statusname, type.name as typename,
+            owner.hash as userhash, owner.name as username, ticket.hash as tickethash,
+            assigned.hash as assignedhash, assigned.name as assignedname, category.name as categoryname, * 
+    FROM ticket, user as owner, status, priority, type, category LEFT OUTER JOIN user as assigned
+        ON assigned.id = ticket.assigned
+    WHERE owner.id = ticket.owner AND ticket.state = status.id AND ticket.priority = priority.id 
+        AND type.id = ticket.type AND category.id = ticket.category;

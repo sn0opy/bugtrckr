@@ -6,28 +6,26 @@
 			<th>{{@lng.status}}</th>
 			<td>{{@ticket->statusname}}</td>
 			<th>{{@lng.created}}</th>
-			<td>{{@ticket->created}}</td>
+			<td>{{date('d.m.Y H:i', @ticket->created)}}</td>
 		</tr>
 
 		<tr>
 			<th>{{@lng.priority}}</th>
 			<td>{{@ticket->priorityname}}</td>
 			<th>{{@lng.assignedTo}}</th>
-
-			<td><a href="/{{@BASE}}user/{{@ticket->assigned}}">{{@ticket->assigned}}</a></td>
+			<td><a href="/{{@BASE}}user/{{@ticket->assignedname}}">{{@ticket->assignedname}}</a></td>
 		</tr>
 
 		<tr>
 			<th>{{@lng.owner}}</th>
-
-			<td><a href="/{{@BASE}}user/{{@ticket->name}}">{{@ticket->name}}</a></td>
+			<td><a href="/{{@BASE}}user/{{@ticket->username}}">{{@ticket->username}}</a></td>
 			<th></th>
 			<td></td>
 		</tr>
 
 		<tr>
 			<th>{{@lng.category}}</th>
-			<td>{{@ticket->category}}</td>
+			<td>{{@ticket->categoryname}}</td>
 			<th></th>
 			<td></td>
 		</tr>
@@ -61,7 +59,7 @@
                 <div class="formValue">
                     <select name="userId" size="1">
                     <F3:repeat group="{{@users}}" value="{{@user}}">
-                        <option value="{{@user.id}}">{{@user.name}}</option>
+                        <option value="{{@user->id}}">{{@user->name}}</option>
                     </F3:repeat>
                     </select>
                 </div>

@@ -43,9 +43,13 @@ class main extends F3instance
         
         $tickets = new DisplayableTicket();
         $tickets = $tickets->find('milestone IN (' .$string. '0) ORDER BY '. $order);
+            
+        $categories = new Category();
+        $categories = $categories->find();
 
-		$this->set('milestones', $milestones);
+        $this->set('milestones', $milestones);
         $this->set('tickets', $tickets);
+        $this->set('categories', $categories);
         $this->set('pageTitle', '{{@lng.tickets}}');
         $this->set('template', 'tickets.tpl.php');
         $this->tpserve();
@@ -137,19 +141,10 @@ class main extends F3instance
         /* Get Project */
         $project = $this->get('SESSION.project');
 
-        try {
-            $activities = Dao::getActivities("project = $project");
-        } catch (Exception $e) {
-            $this->tpfail("Failure while open Activities", $e);
-            return ;
-        }
+        $activities = new Activity();
+        $activities = $activities->find("project = $project");
 
-        foreach($activities as $activity)
-        {
-            $timeline[] = $activity->toArray();
-        }
-
-        $this->set('activities', $timeline);
+        $this->set('activities', $activities);
         $this->set('pageTitle', '{{@lng.timeline}}');
         $this->set('template', 'timeline.tpl.php');
 
@@ -164,7 +159,7 @@ class main extends F3instance
         $hash = $this->get('PARAMS.hash');
 
         $ticket = new DisplayableTicket();
-        $ticket = $ticket->findone('tickethash = "'. $hash.'"');
+        $ticket = $ticket->findone("tickethash = '$hash'");
 
         $milestone = new Milestone();
         $milestone->load(array('id = :id', array(':id' => $ticket->milestone)));
@@ -175,8 +170,12 @@ class main extends F3instance
             return ;
         }
 
+        $users = new User();
+        $users = $users->find();
+
         $this->set('ticket', $ticket);
         $this->set('milestone', $milestone);
+        $this->set('users', $users);
         $this->set('pageTitle', '{{@lng.tickets}} › '. $ticket->title);
         $this->set('template', 'ticket.tpl.php');
         $this->tpserve();
@@ -193,7 +192,7 @@ class main extends F3instance
             return;
         }
         
-        $ticket = new Ticket();        
+        $ticket = new Ticket(); 
         $ticket->hash = $this->helper->getFreeHash('Ticket');
         $ticket->title = $this->get('POST.title');
         $ticket->description = $this->get('POST.description');
@@ -203,7 +202,7 @@ class main extends F3instance
         $ticket->state = 1;
         $ticket->created = time();
         $ticket->priority = $this->get('POST.priority');
-        $ticket->category = 1;
+        $ticket->category = $this->get('POST.category');
         $ticket->milestone = $this->get('POST.milestone');
         $ticket->save();
 
@@ -224,7 +223,7 @@ class main extends F3instance
         $hash = $this->get('PARAMS.hash');
 
         $ticket = new Ticket();
-        $ticket->load('hash = :hash', array(':hash' => $hash));
+        $ticket->load("hash = '$hash'");
 
         $ticket->assigned = $this->get('POST.userId');
         $ticket->state = $this->get('POST.state');

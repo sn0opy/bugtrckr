@@ -28,7 +28,13 @@
 
 		<div class="formRow">
 			<div class="formLabel">{{@lng.category}}</div>
-			<div class="formValue"><input type="text" name="category" /></div>
+			<div class="formValue">
+                <select name="category" size="1">
+                    <F3:repeat group="{{@categories}}" value="{{@category}}">
+                        <option value="{{@category->id}}">{{@category->name}}</option>
+                    </F3:repeat>
+                </select>
+            </div>
 		</div>
 
 		<div class="formRow">
@@ -85,6 +91,7 @@
             <th><a href="/{{@BASE}}tickets/priority">{{@lng.priority}}</a></th>
             <th><a href="/{{@BASE}}tickets/created">{{@lng.created}}</a></th>
             <th>{{@lng.owner}}</th>
+            <th>{{@lng.assigned}}</th>
         </tr>
     </thead>
 
@@ -99,7 +106,8 @@
             <td class="state">{{@ticket->statusname}}</td>
             <td class="priority">{{@ticket->priorityname}}</td>
             <td class="created">{{date('d.m.Y H:i', @ticket->created)}}</td>
-            <td class="owner"><a href="/{{@BASE}}user/{{@ticket->name}}">{{@ticket->name}}</a></td>
+            <td class="owner"><a href="/{{@BASE}}user/{{@ticket->username}}">{{@ticket->username}}</a></td>
+            <td class="owner"><a href="/{{@BASE}}user/{{@ticket->assignedname}}">{{@ticket->assignedname}}</a></td>
         </tr>
         </F3:repeat>
     </tbody>
