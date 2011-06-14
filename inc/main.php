@@ -143,7 +143,7 @@ class main extends F3instance
 
         $activities = new Activity();
         $activities = $activities->find("project = $project");
-
+        
         $this->set('activities', $activities);
         $this->set('pageTitle', '{{@lng.timeline}}');
         $this->set('template', 'timeline.tpl.php');
@@ -236,7 +236,6 @@ class main extends F3instance
             return ;
         }
 
-        //Dao::addActivity('changed Ticket '. $ticket->title);
         $this->set('PARAMS["hash"]', $hash);
         $this->showTicket($hash);
     }
@@ -281,7 +280,7 @@ class main extends F3instance
     	$project = new Project;
        	$project->load(array('id = :id', array(':id' => $projectId)));
        
-		$role = new Role(); 
+		$role = new Role();
       	$roles = $role->find('projectId = '.$projectId);
 
         $projPerms = new user_perms();
@@ -292,8 +291,11 @@ class main extends F3instance
 
 		$user = new User();
 		$users = $user->find();
+        
+        $categories = new Category();
+        $categories = $categories->find();
 
-		if (!$project->id || !$roles || !$milestones || !$users)
+		if (!$project->id) //|| !$roles || !$milestones || !$users || !$categories)
         {
             $this->tpfail("Failure while open Project");
             return ;
@@ -303,7 +305,8 @@ class main extends F3instance
         $this->set('projMilestones', $milestones);
         $this->set('projRoles', $roles);
         $this->set('projMembers', $projPerms);
-        $this->set('projDetails', $project);        
+        $this->set('projDetails', $project); 
+        $this->set('projCategories', $categories);
         $this->set('template', 'projectSettings.tpl.php');
         $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}}');
         $this->tpserve();
@@ -546,6 +549,21 @@ class main extends F3instance
     /**
      * 
      */
+    function addCategory()
+    {
+        
+        $category = new Category();		    
+	    $category->name = $this->get('POST.name');
+        $category->save();
+        
+        $_SESSION['SUCCESS'] = "Category added successfully";
+
+        $this->reroute('/'.$this->get('BASE').'project/settings/');
+    }
+    
+    /**
+     * 
+     */
     function showAddRole()
     {
         $this->set('template', 'projectSettingsRoleAdd.tpl.php');
@@ -563,6 +581,18 @@ class main extends F3instance
         $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.addmilestone}}');
         $this->tpserve();
     }
+    
+        
+    /**
+     * 
+     */
+    function showAddCategory()
+    {
+        $this->set('template', 'projectSettingsCategoryAdd.tpl.php');
+        $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.addcategory}}');
+        $this->tpserve();
+    }
+    
     
     /**
      * 
