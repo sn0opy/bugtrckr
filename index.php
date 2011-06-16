@@ -18,7 +18,7 @@ session_start();
 $app = require(__DIR__.'/lib/base.php');
 require 'inc/config.inc.php';
 
-$app->set('CACHE', true);
+$app->set('CACHE', false);
 $app->set('DEBUG', 3);
 $app->set('EXTEND', true);
 $app->set('GUI','gui/');

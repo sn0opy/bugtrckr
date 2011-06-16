@@ -1,7 +1,7 @@
 *
 {
-	margin:	0px;
-	padding: 0px;
+    margin: 0px;
+    padding: 0px;
 }
 
 @font-face
@@ -12,10 +12,10 @@
 
 body
 {
-	color: #333;
-	font-size: 10pt;
+    color: #333;
+    font-size: 10pt;
     font-family: OpenSans;
-	min-width: 900px;
+    min-width: 900px;
     background: #FFF;
 }
 
@@ -41,11 +41,11 @@ h3 a:hover
 
 /* 
  *	
- */
+*/
 #head
 {
-	background: #068 url(img/headBg.png);
-	height:	50px;
+    background: #068 url(img/headBg.png);
+    height: 50px;
     font: 10pt Georgia;
 }
 
@@ -103,8 +103,8 @@ h3 a:hover
 
 #content
 {
-	float: left;
-	font-size: 12px;
+    float: left;
+    font-size: 12px;
     width: 100%;
 }
 
@@ -123,9 +123,9 @@ h3 a:hover
 
 #failure
 {
-	background: #FAA;
-	border:	solid 1px #F54;
-	color:	#F00;
+    background: #FAA;
+    border: solid 1px #F54;
+    color: #F00;
     margin: 0 auto;
     padding: 5px;
     border-radius: 3px;
@@ -136,8 +136,8 @@ h3 a:hover
 
 #success
 {
-	background: #D6FFD6;
-	border:	solid 1px #00D600;
+    background: #D6FFD6;
+    border: solid 1px #00D600;
     color: #060;
     padding: 5px;
     border-radius: 3px;
@@ -275,7 +275,7 @@ input, textarea, select
 
 /*
  *
- */
+*/
 .formRow
 {
     float: left;
@@ -296,7 +296,7 @@ input, textarea, select
 
 /* 
  *	
- */
+*/
 h1
 {
     line-height: 50px;
@@ -309,7 +309,7 @@ h1
 
 h2
 {
-	font-size: 16pt;
+    font-size: 16pt;
     margin-bottom: 20px;
 }
 
@@ -320,30 +320,30 @@ h3
 
 /* 
  *	
- */
+*/
 a
 {
-	color: #000;
-	text-decoration: none;
+    color: #000;
+    text-decoration: none;
 }
 
 /* 
  *	
- */
+*/
 table.overview
 {
-	color: #222;
+    color: #222;
     width: 100%;
 }
 
 table.overview a
 {
-	color: #444;
+    color: #444;
 }
 
 table.overview th
 {
-	text-transform: lowercase;
+    text-transform: lowercase;
     font-weight: normal;
     background: #333;
     color: #FFF;
@@ -360,54 +360,54 @@ table.overview th a
 
 table.overview tr:hover
 {
-	background: #AAA;
+    background: #AAA;
 }
 
 table.overview .tr0
 {
-	background: #FAFAFA;
+    background: #FAFAFA;
 }
 
 table.overview .tr1
 {
-	background:	#EEE;
+    background:	#EEE;
 }
 
 table.overview .id
 {
-	width: 3%;
+    width: 3%;
 
 }
 table.overview .state
 {
-	width: 5%;
+    width: 5%;
 }
 
 
 table.overview .state
 {
-	width: 10%;
+    width: 10%;
 }
 
 table.overview .priority
 {
-	width: 8%;
+    width: 8%;
 }
 
 table.overview .created
 {
-	width: 12%;
+    width: 12%;
 }
 
 table.overview .owner
 {
-	width: 7%;
+    width: 7%;
 }
 
 /*
  *
- */
- .milestone
+*/
+.milestone
 {
     margin-bottom: 30px;
 }
@@ -488,16 +488,27 @@ table.overview .owner
 
 /* 
  *	
- */
+*/
 div.ticket
 {
-	background: #ADE;
-	border: 1px solid #8BC;
-	border-radius: 3px;
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
-	padding: 10px;
-	width: 80%;
+    background: #ADE;
+    border: 1px solid #8BC;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    padding: 10px;
+    width: 80%;
+}
+
+div.ticket_timeline
+{
+    border: 1px solid #8BC;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    margin-top: 5px;
+    padding: 10px;
+    width: 80%;
 }
 
 .editTicket
@@ -508,19 +519,19 @@ div.ticket
 div.ticket hr
 {
     background-color: #AAA;
-	border: 0px;
-	height: 1px;
-	margin-top: 10px;
-	margin-bottom: 10px;
+    border: 0px;
+    height: 1px;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 /* 
  *	
- */
+*/
 table.ticket 
 {
-	border-collapse: collapse;
-	width: 100%;
+    border-collapse: collapse;
+    width: 100%;
 }
 
 table.ticket tr
@@ -529,7 +540,7 @@ table.ticket tr
 
 table th, table td
 {
-	padding: 2px;
+    padding: 2px;
     line-height: 18px;
     padding-left: 5px;
 }
@@ -541,16 +552,16 @@ table.ticket th
 
 .add, #login
 {
-	background: #EEE;
+    background: #EEE;
     border: 1px solid #BBB;
-	border-radius: 5px;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	box-shadow: 3px 3px 3px #333;
-	display: none;
-	position: absolute;
-	width: 400px; 
-	z-index: 5;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    box-shadow: 3px 3px 3px #333;
+    display: none;
+    position: absolute;
+    width: 400px; 
+    z-index: 5;
     left: 50%;
     margin-left: -210px;
     padding: 20px;
@@ -605,13 +616,13 @@ table.ticket th
 
 ul.sublist
 {
-	padding: 10px;
+    padding: 10px;
 }
 
 p.info
 {
-	color:	green;
-	font-weight: bold;
+    color:	green;
+    font-weight: bold;
 }
 
 button

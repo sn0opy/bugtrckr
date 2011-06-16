@@ -91,6 +91,9 @@ return array('lng' => array(
     'addmilestone' => 'Meilenstein hinzufügen',
     'add' => 'Hinzufügen',
     'asRole' => 'als',
-    'delete' => 'Entfernen'
+    'delete' => 'Entfernen',
+    'ticket' => 'Ticket',
+    'added' => 'wurde hinzugefügt',
+    'edited_by' => 'wurde geändert von'
 ));
 

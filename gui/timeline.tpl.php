@@ -9,8 +9,8 @@
 <F3:repeat group="{{@activities}}" key="{{@i}}" value="{{@activity}}">
 	<tr class="tr{{@i%2}}">
 		<td>{{@activity->description}}</td>
-		<td>{{@activity->changed}}</td>
-		<td><a href="/{{@BASE}}user/{{@activity->user}}">{{@activity->user}}</a></td>
+		<td>{{date('d.m.Y H:i', @activity->changed)}}</td>
+		<td><a href="/{{@BASE}}user/{{@activity->username}}">{{@activity->username}}</a></td>
 	</tr>
 </F3:repeat>
 </table>

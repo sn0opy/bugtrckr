@@ -11,39 +11,39 @@
  * @copyright Copyright 2011, Bugtrckr-Team
  * @license http://www.gnu.org/licenses/lgpl.txt
  *   
-*/
-
+ */
 class main extends F3instance
 {
+
     private $helper;
-    
+
     function __construct()
     {
         $this->helper = new helper();
     }
-    
+
     function start()
     {
         $this->set('pageTitle', '{{@lng.home}}');
         $this->set('template', 'home.tpl.php');
         $this->tpserve();
     }
-    
+
     function showTickets()
     {
         $order = $this->get('PARAMS.order') ? $this->get('PARAMS.order') : "id";
         $project = $this->get('SESSION.project');
-        
+
         $milestones = new Milestone();
-        $milestones = $milestones->find('project = ' .$project);
-        
+        $milestones = $milestones->find('project = ' . $project);
+
         $string = '';
-        foreach($milestones as $ms)
-            $string .= $ms->id.',';
-        
+        foreach ($milestones as $ms)
+            $string .= $ms->id . ',';
+
         $tickets = new DisplayableTicket();
-        $tickets = $tickets->find('milestone IN (' .$string. '0) ORDER BY '. $order);
-            
+        $tickets = $tickets->find('milestone IN (' . $string . '0) ORDER BY ' . $order);
+
         $categories = new Category();
         $categories = $categories->find();
 
@@ -54,74 +54,70 @@ class main extends F3instance
         $this->set('template', 'tickets.tpl.php');
         $this->tpserve();
     }
-    
+
     function showMilestone()
     {
         $hash = $this->get('PARAMS.hash');
-        
+
         $helper = new helper();
 
-		$milestone = new Milestone();
-		$milestone->load('hash = "' . $hash .'"');
+        $milestone = new Milestone();
+        $milestone->load('hash = "' . $hash . '"');
 
         $ticket = new DisplayableTicket();
-        $tickets = $ticket->find('milestone = '.$milestone->id);
-        
+        $tickets = $ticket->find('milestone = ' . $milestone->id);
+
         $ms['ticketCount'] = $helper->getTicketCount($milestone->id);
 
         $ms['fullTicketCount'] = 0;
-        foreach($ms['ticketCount'] as $cnt)
+        foreach ($ms['ticketCount'] as $cnt)
             $ms['fullTicketCount'] += $cnt['count'];
 
         $ms['openTickets'] = 0;
-        foreach($ms['ticketCount'] as $j => $cnt)
+        foreach ($ms['ticketCount'] as $j => $cnt)
         {
             $ms['ticketCount'][$j]['percent'] = round($cnt['count'] * 100 / $ms['fullTicketCount']);
-            $ms['ticketCount'][$j]['title'] = $this->get("ticket_state.".$ms['ticketCount'][$j]['state']);
+            $ms['ticketCount'][$j]['title'] = $this->get("ticket_state." . $ms['ticketCount'][$j]['state']);
 
-            if($ms['ticketCount'][$j]['state'] != 5)
-                 $ms['openTickets'] += $ms['ticketCount'][$j]['count'];
+            if ($ms['ticketCount'][$j]['state'] != 5)
+                $ms['openTickets'] += $ms['ticketCount'][$j]['count'];
         }
-            
+
         $this->set('tickets', $tickets);
         $this->set('stats', $ms);
         $this->set('milestone', $milestone);
-        $this->set('pageTitle', '{{@lng.milestone}} › '. $milestone->name);
+        $this->set('pageTitle', '{{@lng.milestone}} › ' . $milestone->name);
         $this->set('template', 'milestone.tpl.php');
         $this->tpserve();
-
     }
 
-
     function showRoadmap()
-    {        
+    {
         $ms = array();
         $fullCount = 0;
-        
+
         $helper = new helper();
 
         $milestones = new Milestone();
-        $milestones = $milestones->find('project = '.$this->get('SESSION.project'));
+        $milestones = $milestones->find('project = ' . $this->get('SESSION.project'));
 
-        foreach($milestones as $milestone)
-        { 
+        foreach ($milestones as $milestone)
+        {
             $ms[$milestone->id]['infos'] = $milestone;
             $ms[$milestone->id]['ticketCount'] = $helper->getTicketCount($milestone->id);
-            
+
             $ms[$milestone->id]['fullTicketCount'] = 0;
-            foreach($ms[$milestone->id]['ticketCount'] as $cnt)
+            foreach ($ms[$milestone->id]['ticketCount'] as $cnt)
                 $ms[$milestone->id]['fullTicketCount'] += $cnt['count'];
 
             $ms[$milestone->id]['openTickets'] = 0;
-            foreach($ms[$milestone->id]['ticketCount'] as $j => $cnt)
+            foreach ($ms[$milestone->id]['ticketCount'] as $j => $cnt)
             {
                 $ms[$milestone->id]['ticketCount'][$j]['percent'] = round($cnt['count'] * 100 / $ms[$milestone->id]['fullTicketCount']);
-                $ms[$milestone->id]['ticketCount'][$j]['title'] = $this->get("ticket_state.".$ms[$milestone->id]['ticketCount'][$j]['state']);
+                $ms[$milestone->id]['ticketCount'][$j]['title'] = $this->get("ticket_state." . $ms[$milestone->id]['ticketCount'][$j]['state']);
 
-                if($ms[$milestone->id]['ticketCount'][$j]['state'] != 5)
-                     $ms[$milestone->id]['openTickets'] += $ms[$milestone->id]['ticketCount'][$j]['count'];
-
- 
+                if ($ms[$milestone->id]['ticketCount'][$j]['state'] != 5)
+                    $ms[$milestone->id]['openTickets'] += $ms[$milestone->id]['ticketCount'][$j]['count'];
             }
         }
 
@@ -141,9 +137,9 @@ class main extends F3instance
         /* Get Project */
         $project = $this->get('SESSION.project');
 
-        $activities = new Activity();
+        $activities = new DisplayableActivity();
         $activities = $activities->find("project = $project");
-        
+
         $this->set('activities', $activities);
         $this->set('pageTitle', '{{@lng.timeline}}');
         $this->set('template', 'timeline.tpl.php');
@@ -164,10 +160,13 @@ class main extends F3instance
         $milestone = new Milestone();
         $milestone->load(array('id = :id', array(':id' => $ticket->milestone)));
 
-		if (!$ticket->id || !$milestone->id)
-		{
+        $activities = new DisplayableActivity();
+        $activities = $activities->find("ticket = " . $ticket->id);
+
+        if (!$ticket->id || !$milestone->id)
+        {
             $this->tpfail("Can't open ticket");
-            return ;
+            return;
         }
 
         $users = new User();
@@ -175,8 +174,9 @@ class main extends F3instance
 
         $this->set('ticket', $ticket);
         $this->set('milestone', $milestone);
+        $this->set('activities', $activities);
         $this->set('users', $users);
-        $this->set('pageTitle', '{{@lng.tickets}} › '. $ticket->title);
+        $this->set('pageTitle', '{{@lng.tickets}} › ' . $ticket->title);
         $this->set('template', 'ticket.tpl.php');
         $this->tpserve();
     }
@@ -186,13 +186,13 @@ class main extends F3instance
      */
     function addTicket()
     {
-        if(!$this->helper->getPermission('iss_addIssues'))
+        if (!$this->helper->getPermission('iss_addIssues'))
         {
             $this->tpfail('You are not allowed to add tickets.');
             return;
         }
-        
-        $ticket = new Ticket(); 
+
+        $ticket = new Ticket();
         $ticket->hash = $this->helper->getFreeHash('Ticket');
         $ticket->title = $this->get('POST.title');
         $ticket->description = $this->get('POST.description');
@@ -206,13 +206,17 @@ class main extends F3instance
         $ticket->milestone = $this->get('POST.milestone');
         $ticket->save();
 
-		if (!$ticket->_id)
-		{       
+        if (!$ticket->_id)
+        {
             $this->tpfail("Failure while saving Ticket");
-            return ;
+            return;
         }
         
-        $this->reroute('/'.$this->get('BASE').'ticket/'.$ticket->hash);
+        helper::addActivity(
+            $this->get('lng.ticket') . " '$ticket->title' " . $this->get('lng.ticket.added') . ".", 
+            $ticket->_id);
+        
+        $this->reroute('/' . $this->get('BASE') . 'ticket/' . $ticket->hash);
     }
 
     /**
@@ -230,12 +234,18 @@ class main extends F3instance
 
         $ticket->save();
 
-		if (!$ticket->id)
+        if (!$ticket->id)
         {
             $this->tpfail("Failure while saving Ticket");
-            return ;
+            return;
         }
 
+        helper::addActivity(
+            $this->get('lng.ticket') . " '$ticket->title' " . 
+            $this->get('lng.edited_by') . " '<a href=\"/user/" . $this->get('SESSION.user.name') . "\">" . 
+            $this->get('SESSION.user.name') . "</a>'.",
+            $ticket->id);
+        
         $this->set('PARAMS["hash"]', $hash);
         $this->showTicket($hash);
     }
@@ -247,194 +257,194 @@ class main extends F3instance
     {
         $url = $this->get('SERVER.HTTP_REFERER');
 
-		$projectId = $this->get('POST.project');
+        $projectId = $this->get('POST.project');
 
         $project = new Project();
-        $project->load("hash = '$projectId'");//array('hash = :hash', array(':hash' => $this->get('POST.project'))));
+        $project->load("hash = '$projectId'");
 
-		if (!$project->id)
-		{
+        if (!$project->id)
+        {
             $this->tpfail("Failure while changing Project");
-            return ;
-		}
+            return;
+        }
 
-        if($this->get('SESSION.user.id'))
+        if ($this->get('SESSION.user.id'))
         {
             $user = new User();
-			$user->load("id = ".$this->get('SESSION.user.id'));
+            $user->load("id = " . $this->get('SESSION.user.id'));
             $user->lastProject = $project->id;
             $user->save();
         }
-		
+
         $this->set('SESSION.project', $project->id);
         $this->reroute($url);
-    }    
-    
+    }
+
     /**
      * 
      */
     function showProjectSettings()
-    {    
+    {
         $projectId = $this->get('SESSION.project');
 
-    	$project = new Project;
-       	$project->load(array('id = :id', array(':id' => $projectId)));
-       
-		$role = new Role();
-      	$roles = $role->find('projectId = '.$projectId);
+        $project = new Project;
+        $project->load(array('id = :id', array(':id' => $projectId)));
+
+        $role = new Role();
+        $roles = $role->find('projectId = ' . $projectId);
 
         $projPerms = new user_perms();
-        $projPerms = $projPerms->find('projectId = '.$projectId);
-        
-		$milestone = new Milestone();
-		$milestones = $milestone->find('project = '.$projectId);
+        $projPerms = $projPerms->find('projectId = ' . $projectId);
 
-		$user = new User();
-		$users = $user->find();
-        
+        $milestone = new Milestone();
+        $milestones = $milestone->find('project = ' . $projectId);
+
+        $user = new User();
+        $users = $user->find();
+
         $categories = new Category();
         $categories = $categories->find();
 
-		if (!$project->id) //|| !$roles || !$milestones || !$users || !$categories)
+        if (!$project->id) //|| !$roles || !$milestones || !$users || !$categories)
         {
             $this->tpfail("Failure while open Project");
-            return ;
+            return;
         }
-        
+
         $this->set('users', $users);
         $this->set('projMilestones', $milestones);
         $this->set('projRoles', $roles);
         $this->set('projMembers', $projPerms);
-        $this->set('projDetails', $project); 
+        $this->set('projDetails', $project);
         $this->set('projCategories', $categories);
         $this->set('template', 'projectSettings.tpl.php');
         $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}}');
         $this->tpserve();
     }
-    
+
     function projectAddMember()
     {
-        if(!$this->helper->getPermission('proj_manageMembers'))
+        if (!$this->helper->getPermission('proj_manageMembers'))
         {
             $this->tpfail('You are not allowed to add new members.');
             return;
         }
-        
+
         $projectId = $this->get('SESSION.project');
         $userHash = $this->get('POST.member');
         $roleHash = $this->get('POST.role');
-        
-		$role = new Role(); 
-      	$role->load(array('hash = :hash', array(':hash' => $roleHash)));
-        
-        if($role->dry())
+
+        $role = new Role();
+        $role->load(array('hash = :hash', array(':hash' => $roleHash)));
+
+        if ($role->dry())
         {
             $this->tpfail('Failure while getting role.');
             return;
         }
-        
+
         $user = new User();
         $user->load(array('hash = :hash', array(':hash' => $userHash)));
-        
-        if($user->dry())
+
+        if ($user->dry())
         {
             $this->tpfail('Failure while getting user.');
             return;
         }
-        
+
         $projPerms = new ProjectPermission();
-        $projPerms->load(array('userId = :userId AND projectId = :projectId',  
-                            array(':userId' => $user->id, ':projectId' => $projectId)));
-        
-        if(!$projPerms->dry())
+        $projPerms->load(array('userId = :userId AND projectId = :projectId',
+            array(':userId' => $user->id, ':projectId' => $projectId)));
+
+        if (!$projPerms->dry())
         {
             $this->tpfail('User already exists in this project.');
             return;
         }
-        
+
         $projPerms->userId = $user->id;
         $projPerms->roleId = $role->id;
         $projPerms->projectId = $projectId;
         $projPerms->save();
-        
-        $this->reroute('/'.$this->get('BASE').'project/settings');
+
+        $this->reroute('/' . $this->get('BASE') . 'project/settings');
     }
-    
+
     function projectDelMember()
     {
-        if(!$this->helper->getPermission('proj_manageMembers'))
+        if (!$this->helper->getPermission('proj_manageMembers'))
         {
             $this->tpfail('You are not allowed to add new members.');
             return;
         }
-        
+
         $userHash = $this->get('POST.user');
         $projectId = $this->get('SESSION.project');
-        
+
         $user = new User();
         $user->load(array('hash = :hash', array(':hash' => $userHash)));
-                
-        if($user->dry())
+
+        if ($user->dry())
         {
             $this->tpfail('Failure while getting user.');
             return;
-        }        
-        
+        }
+
         $projPerms = new ProjectPermission();
-        $projPerms->load('userId = '.$user->id.' AND projectId = '.$projectId);
+        $projPerms->load('userId = ' . $user->id . ' AND projectId = ' . $projectId);
         $projPerms->erase();
-        
+
         $this->set('SESSION.SUCCESS', 'Member has been removed from the project.');
-        $this->reroute('/'.$this->get('BASE').'project/settings');        
+        $this->reroute('/' . $this->get('BASE') . 'project/settings');
     }
-    
+
     /**
      * 
      */
     function projectSetRole()
     {
-        if(!$this->helper->getPermission('proj_manageMembers'))
+        if (!$this->helper->getPermission('proj_manageMembers'))
         {
             $this->tpfail('You are not allowed to edit members.');
             return;
         }
-        
+
         $projectId = $this->get('SESSION.project');
-        
-       	$user = new user();
-       	$user->load(array('hash = :hash', array(':hash' => $this->get('POST.user'))));
 
-		if (!$user->id)
-		{
+        $user = new user();
+        $user->load(array('hash = :hash', array(':hash' => $this->get('POST.user'))));
+
+        if (!$user->id)
+        {
             $this->tpfail("Failure while getting User");
-            return ;
+            return;
         }
 
-  		$role = new Role();
-       	$role->load(array('hash = :hash', array(':hash' => $this->get('POST.role'))));
-		
-		if (!$role->id)
-		{
+        $role = new Role();
+        $role->load(array('hash = :hash', array(':hash' => $this->get('POST.role'))));
+
+        if (!$role->id)
+        {
             $this->tpfail("Failure while getting Role");
-            return ;
+            return;
         }
-        
-        if($role->projectId != $projectId)
+
+        if ($role->projectId != $projectId)
         {
             $this->tpfail("Role does not belong to this project.");
             return;
         }
 
-  	    $perms = new ProjectPermission();
+        $perms = new ProjectPermission();
         $perms->load(array('projectId = :proj AND userId = :user',
-						array(	':proj' => $projectId,
-								':user' => $user->id)));
+            array(':proj' => $projectId,
+                ':user' => $user->id)));
         $perms->roleId = $role->id;
-	    $perms->save();
-        
-        $this->reroute('/'.$this->get('BASE').'project/settings');
+        $perms->save();
+
+        $this->reroute('/' . $this->get('BASE') . 'project/settings');
     }
-    
+
     /**
      * 
      */
@@ -442,21 +452,21 @@ class main extends F3instance
     {
         $roleHash = $this->get('PARAMS.hash');
 
-		$role = new role();
-    	$role->load(array('hash = :hash', array(':hash' => $roleHash)));
-		
-		if (!$role->id)
-		{
+        $role = new role();
+        $role->load(array('hash = :hash', array(':hash' => $roleHash)));
+
+        if (!$role->id)
+        {
             $this->tpfail("Failure while getting Role");
-            return ;
+            return;
         }
 
-        $this->set('roleData', $role);  
+        $this->set('roleData', $role);
         $this->set('template', 'projectSettingsRole.tpl.php');
         $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.role}} › {{@roleData->name}}');
         $this->tpserve();
     }
-    
+
     /**
      * 
      */
@@ -464,33 +474,34 @@ class main extends F3instance
     {
         $msHash = $this->get('PARAMS.hash');
 
-       	$milestone = new Milestone();
+        $milestone = new Milestone();
         $milestone->load(array('hash = :hash', array(':hash' => $msHash)));
 
-		if (!$milestone->id)
-		{
+        if (!$milestone->id)
+        {
             $this->tpfail("Failure while getting Milestone");
-            return ;
+            return;
         }
 
-        $this->set('msData', $milestone);        
+        $this->set('msData', $milestone);
         $this->set('template', 'projectSettingsMilestone.tpl.php');
         $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.milestone}} › {{@msData->name}}');
-        $this->tpserve();        
+        $this->tpserve();
     }
-    
+
     /**
      * 
      */
     function addEditRole()
     {
         $roleHash = $this->get('POST.hash') ? $this->get('POST.hash') : helper::getFreeHash('Role');
-        
-	    $role = new role();        
-		if (F3::exists('POST.hash')) {
-	    	$role->load(array('hash = :hash', array(':hash' => $roleHash)));
-            
-            if($role->dry())
+
+        $role = new role();
+        if (F3::exists('POST.hash'))
+        {
+            $role->load(array('hash = :hash', array(':hash' => $roleHash)));
+
+            if ($role->dry())
             {
                 $this->tpfail('Failure while editing role.');
                 return;
@@ -515,52 +526,52 @@ class main extends F3instance
         $role->iss_viewWatchers = $this->get('POST.iss_viewWatchers');
         $role->save();
 
-        $this->reroute('/'.$this->get('BASE').'project/settings/role/'. $roleHash);
+        $this->reroute('/' . $this->get('BASE') . 'project/settings/role/' . $roleHash);
     }
-    
+
     /**
      * 
      */
     function addEditMilestone()
     {
         $msHash = $this->get('POST.hash') ? $this->get('POST.hash') : helper::getFreeHash('Milestone');
-        
-        $milestone = new Milestone();		    
-		if (F3::exists('POST.hash')) 
+
+        $milestone = new Milestone();
+        if (F3::exists('POST.hash'))
         {
-            $milestone->load('hash = "' .$msHash. '"');
-            if($milestone->dry())
+            $milestone->load('hash = "' . $msHash . '"');
+            if ($milestone->dry())
             {
                 $this->tpfail('Failure while editing milestone.');
                 return;
             }
         }
 
-	    $milestone->name = $this->get('POST.name');
+        $milestone->name = $this->get('POST.name');
         $milestone->hash = $msHash;
         $milestone->description = $this->get('POST.description');
         $milestone->project = $this->get('SESSION.project');
         $milestone->finished = $this->get('POST.finished');
         $milestone->save();
 
-        $this->reroute('/'.$this->get('BASE').'project/settings/milestone/'. $msHash);
+        $this->reroute('/' . $this->get('BASE') . 'project/settings/milestone/' . $msHash);
     }
-    
+
     /**
      * 
      */
     function addCategory()
     {
-        
-        $category = new Category();		    
-	    $category->name = $this->get('POST.name');
+
+        $category = new Category();
+        $category->name = $this->get('POST.name');
         $category->save();
-        
+
         $_SESSION['SUCCESS'] = "Category added successfully";
 
-        $this->reroute('/'.$this->get('BASE').'project/settings/');
+        $this->reroute('/' . $this->get('BASE') . 'project/settings/');
     }
-    
+
     /**
      * 
      */
@@ -570,7 +581,7 @@ class main extends F3instance
         $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.addrole}}');
         $this->tpserve();
     }
-    
+
     /**
      * 
      */
@@ -581,8 +592,7 @@ class main extends F3instance
         $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.addmilestone}}');
         $this->tpserve();
     }
-    
-        
+
     /**
      * 
      */
@@ -592,8 +602,7 @@ class main extends F3instance
         $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.addcategory}}');
         $this->tpserve();
     }
-    
-    
+
     /**
      * 
      */
@@ -605,14 +614,14 @@ class main extends F3instance
         $project->public = $this->get('POST.public');
         $project->description = $this->get('POST.description');
         $project->save();
-        
-		if (!$project->id)
-		{    
-			$this->tpfail("Failure while saving Project");
-            return ;
+
+        if (!$project->id)
+        {
+            $this->tpfail("Failure while saving Project");
+            return;
         }
 
-        $this->reroute('/'.$this->get('BASE').'project/settings');
+        $this->reroute('/' . $this->get('BASE') . 'project/settings');
     }
 
     /**
@@ -621,23 +630,23 @@ class main extends F3instance
     function showUser()
     {
         $name = $this->get('PARAMS.name');
-		
+
         $user = new User();
-		$user->load(array('name = :name', array(':name' => $name)));
+        $user->load(array('name = :name', array(':name' => $name)));
 
-        if(!$user->id)
-		{
-	    	$this->tpfail("User not found");
-            return ;	
-		}
+        if (!$user->id)
+        {
+            $this->tpfail("User not found");
+            return;
+        }
 
-		$ticket = new User_ticket();
-		$tickets = $ticket->find('owner = '.$user->id);
+        $ticket = new DisplayableTicket();
+        $tickets = $ticket->find('owner = ' . $user->id);
 
         $this->set('user', $user);
         $this->set('tickets', $tickets);
         $this->set('template', 'user.tpl.php');
-        $this->set('pageTitle', '{{@lng.user}} › '.$name);
+        $this->set('pageTitle', '{{@lng.user}} › ' . $name);
         $this->tpserve();
     }
 
@@ -658,24 +667,24 @@ class main extends F3instance
     {
         $salt = helper::randStr();
 
-	    $user = new user();
-	    $user->name = $this->get('POST.name');
-	    $user->email = $this->get('POST.email');
-    	$user->password = helper::salting($salt, $this->get('POST.password'));
+        $user = new user();
+        $user->name = $this->get('POST.name');
+        $user->email = $this->get('POST.email');
+        $user->password = helper::salting($salt, $this->get('POST.password'));
         $user->salt = $salt;
-       	$user->hash = helper::getFreeHash('User');
-       	$user->admin = 0;
-       	$user->save();
+        $user->hash = helper::getFreeHash('User');
+        $user->admin = 0;
+        $user->save();
 
-		if (!$user->_id)
-		{	
-    		$this->tpfail("Failure while saving User");
-            return ;
-		}
+        if (!$user->_id)
+        {
+            $this->tpfail("Failure while saving User");
+            return;
+        }
 
-		$this->set('SESSION.SUCCESS', 'User registred successfully');
-    	$this->reroute('/'. $this->get('BASE'));
-	}
+        $this->set('SESSION.SUCCESS', 'User registred successfully');
+        $this->reroute('/' . $this->get('BASE'));
+    }
 
     /**
      *
@@ -692,21 +701,21 @@ class main extends F3instance
      */
     function loginUser()
     {
-		$user = new User();
-		$user->load(array('email = :email', array(':email' => $this->get('POST.email'))));
-		$user->load(array('email = :email AND password = :password',
-					array(	':email' => $this->get('POST.email'),
-							':password' => helper::salting($user->salt, $this->get('POST.password')))));
-		
-        if (!$user)
-		{
-			$this->set('FAILURE', 'Login failed.');
-            $this->reroute('/'. $this->get('BASE') .'user/login');
-		}
+        $user = new User();
+        $user->load(array('email = :email', array(':email' => $this->get('POST.email'))));
+        $user->load(array('email = :email AND password = :password',
+            array(':email' => $this->get('POST.email'),
+                ':password' => helper::salting($user->salt, $this->get('POST.password')))));
 
-		$this->set('SESSION.user', array('name' => $user->name, 'id' => $user->id, 'admin' => $user->admin, 'hash' => $user->hash));
+        if (!$user)
+        {
+            $this->set('FAILURE', 'Login failed.');
+            $this->reroute('/' . $this->get('BASE') . 'user/login');
+        }
+
+        $this->set('SESSION.user', array('name' => $user->name, 'id' => $user->id, 'admin' => $user->admin, 'hash' => $user->hash));
         $this->set('SESSION.SUCCESS', 'Login successful');
-        $this->reroute('/'. $this->get('BASE'));
+        $this->reroute('/' . $this->get('BASE'));
     }
 
     /**
@@ -720,8 +729,8 @@ class main extends F3instance
         $this->set('SESSION.userId', NULL);
         session_destroy();
 
-		$this->set('SESSION.SUCCESS', 'User logged out');
-        $this->reroute('/'. $this->get('BASE'));  
+        $this->set('SESSION.SUCCESS', 'User logged out');
+        $this->reroute('/' . $this->get('BASE'));
     }
 
     /**
@@ -729,15 +738,15 @@ class main extends F3instance
      */
     private function tpserve()
     {
-		$project = new Project();
+        $project = new Project();
         $projects = $project->find();
-		
-		if (!$projects)
-		{
-        	$this->tpfail("Failure while loading Projects");
-        	return ;
+
+        if (!$projects)
+        {
+            $this->tpfail("Failure while loading Projects");
+            return;
         }
-        
+
         $this->set('projects', $projects);
         echo Template::serve('main.tpl.php');
     }
@@ -750,7 +759,6 @@ class main extends F3instance
         echo Template::serve('main.tpl.php');
     }
 
-   
     /**
      *
      */
@@ -760,4 +768,5 @@ class main extends F3instance
         $this->set('template', 'error404.tpl.php');
         $this->tpserve();
     }
+
 }

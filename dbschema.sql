@@ -23,8 +23,8 @@ INSERT INTO Milestone (id, hash, name, description, finished, project) VALUES (1
 --
 -- Activity
 --
-CREATE TABLE Activity (id INTEGER PRIMARY KEY AUTOINCREMENT, hash VARCHAR(12) UNIQUE, description text, user int, changed int, project int);
-INSERT INTO Activity (id, hash, description, user, changed, project) VALUES (1, 'b026324c6904', 'Example Activity', 1, 1, 1);
+CREATE TABLE Activity (id INTEGER PRIMARY KEY AUTOINCREMENT, hash VARCHAR(12) UNIQUE, description text, user int, changed int, project int, ticket int);
+INSERT INTO Activity (id, hash, description, user, changed, project, ticket) VALUES (1, 'b026324c6904', 'Example Activity', 1, 1, 1, 1);
 --
 -- Role
 --
@@ -108,3 +108,8 @@ CREATE VIEW displayableticket AS
         ON assigned.id = ticket.assigned
     WHERE owner.id = ticket.owner AND ticket.state = status.id AND ticket.priority = priority.id 
         AND type.id = ticket.type AND category.id = ticket.category;
+CREATE VIEW displayableactivity AS
+    SELECT activity.id, activity.hash, activity.description, activity.changed, activity.ticket, activity.project,
+           user.name as username, user.hash as userhash
+    FROM activity, user 
+    WHERE activity.user = user.id;
