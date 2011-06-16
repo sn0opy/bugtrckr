@@ -13,7 +13,7 @@
         {{* Settings *}}
         <F3:check if="{{@getPermission('proj_editProject')}}">
             <F3:true>
-                <form action="{{@BASE}}project/settings/main/edit" method="post">
+                <form action="{{@BASE}}/project/settings/main/edit" method="post">
                     <div class="formRow">
                         <div class="formLabel">
                             {{@lng.projectname}}
@@ -63,11 +63,11 @@
                     <F3:repeat group="{{@projMembers}}" key="{{@i}}" value="{{@member}}">
                         <tr class="tr{{@i%2}}">
                             <td class="title">
-                                <a href="{{@BASE}}user/{{@member->name}}">{{@member->name}} {{@member->role}}</a>
+                                <a href="{{@BASE}}/user/{{@member->name}}">{{@member->name}} {{@member->role}}</a>
                             </td>
                             <td class="type manageMember">
                                 <p>
-                                <form action="{{@BASE}}project/settings/member/setrole" method="post" class="floatleft">
+                                <form action="{{@BASE}}/project/settings/member/setrole" method="post" class="floatleft">
                                     <input type="hidden" name="user" value="{{@member->hash}}" />
                                     <select name="role" class="floatleft">
                                         <F3:repeat group="{{@projRoles}}" value="{{@role}}">
@@ -76,7 +76,7 @@
                                     </select>
                                     <input type="submit" value="Ändern" />
                                 </form>
-                                <form action="{{@BASE}}project/setttings/member/delete" method="post" class="floatleft">
+                                <form action="{{@BASE}}/project/setttings/member/delete" method="post" class="floatleft">
                                     <input type="hidden" name="user" value="{{@member->hash}}" />
                                     <input type="submit" value="{{@lng.delete}}" />
                                 </form>
@@ -87,7 +87,7 @@
                     </tbody>
                 </table>
 
-                <form action="{{@BASE}}project/settings/member/add" method="post">
+                <form action="{{@BASE}}/project/settings/member/add" method="post">
                     <p class="addUser">
                         <select name="member">
                             <F3:repeat group="{{@users}}" value="{{@user}}">
@@ -124,13 +124,13 @@
                     <F3:repeat group="{{@projMilestones}}" key="{{@i}}" value="{{@milestone}}">
                         <tr class="tr{{@i%2}}">
                             <td class="title">
-                                <a href="{{@BASE}}project/settings/milestone/{{@milestone->hash}}">{{@milestone->name}}</a>
+                                <a href="{{@BASE}}/project/settings/milestone/{{@milestone->hash}}">{{@milestone->name}}</a>
                             </td>
                         </tr>
                     </F3:repeat>
                     </tbody>
                 </table>
-                <a href="{{@BASE}}project/settings/milestone/add">{{@lng.addmilestone}}</a>
+                <a href="{{@BASE}}/project/settings/milestone/add">{{@lng.addmilestone}}</a>
             </F3:true>
             <F3:false>
                 <div class="error">{{@lng.noAccess}}</div>
@@ -152,13 +152,13 @@
                     <F3:repeat group="{{@projRoles}}" key="{{@i}}" value="{{@role}}">
                         <tr class="tr{{@i%2}}">
                             <td class="title">
-                                <a href="{{@BASE}}project/settings/role/{{@role->hash}}">{{@role->name}}</a>
+                                <a href="{{@BASE}}/project/settings/role/{{@role->hash}}">{{@role->name}}</a>
                             </td>
                         </tr>
                     </F3:repeat>
                     </tbody>
                 </table>
-                <a href="{{@BASE}}project/settings/role/add">{{@lng.addrole}}</a>
+                <a href="{{@BASE}}/project/settings/role/add">{{@lng.addrole}}</a>
             </F3:true>
             <F3:false>
                 <div class="error">{{@lng.noAccess}}
@@ -187,7 +187,7 @@
                     </F3:repeat>
                     </tbody>
                 </table>
-                <a href="{{@BASE}}project/settings/category/add">{{@lng.addcategory}}</a>
+                <a href="{{@BASE}}/project/settings/category/add">{{@lng.addcategory}}</a>
             </F3:true>
             <F3:false>
                 <div class="error">{{@lng.noAccess}}</div>

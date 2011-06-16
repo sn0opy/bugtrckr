@@ -2,7 +2,7 @@
 
 <F3:repeat group="{{@road}}" key="{{@i}}" value="{{@item}}">
 <div class="milestone clearfix">
-	<h3><a href="{{@BASE}}milestone/{{@item.infos->hash}}">{{@item.infos->name}}</a></h3>
+	<h3><a href="{{@BASE}}/milestone/{{@item.infos->hash}}">{{@item.infos->name}}</a></h3>
 
     <div class="meta">
         <F3:check if="{{@item.fullTicketCount}}">

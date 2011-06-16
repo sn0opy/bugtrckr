@@ -1,7 +1,7 @@
 <h2>{{@lng.role}} › {{@roleData->name}} <span class="hash">#{{@roleData->hash}}</span></h2>
 
 <div class="roleSettings">
-<form action="{{@BASE}}project/settings/role/edit" method="post">
+<form action="{{@BASE}}/project/settings/role/edit" method="post">
     <input type="hidden" name="hash" value="{{@roleData->hash}}" />
     
     <div class="formRow">

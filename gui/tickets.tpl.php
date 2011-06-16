@@ -13,7 +13,7 @@
 		X
 	</a>
 
-	<form method="POST" action="{{@BASE}}ticket/">
+	<form method="POST" action="{{@BASE}}/ticket/">
 		<div class="formRow">
 			<div class="formLabel">{{@lng.title}}</div>
 			<div class="formValue"><input type="text" name="title" /></div>
@@ -84,12 +84,12 @@
 <table class="overview">
     <thead>
         <tr>
-            <th><a href="{{@BASE}}tickets/id">#</a></th>
-			<th><a href="{{@BASE}}tickets/title">{{@lng.title}}</a></th>
-			<th><a href="{{@BASE}}tickets/type">{{@lng.type}}</a></th>
-			<th><a href="{{@BASE}}tickets/state">{{@lng.status}}</a></th>
-            <th><a href="{{@BASE}}tickets/priority">{{@lng.priority}}</a></th>
-            <th><a href="{{@BASE}}tickets/created">{{@lng.created}}</a></th>
+            <th><a href="{{@BASE}}/tickets/id">#</a></th>
+			<th><a href="{{@BASE}}/tickets/title">{{@lng.title}}</a></th>
+			<th><a href="{{@BASE}}/tickets/type">{{@lng.type}}</a></th>
+			<th><a href="{{@BASE}}/tickets/state">{{@lng.status}}</a></th>
+            <th><a href="{{@BASE}}/tickets/priority">{{@lng.priority}}</a></th>
+            <th><a href="{{@BASE}}/tickets/created">{{@lng.created}}</a></th>
             <th>{{@lng.owner}}</th>
             <th>{{@lng.assigned}}</th>
         </tr>
@@ -100,14 +100,14 @@
         <tr class="tr{{@i%2}}">
             <td class="id">{{@i+1}}</td>
             <td class="title">
-                <a href="{{@BASE}}ticket/{{@ticket->tickethash}}">{{@ticket->title}}</a>
+                <a href="{{@BASE}}/ticket/{{@ticket->tickethash}}">{{@ticket->title}}</a>
 			</td>
 			<td class="type">{{@ticket->typename}}</td>
             <td class="state">{{@ticket->statusname}}</td>
             <td class="priority">{{@ticket->priorityname}}</td>
             <td class="created">{{date('d.m.Y H:i', @ticket->created)}}</td>
-            <td class="owner"><a href="{{@BASE}}user/{{@ticket->username}}">{{@ticket->username}}</a></td>
-            <td class="owner"><a href="{{@BASE}}user/{{@ticket->assignedname}}">{{@ticket->assignedname}}</a></td>
+            <td class="owner"><a href="{{@BASE}}/user/{{@ticket->username}}">{{@ticket->username}}</a></td>
+            <td class="owner"><a href="{{@BASE}}/user/{{@ticket->assignedname}}">{{@ticket->assignedname}}</a></td>
         </tr>
         </F3:repeat>
     </tbody>
