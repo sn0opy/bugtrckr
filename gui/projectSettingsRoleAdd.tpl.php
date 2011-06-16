@@ -1,7 +1,7 @@
 <h2>{{@lng.role}} › {{@lng.addrole}}</h2>
 
 <div class="roleSettings">
-<form action="/{{@BASE}}project/settings/role/edit" method="post">
+<form action="{{@BASE}}project/settings/role/edit" method="post">
     <div class="formRow">
         <div class="formLabel">
             {{@lng.name}}

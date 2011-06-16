@@ -1,7 +1,7 @@
 <h2>{{@lng.milestone}} › {{@msData->name}} <span class="hash">#{{@msData->hash}}</span></h2>
 
 <div class="msSettings">
-    <form action="/{{@BASE}}project/settings/milestone/edit" method="post">
+    <form action="{{@BASE}}project/settings/milestone/edit" method="post">
         <input type="hidden" name="hash" value="{{@msData->hash}}" />
 
         <div class="formRow">

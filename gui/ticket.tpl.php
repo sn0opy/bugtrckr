@@ -13,12 +13,12 @@
             <th>{{@lng.priority}}</th>
             <td>{{@ticket->priorityname}}</td>
             <th>{{@lng.assignedTo}}</th>
-            <td><a href="/{{@BASE}}user/{{@ticket->assignedname}}">{{@ticket->assignedname}}</a></td>
+            <td><a href="{{@BASE}}user/{{@ticket->assignedname}}">{{@ticket->assignedname}}</a></td>
         </tr>
 
         <tr>
             <th>{{@lng.owner}}</th>
-            <td><a href="/{{@BASE}}user/{{@ticket->username}}">{{@ticket->username}}</a></td>
+            <td><a href="{{@BASE}}user/{{@ticket->username}}">{{@ticket->username}}</a></td>
             <th></th>
             <td></td>
         </tr>
@@ -61,7 +61,7 @@
             <tr class="tr{{@i%2}}">
                 <td>{{@activity->description}}</td>
                 <td>{{date('d.m.Y H:i', @activity->changed)}}</td>
-                <td><a href="/{{@BASE}}user/{{@activity->username}}">{{@activity->username}}</a></td>
+                <td><a href="{{@BASE}}user/{{@activity->username}}">{{@activity->username}}</a></td>
             </tr>
         </F3:repeat>
     </table>
@@ -72,7 +72,7 @@
     <F3:true>
 
         <div class="editTicket">
-            <form method="POST" action="/{{@BASE}}ticket/{{@ticket->tickethash}}">
+            <form method="POST" action="{{@BASE}}ticket/{{@ticket->tickethash}}">
 
                 <div class="formRow">
                     <div class="formLabel">{{@lng.assignedTo}}</div>

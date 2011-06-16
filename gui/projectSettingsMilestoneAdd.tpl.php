@@ -1,7 +1,7 @@
 <h2>{{@lng.milestone}} › {{@lng.addmilestone}}</h2>
 
 <div class="msSettings">
-    <form action="/{{@BASE}}project/settings/milestone/edit" method="post">
+    <form action="{{@BASE}}project/settings/milestone/edit" method="post">
         <div class="formRow">
             <div class="formLabel">
                 {{@lng.name}}
