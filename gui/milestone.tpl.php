@@ -6,13 +6,13 @@
             <tr>
             <F3:repeat group="{{@stats.ticketCount}}" value="{{@tickCnt}}">
                 <td width="{{@tickCnt.percent}}%" title="{{@tickCnt.title}}"
-                    class="color{{@tickCnt.state}}">{{@tickCnt.count}}</td>
+                    class="background-color{{@tickCnt.state}}">{{@tickCnt.count}}</td>
             </F3:repeat>
             </tr>
         </table>
     </F3:true>
     <F3:false>
-       <table class="percentBar">
+        <table class="percentBar">
             <tr>
                 <td width="100%" class="noTickets">0</td>
             </tr>
@@ -27,29 +27,34 @@
     <h3>{{@lng.tickets}}:</h3>
     <table class="overview">
         <thead>
-        <tr>
-            <th><a href="{{@BASE}}/tickets/id">#</a></th>
-            <th><a href="{{@BASE}}/tickets/title">{{@lng.title}}</a></th>
-            <th><a href="{{@BASE}}/tickets/state">{{@lng.status}}</a></th>
-            <th><a href="{{@BASE}}/tickets/priority">{{@lng.priority}}</a></th>
-            <th><a href="{{@BASE}}/tickets/created">{{@lng.created}}</a></th>
-            <th>{{@lng.owner}}</th>
-        </tr>
+            <tr>
+                <th><a href="{{@BASE}}/tickets/id">#</a></th>
+                <th><a href="{{@BASE}}/tickets/title">{{@lng.title}}</a></th>
+                <th><a href="{{@BASE}}/tickets/type">{{@lng.type}}</a></th>
+                <th><a href="{{@BASE}}/tickets/state">{{@lng.status}}</a></th>
+                <th><a href="{{@BASE}}/tickets/priority">{{@lng.priority}}</a></th>
+                <th><a href="{{@BASE}}/tickets/created">{{@lng.created}}</a></th>
+                <th>{{@lng.owner}}</th>
+                <th>{{@lng.assigned}}</th>
+            </tr>
         </thead>
 
         <tbody>
-            <F3:repeat group="{{@tickets}}" key="{{@i}}" value="{{@ticket}}">
+        <F3:repeat group="{{@tickets}}" key="{{@i}}" value="{{@ticket}}">
             <tr class="tr{{@i%2}}">
                 <td class="id">{{@i+1}}</td>
                 <td class="title">
-                    <a href="{{@BASE}}/ticket/{{@ticket->hash}}">{{@ticket->title}}</a>
+                    <a href="{{@BASE}}/ticket/{{@ticket->tickethash}}">{{@ticket->title}}</a>
                 </td>
-                <td class="state">{{@ticket->state}}</td>
-                <td class="priority">{{@ticket->priority}}</td>
+                <td class="type">{{@ticket->typename}}</td>
+                <td class="state color{{@ticket->state}}">
+                    {{@ticket->statusname}}</td>
+                <td class="priority">{{@ticket->priorityname}}</td>
                 <td class="created">{{date('d.m.Y H:i', @ticket->created)}}</td>
-                <td class="owner"><a href="{{@BASE}}/user/{{@ticket->owner}}">{{@ticket->owner}}</a></td>
+                <td class="owner"><a href="{{@BASE}}/user/{{@ticket->username}}">{{@ticket->username}}</a></td>
+                <td class="owner"><a href="{{@BASE}}/user/{{@ticket->assignedname}}">{{@ticket->assignedname}}</a></td>
             </tr>
-            </F3:repeat>
+        </F3:repeat>
         </tbody>
     </table>
 </div>

@@ -96,4 +96,3 @@ return array('lng' => array(
     'added' => 'wurde hinzugefügt',
     'edited_by' => 'wurde geändert von'
 ));
-

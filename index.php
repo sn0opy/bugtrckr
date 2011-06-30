@@ -35,40 +35,39 @@ $app->set('getPermission', function($permission) {
     return $helper->getPermission($permission);
 });
         
-$app->route('GET /', 'main->start');
-$app->route('GET /roadmap', 'main->showRoadmap');
-$app->route('GET /timeline', 'main->showTimeline');
-$app->route('GET /tickets', 'main->showTickets');
-$app->route('GET /tickets/@order', 'main->showTickets');
-$app->route('GET /ticket/@hash', 'main->showTicket');
-$app->route('GET /user/@name', 'main->showUser');
-$app->route('GET /user/new', 'main->showUserRegister');
-$app->route('GET /user/login', 'main->showUserLogin');
-$app->route('GET /user/logout', 'main->logoutUser');
-$app->route('GET /milestone/@hash', 'main->showMilestone');
-$app->route('GET /project/settings', 'main->showProjectSettings');
-$app->route('GET /project/settings/role/@hash', 'main->showProjectSettingsRole');
-$app->route('GET /project/settings/role/add', 'main->showAddRole');
-$app->route('GET /project/settings/milestone/@hash', 'main->showProjectSettingsMilestone');
-$app->route('GET /project/settings/milestone/add', 'main->showAddMilestone');
-$app->route('GET /project/settings/category/add', 'main->showAddCategory');
+$app->route('GET /', 'cmain->start');
+$app->route('GET /roadmap', 'cmilestone->showRoadmap');
+$app->route('GET /timeline', 'ctimeline->showTimeline');
+$app->route('GET /tickets', 'cticket->showTickets');
+$app->route('GET /tickets/@order', 'cticket->showTickets');
+$app->route('GET /ticket/@hash', 'cticket->showTicket');
+$app->route('GET /user/@name', 'cuser->showUser');
+$app->route('GET /user/new', 'cuser->showUserRegister');
+$app->route('GET /user/login', 'cuser->showUserLogin');
+$app->route('GET /user/logout', 'cuser->logoutUser');
+$app->route('GET /milestone/@hash', 'cmilestone->showMilestone');
+$app->route('GET /project/settings', 'cproperties->showProjectSettings');
+$app->route('GET /project/settings/role/@hash', 'cproperties->showProjectSettingsRole');
+$app->route('GET /project/settings/role/add', 'cproperties->showAddRole');
+$app->route('GET /project/settings/milestone/@hash', 'cproperties->showProjectSettingsMilestone');
+$app->route('GET /project/settings/milestone/add', 'cproperties->showAddMilestone');
+$app->route('GET /project/settings/category/add', 'cproperties->showAddCategory');
 
 
-$app->route('POST /user/login', 'main->loginUser');
-$app->route('POST /user/new', 'main->registerUser');
-$app->route('POST /ticket', 'main->addTicket');
-$app->route('POST /ticket/@hash', 'main->editTicket');
-$app->route('POST /milestone', 'main->addMilestone');
-$app->route('POST /project/select', 'main->selectProject');
-$app->route('POST /project/settings/member/setrole', 'main->projectSetRole');
-$app->route('POST /project/settings/category/add', 'main->addCategory');
-$app->route('POST /project/settings/role/edit', 'main->addEditRole');
-$app->route('POST /project/settings/main/edit', 'main->projectEditMain');
-$app->route('POST /project/settings/milestone/edit', 'main->addEditMilestone');
-$app->route('POST /project/settings/member/add', 'main->projectAddMember');
-$app->route('POST /project/setttings/member/delete', 'main->projectDelMember');
+$app->route('POST /user/login', 'cuser->loginUser');
+$app->route('POST /user/new', 'cuser->registerUser');
+$app->route('POST /ticket', 'cticket->addTicket');
+$app->route('POST /ticket/@hash', 'cticket->editTicket');
+$app->route('POST /project/select', 'cmain->selectProject');
+$app->route('POST /project/settings/member/setrole', 'cproperties->projectSetRole');
+$app->route('POST /project/settings/category/add', 'cproperties->addCategory');
+$app->route('POST /project/settings/role/edit', 'cproperties->addEditRole');
+$app->route('POST /project/settings/main/edit', 'cproperties->projectEditMain');
+$app->route('POST /project/settings/milestone/edit', 'cmilestone->addEditMilestone');
+$app->route('POST /project/settings/member/add', 'cproperties->projectAddMember');
+$app->route('POST /project/setttings/member/delete', 'cproperties->projectDelMember');
 
-require 'inc/mapping.inc.php';
+//require 'inc/mapping.inc.php';
 
 $app->run();
 
