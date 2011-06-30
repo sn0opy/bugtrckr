@@ -450,29 +450,54 @@ table.overview .owner
     line-height: 10px;
 }
 
-.percentBar .color1
+.percentBar .background-color1
 {
     background-color: #88C134;
 }
 
-.percentBar .color2
+.percentBar .background-color2
 {
     background-color: #81629F;
 }
 
-.percentBar .color3
+.percentBar .background-color3
 {
     background-color: #22B5BF;
 }
 
-.percentBar .color4
+.percentBar .background-color4
 {
     background-color: #E98813;
 }
 
-.percentBar .color5
+.percentBar .background-color5
 {
     background-color: #D2315D;
+}
+
+.color1
+{
+    color: #88C134;
+}
+
+.color2
+{
+    color: #81629F;
+}
+
+.color3
+{
+    color: #22B5BF;
+}
+
+.color4
+{
+    color: #E98813;
+}
+
+.color5
+{
+    color: #D2315D;
 }
 
 .percentBar .noTickets

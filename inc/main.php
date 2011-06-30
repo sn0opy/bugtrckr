@@ -216,7 +216,7 @@ class main extends F3instance
             $this->get('lng.ticket') . " '$ticket->title' " . $this->get('lng.ticket.added') . ".", 
             $ticket->_id);
         
-        $this->reroute('/' . $this->get('BASE') . 'ticket/' . $ticket->hash);
+        $this->reroute($this->get('BASE') . '/ticket/' . $ticket->hash);
     }
 
     /**
@@ -367,7 +367,7 @@ class main extends F3instance
         $projPerms->projectId = $projectId;
         $projPerms->save();
 
-        $this->reroute('/' . $this->get('BASE') . 'project/settings');
+        $this->reroute($this->get('BASE') . '/project/settings');
     }
 
     function projectDelMember()
@@ -395,7 +395,7 @@ class main extends F3instance
         $projPerms->erase();
 
         $this->set('SESSION.SUCCESS', 'Member has been removed from the project.');
-        $this->reroute('/' . $this->get('BASE') . 'project/settings');
+        $this->reroute($this->get('BASE') . '/project/settings');
     }
 
     /**
@@ -442,7 +442,7 @@ class main extends F3instance
         $perms->roleId = $role->id;
         $perms->save();
 
-        $this->reroute('/' . $this->get('BASE') . 'project/settings');
+        $this->reroute($this->get('BASE') . '/project/settings');
     }
 
     /**
@@ -526,7 +526,7 @@ class main extends F3instance
         $role->iss_viewWatchers = $this->get('POST.iss_viewWatchers');
         $role->save();
 
-        $this->reroute('/' . $this->get('BASE') . 'project/settings/role/' . $roleHash);
+        $this->reroute($this->get('BASE') . '/project/settings/role/' . $roleHash);
     }
 
     /**
@@ -554,7 +554,7 @@ class main extends F3instance
         $milestone->finished = $this->get('POST.finished');
         $milestone->save();
 
-        $this->reroute('/' . $this->get('BASE') . 'project/settings/milestone/' . $msHash);
+        $this->reroute($this->get('BASE') . '/project/settings/milestone/' . $msHash);
     }
 
     /**
@@ -569,7 +569,7 @@ class main extends F3instance
 
         $_SESSION['SUCCESS'] = "Category added successfully";
 
-        $this->reroute('/' . $this->get('BASE') . 'project/settings/');
+        $this->reroute($this->get('BASE') . '/project/settings/');
     }
 
     /**
@@ -621,7 +621,7 @@ class main extends F3instance
             return;
         }
 
-        $this->reroute('/' . $this->get('BASE') . 'project/settings');
+        $this->reroute($this->get('BASE') . '/project/settings');
     }
 
     /**
@@ -683,7 +683,7 @@ class main extends F3instance
         }
 
         $this->set('SESSION.SUCCESS', 'User registred successfully');
-        $this->reroute('/' . $this->get('BASE'));
+        $this->reroute($this->get('BASE') . '/');
     }
 
     /**
@@ -710,12 +710,12 @@ class main extends F3instance
         if (!$user)
         {
             $this->set('FAILURE', 'Login failed.');
-            $this->reroute('/' . $this->get('BASE') . 'user/login');
+            $this->reroute($this->get('BASE') . '/user/login');
         }
 
         $this->set('SESSION.user', array('name' => $user->name, 'id' => $user->id, 'admin' => $user->admin, 'hash' => $user->hash));
         $this->set('SESSION.SUCCESS', 'Login successful');
-        $this->reroute('/' . $this->get('BASE'));
+        $this->reroute($this->get('BASE') . '/');
     }
 
     /**
@@ -730,7 +730,7 @@ class main extends F3instance
         session_destroy();
 
         $this->set('SESSION.SUCCESS', 'User logged out');
-        $this->reroute('/' . $this->get('BASE'));
+        $this->reroute($this->get('BASE') . '/');
     }
 
     /**

@@ -10,7 +10,7 @@
                 <table class="percentBar">
                     <tr>
                     <F3:repeat group="{{@item.ticketCount}}" value="{{@tickCnt}}">
-                        <td width="{{@tickCnt.percent}}%" title="{{@tickCnt.title}}" class="color{{@tickCnt.state}}">{{@tickCnt.count}}</td>
+                        <td width="{{@tickCnt.percent}}%" title="{{@tickCnt.title}}" class="background-color{{@tickCnt.state}}">{{@tickCnt.count}}</td>
                     </F3:repeat>
                     </tr>
                 </table>
