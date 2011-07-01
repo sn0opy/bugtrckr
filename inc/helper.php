@@ -63,17 +63,19 @@ class helper extends F3instance
     {
         $userId = $this->get('SESSION.user->id');
         $projectId = $this->get('SESSION.project');
-
+        
         if ($userId)
         {
             $user = new User();
             $user->load('id = ' . $userId);
 
             $projPerm = new ProjectPermission();
-            $permissions = $projPerm->load('userId = ' . $userId . ' AND projectId = ' . $projectId);
+            $permissions = $projPerm->find('userId = ' . $userId . ' AND projectId = ' . $projectId);
 
+            $permissions = $permissions[0]; // TODO: find a better way ...
+          
             $role = new Role();
-            $role->load('id = ' . $projPerm->roleId);
+            $role->load('id = ' . $permissions->roleId);
 
             if ($user->admin) // admin has access to everything
                 return true;
