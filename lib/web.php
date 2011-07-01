@@ -8,7 +8,7 @@
 	compliance with the license. Any of the license terms and conditions
 	can be waived if you get permission from the copyright holder.
 
-	Copyright (c) 2009-2010 F3::Factory
+	Copyright (c) 2009-2011 F3::Factory
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package Expansion
@@ -20,40 +20,25 @@ class Web extends Base {
 
 	//@{ Locale-specific error/exception messages
 	const
-		TEXT_Minify='Unable to minify {@CONTEXT}';
+		TEXT_Minify='Unable to minify %s',
+		TEXT_Timeout='Connection timed out';
 	//@}
 
-	/**
-		Return translation table for Latin diacritics and 7-bit equivalents
-			@return array
-			@public
-	**/
-	static function diacritics() {
-		return array(
-			'À'=>'A','Á'=>'A','Â'=>'A','Ã'=>'A','Å'=>'A','Ä'=>'AE','Æ'=>'AE',
-			'à'=>'a','á'=>'a','â'=>'a','ã'=>'a','å'=>'a','ä'=>'ae','æ'=>'ae',
-			'Þ'=>'B','þ'=>'b','Č'=>'C','Ć'=>'C','Ç'=>'C','č'=>'c','ć'=>'c',
-			'ç'=>'c','ð'=>'d','Đ'=>'Dj','đ'=>'dj','È'=>'E','É'=>'E','Ê'=>'E',
-			'Ë'=>'E','è'=>'e','é'=>'e','ê'=>'e','ë'=>'e','Ì'=>'I','Í'=>'I',
-			'Î'=>'I','Ï'=>'I','ì'=>'i','í'=>'i','î'=>'i','ï'=>'i','Ñ'=>'N',
-			'ñ'=>'n','Ò'=>'O','Ó'=>'O','Ô'=>'O','Õ'=>'O','Ø'=>'O','Ö'=>'OE',
-			'Œ'=>'OE','ð'=>'o','ò'=>'o','ó'=>'o','ô'=>'o','õ'=>'o','ö'=>'oe',
-			'œ'=>'oe','ø'=>'o','Ŕ'=>'R','ŕ'=>'r','Š'=>'S','š'=>'s','ß'=>'ss',
-			'Ù'=>'U','Ú'=>'U','Û'=>'U','Ü'=>'UE','ù'=>'u','ú'=>'u','û'=>'u',
-			'ü'=>'ue','Ý'=>'Y','ý'=>'y','ý'=>'y','ÿ'=>'yu','Ž'=>'Z','ž'=>'z'
-		);
-	}
+	const
+		//! Carriage return/line feed sequence
+		EOL="\r\n";
 
 	/**
-		Return an RFC 1738-compliant URL-friendly version of string
+		Return a URL/filesystem-friendly version of string
 			@return string
 			@param $text string
 			@param $maxlen integer
 	**/
 	static function slug($text,$maxlen=0) {
-		$out=preg_replace('/[^\w\.!~\*\'"(),]+/','-',
-			trim(strtr($text,self::diacritics())));
-		return $maxlen?substr($out,0,$maxlen):$out;
+		$out=preg_replace('/([^\w]|-)+/','-',
+			trim(strtr(str_replace('\'','',$text),
+			self::$vars['DIACRITICS'])));
+		return trim(strtolower($maxlen?substr($out,0,$maxlen):$out),'-');
 	}
 
 	/**
@@ -74,11 +59,10 @@ class Web extends Base {
 			'js'=>'application/x-javascript',
 			'css'=>'text/css'
 		);
-		$path=self::fixslashes(self::$vars['GUI'].$base);
+		$path=self::fixslashes($base);
 		foreach ($files as $file)
 			if (!is_file($path.$file)) {
-				self::$vars['CONTEXT']=$file;
-				trigger_error(self::TEXT_Minify);
+				trigger_error(sprintf(self::TEXT_Minify,$file));
 				return;
 			}
 		$src='';
@@ -207,7 +191,7 @@ class Web extends Base {
 				if ($ofs+1<strlen($src)) {
 					while (ctype_space($src[$ofs]))
 						$ofs++;
-					if (preg_match('/\w[\w'.
+					if (preg_match('/[\w%][\w'.
 						// IE is sensitive about certain spaces in CSS
 						($ext[1]=='css'?'#\-*\.':'').'$]/',$last.$src[$ofs]))
 							$dst.=$src[$ptr];
@@ -240,36 +224,157 @@ class Web extends Base {
 	}
 
 	/**
+		Send HTTP/S request to another host; Follow 30x redirects (default);
+		Forward headers received (if specified) and return content
+			@return mixed
+			@param $pattern string
+			@param $query string
+			@param $reqhdrs array
+			@param $follow boolean
+			@param $forward boolean
+			@public
+	**/
+	static function http(
+		$pattern,$query='',$reqhdrs=array(),$follow=TRUE,$forward=FALSE) {
+		// Check if valid route pattern
+		list($method,$route)=explode(' ',$pattern,2);
+		// Content divider
+		$div=chr(0);
+		$url=parse_url($route);
+		if (!$url['path'])
+			// Set to Web root
+			$url['path']='/';
+		if ($method!='GET') {
+			if (isset($url['query']) && $url['query']) {
+				// Non-GET method; Query is distinct from URI
+				$query=$url['query'];
+				$url['query']='';
+			}
+		}
+		else {
+			if ($query) {
+				// GET method; Query is integral part of URI
+				$url['query']=$query;
+				$query='';
+			}
+		}
+		// Set up host name and TCP port for socket connection
+		if (isset($url['scheme']) && $url['scheme']=='https') {
+			if (!isset($url['port']))
+				$url['port']=443;
+			$target='ssl://'.$url['host'].':'.$url['port'];
+		}
+		else {
+			if (!isset($url['port']))
+				$url['port']=80;
+			$target=$url['host'].':'.$url['port'];
+		}
+		$socket=@fsockopen($target,$url['port'],$errno,$text);
+		if (!$socket) {
+			// Can't establish connection
+			trigger_error($text);
+			return FALSE;
+		}
+		// Set connection timeout parameters
+		stream_set_blocking($socket,TRUE);
+		stream_set_timeout($socket,ini_get('default_socket_timeout'));
+		// Send HTTP request
+		fputs($socket,
+			$method.' '.$url['path'].
+				(isset($url['query']) && $url['query']?
+					('?'.$url['query']):'').' '.
+					'HTTP/1.0'.self::EOL.
+				self::HTTP_Host.': '.$url['host'].self::EOL.
+				self::HTTP_Agent.': Mozilla/5.0 '.
+					'(compatible;'.PHP_OS.')'.self::EOL.
+				($reqhdrs?
+					(implode(self::EOL,$reqhdrs).self::EOL):'').
+				($method!='GET'?(
+					'Content-Type: '.
+						'application/x-www-form-urlencoded'.self::EOL.
+					'Content-Length: '.strlen($query).self::EOL):'').
+				self::HTTP_AcceptEnc.': gzip'.self::EOL.
+				self::HTTP_Connect.': close'.self::EOL.self::EOL.
+			$query.self::EOL.self::EOL
+		);
+		$found=FALSE;
+		$expires=FALSE;
+		$gzip=FALSE;
+		$rcvhdrs='';
+		$info=stream_get_meta_data($socket);
+		// Get headers and response
+		$response='';
+		while (!feof($socket) && !$info['timed_out']) {
+			$response.=fgets($socket,4096); // MDFK97
+			$info=stream_get_meta_data($socket);
+			if (!$found && is_int(strpos($response,self::EOL.self::EOL))) {
+				$found=TRUE;
+				$rcvhdrs=strstr($response,self::EOL.self::EOL,TRUE);
+				ob_start();
+				if ($follow &&
+					preg_match('/HTTP\/1\.\d\s30\d/',$rcvhdrs)) {
+					// Redirection
+					preg_match('/'.self::HTTP_Location.
+						':\s*(.+?)/',$rcvhdrs,$loc);
+					return self::http($method.' '.$loc[1],$query,$reqhdrs);
+				}
+				foreach (explode(self::EOL,$rcvhdrs) as $hdr) {
+					self::$vars['HEADERS'][]=$hdr;
+					if (PHP_SAPI!='cli' && $forward)
+						// Forward HTTP header
+						header($hdr);
+					elseif (preg_match('/^'.
+						self::HTTP_Encoding.':\s*.*gzip/',$hdr))
+						// Uncompress content
+						$gzip=TRUE;
+				}
+				ob_end_flush();
+				// Split content from HTTP response headers
+				$response=substr(strstr($response,self::EOL.self::EOL),4);
+			}
+		}
+		fclose($socket);
+		if ($info['timed_out']) {
+			trigger_error(self::TEXT_Timeout);
+			return FALSE;
+		}
+		if (PHP_SAPI!='cli') {
+			if ($gzip)
+				$response=gzinflate(substr($response,10));
+		}
+		// Return content
+		return $response;
+	}
+
+	/**
 		Parse each URL recursively and generate sitemap
 			@param $url string
 			@public
 	**/
-	static function sitemap($url='/') {
+	static function sitemap($url=NULL) {
+		if (is_null($url))
+			$url=self::$vars['BASE'].'/';
 		if (isset(self::$vars['SITEMAP'][$url]) &&
-			!is_null(self::$vars['SITEMAP'][$url]['status']))
+			is_bool(self::$vars['SITEMAP'][$url]['status']))
 			// Already crawled
 			return;
-		preg_match('/^http[s]*:\/\/([^\/$]+)/',$url,$host);
-		if (!empty($host) && $host[1]!=$_SERVER['SERVER_NAME']) {
-			// Remote URL
+		$response=self::http('GET '.self::$vars['PROTOCOL'].'://'.
+			$_SERVER['SERVER_NAME'].$url);
+		if (!$response) {
+			// No HTTP response
 			self::$vars['SITEMAP'][$url]['status']=FALSE;
 			return;
 		}
-		$state=self::$vars['QUIET'];
-		self::$vars['QUIET']=TRUE;
-		self::mock('GET '.$url);
-		self::run();
-		// Check if an error occurred or no HTTP response
-		if (self::$vars['ERROR'] || !self::$vars['RESPONSE']) {
-			self::$vars['SITEMAP'][$url]['status']=FALSE;
-			// Reset error flag for next page
-			self::$vars['ERROR']=NULL;
-			return;
-		}
-		$doc=new domdocument('1.0',self::$vars['ENCODING']);
+		foreach (self::$vars['HEADERS'] as $header)
+			if (preg_match('/HTTP\/\d\.\d\s(\d+)/',$header,$match) &&
+				$match[1]!=200) {
+				self::$vars['SITEMAP'][$url]['status']=FALSE;
+				return;
+			}
+		$doc=new DOMDocument('1.0',self::$vars['ENCODING']);
 		// Suppress errors caused by invalid HTML structures
 		libxml_use_internal_errors(TRUE);
-		if ($doc->loadHTML(self::$vars['RESPONSE'])) {
+		if ($doc->loadHTML($response)) {
 			// Valid HTML; add to sitemap
 			if (!self::$vars['SITEMAP'][$url]['level'])
 				// Web root
@@ -278,8 +383,8 @@ class Web extends Base {
 			self::$vars['SITEMAP'][$url]['mod']=time();
 			self::$vars['SITEMAP'][$url]['freq']=0;
 			// Cached page
-			$hash='url.'.hash('GET '.$url);
-			$cached=cache\cached($hash);
+			$hash='url.'.self::hash('GET '.$url);
+			$cached=Cache::cached($hash);
 			if ($cached) {
 				self::$vars['SITEMAP'][$url]['mod']=$cached['time'];
 				self::$vars['SITEMAP'][$url]['freq']=$_SERVER['REQUEST_TTL'];
@@ -288,8 +393,10 @@ class Web extends Base {
 			$links=$doc->getElementsByTagName('a');
 			foreach ($links as $link) {
 				$ref=$link->getAttribute('href');
-				$rel=$link->getAttribute('rel');
-				if (!$ref || $rel && preg_match('/nofollow/',$rel))
+				preg_match('/^http[s]*:\/\/([^\/$]+)/',$ref,$host);
+				if (!empty($host) && $host[1]!=$_SERVER['SERVER_NAME'] ||
+					!$ref || ($rel=$link->getAttribute('rel')) &&
+					preg_match('/nofollow/',$rel))
 					// Don't crawl this link!
 					continue;
 				if (!isset(self::$vars['SITEMAP'][$ref]))
@@ -299,7 +406,8 @@ class Web extends Base {
 					);
 			}
 			// Parse each link
-			array_walk(array_keys(self::$vars['SITEMAP']),'self::sitemap');
+			$map=array_keys(self::$vars['SITEMAP']);
+			array_walk($map,'self::sitemap');
 		}
 		unset($doc);
 		if (!self::$vars['SITEMAP'][$url]['level']) {
@@ -319,11 +427,11 @@ class Web extends Base {
 			$xml=simplexml_load_string(
 				'<?xml version="1.0" encoding="'.
 					self::$vars['ENCODING'].'"?>'.
-				'<urlset xmlns="'.
-					'http://www.sitemaps.org/schemas/sitemap/0.9'.
-				'"/>'
+				'<urlset xmlns='.
+					'"http://www.sitemaps.org/schemas/sitemap/0.9"'.
+				'/>'
 			);
-			$host='http://'.$_SERVER['SERVER_NAME'];
+			$host=self::$vars['PROTOCOL'].'://'.$_SERVER['SERVER_NAME'];
 			foreach (self::$vars['SITEMAP'] as $key=>$ref) {
 				// Add new URL
 				$item=$xml->addChild('url');
@@ -336,7 +444,6 @@ class Web extends Base {
 					sprintf('%1.1f',1-$ref['level']/$depth));
 			}
 			// Send output
-			self::$vars['QUIET']=$state;
 			if (PHP_SAPI!='cli')
 				header(self::HTTP_Content.': application/xml; '.
 					'charset='.self::$vars['ENCODING']);
@@ -347,12 +454,43 @@ class Web extends Base {
 	}
 
 	/**
+		Return TRUE if HTTP request origin is AJAX
+			@return boolean
+			@public
+	**/
+	static function isajax() {
+		return isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+			$_SERVER['HTTP_X_REQUESTED_WITH']=='XMLHttpRequest';
+	}
+
+	/**
 		Class initializer
 			@public
 	**/
 	static function onload() {
+		if (!extension_loaded('sockets'))
+			// Sockets extension required
+			trigger_error(sprintf(self::TEXT_PHPExt,'sockets'));
+		// Default translations
+		$diacritics=array(
+			'À'=>'A','Á'=>'A','Â'=>'A','Ã'=>'A','Å'=>'A','Ä'=>'A','Æ'=>'AE',
+			'à'=>'a','á'=>'a','â'=>'a','ã'=>'a','å'=>'a','ä'=>'a','æ'=>'ae',
+			'Þ'=>'B','þ'=>'b','Č'=>'C','Ć'=>'C','Ç'=>'C','č'=>'c','ć'=>'c',
+			'ç'=>'c','Ď'=>'D','ð'=>'d','ď'=>'d','Đ'=>'Dj','đ'=>'dj','È'=>'E',
+			'É'=>'E','Ê'=>'E','Ë'=>'E','è'=>'e','é'=>'e','ê'=>'e','ë'=>'e',
+			'Ì'=>'I','Í'=>'I','Î'=>'I','Ï'=>'I','ì'=>'i','í'=>'i','î'=>'i',
+			'ï'=>'i','Ľ'=>'L','ľ'=>'l','Ñ'=>'N','Ň'=>'N','ñ'=>'n','ň'=>'n',
+			'Ò'=>'O','Ó'=>'O','Ô'=>'O','Õ'=>'O','Ø'=>'O','Ö'=>'O','Œ'=>'OE',
+			'ð'=>'o','ò'=>'o','ó'=>'o','ô'=>'o','õ'=>'o','ö'=>'o','œ'=>'oe',
+			'ø'=>'o','Ŕ'=>'R','Ř'=>'R','ŕ'=>'r','ř'=>'r','Š'=>'S','š'=>'s',
+			'ß'=>'ss','Ť'=>'T','ť'=>'t','Ù'=>'U','Ú'=>'U','Û'=>'U','Ü'=>'U',
+			'Ů'=>'U','ù'=>'u','ú'=>'u','û'=>'u','ü'=>'u','ů'=>'u','Ý'=>'Y',
+			'Ÿ'=>'Y','ý'=>'y','ý'=>'y','ÿ'=>'y','Ž'=>'Z','ž'=>'z'
+		);
+		self::$vars['DIACRITICS']=isset(self::$vars['DIACRITICS'])?
+			array_merge($diacritics,self::$vars['DIACRITICS']):$diacritics;
 		// Site structure
-		$vars['SITEMAP']=NULL;
+		self::$vars['SITEMAP']=NULL;
 	}
 
 }

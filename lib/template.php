@@ -8,10 +8,10 @@
 	compliance with the license. Any of the license terms and conditions
 	can be waived if you get permission from the copyright holder.
 
-	Copyright (c) 2009-2010 F3::Factory
+	Copyright (c) 2009-2011 F3::Factory
 	Bong Cosca <bong.cosca@yahoo.com>
 
-		@package Network
+		@package Template
 		@version 2.0.0
 **/
 
@@ -29,16 +29,58 @@ class Template extends Base {
 		$includes=array();
 
 	/**
+		Render markup string
+			@return string
+			@param $text string
+			@param $globals boolean
+			@public
+	**/
+	static function markup($text,$globals=TRUE) {
+		// Parse raw template
+		$doc=new F3markup($globals);
+		$text=$doc->load($text);
+		// Render in a sandbox
+		$instance=new F3instance;
+		ob_start();
+		if (ini_get('allow_url_fopen') && ini_get('allow_url_include'))
+			// Stream wrap
+			$instance->sandbox('data:text/plain,'.urlencode($text));
+		else {
+			// Save PHP-equivalent file in temporary folder
+			if (!is_dir(self::$vars['TEMP']))
+				self::mkdir(self::$vars['TEMP']);
+			$hmd5=self::hash(md5($text));
+			$hash='tpl.'.$hmd5;
+			$temp=self::$vars['TEMP'].$_SERVER['SERVER_NAME'].'.'.$hash;
+			// Create semaphore
+			$hash='sem.'.$hmd5;
+			$cached=Cache::cached($hash);
+			while ($cached)
+				// Locked by another process
+				usleep(mt_rand(0,100));
+			Cache::set($hash,TRUE);
+			file_put_contents($temp,$text,LOCK_EX);
+			// Remove semaphore
+			Cache::clear($hash);
+			$instance->sandbox($temp);
+		}
+		$out=ob_get_clean();
+		unset($instance);
+		return self::$vars['TIDY']?self::tidy($out):$out;
+	}
+
+	/**
 		Render template
 			@return string
 			@param $file string
 			@param $mime string
+			@param $globals boolean
 			@public
 	**/
-	static function serve($file,$mime='text/html') {
+	static function serve($file,$mime='text/html',$globals=TRUE) {
 		$file=self::resolve($file);
 		$found=FALSE;
-		foreach (preg_split('/\||;/',self::$vars['GUI'],0,
+		foreach (preg_split('/[\|;,]/',self::$vars['GUI'],0,
 			PREG_SPLIT_NO_EMPTY) as $gui) {
 			if (is_file($view=self::fixslashes($gui.$file))) {
 				$found=TRUE;
@@ -66,39 +108,41 @@ class Template extends Base {
 			$text=Cache::get($hash);
 		else {
 			// Parse raw template
-			$doc=new F3markup;
+			$doc=new F3markup($globals);
 			$text=$doc->load(file_get_contents($view));
 			// Save PHP-compiled template to cache
 			Cache::set($hash,$text);
 		}
+		// Render in a sandbox
+		$instance=new F3instance;
 		ob_start();
 		if (ini_get('allow_url_fopen') && ini_get('allow_url_include'))
 			// Stream wrap
-			require 'data:text/plain,'.urlencode($text);
+			$instance->sandbox('data:text/plain,'.urlencode($text));
 		else {
 			// Save PHP-equivalent file in temporary folder
-			self::folder(self::$vars['TEMP']);
-
+			if (!is_dir(self::$vars['TEMP']))
+				self::mkdir(self::$vars['TEMP']);
 			$temp=self::$vars['TEMP'].$_SERVER['SERVER_NAME'].'.'.$hash;
-			if (!$cached || !is_file($temp)) {
+			if (!$cached || !is_file($temp) ||
+				filemtime($temp)<Cache::cached($view)) {
 				// Create semaphore
 				$hash='sem.'.self::hash($view);
 				$cached=Cache::cached($hash);
 				while ($cached)
 					// Locked by another process
-					usleep(mt_rand(0,1000));
+					usleep(mt_rand(0,100));
 				Cache::set($hash,TRUE);
 				file_put_contents($temp,$text,LOCK_EX);
 				// Remove semaphore
 				Cache::clear($hash);
 			}
-
-			// Render
-			require $temp;
+			$instance->sandbox($temp);
 		}
 		$out=ob_get_clean();
+		unset($instance);
 		unset(self::$includes[array_search($view,self::$includes)]);
-		return $out;
+		return !self::$includes && self::$vars['TIDY']?self::tidy($out):$out;
 	}
 
 }
@@ -109,9 +153,13 @@ class F3markup extends Base {
 	//@{ Locale-specific error/exception messages
 	const
 		TEXT_AttribMissing='Missing attribute: %s',
-		TEXT_AttribInvalid='Invalid attribute: %s';
+		TEXT_AttribInvalid='Invalid attribute: %s',
+		TEXT_Global='Use of global variable %s is not allowed';
 	//@}
 
+	public
+		//! Enable/disable PHP globals
+		$globals=TRUE;
 	private
 		//! Parsed markup string
 		$tree=array(),
@@ -119,7 +167,7 @@ class F3markup extends Base {
 		$syms=array();
 
 	/**
-		Return stringified framework variable
+		Convert template expression to PHP code
 			@return string
 			@param $str string
 			@param $echo boolean
@@ -131,12 +179,20 @@ class F3markup extends Base {
 		return preg_replace_callback(
 				'/{{(.+?)}}/s',
 				function($expr) use(&$syms,$self,$echo) {
-					$out=preg_replace_callback(
-						'/(?!\w)@(\w+(?:\[[^\]]+\]|\.\w+)*(?:->\w+)?)'.
-						'\h*(\([^\)]*\))?(?:\/\/(.+))?/',
-						function($var) use(&$syms) {
-							$self=__CLASS__;
+					$out=preg_replace_callback('/(?!\w)'.
+						'@(\w+(?:\[[^\]]+\]|\.\w+(?![\w\(]))*'.
+						'(?:\s*->\s*\w+)?)(\s*\([^\)]*\))?(?:\s*\\\(.+))?/',
+						function($var) use(&$syms,$self) {
+							//Return stringified framework variable
 							preg_match('/^(\w+)\b(.*)/',$var[1],$match);
+							if (!$self->globals &&
+								preg_match('/'.$self::PHP_Globals.'/',
+								$match[1])) {
+								trigger_error(
+									sprintf($self::TEXT_Global,$match[1])
+								);
+								return FALSE;
+							}
 							if (in_array($match[1],$syms))
 								return '$_'.$self::remix($var[1]);
 							$str='F3::get('.var_export($var[1],TRUE).')';
@@ -166,23 +222,23 @@ class F3markup extends Base {
 		Return TRUE if all mandatory attributes are present
 			@return boolean
 			@param $key string
-			@param $tag array
+			@param $tags array
 			@param $attrs array
 			@public
 	**/
-	function isdef($key,array $tag,array $attrs) {
+	function isdef($key,array $tags,array $attrs) {
 		$ok=TRUE;
 		foreach ($attrs as $attr)
-			if (!isset($tag['@attrib'][$attr])) {
+			if (!isset($tags['@attrib'][$attr])) {
 				$ok=FALSE;
 				break;
 			}
 		if ($ok)
 			return TRUE;
 		$out='<'.$key;
-		if (isset($tag['@attrib']))
-			foreach ($tag['@attrib'] as $akey=>$aval)
-				$out.=' '.$akey.'="'.htmlspecialchars($aval).'"';
+		if (isset($tags['@attrib']))
+			foreach ($tags['@attrib'] as $akey=>$aval)
+				$out.=' '.$akey.'="'.$aval.'"';
 		$out.='>';
 		trigger_error(sprintf(self::TEXT_AttribMissing,$out));
 		return FALSE;
@@ -209,41 +265,57 @@ class F3markup extends Base {
 							if (!$this->isdef($nkey,$nval,array('href')))
 								return;
 							$hvar=$nval['@attrib']['href'];
-							$out.='<?php echo Template::serve('.
-								var_export($hvar,TRUE).'); ?>';
+							if (isset($nval['@attrib']['if'])) {
+								$ival=$nval['@attrib']['if'];
+								$cond=$this->expr($ival);
+								// Syntax check
+								if ($cond==$ival) {
+									trigger_error(sprintf(
+										self::TEXT_AttribInvalid,
+										'if="'.addcslashes($ival,'"').'"'));
+									return;
+								}
+							}
+							$out.='<?php '.(isset($ival)?
+								('if ('.$cond.') '):'').
+								'echo Template::serve('.
+									var_export($hvar,TRUE).'); ?>';
 							break;
 						case 'loop':
 							// <loop> directive
 							if (!$this->isdef($nkey,$nval,
 								array('counter','from','to')))
 								return;
-							$cvar=preg_replace('/{{@(.+?)}}/','\1',
-								$nval['@attrib']['counter']);
+							$cvar=self::remix(
+								preg_replace('/{{\s*@(.+?)\s*}}/','\1',
+									$nval['@attrib']['counter']));
 							foreach ($nval['@attrib'] as $akey=>$aval) {
 								${$akey[0].'att'}=$aval;
 								${$akey[0].'str'}=$this->expr($aval);
 								// Syntax check
 								if (${$akey[0].'str'}==$aval) {
 									trigger_error(sprintf(
-										self::TEXT_AttribInvalid,
-										$akey.'="'.addslashes($aval).'"'));
+										self::TEXT_AttribInvalid,$akey.'="'.
+											addcslashes($aval,'"').'"'));
 									return;
 								}
 							}
 							unset($nval['@attrib']);
 							$this->syms[]=$cvar;
 							$out.='<?php for ('.
-								'$_'.$cvar.'='.(float)$fstr.';'.
-								'$_'.$cvar.'<'.(float)$tstr.';'.
-								'$_'.$cvar.'+='.(float)
+								'$_'.$cvar.'='.$fstr.';'.
+								'$_'.$cvar.'<='.$tstr.';'.
+								'$_'.$cvar.'+='.
+									// step attribute
 									(isset($satt)?$sstr:'1').'): ?>'.
 								$this->build($nval).
 								'<?php endfor; ?>';
 							break;
 						case 'repeat':
 							// <repeat> directive
-							if (!$this->isdef($nkey,$nval,
-								array('group','value')))
+							if (!$this->isdef($nkey,$nval,array('group')) &&
+								(!$this->isdef($nkey,$nval,array('key')) ||
+								!$this->isdef($nkey,$nval,array('value'))))
 								return;
 							$gval=$nval['@attrib']['group'];
 							$gstr=$this->expr($gval);
@@ -251,28 +323,38 @@ class F3markup extends Base {
 							if ($gstr==$gval) {
 								trigger_error(sprintf(
 									self::TEXT_AttribInvalid,
-									'group="'.addslashes($gval).'"'));
+									'group="'.addcslashes($gval,'"').'"'));
 								return;
 							}
-							unset($nval['@attrib']['group']);
 							foreach ($nval['@attrib'] as $akey=>$aval) {
-								${$akey[0].'var'}=
-									preg_replace('/{{@(.+?)}}/','\1',$aval);
+								${$akey[0].'var'}=self::remix(
+									preg_replace('/{{\s*@(.+?)\s*}}/',
+										'\1',$aval));
 								// Syntax check
 								if (${$akey[0].'var'}==$aval) {
 									trigger_error(sprintf(
 										self::TEXT_AttribInvalid,
-										$akey.'="'.addslashes($aval).'"'));
+										$akey.'='.
+											'"'.addcslashes($aval,'"').'"'));
 									return;
 								}
 							}
 							unset($nval['@attrib']);
+							unset($nval['@attrib']);
+							if (isset($vvar))
+								$this->syms[]=$vvar;
+							else
+								$vvar=self::hash($gvar);
 							if (isset($kvar))
 								$this->syms[]=$kvar;
-							$this->syms[]=$vvar;
-							$out.='<?php foreach (('.$gstr.'?:array()) as '.
+							if (isset($cvar))
+								$this->syms[]=$cvar;
+							$out.='<?php '.
+								(isset($cvar)?('$_'.$cvar.'=0; '):'').
+								'foreach (('.$gstr.'?:array()) as '.
 								(isset($kvar)?('$_'.$kvar.'=>'):'').
-									'$_'.$vvar.'): ?>'.
+									'$_'.$vvar.'): '.
+								(isset($cvar)?('$_'.$cvar.'++; '):'').'?>'.
 								$this->build($nval).
 								'<?php endforeach; ?>';
 							break;
@@ -286,7 +368,7 @@ class F3markup extends Base {
 							if ($cond==$ival) {
 								trigger_error(sprintf(
 									self::TEXT_AttribInvalid,
-									'if="'.addslashes($ival).'"'));
+									'if="'.addcslashes($ival,'"').'"'));
 								return;
 							}
 							$out.='<?php if ('.$cond.'): ?>'.
@@ -333,7 +415,8 @@ class F3markup extends Base {
 		while ($ptr<$len) {
 			if (preg_match('/^<(\/?)'.
 				'(?:F3+:)?(include|exclude|loop|repeat|check|true|false)\b'.
-				'(.*?)(\/?)>/is',substr($text,$ptr),$match)) {
+				'((?:\s+\w+s*=\s*(?:"(?:.+?)"|\'(?:.+?)\'))*)\s*(\/?)>/is',
+				substr($text,$ptr),$match)) {
 				if (strlen($temp))
 					$node[]=$temp;
 				// Element node
@@ -361,8 +444,8 @@ class F3markup extends Base {
 					$node=&$node[][$match[2]];
 					if ($match[3]) {
 						// Process attributes
-						preg_match_all('/\s+(\w+\b)\s*='.
-							'\s*(?:"(.+?)"|\'(.+?)\')/s',$match[3],$attr,
+						preg_match_all('/\s+(\w+)\s*=\s*'.
+							'(?:"(.+?)"|\'(.+?)\')/s',$match[3],$attr,
 							PREG_SET_ORDER);
 						foreach ($attr as $kv)
 							$node['@attrib'][$kv[1]]=$kv[2]?:$kv[3];
@@ -393,7 +476,8 @@ class F3markup extends Base {
 		Override base constructor
 			@public
 	**/
-	function __construct() {
+	function __construct($globals) {
+		$this->globals=$globals;
 	}
 
 }

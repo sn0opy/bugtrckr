@@ -8,7 +8,7 @@
 	compliance with the license. Any of the license terms and conditions
 	can be waived if you get permission from the copyright holder.
 
-	Copyright (c) 2009-2010 F3::Factory
+	Copyright (c) 2009-2011 F3::Factory
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package Log
@@ -21,8 +21,7 @@ class Log extends Base {
 	//@{ Locale-specific error/exception messages
 	const
 		TEXT_LogOpen='Unable to open log file',
-		TEXT_LogLock='Unable to gain exclusive access to log file',
-		TEXT_Write='{@CONTEXT.0} must have write permission on {@CONTEXT.1}';
+		TEXT_LogLock='Unable to gain exclusive access to log file';
 	//@}
 
 	const
@@ -48,7 +47,7 @@ class Log extends Base {
 			if ((microtime(TRUE)-$time)>self::LOG_Timeout)
 				// Give up
 				return FALSE;
-			usleep(mt_rand(1,3000));
+			usleep(mt_rand(0,100));
 		}
 		return TRUE;
 	}
@@ -86,7 +85,7 @@ class Log extends Base {
 	}
 
 	/**
-		Logger constructor; requires path/file name as argument
+		Logger constructor; requires fulll path as argument
 			@public
 	**/
 	function __construct($file) {

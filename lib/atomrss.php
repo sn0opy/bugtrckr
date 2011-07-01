@@ -8,7 +8,7 @@
 	compliance with the license. Any of the license terms and conditions
 	can be waived if you get permission from the copyright holder.
 
-	Copyright (c) 2009-2010 F3::Factory
+	Copyright (c) 2009-2011 F3::Factory
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package AtomRSS
@@ -26,8 +26,8 @@ class AtomRSS extends Base {
 			@param $tags string
 			@public
 	**/
-	static function read($url,$count=10,$tags='b|i|u|a') {
-		$data=Net::http('GET '.$url);
+	static function read($url,$count=10,$tags='b;i;u;a') {
+		$data=Web::http('GET '.$url);
 		if (!$data)
 			return FALSE;
 		$xml=simplexml_load_string(
@@ -43,7 +43,7 @@ class AtomRSS extends Base {
 					'title'=>(string)$item->title,
 					'link'=>(string)$item->link,
 					'text'=>strip_tags($item->description,
-						'<'.implode('><',explode('|',$tags)).'>')
+						'<'.implode('><',self::split($tags)).'>')
 				);
 		}
 		elseif (isset($xml->entry)) {
@@ -53,7 +53,7 @@ class AtomRSS extends Base {
 					'title'=>(string)$item->title,
 					'link'=>(string)$item->link['href'],
 					'text'=>strip_tags($item->summary,
-						'<'.implode('><',explode('|',$tags)).'>')
+						'<'.implode('><',self::split($tags)).'>')
 				);
 		}
 		else

@@ -8,7 +8,7 @@
 	compliance with the license. Any of the license terms and conditions
 	can be waived if you get permission from the copyright holder.
 
-	Copyright (c) 2009-2010 F3::Factory
+	Copyright (c) 2009-2011 F3::Factory
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package ICU
@@ -268,30 +268,28 @@ class ICU extends Base {
 			'/{(\d+)(?:,(\w+)(?:,(\w+))?)?}/',
 			function($expr) use($args,$info) {
 				$arg=$args[$expr[1]];
-				if (isset($expr[2])) {
-					if ($expr[2]=='number') {
-						if (isset($expr[3]))
-							switch ($expr[3]) {
-								case 'integer':
-									return number_format($arg,0,
-										$info['decimal_point'],
-										$info['thousands_sep']);
-								case 'currency':
-									return $info['currency_symbol'].
-										($info['p_sep_by_space']?' ':'').
-										number_format($arg,
-											$info['frac_digits'],
-											$info['mon_decimal_point'],
-											$info['mon_thousands_sep']);
-							}
-						else
-							return sprintf('%f',$arg);
-					}
-					elseif ($expr[2]=='date')
-						return strftime('%x',$arg);
+				if (!isset($expr[2]))
+					return $arg;
+				if ($expr[2]=='number') {
+					if (isset($expr[3]))
+						switch ($expr[3]) {
+							case 'integer':
+								return number_format($arg,0,
+									$info['decimal_point'],
+									$info['thousands_sep']);
+							case 'currency':
+								return $info['currency_symbol'].
+									($info['p_sep_by_space']?' ':'').
+									number_format($arg,
+										$info['frac_digits'],
+										$info['mon_decimal_point'],
+										$info['mon_thousands_sep']);
+						}
 					else
-						return $arg;
+						return sprintf('%f',$arg);
 				}
+				elseif ($expr[2]=='date')
+					return strftime('%x',$arg);
 				else
 					return $arg;
 			},

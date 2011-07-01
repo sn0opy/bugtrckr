@@ -8,7 +8,7 @@
 	compliance with the license. Any of the license terms and conditions
 	can be waived if you get permission from the copyright holder.
 
-	Copyright (c) 2009-2010 F3::Factory
+	Copyright (c) 2009-2011 F3::Factory
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package Base
@@ -36,9 +36,9 @@ class Base {
 		TEXT_Object='%s cannot be used in object context',
 		TEXT_Class='Undefined class %s',
 		TEXT_Method='Undefined method %s',
-		TEXT_Conflict='%s conflicts with framework method name',
-		TEXT_NotFound='The requested URL %s was not found',
-		TEXT_Handler='The route handler %s is invalid',
+		TEXT_NotFound='The URL %s was not found (%s request)',
+		TEXT_Callback='The callback function %s is invalid',
+		TEXT_Import='Import file %s not found',
 		TEXT_NoRoutes='No routes specified',
 		TEXT_HTTP='HTTP status code %s is invalid',
 		TEXT_Render='Unable to render %s - file does not exist',
@@ -121,21 +121,19 @@ class Base {
 		//! Framework-mapped PHP globals
 		PHP_Globals='GET|POST|COOKIE|REQUEST|SESSION|FILES|SERVER|ENV',
 		//! HTTP methods for RESTful interface
-		HTTP_Methods='GET|HEAD|POST|PUT|DELETE|OPTIONS',
-		//! Default extensions allowed in templates
-		FUNCS_Default='standard|date|pcre';
+		HTTP_Methods='GET|HEAD|POST|PUT|DELETE|OPTIONS';
 
+	//@{ Global variables and references to constants
 	protected static
-		//! Global variables
 		$vars,
-		//! NULL reference
-		$null;
+		$null=NULL,
+		$true=TRUE,
+		$false=FALSE;
+	//@}
 
 	private static
-		//! Functions allowed in template
-		$funcs=array(),
 		//! Read-only framework variables
-		$readonly='BASE|MAXSIZE|PROTOCOL|ROUTES|STATS|VERSION';
+		$readonly='BASE|PROTOCOL|ROUTES|STATS|VERSION';
 
 	/**
 		Convert Windows double-backslashes to slashes; Also for
@@ -155,11 +153,12 @@ class Base {
 			@public
 	**/
 	static function stringify($val) {
-		return preg_replace('/\h+=>\h+/','=>',
+		return preg_replace('/\s+=>\s+/','=>',
 			is_object($val) && !method_exists($val,'__set_state')?
 				(method_exists($val,'__toString')?
-					var_export((string)$val,TRUE):
-					('object:'.get_class($val))):var_export($val,TRUE));
+					var_export((string)stripslashes($val),TRUE):
+					('object:'.get_class($val))):
+				var_export($val,TRUE));
 	}
 
 	/**
@@ -180,6 +179,17 @@ class Base {
 				('array('.self::csv($val).')'):self::stringify($val);
 		}
 		return $str;
+	}
+
+	/**
+		Split pipe-, semi-colon, comma-separated string
+			@return array
+			@param $str string
+			@public
+	**/
+	static function split($str) {
+		return array_map('trim',
+			preg_split('/[|;,]/',$str,0,PREG_SPLIT_NO_EMPTY));
 	}
 
 	/**
@@ -245,7 +255,7 @@ class Base {
 	static function remix($key) {
 		$out='';
 		$obj=FALSE;
-		foreach (preg_split('/\[\h*[\'"]?|[\'"]?\h*\]|\.|(->)/',
+		foreach (preg_split('/\[\s*[\'"]?|[\'"]?\s*\]|\.|(->)/',
 			$key,NULL,PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE) as $fix) {
 			if ($out) {
 				if ($fix=='->') {
@@ -271,7 +281,7 @@ class Base {
 			@public
 	**/
 	static function valid($key) {
-		if (preg_match('/^(\w+(?:\[[^\]]+\]|\.\w+|->\w+)*)$/',$key))
+		if (preg_match('/^(\w+(?:\[[^\]]+\]|\.\w+|\s*->\s*\w+)*)$/',$key))
 			return TRUE;
 		// Invalid variable name
 		trigger_error(sprintf(self::TEXT_Illegal,var_export($key,TRUE)));
@@ -283,16 +293,22 @@ class Base {
 			@return mixed
 			@param $key string
 			@param $set boolean
+			@param $check boolean
 			@public
 	**/
-	static function &ref($key,$set=TRUE) {
+	static function &ref($key,$set=TRUE,$check=TRUE) {
 		// Traverse array
-		$matches=preg_split('/\[\h*[\'"]?|[\'"]?\h*\]|\.|(->)/',
-			$key,NULL,PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
-		if ($set &&
-			// Read-only framework variables
-			!preg_match('/^('.self::$readonly.')\b/',
-				$matches[0]))
+		$matches=preg_split(
+			'/\[\s*[\'"]?|[\'"]?\s*\]|\.|(->)/',self::remix($key),
+			NULL,PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
+		// Referencing a SESSION variable element auto-starts a session
+		if ($check && $matches[0]=='SESSION' && !session_id()) {
+			session_start();
+			// Sync framework and PHP global
+			self::$vars['SESSION']=&$_SESSION;
+		}
+		// Read-only framework variable?
+		if ($set && !preg_match('/^('.self::$readonly.')\b/',$matches[0]))
 			$var=&self::$vars;
 		else
 			$var=self::$vars;
@@ -300,29 +316,175 @@ class Base {
 		foreach ($matches as $match)
 			if ($match=='->')
 				$obj=TRUE;
-			elseif ($set) {
-				// Create property/array element if not found
-				if ($obj) {
-					if (!is_object($var))
-						$var=new stdClass;
-					$var=&$var->$match;
+			else {
+				if (preg_match('/@(\w+)/',$match,$token))
+					// Token found
+					$match=&self::ref($token[1]);
+				if ($set) {
+					// Create property/array element if not found
+					if ($obj) {
+						if (!is_object($var))
+							$var=new stdClass;
+						if (!isset($var->$match))
+							$var->$match=NULL;
+						$var=&$var->$match;
+						$obj=FALSE;
+					}
+					else
+						$var=&$var[$match];
+				}
+				elseif ($obj && isset($var->$match)) {
+					// Object property found
+					$var=$var->$match;
 					$obj=FALSE;
 				}
+				elseif (is_array($var) && isset($var[$match]))
+					// Array element found
+					$var=$var[$match];
 				else
-					$var=&$var[$match];
+					// Property/array element doesn't exist
+					return self::$null;
 			}
-			elseif ($obj && isset($var->$match)) {
-				// Object property found
-				$var=$var->$match;
-				$obj=FALSE;
-			}
-			elseif (is_array($var) && isset($var[$match]))
-				// Array element found
-				$var=$var[$match];
-			else
-				// Property/array element doesn't exist
-				return self::$null;
+		if ($set && count($matches)>1 &&
+			preg_match('/GET|POST|COOKIE/',$matches[0],$php)) {
+			// Sync with REQUEST
+			$req=&self::ref(
+				preg_replace('/^'.$php[0].'\b/','REQUEST',$key),TRUE
+			);
+			$req=$var;
+		}
 		return $var;
+	}
+
+	/**
+		Copy contents of framework variable to another
+			@param $src string
+			@param $dst string
+			@public
+	**/
+	static function copy($src,$dst) {
+		$ref=&self::ref($dst);
+		$ref=self::ref($src);
+	}
+
+	/**
+		Concatenate string to framework string variable
+			@param $var string
+			@param $val string
+			@public
+	**/
+	static function concat($var,$val) {
+		$ref=&self::ref($var);
+		$ref.=$val;
+	}
+
+	/**
+		Format framework string variable
+			@return string
+			@public
+	**/
+	static function sprintf() {
+		return call_user_func_array('sprintf',
+			array_map('self::resolve',func_get_args()));
+	}
+
+	/**
+		Add keyed element to the end of framework array variable
+			@param $var string
+			@param $key string
+			@param $val mixed
+			@public
+	**/
+	static function append($var,$key,$val) {
+		$ref=&self::ref($var);
+		$ref[self::resolve($key)]=$val;
+	}
+
+	/**
+		Swap keys and values of framework array variable
+			@param $var string
+			@public
+	**/
+	static function flip($var) {
+		$ref=&self::ref($var);
+		$ref=array_combine(array_values($ref),array_keys($ref));
+	}
+
+	/**
+		Merge one or more framework array variables
+			@public
+	**/
+	static function merge() {
+		$args=func_get_args();
+		foreach ($args as &$arg) {
+			if (is_string($arg))
+				$arg=self::ref($arg);
+			if (!is_array($arg))
+				trigger_error(sprintf(self::TEXT_NotArray,
+					self::stringify($arg)));
+		}
+		$ref=&self::ref($var);
+		$ref=call_user_func_array('array_merge',$args);
+	}
+
+	/**
+		Add element to the end of framework array variable
+			@param $var string
+			@param $val mixed
+			@public
+	**/
+	static function push($var,$val) {
+		$ref=&self::ref($var);
+		if (!is_array($ref))
+			$ref=array();
+		array_push($ref,is_array($val)?
+			array_map('self::resolve',$val):
+			(is_string($val)?self::resolve($val):$val));
+	}
+
+	/**
+		Remove last element of framework array variable and
+		return the element
+			@return mixed
+			@param $var string
+			@public
+	**/
+	static function pop($var) {
+		$ref=&self::ref($var);
+		if (is_array($ref))
+			return array_pop($ref);
+		trigger_error(sprintf(self::TEXT_NotArray,$var));
+		return FALSE;
+	}
+
+	/**
+		Add element to the beginning of framework array variable
+			@param $var string
+			@param $val mixed
+			@public
+	**/
+	static function unshift($var,$val) {
+		$ref=&self::ref($var);
+		if (!is_array($ref))
+			$ref=array();
+		array_unshift($ref,is_array($val)?
+			array_map('self::resolve',$val):
+			(is_string($val)?self::resolve($val):$val));
+	}
+
+	/**
+		Remove first element of framework array variable and
+		return the element
+			@return mixed
+			@param $var string
+			@public
+	**/
+	static function shift($var) {
+		$ref=&self::ref($var);
+		if (is_array($ref))
+			return array_shift($ref);
+		trigger_error(sprintf(self::TEXT_NotArray,$var));
+		return FALSE;
 	}
 
 	/**
@@ -341,20 +503,18 @@ class Base {
 				// Evaluate expression
 				$out=preg_replace_callback(
 					// Function
-					'/(?!@)\b(\w+)\h*\(([^\)]*)\)/',
+					'/(?<!@)\b(\w+)\s*\(([^\)]*)\)/',
 					function($func) use($self) {
 						return is_callable($ref=$self::ref($func[1],FALSE))?
 							// Variable holds an anonymous function
 							call_user_func_array($ref,str_getcsv($func[2])):
-							// Check if empty array/prohibited function
-							($func[1].$func[2]=='array'?'NULL':
-								($self::allowed($func[1])?
-									$func[0]:var_export($func[0],TRUE)));
+							// Check if empty array
+							($func[1].$func[2]=='array'?'NULL':$func[0]);
 					},
 					preg_replace_callback(
 						// Framework variable
-						'/(?!\w)@(\w+(?:\[[^\]]+\]|\.\w+)*(?:->\w+)?)'.
-							'\h*(\(([^\)]*)\))?(?:\/\/(.+))?/',
+						'/(?<!\w)@(\w+(?:\[[^\]]+\]|\.\w+)*'.
+						'(?:\s*->\s*\w+)?)\s*(\(([^\)]*)\))?(?:\\\(.+))?/',
 						function($var) use($self) {
 							// Retrieve variable contents
 							$val=$self::ref($var[1],FALSE);
@@ -362,7 +522,7 @@ class Base {
 								// Anonymous function
 								$val=call_user_func_array(
 									$val,str_getcsv($var[3]));
-							if (isset($var[4]) && class_exists('ICU'))
+							if (isset($var[4]) && class_exists('ICU',FALSE))
 								// ICU-formatted string
 								$val=call_user_func_array('ICU::format',
 									array($val,str_getcsv($var[4])));
@@ -371,63 +531,13 @@ class Base {
 						$expr[1]
 					)
 				);
-				return !preg_match('/@|\bnew\h+/i',$out) &&
+				return !preg_match('/@|\bnew\s+/i',$out) &&
 					($eval=eval('return (string)'.$out.';'))!==FALSE?
 						$eval:$out;
 			},
 			$val
 		);
 		return $str;
-	}
-
-	/**
-		Allow PHP and user-defined functions to be used in templates
-			@param $str string
-			@public
-	**/
-	static function allow($str='') {
-		// Create lookup table of functions allowed in templates
-		$legal=array();
-		// Get list of all defined functions
-		$dfuncs=get_defined_functions();
-		foreach (explode('|',$str) as $ext) {
-			$funcs=array();
-			if (extension_loaded($ext))
-				$funcs=get_extension_funcs($ext);
-			elseif ($ext=='user')
-				$funcs=$dfuncs['user'];
-			$legal=array_merge($legal,$funcs);
-		}
-		// Remove prohibited functions
-		$illegal='/^('.
-			'apache_|call|chdir|env|escape|exec|extract|fclose|fflush|'.
-			'fget|file_put|flock|fopen|fprint|fput|fread|fseek|fscanf|'.
-			'fseek|fsockopen|fstat|ftell|ftp_|ftrunc|get|header|http_|'.
-			'import|ini_|ldap_|link|log_|magic|mail|mcrypt_|mkdir|ob_|'.
-			'php|popen|posix_|proc|rename|rmdir|rpc|set_|sleep|stream|'.
-			'sys|thru|unreg|include|require'.
-		')/i';
-		$legal=array_merge(
-			array_filter(
-				$legal,
-				function($func) use($illegal) {
-					return !preg_match($illegal,$func);
-				}
-			),
-			// PHP language constructs that may be used in expressions
-			array('array','isset')
-		);
-		self::$funcs=array_map('strtolower',$legal);
-	}
-
-	/**
-		Return TRUE if function can be used in templates
-			@return boolean
-			@param $func string
-			@public
-	**/
-	static function allowed($func) {
-		return in_array($func,self::$funcs);
 	}
 
 	/**
@@ -472,23 +582,39 @@ class Base {
 	}
 
 	/**
-		Create specified folder
-			@param $name string
+		Clean and repair HTML
+			@return string
+			@param $html string
 			@public
 	**/
-	static function folder($name) {
-		if (!is_dir($name)) {
-			if (!is_writable(dirname($name)) &&
-				function_exists('posix_getpwuid')) {
-					$uid=posix_getpwuid(posix_geteuid());
-					trigger_error(sprintf(self::TEXT_Write,
-						$uid['name'],realpath(dirname($name))));
-					return FALSE;
-			}
-			// Create the framework's cache folder
-			umask(0);
-			mkdir($name,0755);
+	static function tidy($html) {
+		if (!extension_loaded('tidy'))
+			return $html;
+		$tidy=new Tidy;
+		$tidy->parseString($html,self::$vars['TIDY'],
+			str_replace('-','',self::$vars['ENCODING']));
+		$tidy->cleanRepair();
+		return (string)$tidy;
+	}
+
+	/**
+		Create folder; Trigger error and return FALSE if script has no
+		permission to create folder in the specified path
+			@param $name string
+			@param $perm int
+			@public
+	**/
+	static function mkdir($name,$perm=0755) {
+		if (!is_writable(dirname($name)) &&
+			function_exists('posix_getpwuid')) {
+			$uid=posix_getpwuid(posix_geteuid());
+			trigger_error(sprintf(self::TEXT_Write,
+				$uid['name'],realpath(dirname($name))));
+			return FALSE;
 		}
+		// Create the folder
+		umask(0);
+		mkdir($name,$perm);
 	}
 
 	/**
@@ -532,49 +658,35 @@ class F3 extends Base {
 			@param $key string
 			@param $val mixed
 			@param $persist boolean
-			@param $conv boolean
+			@param $resolve boolean
 			@public
 	**/
-	static function set($key,$val,$persist=FALSE,$conv=TRUE) {
+	static function set($key,$val,$persist=FALSE,$resolve=TRUE) {
 		if (preg_match('/{{.+}}/',$key))
 			// Variable variable
 			$key=self::resolve($key);
 		if (!self::valid($key))
 			return;
-		// Referencing a SESSION variable element auto-starts a session
-		if (preg_match('/^SESSION\b/',$key) && !session_id()) {
-			session_start();
-			// Sync framework and PHP global
-			self::$vars['SESSION']=&$_SESSION;
-		}
-		$name=self::remix($key);
-		$var=&self::ref($name);
-		if (is_array($val)) {
+		$var=&self::ref($key);
+		if (is_string($val) && $resolve)
+			$val=self::resolve($val);
+		elseif (is_array($val)) {
 			$var=array();
 			// Recursive token substitution
 			foreach ($val as $subk=>$subv)
 				self::set($key.'['.var_export($subk,TRUE).']',
-					$subv,FALSE,$conv);
+					$subv,FALSE);
 			return;
-		}
-		elseif (is_string($val)) {
-			$val=self::resolve($val);
-			if (!preg_match('/^[A-Z]+\b/',$key) && $conv)
-				// Userland variable; Convert to HTML entities
-				$val=htmlspecialchars($val,
-					ENT_COMPAT,self::$vars['ENCODING'],FALSE);
 		}
 		$var=$val;
 		if (preg_match('/LANGUAGE|LOCALES/',$key) && class_exists('ICU'))
 			// Load appropriate dictionaries
 			ICU::load();
-		elseif ($key=='PREFIX')
-			self::alias($val);
 		// Initialize cache if explicitly defined
 		elseif ($key=='CACHE' && !is_bool($val))
 			Cache::prep();
 		if ($persist) {
-			$hash='var.'.self::hash($name);
+			$hash='var.'.self::hash(self::remix($key));
 			Cache::set($hash,$val);
 		}
 	}
@@ -592,19 +704,12 @@ class F3 extends Base {
 			$key=self::resolve($key);
 		if (!self::valid($key))
 			return self::$null;
-		// Referencing a SESSION variable element auto-starts a session
-		if (preg_match('/^SESSION\b/',$key) && !session_id()) {
-			session_start();
-			// Sync framework and PHP global
-			self::$vars['SESSION']=&$_SESSION;
-		}
-		$name=self::remix($key);
-		$val=self::ref($name,FALSE);
+		$val=self::ref($key,FALSE);
 		if (is_string($val))
-			return class_exists('ICU')?ICU::format($val,$args):$val;
-		if (is_null($val)) {
+			return class_exists('ICU',FALSE)?ICU::format($val,$args):$val;
+		elseif (is_null($val)) {
 			// Attempt to retrieve from cache
-			$hash='var.'.self::hash($name);
+			$hash='var.'.self::hash(self::remix($key));
 			if (Cache::cached($hash))
 				$val=Cache::get($hash);
 		}
@@ -639,9 +744,8 @@ class F3 extends Base {
 		// Assign NULL to framework variables; do not unset
 		eval(ctype_upper(preg_replace('/^\w+/','\0',$key))?
 			'self::$vars'.$name.'=NULL;':'unset(self::$vars'.$name.');');
-		$name=self::remix($key);
 		// Remove from cache
-		$hash='var.'.self::hash($name);
+		$hash='var.'.self::hash(self::remix($key));
 		if (Cache::cached($hash))
 			Cache::clear($hash);
 	}
@@ -658,7 +762,7 @@ class F3 extends Base {
 			$key=self::resolve($key);
 		if (!self::valid($key))
 			return FALSE;
-		$var=&self::ref(self::remix($key));
+		$var=&self::ref($key,FALSE,FALSE);
 		return isset($var);
 	}
 
@@ -676,65 +780,6 @@ class F3 extends Base {
 			// Bind key-value pairs
 			foreach ($arg as $key=>$val)
 				self::set($pfx.$key,$val);
-	}
-
-	/**
-		Return true if framework variable is an array
-			@return boolean
-			@param $var string
-			@public
-	**/
-	static function is_array($var) {
-		if (is_array(self::ref(self::remix($var),FALSE)))
-			return TRUE;
-		trigger_error(sprintf(self::TEXT_NotArray,$name));
-		return FALSE;
-	}
-
-	/**
-		Add element to the end of framework array variable
-			@param $var string
-			@param $val mixed
-			@public
-	**/
-	static function push($var,$val) {
-		if (self::is_array($name=self::remix($var)))
-			array_push($ref=&self::ref($name),$val);
-	}
-
-	/**
-		Remove last element of framework array variable and
-		return the element
-			@return mixed
-			@param $var string
-			@public
-	**/
-	static function pop($var) {
-		return self::is_array($name=self::remix($var))?
-			array_pop($ref=&self::ref($name)):FALSE;
-	}
-
-	/**
-		Add element to the beginning of framework array variable
-			@param $var string
-			@param $val mixed
-			@public
-	**/
-	static function unshift($var,$val) {
-		if (self::is_array($name=self::remix($var)))
-			array_unshift($ref=&self::ref($name),$val);
-	}
-
-	/**
-		Remove first element of framework array variable and
-		return the element
-			@return mixed
-			@param $var string
-			@public
-	**/
-	static function shift($var) {
-		return self::is_array($name=self::remix($var))?
-			array_shift($ref=&self::ref($name)):FALSE;
 	}
 
 	/**
@@ -837,6 +882,33 @@ class F3 extends Base {
 	}
 
 	/**
+		Convert special characters to HTML entities using globally-
+		defined character set
+			@return string
+			@param $str string
+			@param $all boolean
+			@public
+	**/
+	static function htmlencode($str,$all=FALSE) {
+		return call_user_func(
+			$all?'htmlentities':'htmlspecialchars',
+			$str,ENT_COMPAT,self::$vars['ENCODING'],TRUE);
+	}
+
+	/**
+		Convert HTML entities back to their equivalent characters
+			@return string
+			@param $str string
+			@param $all boolean
+			@public
+	**/
+	static function htmldecode($str,$all=FALSE) {
+		return $all?
+			html_entity_decode($str,ENT_COMPAT,self::$vars['ENCODING']):
+			htmlspecialchars_decode($str,ENT_COMPAT);
+	}
+
+	/**
 		Send HTTP status header; Return text equivalent of status code
 			@return mixed
 			@param $code int
@@ -889,10 +961,17 @@ class F3 extends Base {
 	**/
 	static function expire($secs=0) {
 		if (PHP_SAPI!='cli' && !headers_sent()) {
+			$time=time();
+			$req=self::headers();
+			if (isset($req[self::HTTP_IfMod]) &&
+				strtotime($req[self::HTTP_IfMod])+$secs>$time) {
+				self::status(304);
+				die;
+			}
 			header(self::HTTP_Powered.': '.self::TEXT_AppName);
 			if ($secs) {
 				header_remove(self::HTTP_Pragma);
-				header(self::HTTP_Expires.': '.gmdate('r',time()+$secs));
+				header(self::HTTP_Expires.': '.gmdate('r',$time+$secs));
 				header(self::HTTP_Cache.': max-age='.$secs);
 				header(self::HTTP_LastMod.': '.gmdate('r'));
 			}
@@ -911,9 +990,13 @@ class F3 extends Base {
 	static function reroute($uri) {
 		$uri=self::resolve($uri);
 		if (PHP_SAPI!='cli' && !headers_sent()) {
+			if (session_id())
+				session_commit();
 			// HTTP redirect
 			self::status($_SERVER['REQUEST_METHOD']=='GET'?301:303);
-			header(self::HTTP_Location.': '.self::$vars['BASE'].$uri);
+			header(self::HTTP_Location.': '.
+				(preg_match('/^https?:\/\//',$uri)?
+					$uri:(self::$vars['BASE'].$uri)));
 			die;
 		}
 		self::mock('GET '.$uri);
@@ -925,17 +1008,18 @@ class F3 extends Base {
 			@param $pattern string
 			@param $funcs mixed
 			@param $ttl integer
+			@param $throttle int
 			@param $hotlink boolean
 			@public
 	**/
-	static function route($pattern,$funcs,$ttl=0,$hotlink=TRUE) {
+	static function route($pattern,$funcs,$ttl=0,$throttle=0,$hotlink=TRUE) {
 		list($methods,$uri)=
 			preg_split('/\s+/',$pattern,2,PREG_SPLIT_NO_EMPTY);
-		foreach (explode('|',$methods) as $method)
+		foreach (self::split($methods) as $method)
 			// Use pattern and HTTP methods as route indexes
 			self::$vars['ROUTES'][$uri][strtoupper($method)]=
 				// Save handler, cache timeout and hotlink permission
-				array($funcs,$ttl,$hotlink);
+				array($funcs,$ttl,$hotlink,$throttle);
 	}
 
 	/**
@@ -943,14 +1027,15 @@ class F3 extends Base {
 			@param $url string
 			@param $obj mixed
 			@param $ttl integer
+			@param $throttle int
 			@param $hotlink boolean
 			@public
 	**/
-	static function map($url,$obj,$ttl=0,$hotlink=TRUE) {
+	static function map($url,$obj,$ttl=0,$throttle=0,$hotlink=TRUE) {
 		foreach (explode('|',self::HTTP_Methods) as $method) {
 			if (method_exists($obj,$method))
 				self::route($method.' '.$url,
-					array($obj,$method),$ttl,$hotlink);
+					array($obj,$method),$ttl,$throttle,$hotlink);
 		}
 	}
 
@@ -958,50 +1043,59 @@ class F3 extends Base {
 		Call route handler
 			@return mixed
 			@param $funcs string
+			@param $listen boolean
 			@public
 	**/
-	static function call($funcs) {
+	static function call($funcs,$listen=FALSE) {
 		$classes=array();
-		$funcs=is_string($funcs)?explode('|',$funcs):array($funcs);
+		$funcs=is_string($funcs)?self::split($funcs):array($funcs);
 		foreach ($funcs as $func) {
 			if (is_string($func)) {
-				// Replace tokens in route handler, if any
-				$diff=FALSE;
-				if (preg_match('/{{.+}}/',$func)) {
-					$func=self::resolve($func);
-					$diff=TRUE;
-				}
-				if (preg_match('/(.+)(->|::)(.+)/',$func,$match)) {
-					if ($diff && (!class_exists($match[1]) ||
-						!method_exists($match[1],$match[3]))) {
-						self::error(404);
-						return;
+				$func=self::resolve($func);
+				if (preg_match('/(.+)\s*(->|::)\s*(.+)/s',$func,$match)) {
+					if (!class_exists($match[1]) ||
+						!method_exists($match[1],$match[3])) {
+						trigger_error(sprintf(self::TEXT_Callback,$func));
+						return FALSE;
 					}
 					$func=array($match[2]=='->'?
 						new $match[1]:$match[1],$match[3]);
 				}
-				elseif ($diff && !function_exists($func)) {
-					self::error(404);
-					return;
+				elseif (!function_exists($func)) {
+					if (preg_match('/\.php$/i',$func)) {
+						foreach (self::split(self::$vars['IMPORTS'])
+							as $path)
+							if (is_file($file=$path.$func)) {
+								$instance=new F3instance;
+								return $instance->sandbox($file);
+							}
+						trigger_error(sprintf(self::TEXT_Import,$func));
+					}
+					else
+						trigger_error(sprintf(self::TEXT_Callback,$func));
+					return FALSE;
 				}
 			}
 			if (!is_callable($func)) {
-				trigger_error(sprintf(self::TEXT_Handler,
+				trigger_error(sprintf(self::TEXT_Callback,
 					is_array($func) && count($func)>1?
 						(get_class($func[0]).(is_object($func[0])?'->':'::').
 							$func[1]):$func));
-				return;
+				return FALSE;
 			}
 			$oop=is_array($func) &&
 				(is_object($func[0]) || is_string($func[0]));
-			if ($oop && method_exists($func[0],$before='beforeRoute') &&
+			if ($listen && $oop &&
+				method_exists($func[0],$before='beforeRoute') &&
 				!in_array($func[0],$classes)) {
 				// Execute beforeRoute() once per class
-				call_user_func(array($func[0],$before));
+				if (call_user_func(array($func[0],$before))===FALSE)
+					return FALSE;
 				$classes[]=is_object($func[0])?get_class($func[0]):$func[0];
 			}
 			$out=call_user_func($func);
-			if ($oop && method_exists($func[0],$after='afterRoute') &&
+			if ($listen && $oop &&
+				method_exists($func[0],$after='afterRoute') &&
 				!in_array($func[0],$classes)) {
 				// Execute afterRoute() once per class
 				call_user_func(array($func[0],$after));
@@ -1019,10 +1113,10 @@ class F3 extends Base {
 		// Validate user against spam blacklists
 		if (self::$vars['DNSBL'] && !self::privateip($addr=self::realip()) &&
 			(!self::$vars['EXEMPT'] ||
-			!in_array($addr,explode('|',self::$vars['EXEMPT'])))) {
+			!in_array($addr,self::split(self::$vars['EXEMPT'])))) {
 			// Convert to reverse IP dotted quad
 			$quad=implode('.',array_reverse(explode('.',$addr)));
-			foreach (explode('|',self::$vars['DNSBL']) as $list)
+			foreach (self::split(self::$vars['DNSBL']) as $list)
 				// Check against DNS blacklist
 				if (gethostbyname($quad.'.'.$list)!=$quad.'.'.$list) {
 					if (self::$vars['SPAM'])
@@ -1048,19 +1142,20 @@ class F3 extends Base {
 				preg_replace(
 					'/(?:{{)?@(\w+\b)(?:}})?/i',
 					// Valid URL characters (RFC 1738)
-					'(?P<\1>[\w\-\.!~\*\'"(),\h]+)',
+					'(?P<\1>[\w\-\.!~\*\'"(),\s]+)',
 					// Wildcard character in URI
 					str_replace('\*','(.*)',preg_quote($uri,'/'))
 				).'\/?(?:\?.*)?$/i',
-				substr(rawurldecode($_SERVER['REQUEST_URI']),
-					strlen(self::$vars['BASE'])),$args))
+				preg_replace('/^'.preg_quote(self::$vars['BASE'],'/').
+					'\b(.+)/','\1',rawurldecode($_SERVER['REQUEST_URI'])),
+				$args))
 				continue;
 			$found=TRUE;
 			// Inspect each defined route
 			foreach ($route as $method=>$proc) {
 				if (!preg_match('/'.$method.'/',$_SERVER['REQUEST_METHOD']))
 					continue;
-				list($funcs,$ttl,$hotlink)=$proc;
+				list($funcs,$ttl,$throttle,$hotlink)=$proc;
 				if (!$hotlink && isset(self::$vars['HOTLINK']) &&
 					isset($_SERVER['HTTP_REFERER']) &&
 					parse_url($_SERVER['HTTP_REFERER'],PHP_URL_HOST)!=
@@ -1112,25 +1207,24 @@ class F3 extends Base {
 						}
 					}
 					else {
+						// Activate cache timer
+						self::expire($ttl);
+						$type='';
+						foreach (headers_list() as $hdr)
+							if (preg_match($uri,$hdr)) {
+								// Add Content-Type header to buffer
+								$type=$hdr;
+								break;
+							}
 						// Cache this page
 						ob_start();
-						self::call($funcs);
+						self::call($funcs,TRUE);
 						self::$vars['RESPONSE']=ob_get_clean();
 						if (!self::$vars['ERROR'] &&
-							self::$vars['RESPONSE']) {
-							// Activate cache timer
-							self::expire($ttl);
-							$type='';
-							foreach (headers_list() as $hdr)
-								if (preg_match($uri,$hdr)) {
-									// Add Content-Type header to buffer
-									$type=$hdr;
-									break;
-								}
+							self::$vars['RESPONSE'])
 							// Compress and save to cache
 							Cache::set($hash,
 								$type.$div.self::$vars['RESPONSE']);
-						}
 					}
 				}
 				else {
@@ -1139,17 +1233,18 @@ class F3 extends Base {
 					if ($_SERVER['REQUEST_METHOD']=='PUT') {
 						// Associate PUT with file handle of stdin stream
 						self::$vars['PUT']=fopen('php://input','rb');
-						self::call($funcs);
+						self::call($funcs,TRUE);
 						fclose(self::$vars['PUT']);
 					}
 					else
-						self::call($funcs);
+						self::call($funcs,TRUE);
 					self::$vars['RESPONSE']=ob_get_clean();
 				}
 				$elapsed=time()-$time;
-				if (self::$vars['THROTTLE']/1e3>$elapsed)
+				$throttle=$throttle?:self::$vars['THROTTLE'];
+				if ($throttle/1e3>$elapsed)
 					// Delay output
-					usleep(1e6*(self::$vars['THROTTLE']/1e3-$elapsed));
+					usleep(1e6*($throttle/1e3-$elapsed));
 				if (self::$vars['RESPONSE'] && !self::$vars['QUIET'])
 					// Display response
 					echo self::$vars['RESPONSE'];
@@ -1159,6 +1254,49 @@ class F3 extends Base {
 		}
 		// No such Web page
 		self::error(404);
+	}
+
+	/**
+		Transmit a file for downloading by HTTP client; If kilobytes per
+		second is specified, output is throttled (bandwidth will not be
+		controlled by default); Return TRUE if successful, FALSE otherwise;
+		Support for partial downloads is indicated by third argument
+			@param $file string
+			@param $kbps integer
+			@param $partial
+			@public
+	**/
+	static function send($file,$kbps=0,$partial=TRUE) {
+		$file=self::resolve($file);
+		if (!is_file($file)) {
+			self::error(404);
+			return FALSE;
+		}
+		if (PHP_SAPI!='cli') {
+			header(self::HTTP_Content.': application/octet-stream');
+			header(self::HTTP_Disposition.': filename="'.basename($file).'"');
+			header(self::HTTP_Partial.': '.($partial?'bytes':'none'));
+			header(self::HTTP_Length.': '.filesize($file));
+			ob_end_flush();
+		}
+		$max=ini_get('max_execution_time');
+		$ctr=1;
+		$handle=fopen($file,'r');
+		$time=microtime(TRUE);
+		while (!feof($handle) && !connection_aborted()) {
+			if ($kbps>0) {
+				// Throttle bandwidth
+				$ctr++;
+				$elapsed=microtime(TRUE)-$time;
+				if (($ctr/$kbps)>$elapsed)
+					usleep(1e6*($ctr/$kbps-$elapsed));
+			}
+			// Send 1KiB and reset timer
+			echo fread($handle,1024);
+			set_time_limit($max);
+		}
+		fclose($handle);
+		return TRUE;
 	}
 
 	/**
@@ -1173,12 +1311,12 @@ class F3 extends Base {
 		if (is_array($input))
 			foreach ($input as &$val)
 				$val=self::scrub($val,$tags);
-		return is_string($input)?
-			htmlspecialchars(
-				$tags=='*'?$input:
-					(strip_tags($input,is_string($tags)?
-						('<'.implode('><',explode('|',$tags)).'>'):$tags)),
-				ENT_COMPAT,self::$vars['ENCODING'],FALSE):$input;
+		if (is_string($input)) {
+			$input=($tags=='*')?
+				$input:strip_tags($input,is_string($tags)?
+					('<'.implode('><',self::split($tags)).'>'):$tags);
+		}
+		return $input;
 	}
 
 	/**
@@ -1190,54 +1328,47 @@ class F3 extends Base {
 			@param $opt array
 			@public
 	**/
-	static function input($fields,$funcs,
+	static function input($fields,$funcs=NULL,
 		$tags=NULL,$filter=FILTER_UNSAFE_RAW,$opt=array()) {
-		$funcs=is_string($funcs)?explode('|',$funcs):array($funcs);
-		foreach (explode('|',$fields) as $field) {
-			$found=NULL;
+		$funcs=is_string($funcs)?self::split($funcs):array($funcs);
+		foreach (self::split($fields) as $field) {
+			$found=FALSE;
 			// Sanitize relevant globals
-			$php=$_SERVER['REQUEST_METHOD'].'|REQUEST|FILES';
-			foreach (explode('|',$php) as $var)
+			foreach (explode('|','GET|POST|REQUEST') as $var)
 				if (isset(self::$vars[$var][$field])) {
-					self::$vars[$var][$field]=filter_var(
-						self::scrub(self::$vars[$var][$field],$tags),
-						$filter,$opt);
-					if (!$found)
-						$found=$var;
+					self::$vars[$var][$field]=
+						self::scrub(self::$vars[$var][$field],$tags);
+					$val=filter_var(self::$vars[$var][$field],$filter,$opt);
+					foreach ($funcs as $func)
+						if ($func) {
+							if (is_string($func) &&
+								preg_match('/([\w\\\]+)\s*->\s*(\w+)/',
+									$func,$match))
+								// Convert class->method syntax
+								$func=array(new $match[1],$match[2]);
+							if (!is_callable($func)) {
+								// Invalid handler
+								trigger_error(
+									sprintf(self::TEXT_Form,$field)
+								);
+								return;
+							}
+							if (!$found) {
+								$out=call_user_func($func,$val,$field);
+								if ($out)
+									self::$vars[$var][$field]=$out;
+								$found=TRUE;
+							}
+							elseif ($val)
+								self::$vars[$var][$field]=$val;
+						}
 				}
-			if ($found) {
-				foreach ($funcs as $func) {
-					if (is_string($func) &&
-						preg_match('/([\w\\\]+)->(\w+)/',$func,$match))
-						// Convert class->method syntax to callback
-						$func=array(new $match[1],$match[2]);
-					if (!is_callable($func)) {
-						// Invalid handler
-						trigger_error(sprintf(self::TEXT_Form,$field));
-						return;
-					}
-					call_user_func($func,self::$vars[$found][$field],$field);
-				}
+			if (!$found) {
+				// Invalid handler
+				trigger_error(sprintf(self::TEXT_Form,$field));
 				return;
 			}
-			// Invalid handler
-			trigger_error(sprintf(self::TEXT_Form,$field));
-			return;
 		}
-	}
-
-	/**
-		Clean and repair HTML
-			@return string
-			@param $html string
-			@public
-	**/
-	static function tidy($html) {
-		$tidy=new Tidy;
-		$tidy->parseString($html,self::$vars['TIDY'],
-			str_replace('-','',self::$vars['ENCODING']));
-		$tidy->cleanRepair();
-		return (string)$tidy;
 	}
 
 	/**
@@ -1248,12 +1379,12 @@ class F3 extends Base {
 	**/
 	static function render($file) {
 		$file=self::resolve($file);
-		if (is_file($view=self::fixslashes(self::$vars['GUI'].$file))) {
-			$sandbox=new F3instance;
-			$out=$sandbox->grab($view);
-			return self::$vars['TIDY'] && extension_loaded('tidy')?
-				self::tidy($out):$out;
-		}
+		foreach (self::split(self::$vars['GUI']) as $gui)
+			if (is_file($view=self::fixslashes($gui.$file))) {
+				$instance=new F3instance;
+				$out=$instance->grab($view);
+				return self::$vars['TIDY']?self::tidy($out):$out;
+			}
 		trigger_error(sprintf(self::TEXT_Render,$view));
 	}
 
@@ -1280,7 +1411,8 @@ class F3 extends Base {
 	**/
 	static function mock($pattern,array $params=NULL) {
 		// Override PHP globals
-		list($method,$uri)=preg_split('/\s+/',$pattern,2,PREG_SPLIT_NO_EMPTY);
+		list($method,$uri)=preg_split('/\s+/',
+			$pattern,2,PREG_SPLIT_NO_EMPTY);
 		$query=explode('&',parse_url($uri,PHP_URL_QUERY));
 		foreach ($query as $pair)
 			if (strpos($pair,'=')) {
@@ -1329,8 +1461,8 @@ class F3 extends Base {
 		$out='';
 		if ($code==404)
 			// No stack trace needed
-			$str=self::resolve(
-				sprintf(self::TEXT_NotFound,$_SERVER['REQUEST_URI']));
+			$str=self::resolve(sprintf(self::TEXT_NotFound,
+				$_SERVER['REQUEST_URI'],$_SERVER['REQUEST_METHOD']));
 		else {
 			// Generate internal server error if code is zero
 			if (!$code)
@@ -1393,11 +1525,9 @@ class F3 extends Base {
 				error_log($str);
 		if ($prior || self::$vars['QUIET'])
 			return;
-		foreach (explode('|','title|text|trace') as $sub)
+		foreach (array('title','text','trace') as $sub)
 			// Convert to HTML entities for safety
-			$error[$sub]=htmlspecialchars(
-				rawurldecode($error[$sub]),ENT_COMPAT,
-				self::$vars['ENCODING']);
+			$error[$sub]=self::htmlencode(rawurldecode($error[$sub]));
 		$error['trace']=nl2br($error['trace']);
 		$func=self::$vars['ONERROR'];
 		if ($func)
@@ -1413,20 +1543,6 @@ class F3 extends Base {
 					'<p>'.$error['trace'].'</p>'.
 				'</body>'.
 			'</html>';
-	}
-
-	/**
-		Create function aliases for framework methods
-			@param $prefix string
-			@public
-	**/
-	static function alias($prefix='') {
-		foreach (get_class_methods(__CLASS__) as $func)
-			if (!function_exists($func) && $func[0]!='_')
-				eval('function '.$prefix.'_'.$func.'() {'.
-					'return call_user_func_array(\''.
-						__CLASS__.'::'.$func.'\','.'func_get_args());'.
-					'}');
 	}
 
 	/**
@@ -1490,7 +1606,8 @@ class F3 extends Base {
 			// Autoload folders
 			'AUTOLOAD'=>$root,
 			// Web root folder
-			'BASE'=>preg_replace('/\/[^\/]+$/','',$_SERVER['SCRIPT_NAME']),
+			'BASE'=>self::fixslashes(
+				preg_replace('/\/[^\/]+$/','',$_SERVER['SCRIPT_NAME'])),
 			// Cache backend to use (autodetect if true; disable if false)
 			'CACHE'=>FALSE,
 			// Stack trace verbosity:
@@ -1499,17 +1616,19 @@ class F3 extends Base {
 			// DNS black lists
 			'DNSBL'=>NULL,
 			// Document encoding
-			'ENCODING'=>'UTF-8',
+			'ENCODING'=>'utf-8',
 			// Last error
 			'ERROR'=>NULL,
 			// Allow/prohibit framework class extension
-			'EXTEND'=>FALSE,
+			'EXTEND'=>TRUE,
 			// IP addresses exempt from spam detection
 			'EXEMPT'=>NULL,
-			// User interface folder
+			// User interface folders
 			'GUI'=>$root,
 			// URL for hotlink redirection
 			'HOTLINK'=>NULL,
+			// Include path for procedural code
+			'IMPORTS'=>$root,
 			// Default language (auto-detect if null)
 			'LANGUAGE'=>NULL,
 			// Autoloaded classes
@@ -1521,7 +1640,7 @@ class F3 extends Base {
 			// Custom error handler
 			'ONERROR'=>NULL,
 			// Plugins folder
-			'PLUGINS'=>__DIR__.'/',
+			'PLUGINS'=>self::fixslashes(__DIR__).'/',
 			// Server protocol
 			'PROTOCOL'=>'http'.
 				(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']!='off'?'s':''),
@@ -1543,7 +1662,7 @@ class F3 extends Base {
 				'TIME'=>array('start'=>microtime(TRUE))
 			),
 			// Temporary folder
-			'TEMP'=>self::fixslashes(realpath(sys_get_temp_dir())).'/',
+			'TEMP'=>$root.'temp/',
 			// Minimum script execution time
 			'THROTTLE'=>0,
 			// Tidy options
@@ -1551,6 +1670,8 @@ class F3 extends Base {
 			// Framework version
 			'VERSION'=>self::TEXT_AppName.' '.self::TEXT_Version
 		);
+		// Alias the GUI variable (2.0+)
+		self::$vars['UI']=&self::$vars['GUI'];
 		// Create convenience containers for PHP globals
 		foreach (explode('|',self::PHP_Globals) as $var) {
 			// Sync framework and PHP globals
@@ -1582,8 +1703,6 @@ class F3 extends Base {
 		// Initialize autoload stack and shutdown sequence
 		spl_autoload_register(__CLASS__.'::autoload');
 		register_shutdown_function(__CLASS__.'::stop');
-		// Restrict template functions
-		self::allow(self::FUNCS_Default);
 	}
 
 	/**
@@ -1600,7 +1719,7 @@ class F3 extends Base {
 			ob_end_flush();
 			if (PHP_SAPI!='cli')
 				header(self::HTTP_Connect.': close');
-			call_user_func(self::$vars['UNLOAD']);
+			self::call(self::$vars['UNLOAD']);
 		}
 	}
 
@@ -1635,20 +1754,39 @@ class F3 extends Base {
 		$list=array_map('self::fixslashes',get_included_files());
 		// Support both namespace mapping styles: NS_class and NS/class
 		foreach (array(str_replace('\\','_',$class),$class) as $style)
-			// Prepend plugins folder
-			foreach (explode('|',self::$vars['PLUGINS'].'|'.
+			// Prioritize plugins
+			foreach (self::split(self::$vars['PLUGINS'].';'.
 				self::$vars['AUTOLOAD']) as $auto) {
-				$path=realpath($auto);
+				$path=self::fixslashes(realpath($auto));
 				if (!$path)
 					continue;
-				$file=self::fixslashes($path.'/'.$style).'.php';
-				$glob=glob(dirname($file).'/*.php',GLOB_NOSORT);
+				$file=self::fixslashes($style).'.php';
+				if (is_int(strpos($file,'/'))) {
+					$ok=FALSE;
+					// Case-insensitive check for folders
+					foreach (explode('/',self::fixslashes(dirname($file)))
+						as $dir)
+						foreach (glob($path.'/*') as $found) {
+							$found=self::fixslashes($found);
+							if (strtolower($path.'/'.$dir)==
+								strtolower($found)) {
+								$path=$found;
+								$ok=TRUE;
+							}
+						}
+					if (!$ok)
+						continue;
+					$file=basename($file);
+				}
+				$glob=glob($path.'/*.php',GLOB_NOSORT);
 				if ($glob) {
+					$glob=array_map('self::fixslashes',$glob);
 					// Case-insensitive check for file presence
-					$fkey=array_search(strtolower($file),
+					$fkey=array_search(strtolower($path.'/'.$file),
 						array_map('strtolower',$glob));
 					if (is_int($fkey) && !in_array($glob[$fkey],$list)) {
-						require $glob[$fkey];
+						$instance=new F3instance;
+						$instance->sandbox($glob[$fkey]);
 						// Verify that the class was loaded
 						if (class_exists($class,FALSE)) {
 							// Run onLoad event handler if defined
@@ -1682,7 +1820,7 @@ class F3 extends Base {
 				foreach (debug_backtrace() as $trace)
 					if (isset($trace['class']) &&
 						// Support namespaces
-						preg_match('/'.preg_quote($trace['class']).'/i',
+						preg_match('/\b'.preg_quote($trace['class']).'\b/i',
 						strtolower($class)) &&
 						preg_match('/'.$trace['function'].'/i',
 						strtolower($func))) {
@@ -1729,7 +1867,7 @@ class Cache extends Base {
 			@public
 	**/
 	static function detect() {
-		$exts=array_intersect(explode('|','apc|xcache'),
+		$exts=array_intersect(array('apc','xcache'),
 			array_map('strtolower',get_loaded_extensions()));
 		$ref=array_merge($exts,array());
 		self::$vars['CACHE']=array_shift($ref)?:
@@ -1748,7 +1886,8 @@ class Cache extends Base {
 			'/^(apc)|(memcache)=(.+)|(xcache)|(folder)\=(.+\/)/i',
 			self::$vars['CACHE'],$match)) {
 			if (isset($match[5]) && $match[5]) {
-				self::folder($match[6]);
+				if (!is_dir($match[6]))
+					self::mkdir($match[6]);
 				// File system
 				self::$backend=array('type'=>'folder','id'=>$match[6]);
 			}
@@ -1964,6 +2103,9 @@ class Cache extends Base {
 //! F3 object mode
 class F3instance {
 
+	const
+		TEXT_Conflict='%s conflicts with framework method name';
+
 	/**
 		Get framework variable reference; Workaround for PHP's
 		call_user_func() reference limitation
@@ -1976,8 +2118,17 @@ class F3instance {
 		return F3::ref($key,$set);
 	}
 
+	/*
+		Run PHP code in sandbox
+			@param $file string
+			@public
+	*/
+	function sandbox($file) {
+		return require $file;
+	}
+
 	/**
-		Grab file contents and run PHP code in sandbox
+		Grab file contents
 			@return mixed
 			@param $file string
 			@public
@@ -1987,7 +2138,7 @@ class F3instance {
 		ob_start();
 		if (!ini_get('short_open_tag')) {
 			$text=preg_replace_callback(
-				'/<\?(?:\s|\s*(=?))(.+?)\?>/s',
+				'/<\?(?:\s|\s*(=))(.+?)\?>/s',
 				function($tag) {
 					return '<?php '.($tag[1]?'echo ':'').trim($tag[2]).' ?>';
 				},
@@ -1998,8 +2149,9 @@ class F3instance {
 				$file='data:text/plain,'.urlencode($text);
 			elseif ($text!=$orig) {
 				// Save re-tagged file in temporary folder
-				F3::folder($ref=F3::ref('TEMP'));
-				$temp=$ref.$_SERVER['SERVER_NAME'].'.php.'.F3::hash($file);
+				if (!is_dir($ref=F3::ref('TEMP')))
+					F3::mkdir($ref);
+				$temp=$ref.$_SERVER['SERVER_NAME'].'.tpl.'.F3::hash($file);
 				if (!is_file($temp)) {
 					// Create semaphore
 					$hash='sem.'.F3::hash($file);
@@ -2016,7 +2168,7 @@ class F3instance {
 			}
 		}
 		// Render
-		require $file;
+		$this->sandbox($file);
 		return ob_get_clean();
 	}
 
@@ -2048,7 +2200,7 @@ class F3instance {
 		$class=new ReflectionClass($this);
 		foreach ($class->getMethods() as $func)
 			if (in_array($func->name,$def))
-				trigger_error(sprintf(F3::TEXT_Conflict,
+				trigger_error(sprintf(self::TEXT_Conflict,
 					get_called_class().'->'.$func->name));
 	}
 

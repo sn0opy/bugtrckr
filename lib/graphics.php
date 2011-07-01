@@ -8,7 +8,7 @@
 	compliance with the license. Any of the license terms and conditions
 	can be waived if you get permission from the copyright holder.
 
-	Copyright (c) 2009-2010 F3::Factory
+	Copyright (c) 2009-2011 F3::Factory
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package Graphics
@@ -45,7 +45,7 @@ class Graphics extends Base {
 		$hex=str_pad(dechex($int),$int<4096?3:6,'0',STR_PAD_LEFT);
 		$len=strlen($hex);
 		if ($len>6) {
-			trigger_error(TEXT_Color);
+			trigger_error(self::TEXT_Color);
 			return FALSE;
 		}
 		$color=str_split($hex,$len/3);
@@ -60,31 +60,27 @@ class Graphics extends Base {
 			@param $dimy integer
 			@param $len integer
 			@param $ttfs string
+			@param $var string
 			@public
 	**/
-	static function captcha($dimx,$dimy,$len,$ttfs='cube') {
+	static function
+		captcha($dimx=150,$dimy=50,$len=5,$ttfs='cube',$var='captcha') {
 		$base=self::rgb(self::$vars['BGCOLOR']);
 		$trans=self::$vars['FGTRANS'];
 		// Specify Captcha seed
-		if (!strlen(session_id()))
-			session_start();
-		$_SESSION['captcha']=substr(md5(uniqid()),0,$len);
-		self::$vars['SESSION']=&$_SESSION;
+		$seed=substr(md5(uniqid()),0,$len);
+		F3::set('SESSION.'.$var,$seed);
 		// Font size
-		$size=min($dimx/$len,.6*$dimy);
-		// Load TrueType font file
-		$fonts=explode('|',$ttfs);
+		$size=.9*min($dimx/$len,$dimy);
+		// Load TrueType fonts
+		$fonts=self::split($ttfs);
 		$file=self::$vars['FONTS'].
-			self::fixslashes($fonts[mt_rand(0,count($fonts)-1)]).'.ttf';
+			self::fixslashes($fonts[array_rand($fonts)]).'.ttf';
 		$stats=&self::ref('STATS');
 		if (!isset($stats['FILES']))
 			$stats['FILES']=array('fonts'=>array());
 		$stats['FILES']['fonts'][basename($file)]=filesize($file);
-		$maxdeg=15;
-		// Compute bounding box metrics
-		$bbox=imagettfbbox($size,0,$file,$_SESSION['captcha']);
-		$wimage=.9*(max($bbox[2],$bbox[4])-max($bbox[0],$bbox[6]));
-		$himage=max($bbox[1],$bbox[3])-max($bbox[5],$bbox[7]);
+		$maxdeg=12;
 		// Create blank image
 		$captcha=imagecreatetruecolor($dimx,$dimy);
 		list($r,$g,$b)=$base;
@@ -96,7 +92,7 @@ class Graphics extends Base {
 			// Random angle
 			$angle=$maxdeg-mt_rand(0,$maxdeg*2);
 			// Get CAPTCHA character from session cookie
-			$char=$_SESSION['captcha'][$i];
+			$char=$seed[$i];
 			$fg=imagecolorallocatealpha(
 				$captcha,
 				mt_rand(0,255-$trans),
@@ -104,12 +100,18 @@ class Graphics extends Base {
 				mt_rand(0,255-$trans),
 				$trans
 			);
+			// Compute bounding box metrics
+			$bbox=imagettfbbox($size,0,$file,$char);
+			$w=max($bbox[2],$bbox[4])-max($bbox[0],$bbox[6]);
+			$h=max($bbox[1],$bbox[3])-max($bbox[5],$bbox[7]);
+			$sin=sin(deg2rad($angle));
 			imagettftext(
 				$captcha,$size,$angle,
-				($dimx-$wimage)/2+$i*$wimage/$len,
-				($dimy-$himage)/2+.9*$himage,
+				.9*$width+abs($h*$sin),
+				$dimy-$h/2+abs($w*$sin),
 				$fg,$file,$char
 			);
+			$width+=$w+abs($h*$sin);
 			imagecolordeallocate($captcha,$fg);
 		}
 		// Make the background transparent
@@ -128,7 +130,7 @@ class Graphics extends Base {
 	static function invert($file) {
 		preg_match('/\.(gif|jp[e]*g|png)$/',$file,$ext);
 		$ext[1]=str_replace('jpg','jpeg',$ext[1]);
-		$file=self::$vars['GUI'].$file;
+		$file=self::fixslashes(self::resolve($file));
 		$img=imagecreatefromstring(file_get_contents($file));
 		imagefilter($img,IMG_FILTER_NEGATE);
 		if (PHP_SAPI!='cli')
@@ -145,7 +147,7 @@ class Graphics extends Base {
 	static function grayscale($file) {
 		preg_match('/\.(gif|jp[e]*g|png)$/',$file,$ext);
 		$ext[1]=str_replace('jpg','jpeg',$ext[1]);
-		$file=self::$vars['GUI'].$file;
+		$file=self::fixslashes(self::resolve($file));
 		$img=imagecreatefromstring(file_get_contents($file));
 		imagefilter($img,IMG_FILTER_GRAYSCALE);
 		if (PHP_SAPI!='cli')
@@ -164,7 +166,7 @@ class Graphics extends Base {
 	static function thumb($file,$dimx,$dimy) {
 		preg_match('/\.(gif|jp[e]*g|png)$/',$file,$ext);
 		$ext[1]=str_replace('jpg','jpeg',$ext[1]);
-		$file=self::fixslashes(self::$vars['GUI']).$file;
+		$file=self::fixslashes(self::resolve($file));
 		$img=imagecreatefromstring(file_get_contents($file));
 		// Get image dimensions
 		$oldx=imagesx($img);
@@ -204,6 +206,7 @@ class Graphics extends Base {
 			@public
 	**/
 	static function identicon($hash,$size=NULL) {
+		$hash=self::resolve($hash);
 		$blox=self::$vars['IBLOCKS'];
 		if (is_null($size))
 			$size=self::$vars['IPIXELS'];
@@ -329,12 +332,6 @@ class Graphics extends Base {
 			@public
 	**/
 	static function fakeImage($dimx,$dimy,$bg=0xEEE) {
-		// GD extension required
-		if (!extension_loaded('gd')) {
-			self::$vars['CONTEXT']='gd';
-			trigger_error(TEXT_PHPExt);
-			return;
-		}
 		list($r,$g,$b)=self::rgb($bg);
 		$img=imagecreatetruecolor($dimx,$dimy);
 		$bg=imagecolorallocate($img,$r,$g,$b);
@@ -351,8 +348,7 @@ class Graphics extends Base {
 	static function onload() {
 		if (!extension_loaded('gd')) {
 			// GD extension required
-			self::$vars['CONTEXT']='gd';
-			trigger_error(TEXT_PHPExt);
+			trigger_error(sprintf(self::TEXT_PHPExt,'gd'));
 		}
 		if (!isset(self::$vars['FONTS']))
 			self::$vars['FONTS']=self::$vars['ROOT'];

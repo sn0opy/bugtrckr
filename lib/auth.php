@@ -8,7 +8,7 @@
 	compliance with the license. Any of the license terms and conditions
 	can be waived if you get permission from the copyright holder.
 
-	Copyright (c) 2009-2010 F3::Factory
+	Copyright (c) 2009-2011 F3::Factory
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package Auth
@@ -21,8 +21,8 @@ class Auth extends Base {
 	//@{ Locale-specific error/exception messages
 	const
 		TEXT_AuthSetup='Invalid AUTH variable configuration',
-		TEXT_IMAPConnect='Unable to connect to IMAP server {@CONTEXT}',
-		TEXT_LDAPConnect='Unable to connect to LDAP server {@CONTEXT}',
+		TEXT_IMAPConnect='Unable to connect to IMAP server %s',
+		TEXT_LDAPConnect='Unable to connect to LDAP server %s',
 		TEXT_LDAPBind='LDAP bind failure';
 	//@}
 
@@ -40,16 +40,15 @@ class Auth extends Base {
 	**/
 	static function sql($id,$pw) {
 		$auth=self::$vars['AUTH'];
-		$params='table|id|pw';
-		foreach (explode('|',$params) as $param)
+		foreach (array('table','id','pw') as $param)
 			if (!isset($auth[$param])) {
 				trigger_error(self::TEXT_AuthSetup);
 				return FALSE;
 			}
 		if (!isset($auth['db']))
-			$auth['db']='DB';
-		$axon=new axon($auth['table'],$auth['db']);
-		$axon->load('{@AUTH.id}="'.$id.'" AND {@AUTH.pw}="'.$pw.'"');
+			$auth['db']=self::ref('DB');
+		$axon=new Axon($auth['table'],$auth['db']);
+		$axon->load('{{@AUTH.id}}="'.$id.'" AND {{@AUTH.pw}}="'.$pw.'"');
 		return $axon->dry()?FALSE:$axon;
 	}
 
@@ -67,17 +66,52 @@ class Auth extends Base {
 	**/
 	static function nosql($id,$pw) {
 		$auth=self::$vars['AUTH'];
-		$params='collection|id|pw';
-		foreach (explode('|',$params) as $param)
+		foreach (array('collection','id','pw') as $param)
 			if (!isset($auth[$param])) {
 				trigger_error(self::TEXT_AuthSetup);
 				return FALSE;
 			}
 		if (!isset($auth['db']))
-			$auth['db']='DB';
+			$auth['db']=self::ref('DB');
 		$m2=new M2($auth['collection'],$auth['db']);
-		$m2->load(array('{@AUTH.id}'=>$id,'{@AUTH.pw}'=>$pw));
+		$m2->load(
+			array(
+				self::ref('AUTH.id')=>$id,
+				self::ref('AUTH.pw')=>$pw
+			)
+		);
 		return $m2->dry()?FALSE:$m2;
+	}
+
+	/**
+		Authenticate against Jig-based flat-file database;
+			AUTH global array elements:
+				db:<Jig-database> (default:'DB'),
+				table:<table-name>,
+				id:<userID-field>,
+				pw:<password-field>
+			@return mixed
+			@param $id string
+			@param $pw string
+			@public
+	**/
+	static function jig($id,$pw) {
+		$auth=self::$vars['AUTH'];
+		foreach (array('table','id','pw') as $param)
+			if (!isset($auth[$param])) {
+				trigger_error(self::TEXT_AuthSetup);
+				return FALSE;
+			}
+		if (!isset($auth['db']))
+			$auth['db']=self::ref('DB');
+		$jig=new Jig($auth['table'],$auth['db']);
+		$jig->load(
+			array(
+				self::ref('AUTH.id')=>$id,
+				self::ref('AUTH.pw')=>$pw
+			)
+		);
+		return $jig->dry()?FALSE:$jig;
 	}
 
 	/**
@@ -94,8 +128,7 @@ class Auth extends Base {
 		// IMAP extension required
 		if (!extension_loaded('imap')) {
 			// Unable to continue
-			self::$vars['CONTEXT']='imap';
-			trigger_error(self::TEXT_PHPExt);
+			trigger_error(sprintf(self::TEXT_PHPExt,'imap'));
 			return;
 		}
 		$auth=self::$vars['AUTH'];
@@ -108,8 +141,7 @@ class Auth extends Base {
 		$ic=@fsockopen($auth['server'],$auth['port']);
 		if (!is_resource($ic)) {
 			// Connection failed
-			self::$vars['CONTEXT']=$auth['server'];
-			trigger_error(self::TEXT_IMAPConnect);
+			trigger_error(sprintf(self::TEXT_IMAPConnect,$auth['server']));
 			return FALSE;
 		}
 		$ibox='{'.$auth['server'].':'.$auth['port'].'}INBOX';
@@ -138,8 +170,7 @@ class Auth extends Base {
 		// LDAP extension required
 		if (!extension_loaded('ldap')) {
 			// Unable to continue
-			self::$vars['CONTEXT']='ldap';
-			trigger_error(self::TEXT_PHPExt);
+			trigger_error(sprintf(self::TEXT_PHPExt,'ldap'));
 			return;
 		}
 		$auth=self::$vars['AUTH'];
@@ -150,8 +181,7 @@ class Auth extends Base {
 		$dc=@ldap_connect($auth['dc']);
 		if (!$dc) {
 			// Connection failed
-			self::$vars['CONTEXT']=$auth['dc'];
-			trigger_error(self::TEXT_LDAPConnect);
+			trigger_error(sprintf(self::TEXT_LDAPConnect,$auth['dc']));
 			return FALSE;
 		}
 		ldap_set_option($dc,LDAP_OPT_PROTOCOL_VERSION,3);
@@ -200,8 +230,9 @@ class Auth extends Base {
 			@public
 	**/
 	static function onload() {
-		// Authentication setup options
-		self::$vars['AUTH']=NULL;
+		if (!isset(self::$vars['AUTH']))
+			// Authentication setup options
+			self::$vars['AUTH']=NULL;
 	}
 
 }

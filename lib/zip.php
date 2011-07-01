@@ -8,7 +8,7 @@
 	compliance with the license. Any of the license terms and conditions
 	can be waived if you get permission from the copyright holder.
 
-	Copyright (c) 2009-2010 F3::Factory
+	Copyright (c) 2009-2011 F3::Factory
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package Zip
@@ -21,7 +21,7 @@ class Zip extends Base {
 	//@{ Locale-specific error/exception messages
 	const
 		TEXT_Required='A ZIP archive must be specified',
-		TEXT_NotValid='File {@CONTEXT} is not a valid ZIP archive',
+		TEXT_NotValid='File %s is not a valid ZIP archive',
 		TEXT_UnMethod='Unsupported compression method';
 	//@}
 
@@ -45,6 +45,15 @@ class Zip extends Base {
 		$cofs;
 
 	/**
+		Return central directory structure
+			@return array
+			@public
+	**/
+	function dir() {
+		return $this->cdir;
+	}
+
+	/**
 		Return content of specified file from ZIP archive; FALSE if
 		compression method is not supported
 			@return mixed
@@ -52,23 +61,28 @@ class Zip extends Base {
 			@public
 	**/
 	function get($path) {
+		if (!$path || $path[strlen($path)-1]=='/')
+			return FALSE;
 		$chdr=$this->cdir[$path];
 		// Find local file header
 		$zip=fopen($this->file,'rb');
 		fseek($zip,implode('',unpack('V',substr($chdr,42,4))));
 		// Read local file header
 		$fhdr=fread($zip,30+strlen($path));
-		if (self::binhex(substr($fhdr,8,2))!='0800') {
+		$comp=self::binhex(substr($fhdr,8,2));
+		if ($comp!='0800' && $comp!='0000') {
 			trigger_error(self::TEXT_UnMethod);
 			return FALSE;
 		}
-		$len=implode(unpack('v',substr($fhdr,28,2)));
-		if ($len)
+		if ($len=implode(unpack('v',substr($fhdr,28,2))))
 			// Append extra field
 			$fhdr.=fread($zip,$len);
-		$data=fread($zip,implode('',unpack('V',substr($fhdr,22,4))));
+		$len=unpack('V',substr($fhdr,22,4));
+		$data='';
+		if ($len)
+			$data=fread($zip,implode('',$len));
 		fclose($zip);
-		return gzinflate($data);
+		return hexdec($comp) && $data?gzinflate($data):$data;
 
 	}
 
@@ -100,7 +114,10 @@ class Zip extends Base {
 			@public
 	**/
 	private function parse($action,$path,$data=NULL,$time=0) {
-		$tfn='zip-'.hash($path);
+		if (!$time)
+			$time=time();
+		$tfn=self::$vars['TEMP'].$_SERVER['SERVER_NAME'].'.zip.'.
+			self::hash($path);
 		$tmp=fopen($tfn,'wb+');
 		if (is_file($this->file)) {
 			$zip=fopen($this->file,'rb');
@@ -234,7 +251,7 @@ class Zip extends Base {
 		$time=$time?getdate($time):getdate();
 		if ($time['year']<1980)
 			$time=array_combine(
-				explode('|','hours|minutes|seconds|mon|mday|year'),
+				array('hours','minutes','seconds','mon','mday','year'),
 				array(0,0,0,1,1,1980)
 			);
 		return
@@ -254,16 +271,13 @@ class Zip extends Base {
 	function __construct($path=NULL) {
 		if (is_null($path)) {
 			trigger_error(self::TEXT_Required);
-			return FALSE;
+			return;
 		}
+		$path=self::resolve($path);
 		$this->file=$path;
 		$this->cdir=array();
-		if (!is_file($path)) {
-			// Invalid ZIP archive
-			$vars['CONTEXT']=$path;
-			trigger_error(self::TEXT_NotValid);
-			return FALSE;
-		}
+		if (!is_file($path))
+			return;
 		// Parse file contents
 		$zip=fopen($path,'rb');
 		$found=FALSE;
@@ -285,9 +299,8 @@ class Zip extends Base {
 		fclose($zip);
 		if (is_bool(strstr($cdir,self::hexbin(self::CDEND_Sig)))) {
 			// Invalid ZIP archive
-			$vars['CONTEXT']=$path;
-			trigger_error(self::TEXT_NotValid);
-			return FALSE;
+			trigger_error(sprintf(self::TEXT_NotValid,$path));
+			return;
 		}
 		// Save central directory record
 		foreach (array_slice(explode(self::hexbin(self::CDHDR_Sig),
