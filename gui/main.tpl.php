@@ -46,7 +46,7 @@
                 </F3:check>                
 				<li>
 					<form method="post" action="{{@BASE}}/project/select">
-						<select name="project" size="1" onclick="submit()">
+						<select name="project" size="1" onBlur="submit();">
 							<F3:repeat group="{{@projects}}" value="{{@project}}">
                                 <option value="{{@project->hash}}" {{(@project->id == @SESSION.project)?'selected="selected"':''}}>{{@project->name}}</option>
 							</F3:repeat>
