@@ -38,7 +38,6 @@ class cmilestone extends Controller
             foreach ($ms[$milestone->id]['ticketCount'] as $j => $cnt)
             {
                 $ms[$milestone->id]['ticketCount'][$j]['percent'] = round($cnt['count'] * 100 / $ms[$milestone->id]['fullTicketCount']);
-                $ms[$milestone->id]['ticketCount'][$j]['title'] = $this->get("ticket_state." . $ms[$milestone->id]['ticketCount'][$j]['state']);
 
                 if ($ms[$milestone->id]['ticketCount'][$j]['state'] != 5)
                     $ms[$milestone->id]['openTickets'] += $ms[$milestone->id]['ticketCount'][$j]['count'];
@@ -73,7 +72,6 @@ class cmilestone extends Controller
         foreach ($ms['ticketCount'] as $j => $cnt)
         {
             $ms['ticketCount'][$j]['percent'] = round($cnt['count'] * 100 / $ms['fullTicketCount']);
-            $ms['ticketCount'][$j]['title'] = $this->get("ticket_state." . $ms['ticketCount'][$j]['state']);
 
             if ($ms['ticketCount'][$j]['state'] != 5)
                 $ms['openTickets'] += $ms['ticketCount'][$j]['count'];
