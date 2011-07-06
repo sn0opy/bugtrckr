@@ -1,7 +1,17 @@
 <?php
 
-require_once('controller.php');
-
+/**
+ * ctimeline.php
+ * 
+ * timeline controller
+ * 
+ * @package timeline
+ * @author Sascha Ohms
+ * @author Philipp Hirsch
+ * @copyright Copyright 2011, Bugtrckr-Team
+ * @license http://www.gnu.org/licenses/lgpl.txt
+ *   
+ */
 class ctimeline extends Controller
 {
 

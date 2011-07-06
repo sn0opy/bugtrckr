@@ -1,5 +1,17 @@
 <?php
 
+/**
+ * cmilestone.php
+ * 
+ * Milestone controller
+ * 
+ * @package milestone
+ * @author Sascha Ohms
+ * @author Philipp Hirsch
+ * @copyright Copyright 2011, Bugtrckr-Team
+ * @license http://www.gnu.org/licenses/lgpl.txt
+ *   
+ */
 class cmilestone extends Controller
 {
 

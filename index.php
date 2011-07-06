@@ -67,8 +67,6 @@ $app->route('POST /project/settings/milestone/edit', 'cmilestone->addEditMilesto
 $app->route('POST /project/settings/member/add', 'cproperties->projectAddMember');
 $app->route('POST /project/setttings/member/delete', 'cproperties->projectDelMember');
 
-//require 'inc/mapping.inc.php';
-
 $app->run();
 
 $app->clear('SESSION.SUCCESS');

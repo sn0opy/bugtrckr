@@ -1,7 +1,17 @@
 <?php
 
-require_once('controller.php');
-
+/**
+ * cticket.php
+ * 
+ * Ticket controller
+ * 
+ * @package ticket
+ * @author Sascha Ohms
+ * @author Philipp Hirsch
+ * @copyright Copyright 2011, Bugtrckr-Team
+ * @license http://www.gnu.org/licenses/lgpl.txt
+ *   
+ */
 class cticket extends Controller
 {
 

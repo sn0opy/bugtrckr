@@ -1,5 +1,17 @@
 <?php
 
+/**
+ * cproperties.php
+ * 
+ * Properties controller for different settings
+ * 
+ * @package Main
+ * @author Sascha Ohms
+ * @author Philipp Hirsch
+ * @copyright Copyright 2011, Bugtrckr-Team
+ * @license http://www.gnu.org/licenses/lgpl.txt
+ *   
+ */
 class cproperties extends Controller
 {
 

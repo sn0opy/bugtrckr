@@ -1,5 +1,17 @@
 <?php
 
+/**
+ * controller.php
+ * 
+ * Main controller class
+ * 
+ * @package controller
+ * @author Sascha Ohms
+ * @author Philipp Hirsch
+ * @copyright Copyright 2011, Bugtrckr-Team
+ * @license http://www.gnu.org/licenses/lgpl.txt
+ *   
+ */
 class Controller extends F3instance
 {
 
