@@ -227,7 +227,7 @@ class cproperties extends Controller
     /**
      * 
      */
-    function addEditRole()
+    function addEditRole($projId = false)
     {
         $roleHash = $this->get('POST.hash') ? $this->get('POST.hash') : helper::getFreeHash('Role');
 
@@ -243,25 +243,28 @@ class cproperties extends Controller
             }
         }
 
-        $role->name = $this->get('POST.name');
-        $role->hash = $roleHash;
-        $role->issuesAssigneable = $this->get('POST.issuesAssigneable');
-        $role->projectId = $this->get('SESSION.project');
-        $role->iss_addIssues = $this->get('POST.iss_addIssues');
-        $role->proj_editProject = $this->get('POST.proj_editProject');
-        $role->proj_manageMembers = $this->get('POST.proj_manageMembers');
-        $role->proj_manageMilestones = $this->get('POST.proj_manageMilestones');
-        $role->proj_manageRoles = $this->get('POST.proj_manageRoles');
-        $role->iss_editIssues = $this->get('POST.iss_editIssues');
-        $role->iss_addIssues = $this->get('POST.iss_addIssues');
-        $role->iss_deleteIssues = $this->get('POST.iss_deleteIssues');
-        $role->iss_moveIssue = $this->get('POST.iss_moveIssue');
-        $role->iss_editWatchers = $this->get('POST.iss_editWatchers');
-        $role->iss_addWatchers = $this->get('POST.iss_addWatchers');
-        $role->iss_viewWatchers = $this->get('POST.iss_viewWatchers');
+        $role->name = ($projId) ? 'Admin' : $this->get('POST.name');
+        $role->hash = ($projId) ? helper::getFreeHash('Role') : $roleHash;
+        $role->issuesAssigneable = ($projId) ? 1 : $this->get('POST.issuesAssigneable');
+        $role->projectId = ($projId) ? $projId : $this->get('SESSION.project');
+        $role->iss_addIssues = ($projId) ? 1 : $this->get('POST.iss_addIssues');
+        $role->proj_editProject = ($projId) ? 1 : $this->get('POST.proj_editProject');
+        $role->proj_manageMembers = ($projId) ? 1 : $this->get('POST.proj_manageMembers');
+        $role->proj_manageMilestones = ($projId) ? 1 : $this->get('POST.proj_manageMilestones');
+        $role->proj_manageRoles = ($projId) ? 1 : $this->get('POST.proj_manageRoles');
+        $role->iss_editIssues = ($projId) ? 1 : $this->get('POST.iss_editIssues');
+        $role->iss_addIssues = ($projId) ? 1 : $this->get('POST.iss_addIssues');
+        $role->iss_deleteIssues = ($projId) ? 1 : $this->get('POST.iss_deleteIssues');
+        $role->iss_moveIssue = ($projId) ? 1 : $this->get('POST.iss_moveIssue');
+        $role->iss_editWatchers = ($projId) ? 1 : $this->get('POST.iss_editWatchers');
+        $role->iss_addWatchers = ($projId) ? 1 : $this->get('POST.iss_addWatchers');
+        $role->iss_viewWatchers = ($projId) ? 1 : $this->get('POST.iss_viewWatchers');
         $role->save();
 
-        $this->reroute($this->get('BASE') . '/project/settings/role/' . $roleHash);
+        if($projId)
+            return $role->_id;
+        else
+            $this->reroute($this->get('BASE') . '/project/settings/role/' . $roleHash);
     }
 
     /**
@@ -337,13 +340,13 @@ class cproperties extends Controller
         $cmain = new cmain;
         $cmain->selectProject($hash, false);
         
+        $projId = $ax->_id;
+        
         $perms = new ProjectPermission();
         $perms->userId = $this->get('SESSION.user.id');
-        $perms->projectId = $ax->_id;
-        $perms->roleId = 1;
+        $perms->projectId = $projId;
+        $perms->roleId = self::addEditRole($projId);
         $perms->save();
-        
-        // TODO: admin-role has to be added! addEditRole() has to be edited, I think
         
         $this->reroute($this->get('BASE').'/');        
     }

@@ -24,7 +24,7 @@
             {{@lng.publicproject}}
         </div>
         <div class="formValue">
-            <input type="checkbox" name="public" />                          
+            <input type="checkbox" name="public" checked="checked" />                          
         </div>
     </div>
     <input type="submit" value="{{@lng.add}}" />
