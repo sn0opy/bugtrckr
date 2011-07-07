@@ -4,10 +4,15 @@
     padding: 0px;
 }
 
-@font-face
-{
-    font-family: OpenSans;
-    src: url('misc/opensans.ttf');
+@font-face {
+    font-family: 'OpenSans';
+    src: url('misc/opensans-webfont.eot');
+    src: url('misc/opensans-webfont.eot?#iefix') format('embedded-opentype'),
+         url('misc/opensans-webfont.woff') format('woff'),
+         url('misc/opensans-webfont.ttf') format('truetype'),
+         url('misc/opensans-webfont.svg#OpenSans') format('svg');
+    font-weight: normal;
+    font-style: normal;
 }
 
 body
@@ -666,4 +671,3 @@ button:hover
     background: #EEE;
     border: 1px solid #CCC;
 }
-

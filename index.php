@@ -46,6 +46,7 @@ $app->route('GET /user/new', 'cuser->showUserRegister');
 $app->route('GET /user/login', 'cuser->showUserLogin');
 $app->route('GET /user/logout', 'cuser->logoutUser');
 $app->route('GET /milestone/@hash', 'cmilestone->showMilestone');
+$app->route('GET /project/add', 'cproperties->showAddProject');
 $app->route('GET /project/settings', 'cproperties->showProjectSettings');
 $app->route('GET /project/settings/role/@hash', 'cproperties->showProjectSettingsRole');
 $app->route('GET /project/settings/role/add', 'cproperties->showAddRole');
@@ -53,12 +54,12 @@ $app->route('GET /project/settings/milestone/@hash', 'cproperties->showProjectSe
 $app->route('GET /project/settings/milestone/add', 'cproperties->showAddMilestone');
 $app->route('GET /project/settings/category/add', 'cproperties->showAddCategory');
 
-
+$app->route('POST /project/select', 'cmain->selectProject');
 $app->route('POST /user/login', 'cuser->loginUser');
 $app->route('POST /user/new', 'cuser->registerUser');
 $app->route('POST /ticket', 'cticket->addTicket');
 $app->route('POST /ticket/@hash', 'cticket->editTicket');
-$app->route('POST /project/select', 'cmain->selectProject');
+$app->route('POST /project/add', 'cproperties->projectAdd');
 $app->route('POST /project/settings/member/setrole', 'cproperties->projectSetRole');
 $app->route('POST /project/settings/category/add', 'cproperties->addCategory');
 $app->route('POST /project/settings/role/edit', 'cproperties->addEditRole');

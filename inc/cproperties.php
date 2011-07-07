@@ -309,6 +309,44 @@ class cproperties extends Controller
         $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.addcategory}}');
         $this->tpserve();
     }
+    
+    /**
+     * 
+     */
+    function showAddProject()
+    {
+        $this->set('template', 'projectAdd.tpl.php');
+        $this->set('pageTitle', '{{@lng.project}} › {{@lng.add}}');
+        $this->tpserve();
+    }
+    
+    /**
+     * 
+     */
+    function projectAdd() 
+    {
+        $hash = helper::getFreeHash('Project');
+        
+        $ax = new Axon('Project');
+        $ax->name = $this->get('POST.name');
+        $ax->description = $this->get('POST.description');
+        $ax->public = ($this->get('POST.public') == 'on') ? 1 : 0;
+        $ax->hash = $hash;
+        $ax->save();
+        
+        $cmain = new cmain;
+        $cmain->selectProject($hash, false);
+        
+        $perms = new ProjectPermission();
+        $perms->userId = $this->get('SESSION.user.id');
+        $perms->projectId = $ax->_id;
+        $perms->roleId = 1;
+        $perms->save();
+        
+        // TODO: admin-role has to be added! addEditRole() has to be edited, I think
+        
+        $this->reroute($this->get('BASE').'/');        
+    }
 
     /**
      * 

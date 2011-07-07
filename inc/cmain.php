@@ -25,11 +25,16 @@ class cmain extends Controller
     /**
      *
      */
-    function selectProject()
+    function selectProject($hash = false, $routeBack = true)
     {
         $url = $this->get('SERVER.HTTP_REFERER');
-
-        $projectId = $this->get('POST.project');
+        $projectId = ($hash) ? $hash : $this->get('REQUEST.project');
+        
+        if($projectId == 'new') 
+        {
+            $this->reroute($this->get('BASE').'/project/add');
+            return;
+        }
 
         $project = new Project();
         $project->load("hash = '$projectId'");
@@ -49,7 +54,9 @@ class cmain extends Controller
         }
 
         $this->set('SESSION.project', $project->id);
-        $this->reroute($url);
+        
+        if($routeBack)
+            $this->reroute($url);
     }
 
 }

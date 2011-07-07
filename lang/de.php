@@ -94,5 +94,6 @@ return array('lng' => array(
     'delete' => 'Entfernen',
     'ticket' => 'Ticket',
     'added' => 'wurde hinzugefügt',
-    'edited_by' => 'wurde geändert von'
+    'edited_by' => 'wurde geändert von',
+    'newProject' => 'Neues Projekt'
 ));
