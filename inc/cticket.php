@@ -63,13 +63,14 @@ class cticket extends Controller
             return;
         }
 
+        $state = new State();    
         $users = new User();
-        $users = $users->find();
-
+        
         $this->set('ticket', $ticket);
         $this->set('milestone', $milestone);
         $this->set('activities', $activities);
-        $this->set('users', $users);
+        $this->set('users', $users = $users->find());
+        $this->set('states', $state->find('lang = "' .$this->get('LANGUAGE'). '"'));
         $this->set('pageTitle', '{{@lng.tickets}} › ' . $ticket->title);
         $this->set('template', 'ticket.tpl.php');
         $this->tpserve();

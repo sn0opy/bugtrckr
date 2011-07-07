@@ -89,8 +89,8 @@
                     <div class="formLabel">{{@lng.status}}</div>
                     <div class="formValue">
                         <select name="state" size="1">
-                            <F3:repeat group="{{@ticket_state}}" key="{{@i}}" value="{{@state}}">
-                                <option value="{{@i}}">{{@state}}</option>
+                            <F3:repeat group="{{@states}}" key="{{@i}}" value="{{@state}}">
+                                <option value="{{@state->id}}">{{@state->name}}</option>
                             </F3:repeat>
                         </select>
                     </div>
