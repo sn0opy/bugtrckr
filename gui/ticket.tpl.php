@@ -55,11 +55,15 @@
         <tr>
             <th>{{@lng.description}}</th>
             <th>{{@lng.changed}}</th>
-            <th>{{@lng.changedby}}</th>
+            <th>{{@lng.by}}</th>
         </tr>
         <F3:repeat group="{{@activities}}" key="{{@i}}" value="{{@activity}}">
             <tr class="tr{{@i%2}}">
-                <td>{{@activity->description}}</td>
+                <td>{{@activity->description}}
+                    <F3:check if="{{@activity->comment}}">
+                        <br/><span class="acitivityCmnt">{{@lng.comment}}: <em>{{nl2br(@activity->comment)}}</em></span>
+                    </F3:check>
+                </td>
                 <td>{{date('d.m.Y H:i', @activity->changed)}}</td>
                 <td><a href="{{@BASE}}/user/{{@activity->username}}">{{@activity->username}}</a></td>
             </tr>
@@ -67,10 +71,8 @@
     </table>
 </div>
 
-{{* this wont work yet, f3 update needed *}}
 <F3:check if="{{@SESSION.user}}">
     <F3:true>
-
         <div class="editTicket">
             <form method="POST" action="{{@BASE}}/ticket/{{@ticket->tickethash}}">
 
@@ -95,6 +97,13 @@
                         </select>
                     </div>
                 </div>
+                
+                <div class="formRow">
+                    <div class="formLabel">{{@lng.comment}}</div>
+                    <div class="formValue">
+                        <textarea name="comment" class="ticketComment"></textarea>
+                    </div>
+                </div>
 
                 <div class="formRow">
                     <div class="formLabel"></div>
@@ -102,7 +111,6 @@
                         <input type="submit" value="{{@lng.submit}}" />
                     </div>
                 </div>
-
             </form>
         </div>
     </F3:true>

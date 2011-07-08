@@ -23,8 +23,8 @@ INSERT INTO Milestone (id, hash, name, description, finished, project) VALUES (1
 --
 -- Activity
 --
-CREATE TABLE Activity (id INTEGER PRIMARY KEY AUTOINCREMENT, hash VARCHAR(12) UNIQUE, description text, user int, changed int, project int, ticket int);
-INSERT INTO Activity (id, hash, description, user, changed, project, ticket) VALUES (1, 'b026324c6904', 'Example Activity', 1, 1, 1, 1);
+CREATE TABLE Activity (id INTEGER PRIMARY KEY AUTOINCREMENT, hash VARCHAR(12) UNIQUE, description text, user int, changed int, project int, ticket int, comment TEXT);
+INSERT INTO Activity (id, hash, description, user, changed, project, ticket) VALUES (1, 'b026324c6904', 'Example Activity', 1, 1, 1, 1, 'This is a comment for that ticket');
 --
 -- Role
 --
@@ -99,7 +99,9 @@ INSERT INTO Category (id, name) VALUES (2, 'Test2');
 -- VIEWS
 --
 CREATE VIEW user_perms as SELECT * FROM user, projectpermission WHERE user.id = projectpermission.userId;
+
 CREATE VIEW user_ticket AS SELECT user.hash as userhash, ticket.hash as tickethash, * FROM user, ticket WHERE user.id = ticket.owner; -- modified: 13.5. 19:30
+
 CREATE VIEW displayableticket AS 
     SELECT priority.name as priorityname, status.name as statusname, type.name as typename,
             owner.hash as userhash, owner.name as username, ticket.hash as tickethash,
@@ -108,8 +110,9 @@ CREATE VIEW displayableticket AS
         ON assigned.id = ticket.assigned
     WHERE owner.id = ticket.owner AND ticket.state = status.id AND ticket.priority = priority.id 
         AND type.id = ticket.type AND category.id = ticket.category;
+
 CREATE VIEW displayableactivity AS
-    SELECT activity.id, activity.hash, activity.description, activity.changed, activity.ticket, activity.project,
+    SELECT activity.id, activity.hash, activity.description, activity.changed, activity.ticket, activity.project, activity.comment,
            user.name as username, user.hash as userhash
     FROM activity, user 
     WHERE activity.user = user.id;

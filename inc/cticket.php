@@ -68,7 +68,7 @@ class cticket extends Controller
         
         $this->set('ticket', $ticket);
         $this->set('milestone', $milestone);
-        $this->set('activities', $activities);
+        $this->set('activities', $activities);        
         $this->set('users', $users = $users->find());
         $this->set('states', $state->find('lang = "' .$this->get('LANGUAGE'). '"'));
         $this->set('pageTitle', '{{@lng.tickets}} › ' . $ticket->title);
@@ -81,14 +81,14 @@ class cticket extends Controller
      */
     function addTicket()
     {
-        if (!$this->helper->getPermission('iss_addIssues'))
+        if (!helper::getPermission('iss_addIssues'))
         {
             $this->tpfail('You are not allowed to add tickets.');
             return;
         }
 
         $ticket = new Ticket();
-        $ticket->hash = $this->helper->getFreeHash('Ticket');
+        $ticket->hash = helper::getFreeHash('Ticket');
         $ticket->title = $this->get('POST.title');
         $ticket->description = $this->get('POST.description');
         $ticket->owner = $this->get('SESSION.user.id');
@@ -108,7 +108,7 @@ class cticket extends Controller
         }
 
         helper::addActivity(
-            $this->get('lng.ticket') . " '$ticket->title' " . $this->get('lng.ticket.added') . ".", $ticket->_id);
+            $this->get('lng.ticket') . " '$ticket->title' " . $this->get('lng.added') . ".", $ticket->_id);
 
         $this->reroute($this->get('BASE') . '/ticket/' . $ticket->hash);
     }
@@ -134,10 +134,7 @@ class cticket extends Controller
             return;
         }
 
-        helper::addActivity(
-            $this->get('lng.ticket') . " '$ticket->title' " .
-            $this->get('lng.edited_by') . " '<a href=\"/user/" . $this->get('SESSION.user.name') . "\">" .
-            $this->get('SESSION.user.name') . "</a>'.", $ticket->id);
+        helper::addActivity($this->get('lng.ticket') . " '" .$ticket->title. "' " .$this->get('lng.edited'), $ticket->id, $this->get('POST.comment'));
 
         $this->set('PARAMS["hash"]', $hash);
         $this->showTicket($hash);

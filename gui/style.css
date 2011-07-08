@@ -544,6 +544,7 @@ div.ticket_timeline
 .editTicket
 {
     margin-top: 10px;
+    padding: 10px;
 }
 
 div.ticket hr
@@ -670,4 +671,17 @@ button:hover
 {
     background: #EEE;
     border: 1px solid #CCC;
+}
+
+.ticketComment 
+{
+    width: 300px;
+    height: 100px;
+}
+
+.acitivityCmnt 
+{
+    color: #444;
+    margin-left: 20px;
+    font-size: 8pt;
 }
