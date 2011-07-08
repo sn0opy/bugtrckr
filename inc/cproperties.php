@@ -59,7 +59,9 @@ class cproperties extends Controller
 
     function projectAddMember()
     {
-        if (!$this->helper->getPermission('proj_manageMembers'))
+        $helper = new helper;
+        
+        if (!$helper->getPermission('proj_manageMembers'))
         {
             $this->tpfail('You are not allowed to add new members.');
             return;
@@ -107,7 +109,9 @@ class cproperties extends Controller
 
     function projectDelMember()
     {
-        if (!$this->helper->getPermission('proj_manageMembers'))
+        $helper = new helper;
+        
+        if (!$helper->getPermission('proj_manageMembers'))
         {
             $this->tpfail('You are not allowed to add new members.');
             return;
@@ -138,7 +142,7 @@ class cproperties extends Controller
      */
     function projectSetRole()
     {
-        if (!$this->helper->getPermission('proj_manageMembers'))
+        if (!helper::getPermission('proj_manageMembers'))
         {
             $this->tpfail('You are not allowed to edit members.');
             return;

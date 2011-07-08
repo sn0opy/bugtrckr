@@ -16,8 +16,17 @@ class cticket extends Controller
 {
 
     function showTickets()
-    {
-        $order = $this->get('PARAMS.order') ? $this->get('PARAMS.order') : "id";
+    {     
+        $order = 'id';
+        
+        if($this->exists('SESSION.ticketOrder'))
+            $order = $this->get('SESSION.ticketOrder'); // we could also reroute to /tickets/@SESSION.ticketOrder
+        
+        if($this->exists('PARAMS.order'))
+            $order = $this->get('PARAMS.order');
+
+        $this->set('SESSION.ticketOrder', $order);
+        
         $project = $this->get('SESSION.project');
 
         $milestones = new Milestone();
