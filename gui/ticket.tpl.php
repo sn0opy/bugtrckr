@@ -92,7 +92,10 @@
                     <div class="formValue">
                         <select name="state" size="1">
                             <F3:repeat group="{{@states}}" key="{{@i}}" value="{{@state}}">
-                                <option value="{{@state->id}}">{{@state->name}}</option>
+                                <F3:check if="{{@state->name == @ticket->statusname}}">
+                                    <F3:true><option value="{{@state->id}}" selected="selected">{{@state->name}}</option></F3:true>
+                                    <F3:false><option value="{{@state->id}}">{{@state->name}}</option></F3:false>
+                                </F3:check>
                             </F3:repeat>
                         </select>
                     </div>
