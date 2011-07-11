@@ -19,5 +19,5 @@
                 <div class="formValue"><input type="submit" value="{{@lng.login}}" /></div>
             </div>
         </form>
-    <F3:false>
+    </F3:false>
 </F3:check>

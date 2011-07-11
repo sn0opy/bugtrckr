@@ -97,7 +97,7 @@ class cuser extends Controller
             array(':email' => $this->get('POST.email'),
                 ':password' => helper::salting($user->salt, $this->get('POST.password')))));
 
-        if (!$user)
+        if ($user->dry())
         {
             $this->set('FAILURE', 'Login failed.');
             $this->reroute($this->get('BASE') . '/user/login');
