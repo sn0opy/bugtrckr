@@ -12,7 +12,7 @@
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package Template
-		@version 2.0.0
+		@version 2.0.2
 **/
 
 //! Template engine
@@ -96,11 +96,11 @@ class Template extends Base {
 			trigger_error(sprintf(self::TEXT_Recursive,$file));
 			return '';
 		}
-		self::$includes[]=$view;
-		if (PHP_SAPI!='cli')
+		if (PHP_SAPI!='cli' && !headers_sent() && !self::$includes)
 			// Send HTTP header with appropriate character set
 			header(self::HTTP_Content.': '.$mime.'; '.
 				'charset='.self::$vars['ENCODING']);
+		self::$includes[]=$view;
 		$hash='tpl.'.self::hash($view);
 		$cached=Cache::cached($hash);
 		if ($cached && filemtime($view)<$cached)

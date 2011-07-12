@@ -46,7 +46,7 @@ class cuser extends Controller
     function showUserRegister()
     {
         $this->set('template', 'userRegister.tpl.php');
-        $this->set('pageTitle', '{{@lng.user}} › {@lng.registration}');
+        $this->set('pageTitle', '{{@lng.user}} › {{@lng.registration}}');
         $this->tpserve();
     }
 

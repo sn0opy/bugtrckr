@@ -12,7 +12,7 @@
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package DB
-		@version 2.0.0
+		@version 2.0.2
 **/
 
 //! SQL data access layer
@@ -30,7 +30,11 @@ class DB extends Base {
 		$dbname,$backend,$pdo,$result;
 	private
 		//! Connection parameters
-		$dsn,$user,$pw,$opt;
+		$dsn,$user,$pw,$opt,
+		//! Transaction tracker
+		$trans=FALSE,
+		//! Auto-commit mode
+		$auto=TRUE;
 
 	/**
 		Force PDO instantiation
@@ -42,12 +46,15 @@ class DB extends Base {
 
 	/**
 		Begin SQL transaction
+			@param $auto boolean
 			@public
 	**/
-	function begin() {
+	function begin($auto=FALSE) {
 		if (!$this->pdo)
 			self::instantiate();
 		$this->pdo->beginTransaction();
+		$this->trans=TRUE;
+		$this->auto=$auto;
 	}
 
 	/**
@@ -58,6 +65,8 @@ class DB extends Base {
 		if (!$this->pdo)
 			self::instantiate();
 		$this->pdo->rollback();
+		$this->trans=FALSE;
+		$this->auto=TRUE;
 	}
 
 	/**
@@ -68,6 +77,8 @@ class DB extends Base {
 		if (!$this->pdo)
 			self::instantiate();
 		$this->pdo->commit();
+		$this->trans=FALSE;
+		$this->auto=TRUE;
 	}
 
 	/**
@@ -88,12 +99,19 @@ class DB extends Base {
 				'queries'=>array()
 			);
 		$batch=is_array($cmds);
-		if (!$batch) {
+		if ($batch) {
+			if (!$this->trans && $this->auto)
+				$this->begin(TRUE);
+			if (is_null($args)) {
+				$args=array();
+				for ($i=0;$i<count($cmds);$i++)
+					$args[]=NULL;
+			}
+		}
+		else {
 			$cmds=array($cmds);
 			$args=array($args);
 		}
-		elseif (!$this->pdo->inTransaction())
-			$this->begin();
 		foreach (array_combine($cmds,$args) as $cmd=>$arg) {
 			$hash='sql.'.self::hash($cmd);
 			$cached=Cache::cached($hash);
@@ -109,32 +127,20 @@ class DB extends Base {
 					$query=$this->pdo->query($cmd);
 				else {
 					$query=$this->pdo->prepare($cmd);
-					$ok=TRUE;
-					if (!is_object($query))
-						$ok=FALSE;
-					else {
+					if (is_object($query)) {
 						foreach ($arg as $key=>$value)
 							if (!(is_array($value)?
 								$query->bindvalue($key,$value[0],$value[1]):
 								$query->bindvalue($key,$value,
-									$this->type($value)))) {
-								$ok=FALSE;
+									$this->type($value))))
 								break;
-							}
-						if ($ok)
-							$ok=$query->execute();
-					}
-					if (!$ok) {
-						if ($this->pdo->inTransaction())
-							$this->rollback();
-						trigger_error(sprintf(self::TEXT_ExecFail,$cmd));
-						return FALSE;
+						$query->execute();
 					}
 				}
 				// Check SQLSTATE
 				foreach (array($this->pdo,$query) as $obj)
 					if ($obj->errorCode()!=PDO::ERR_NONE) {
-						if ($this->pdo->inTransaction())
+						if ($this->trans && $this->auto)
 							$this->rollback();
 						$error=$obj->errorinfo();
 						trigger_error($error[2]);
@@ -152,7 +158,7 @@ class DB extends Base {
 				$stats[$this->dsn]['queries'][$cmd]++;
 			}
 		}
-		if ($batch && !$this->pdo->inTransaction())
+		if ($batch || $this->trans && $this->auto)
 			$this->commit();
 		return $this->result;
 	}
@@ -213,17 +219,26 @@ class DB extends Base {
 						'c.table_name=k.table_name AND '.
 						'c.column_name=k.column_name '.
 						($this->dbname?
-							'AND c.table_schema=k.table_schema ':'').
+							('AND '.
+							(preg_match('/^pgsql$/',$this->backend)?
+								'c.table_catalog=k.table_catalog':
+								'c.table_schema=k.table_schema').' '):'').
 				'LEFT OUTER JOIN '.
 					'information_schema.table_constraints AS t ON '.
 						'k.table_name=t.table_name AND '.
 						'k.constraint_name=t.constraint_name '.
 						($this->dbname?
-							'AND k.table_schema=t.table_schema ':'').
+							('AND '.
+							(preg_match('/^pgsql$/',$this->backend)?
+								'k.table_catalog=t.table_catalog':
+								'k.table_schema=t.table_schema').' '):'').
 				'WHERE '.
-					'c.table_name="'.$table.'"'.
+					'c.table_name=\''.$table.'\''.
 					($this->dbname?
-						('AND c.table_schema="'.$this->dbname.'"'):'').
+						('AND '.
+						(preg_match('/^pgsql$/',$this->backend)?
+							'c.table_catalog':'c.table_schema').
+							'=\''.$this->dbname.'\''):'').
 				';',
 				'field','pkey','PRIMARY KEY','data_type')
 		);
@@ -586,23 +601,25 @@ class Axon extends Base {
 		if ($new) {
 			// Insert record
 			$fields=$values='';
-			foreach ($this->fields as $field=>$val) {
-				$fields.=($fields?',':'').$field;
-				$values.=($values?',':'').':'.$field;
-				$bind[':'.$field]=array($val,$this->types[$field]);
-			}
+			foreach ($this->fields as $field=>$val)
+				if (isset($this->mod[$field])) {
+					$fields.=($fields?',':'').$field;
+					$values.=($values?',':'').':'.$field;
+					$bind[':'.$field]=array($val,$this->types[$field]);
+				}
 			$this->db->exec(
 				'INSERT INTO '.$this->table.' ('.$fields.') '.
 					'VALUES ('.$values.');',$bind);
 			$this->_id=$this->db->pdo->lastinsertid();
 		}
-		elseif ($this->mod) {
+		elseif (!is_null($this->mod)) {
 			// Update record
 			$set=$cond='';
-			foreach ($this->fields as $field=>$val) {
-				$set.=($set?',':'').$field.'=:'.$field;
-				$bind[':'.$field]=array($val,$this->types[$field]);
-			}
+			foreach ($this->fields as $field=>$val)
+				if (isset($this->mod[$field])) {
+					$set.=($set?',':'').$field.'=:'.$field;
+					$bind[':'.$field]=array($val,$this->types[$field]);
+				}
 			// Use primary keys to find record
 			foreach ($this->pkeys as $pkey=>$val) {
 				$cond.=($cond?' AND ':'').$pkey.'=:c_'.$pkey;
@@ -665,8 +682,11 @@ class Axon extends Base {
 		$keys=is_null($keys)?array_keys($var):self::split($keys);
 		foreach ($keys as $key)
 			if (in_array($key,array_keys($var)) &&
-				in_array($key,array_keys($this->fields)))
+				in_array($key,array_keys($this->fields))) {
+				if ($this->fields[$key]!=$var[$key])
+					$this->mod[$key]=TRUE;
 				$this->fields[$key]=$var[$key];
+			}
 		$this->empty=FALSE;
 	}
 
@@ -794,8 +814,8 @@ class Axon extends Base {
 	**/
 	function __set($field,$val) {
 		if (array_key_exists($field,$this->fields)) {
-			if ($this->fields[$field]!=$val && !$this->mod)
-				$this->mod=TRUE;
+			if ($this->fields[$field]!=$val && !isset($this->mod[$field]))
+				$this->mod[$field]=TRUE;
 			$this->fields[$field]=$val;
 			if (!is_null($val))
 				$this->empty=FALSE;

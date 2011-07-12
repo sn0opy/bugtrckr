@@ -12,7 +12,7 @@
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package ICU
-		@version 2.0.0
+		@version 2.0.2
 **/
 
 //! Language support tools
@@ -223,10 +223,13 @@ class ICU extends Base {
 					$def=preg_replace('/^(\w+-\w+)\b.*/','\1',
 						$_SERVER['HTTP_ACCEPT_LANGUAGE']);
 				else {
-					$def=setlocale(LC_ALL,'');
+					$def=setlocale(LC_ALL,NULL);
 					if (strtoupper(substr(PHP_OS,0,3))=='WIN')
 						$def=key(preg_grep('/'.strstr($def,'_',TRUE).'/',
 							self::$languages));
+					elseif (!preg_match('/^\w{2}(?:_\w{2})?\b/',$def))
+						// Environment points to invalid language
+						$def='en';
 				}
 			}
 			self::$vars['LANGUAGE']=$def;
