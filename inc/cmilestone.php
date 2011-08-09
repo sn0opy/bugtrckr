@@ -57,7 +57,13 @@ class cmilestone extends Controller
         $helper = new helper();
 
         $milestone = new Milestone();
-        $milestone->load('hash = "' . $hash . '"');
+        $milestone->load(array('hash = :hash', array(':hash' => $hash)));
+
+        if($milestone->dry())
+        {
+            $this->tpfail('No such milestone exists');
+            return;
+        }
 
         $ticket = new DisplayableTicket();
         $tickets = $ticket->find('milestone = ' . $milestone->id);

@@ -25,7 +25,7 @@ class Controller extends F3instance
 
         if (!$projects)
         {
-            $this->set('FAILURE', $msg);
+            $this->set('SESSION.FAILURE', $msg);
             $this->set('template', 'error404.tpl.php');
         }
 
@@ -46,8 +46,7 @@ class Controller extends F3instance
      */
     protected function tpfail($msg)
     {
-        $this->set('FAILURE', $msg);
-        $this->set('template', 'error404.tpl.php');
+        $this->set('SESSION.FAILURE', $msg);
         $this->tpserve();
     }
 

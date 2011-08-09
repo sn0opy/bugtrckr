@@ -21,7 +21,7 @@
     <h3>Bugtrckr-Team</h3>
     <p>Our current team consists of two persons</p>
     <ul>
-        <li>Sascha 'Sn0opy' Ohms</li>
-        <li>Philipp 'hanspolo' Hirsch</li>
+        <li>Sascha Ohms</li>
+        <li>Philipp Hirsch</li>
     </ul>
 </div>

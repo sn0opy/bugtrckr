@@ -13,8 +13,6 @@
  *   
 **/
 
-session_start();
-
 $app = require(__DIR__.'/lib/base.php');
 require 'inc/config.inc.php';
 
@@ -71,3 +69,4 @@ $app->route('POST /project/setttings/member/delete', 'cproperties->projectDelMem
 $app->run();
 
 $app->clear('SESSION.SUCCESS');
+$app->clear('SESSION.FAILURE');

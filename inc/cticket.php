@@ -58,7 +58,12 @@ class cticket extends Controller
         $hash = $this->get('PARAMS.hash');
 
         $ticket = new DisplayableTicket();
-        $ticket = $ticket->findone("tickethash = '$hash'");
+        $ticket->load(array("tickethash = :hash", array(':hash' => $hash)));
+
+        if($ticket->dry()) {
+            $this->tpfail("There's no such ticket");
+            return;
+        }
 
         $milestone = new Milestone();
         $milestone->load(array('id = :id', array(':id' => $ticket->milestone)));
