@@ -82,7 +82,7 @@ class cuser extends Controller
     function showUserLogin()
     {
         $this->set('template', 'userLogin.tpl.php');
-        $this->set('pageTitle', '{{@lng.user}} › {@lng.login}');
+        $this->set('pageTitle', '{{@lng.user}} › {{@lng.login}}');
         $this->tpserve();
     }
 
@@ -91,7 +91,7 @@ class cuser extends Controller
      */
     function loginUser()
     {
-        $user = new User();
+        $user = new User();        
         $user->load(array('email = :email', array(':email' => $this->get('POST.email'))));
         $user->load(array('email = :email AND password = :password',
             array(':email' => $this->get('POST.email'),
@@ -99,9 +99,15 @@ class cuser extends Controller
 
         if ($user->dry())
         {
-            $this->set('FAILURE', 'Login failed.');
+            $this->set('SESSION.FAILURE', 'Password or Email is incorrect');
             $this->reroute($this->get('BASE') . '/user/login');
         }
+
+        echo $this->get('SESSION.project');
+
+        // enable user's last used project if he hasn't already chosen one
+        if($user->lastProject && !$this->get('SESSION.project'))
+            $this->set('SESSION.project', $user->lastProject);
 
         $this->set('SESSION.user', array('name' => $user->name, 'id' => $user->id, 'admin' => $user->admin, 'hash' => $user->hash));
         $this->set('SESSION.SUCCESS', 'Login successful');

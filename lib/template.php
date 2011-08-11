@@ -12,7 +12,7 @@
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package Template
-		@version 2.0.2
+		@version 2.0.3
 **/
 
 //! Template engine
@@ -474,6 +474,7 @@ class F3markup extends Base {
 
 	/**
 		Override base constructor
+			@param $globals boolean
 			@public
 	**/
 	function __construct($globals) {

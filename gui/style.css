@@ -122,47 +122,36 @@ h3 a:hover
 {
     clear: both;
     text-align: center;
-    border-top: 1px solid #CCC;
+    border-top: 1px dotted #DDD;
     padding-top: 10px;
+    color: #CCC;
 }
 
-#failure
+.failure
 {
     background: #FAA;
     border: solid 1px #F54;
-    color: #F00;
+    color: #333;
     margin: 0 auto;
     padding: 5px;
     border-radius: 3px;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
-    width: 500px;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
-#success
+.success
 {
     background: #D6FFD6;
     border: solid 1px #00D600;
-    color: #060;
+    color: #333;
     padding: 5px;
     border-radius: 3px;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
     margin-top: 5px;
     margin-bottom: 5px;
-}
-
-.error 
-{
-    color: #600;
-    padding: 5px;
-    margin-top: 5px;
-    margin-bottom: 5px;
-    background: #FFB3B3;
-    border: 1px solid #F66;
-    border-radius: 4px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
 }
 
 .projectText
@@ -267,10 +256,19 @@ input, textarea, select
     background: #FFF;
     border: 1px solid #CCC;
     font: 10pt Helvetica;
-    padding: 3px;
+    padding: 4px;
     border-radius: 3px;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
+    box-shadow: inset 1px 1px 3px #DDD;
+}
+
+input[type=submit] {
+    box-shadow: inset -1px -1px 2px #DDD;
+}
+
+input[type=submit]:active {
+    box-shadow: inset 1px 1px 2px #DDD;
 }
 
 .normalText
@@ -583,12 +581,12 @@ table.ticket th
 
 .add, #login
 {
-    background: #EEE;
+    background: #F9F9F9;
     border: 1px solid #BBB;
     border-radius: 5px;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
-    box-shadow: 3px 3px 3px #333;
+    box-shadow: 0px 0px 5px rgba(0,0,0,0.3);
     display: none;
     position: absolute;
     width: 400px; 
@@ -606,6 +604,10 @@ table.ticket th
     text-transform: none;
 }
 
+.add a:hover, #login a:hover {
+    text-decoration: underline;
+}
+
 .add input, .add textarea
 {
     width: 400px;
@@ -619,19 +621,25 @@ table.ticket th
 .closeButton
 {
     float: right;
-    border-radius: 5px;
-    display: block;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
     text-align: center;
-    width: 20px;
-    height: 20px;
-    line-height: 25px;
-    border: 1px solid #AAA;
-
+    box-shadow: inset -1px -1px 2px #DDD;
+    font: 10pt Helvetica;
+    padding: 4px;
+    border: 1px solid #CCC !important;
+    background: #FFF;
+    padding-left: 8px;
+    padding-right: 8px;
 }
 
-.closeButton:hover
-{
-    box-shadow: inset 1px 1px 2px #333;
+.closeButton:hover {
+    text-decoration: none !important;
+}
+
+.closeButton:active {
+    box-shadow: inset 1px 1px 2px #DDD;
 }
 
 #add .formRow

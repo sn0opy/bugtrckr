@@ -31,10 +31,7 @@ class cmain extends Controller
         $projectId = ($hash) ? $hash : $this->get('REQUEST.project');
         
         if($projectId == 'new') 
-        {
             $this->reroute($this->get('BASE').'/project/add');
-            return;
-        }
 
         $project = new Project();
         $project->load("hash = '$projectId'");

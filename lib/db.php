@@ -12,7 +12,7 @@
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package DB
-		@version 2.0.2
+		@version 2.0.3
 **/
 
 //! SQL data access layer
@@ -22,7 +22,7 @@ class DB extends Base {
 	const
 		TEXT_ExecFail='Unable to execute prepared statement: %s',
 		TEXT_DBEngine='Database engine is not supported',
-		TEXT_Schema='Schema for % table is not available';
+		TEXT_Schema='Schema for %s table is not available';
 	//@}
 
 	public
@@ -143,7 +143,7 @@ class DB extends Base {
 						if ($this->trans && $this->auto)
 							$this->rollback();
 						$error=$obj->errorinfo();
-						trigger_error($error[2]);
+						$this->error(500,$error[2]);
 						return FALSE;
 					}
 				$this->result=preg_match(
@@ -204,14 +204,15 @@ class DB extends Base {
 			@public
 	**/
 	function schema($table,$ttl) {
+		// Support these engines
 		$cmd=array(
 			'sqlite2?'=>array(
 				'PRAGMA table_info('.$table.');',
 				'name','pk',1,'type'),
 			'mysql'=>array(
-				'SHOW columns FROM '.$this->dbname.'.'.$table.';',
+				'SHOW columns FROM `'.$this->dbname.'`.'.$table.';',
 				'Field','Key','PRI','Type'),
-			'(mysql|mssql|sybase|dblib|pgsql)'=>array(
+			'mssql|sybase|dblib|pgsql'=>array(
 				'SELECT c.column_name AS field,t.constraint_type AS pkey '.
 				'FROM information_schema.columns AS c '.
 				'LEFT OUTER JOIN '.
@@ -229,14 +230,14 @@ class DB extends Base {
 						'k.constraint_name=t.constraint_name '.
 						($this->dbname?
 							('AND '.
-							(preg_match('/^pgsql$/',$this->backend)?
+							(preg_match('/pgsql/',$this->backend)?
 								'k.table_catalog=t.table_catalog':
 								'k.table_schema=t.table_schema').' '):'').
 				'WHERE '.
 					'c.table_name=\''.$table.'\''.
 					($this->dbname?
 						('AND '.
-						(preg_match('/^pgsql$/',$this->backend)?
+						(preg_match('/pgsql/',$this->backend)?
 							'c.table_catalog':'c.table_schema').
 							'=\''.$this->dbname.'\''):'').
 				';',
@@ -244,7 +245,7 @@ class DB extends Base {
 		);
 		$match=FALSE;
 		foreach ($cmd as $backend=>$val)
-			if (preg_match('/^'.$backend.'$/',$this->backend)) {
+			if (preg_match('/'.$backend.'/',$this->backend)) {
 				$match=TRUE;
 				break;
 			}
@@ -267,19 +268,73 @@ class DB extends Base {
 	}
 
 	/**
-		Dump database
-			@param $file string
+		Custom session handler
+			@param $table string
 			@public
 	**/
-	static function dump($file) {
-	}
-
-	/**
-		Load database
-			@param $file string
-			@public
-	**/
-	static function load($file) {
+	function session($table='sessions') {
+		$self=$this;
+		session_set_save_handler(
+			function($path,$name) use($self,$table) {
+				// Support these engines
+				$cmd=array(
+					'sqlite2?'=>
+						'SELECT name FROM sqlite_master '.
+						'WHERE type=\'table\' AND name=\''.$table.'\';',
+					'mysql|mssql|sybase|dblib|pgsql'=>
+						'SELECT table_name FROM information_schema.tables '.
+						'WHERE '.
+							(preg_match('/pgsql/',$self->backend)?
+								'table_catalog':'table_schema').
+								'=\''.$self->dbname.'\' AND '.
+							'table_name=\''.$table.'\''
+				);
+				foreach ($cmd as $backend=>$val)
+					if (preg_match('/'.$backend.'/',$self->backend))
+						break;
+				$result=$self->exec($val,NULL);
+				if (!$result)
+					// Create SQL table
+					$self->exec(
+						'CREATE TABLE '.
+							(preg_match('/sqlite2?/',$self->backend)?
+								'':($self->dbname.'.')).$table.' ('.
+							'id VARCHAR(40),'.
+							'data LONGTEXT,'.
+							'stamp INTEGER'.
+						');'
+					);
+				register_shutdown_function('session_commit');
+				return TRUE;
+			},
+			function() {
+				return TRUE;
+			},
+			function($id) use($table) {
+				$axon=new Axon($table);
+				$axon->load(array('id=:id',array(':id'=>$id)));
+				return $axon->dry()?FALSE:$axon->data;
+			},
+			function($id,$data) use($table) {
+				$axon=new Axon($table);
+				$axon->load(array('id=:id',array(':id'=>$id)));
+				$axon->id=$id;
+				$axon->data=$data;
+				$axon->stamp=time();
+				$axon->save();
+				return TRUE;
+			},
+			function($id) use($table) {
+				$axon=new Axon($table);
+				$axon->erase(array('id=:id',array(':id'=>$id)));
+				return TRUE;
+			},
+			function($max) use($table) {
+				$axon=new Axon($table);
+				$axon->erase('stamp+'.$max.'<'.time());
+				return TRUE;
+			}
+		);
 	}
 
 	/**
@@ -361,7 +416,7 @@ class Axon extends Base {
 		foreach ($row as $field=>$val) {
 			if (array_key_exists($field,$this->fields)) {
 				$axon->fields[$field]=$val;
-				if (is_array($this->pkeys) &&
+				if ($this->pkeys &&
 					array_key_exists($field,$this->pkeys))
 					$axon->pkeys[$field]=$val;
 			}
@@ -420,6 +475,24 @@ class Axon extends Base {
 			foreach ($rows as &$row)
 				$row=$this->factory($row);
 		return $rows;
+	}
+
+	/**
+		SQL select statement wrapper;
+		Returns an array of associative arrays
+			@return array
+			@param $fields string
+			@param $cond mixed
+			@param $group string
+			@param $seq string
+			@param $limit int
+			@param $ofs int
+			@public
+	**/
+	function aselect(
+		$fields=NULL,
+		$cond=NULL,$group=NULL,$seq=NULL,$limit=0,$ofs=0) {
+		return $this->find($fields,$cond,$group,$seq,$limit,$ofs,FALSE);
 	}
 
 	/**
@@ -532,7 +605,8 @@ class Axon extends Base {
 				// Hydrate Axon
 				foreach ($axon->fields as $field=>$val) {
 					$this->fields[$field]=$val;
-					if (array_key_exists($field,$this->pkeys))
+					if ($this->pkeys &&
+						array_key_exists($field,$this->pkeys))
 						$this->pkeys[$field]=$val;
 				}
 				if ($axon->adhoc)
@@ -601,15 +675,17 @@ class Axon extends Base {
 		if ($new) {
 			// Insert record
 			$fields=$values='';
+			$bind=array();
 			foreach ($this->fields as $field=>$val)
 				if (isset($this->mod[$field])) {
 					$fields.=($fields?',':'').$field;
 					$values.=($values?',':'').':'.$field;
 					$bind[':'.$field]=array($val,$this->types[$field]);
 				}
-			$this->db->exec(
-				'INSERT INTO '.$this->table.' ('.$fields.') '.
-					'VALUES ('.$values.');',$bind);
+			if ($bind)
+				$this->db->exec(
+					'INSERT INTO '.$this->table.' ('.$fields.') '.
+						'VALUES ('.$values.');',$bind);
 			$this->_id=$this->db->pdo->lastinsertid();
 		}
 		elseif (!is_null($this->mod)) {
@@ -621,10 +697,11 @@ class Axon extends Base {
 					$bind[':'.$field]=array($val,$this->types[$field]);
 				}
 			// Use primary keys to find record
-			foreach ($this->pkeys as $pkey=>$val) {
-				$cond.=($cond?' AND ':'').$pkey.'=:c_'.$pkey;
-				$bind[':c_'.$pkey]=array($val,$this->types[$pkey]);
-			}
+			if ($this->pkeys)
+				foreach ($this->pkeys as $pkey=>$val) {
+					$cond.=($cond?' AND ':'').$pkey.'=:c_'.$pkey;
+					$bind[':c_'.$pkey]=array($val,$this->types[$pkey]);
+				}
 			if ($set)
 				$this->db->exec(
 					'UPDATE '.$this->table.' SET '.$set.
@@ -634,6 +711,7 @@ class Axon extends Base {
 			// Update primary keys with new values
 			foreach (array_keys($this->pkeys) as $pkey)
 				$this->pkeys[$pkey]=$this->fields[$pkey];
+		$this->empty=FALSE;
 		if (method_exists($this,'afterSave'))
 			$this->afterSave();
 	}

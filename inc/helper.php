@@ -109,4 +109,3 @@ class helper extends F3instance
     }
 
 }
-

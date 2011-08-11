@@ -12,7 +12,7 @@
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package Base
-		@version 2.0.2
+		@version 2.0.3
 **/
 
 //! Base structure
@@ -21,7 +21,7 @@ class Base {
 	//@{ Framework details
 	const
 		TEXT_AppName='Fat-Free Framework',
-		TEXT_Version='2.0.0';
+		TEXT_Version='2.0.3';
 	//@}
 
 	//@{ Locale-specific error/exception messages
@@ -66,7 +66,7 @@ class Base {
 		HTTP_303='See Other',
 		HTTP_304='Not Modified',
 		HTTP_305='Use Proxy',
-		HTTP_306='Temporary Redirect',
+		HTTP_307='Temporary Redirect',
 		HTTP_400='Bad Request',
 		HTTP_401='Unauthorized',
 		HTTP_402='Payment Required',
@@ -544,7 +544,9 @@ class Base {
 			@param $addr string
 			@public
 	**/
-	static function privateip($addr) {
+	static function privateip($addr=NULL) {
+		if (!$addr)
+			$addr=$_SERVER['REMOTE_ADDR'];
 		return preg_match('/^127\.0\.0\.\d{1,3}$/',$addr) ||
 			!filter_var($addr,FILTER_VALIDATE_IP,
 				FILTER_FLAG_IPV4|FILTER_FLAG_NO_PRIV_RANGE);
@@ -635,6 +637,15 @@ class Base {
 	static function __callStatic($func,array $args) {
 		trigger_error(sprintf(self::TEXT_Method,get_called_class().'::'.
 			$func.'('.self::csv($args).')'));
+	}
+
+	/**
+		Return instance of child class
+			@public
+	**/
+	static function instance() {
+		return eval('return new '.get_called_class().
+			'('.self::csv(func_get_args()).');');
 	}
 
 	/**
@@ -822,7 +833,7 @@ class F3 extends Base {
 					file_get_contents($file),$matches,PREG_SET_ORDER);
 			$cfg=array();
 			$ptr=&$cfg;
-			foreach ($matches as $match) {
+			foreach ($matches as $match)
 				if (isset($match[1]) && !empty($match[1])) {
 					// Section header
 					if (!isset($map[$match[1]])) {
@@ -856,7 +867,6 @@ class F3 extends Base {
 						// Key-value pair
 						$ptr[trim($match[2])]=$match[3];
 				}
-			}
 			ob_start();
 			foreach ($cfg as $section=>$pairs)
 				if (isset($map[$section]) && is_array($pairs)) {
@@ -1270,7 +1280,7 @@ class F3 extends Base {
 			self::error(404);
 			return FALSE;
 		}
-		if (PHP_SAPI!='cli') {
+		if (PHP_SAPI!='cli' && !headers_sent()) {
 			header(self::HTTP_Content.': application/octet-stream');
 			header(self::HTTP_Disposition.': filename="'.basename($file).'"');
 			header(self::HTTP_Partial.': '.($partial?'bytes':'none'));
@@ -1586,7 +1596,7 @@ class F3 extends Base {
 					);
 				}
 				$self=__CLASS__;
-				$self::error($ex->getCode(),$ex->getMessage(),$trace);
+				$self::error(500,$ex->getMessage(),$trace);
 				// PHP aborts at this point
 			}
 		);
@@ -1718,7 +1728,7 @@ class F3 extends Base {
 			self::error(500,$error['message'],array($error));
 		if (isset(self::$vars['UNLOAD'])) {
 			ob_end_flush();
-			if (PHP_SAPI!='cli')
+			if (PHP_SAPI!='cli' && !headers_sent())
 				header(self::HTTP_Connect.': close');
 			self::call(self::$vars['UNLOAD']);
 		}
@@ -1765,8 +1775,8 @@ class F3 extends Base {
 				if (is_int(strpos($file,'/'))) {
 					$ok=FALSE;
 					// Case-insensitive check for folders
-					foreach (explode('/',self::fixslashes(dirname($file)))
-						as $dir)
+					foreach (explode('/',
+						self::fixslashes(dirname($file))) as $dir)
 						foreach (glob($path.'/*') as $found) {
 							$found=self::fixslashes($found);
 							if (strtolower($path.'/'.$dir)==
@@ -2186,6 +2196,7 @@ class F3instance {
 
 	/**
 		Class constructor
+			@param $boot boolean
 			@public
 	**/
 	function __construct($boot=FALSE) {
