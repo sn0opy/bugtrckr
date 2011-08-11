@@ -44,7 +44,7 @@
                         <li><a href="{{@BASE}}/user/new">{{@lng.registration}}</a></li>
                     </F3:false>
                 </F3:check>                
-				<li>
+				<li class="project_selector">
 					<form method="post" action="{{@BASE}}/project/select">
 						<select name="project" size="1" onBlur="submit();">
                             <option value="new">{{@lng.newProject}}</option>

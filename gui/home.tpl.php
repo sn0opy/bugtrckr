@@ -6,7 +6,7 @@
 
     <h3>Features</h3>
     <ul>
-        <li>ACL via roles</li>
+        <li>Rolebased ACL</li>
         <li>Multi projects</li>
         <li>Issue tracking</li>
         <li>Milestones</li>
