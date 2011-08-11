@@ -25,7 +25,7 @@ class Controller extends F3instance
 
         if (!$projects)
         {
-            $this->set('FAILURE', $msg);
+//            $this->set('FAILURE', $msg);
             $this->set('template', 'error404.tpl.php');
         }
 
