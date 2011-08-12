@@ -13,6 +13,8 @@
  *   
 **/
 
+session_start();
+
 $app = require(__DIR__.'/lib/base.php');
 require 'inc/config.inc.php';
 
@@ -52,6 +54,7 @@ $app->route('GET /project/settings/milestone/@hash', 'cproperties->showProjectSe
 $app->route('GET /project/settings/milestone/add', 'cproperties->showAddMilestone');
 $app->route('GET /project/settings/category/add', 'cproperties->showAddCategory');
 
+$app->route('POST /search', 'cticket->showTickets');
 $app->route('POST /project/select', 'cmain->selectProject');
 $app->route('POST /user/login', 'cuser->loginUser');
 $app->route('POST /user/new', 'cuser->registerUser');

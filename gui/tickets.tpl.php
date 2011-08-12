@@ -81,6 +81,12 @@
 	<br class="clearfix" />
 </div>
 
+<div>
+	<form action="/search" method="POST">
+		<input type="input" name="search" value="{{@SESSION.ticketSearch}}" /><input type="submit" value="Suchen"/>
+	</form>
+</div>
+
 <table class="overview">
     <thead>
         <tr>

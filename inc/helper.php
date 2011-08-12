@@ -70,18 +70,21 @@ class helper extends F3instance
             $user->load('id = ' . $userId);
 
             $projPerm = new ProjectPermission();
-            $permissions = $projPerm->find('userId = ' . $userId . ' AND projectId = ' . $projectId);
+            $permissions = $projPerm->findone('userId = ' . $userId . ' AND projectId = ' . $projectId);
 
-            $permissions = $permissions[0]; // TODO: find a better way ...
-          
+			if ($permissions == null)
+				return false;
+
             $role = new Role();
-            $role->load('id = ' . $permissions->roleId);
-
+            if (!$role->load('id = ' . $permissions->roleId))
+				return false;
+			
             if ($user->admin) // admin has access to everything
                 return true;
 
-            if (in_array($permission, $permissions))
-                if ($permissions[$permission] == true)
+			if ($role->id > 0)
+//            if (in_array($permission, $permissions))
+                if ($role->$permission == true)
                     return true;
         }
 

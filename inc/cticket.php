@@ -18,26 +18,37 @@ class cticket extends Controller
     function showTickets()
     {     
         $order = 'id';
+		$search = '';
         
         if($this->exists('SESSION.ticketOrder'))
             $order = $this->get('SESSION.ticketOrder'); // we could also reroute to /tickets/@SESSION.ticketOrder
+
+		if ($this->exists('SESSION.ticketSearch'))
+			$search = $this->get('SESSION.ticketSearch');
         
         if($this->exists('PARAMS.order'))
             $order = $this->get('PARAMS.order');
 
+		if($this->exists('POST.search'))
+			$search = $this->get('POST.search');
+
         $this->set('SESSION.ticketOrder', $order);
+		$this->set('SESSION.ticketSearch', $search);
         
         $project = $this->get('SESSION.project');
 
         $milestones = new Milestone();
         $milestones = $milestones->find('project = ' . $project);
 
-        $string = '';
+		$msids = array();
         foreach ($milestones as $ms)
-            $string .= $ms->id . ',';
+            $msids[] = $ms->id;
+		$string = implode($msids, ',');
 
         $tickets = new DisplayableTicket();
-        $tickets = $tickets->find('milestone IN (' . $string . '0) ORDER BY ' . $order);
+        $tickets = $tickets->find('milestone IN (' . $string . ') AND ' .
+					'title LIKE \'%'.$search.'%\'' .
+			 		'ORDER BY ' . $order);
 
         $categories = new Category();
         $categories = $categories->find();
