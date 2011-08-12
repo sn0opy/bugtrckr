@@ -1,0 +1,130 @@
+*
+{
+    margin: 0px;
+    padding: 0px;
+}
+
+@font-face {
+    font-family: 'OpenSans';
+    src: url('../gui/misc/opensans-webfont.eot');
+    src: url('../gui/misc/opensans-webfont.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body
+{
+    color: #333;
+    font-size: 10pt;
+    font-family: OpenSans, Helvetica, Calibri, sans-serif;
+    background: #FFF;
+    margin-top: 30px;
+}
+
+h1 {
+    font: 17pt Georgia;
+    line-height: 50px;
+    text-align: right;
+    margin-right: 60px;
+    color: #FFF;
+    font-style: italic;
+    text-shadow: 1px 1px 3px #000;
+}
+
+h2 {
+    margin-top: 20px;
+}
+
+ul {
+    list-style-type: none;
+}
+
+p {
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+input {
+    color: #555;
+    background: #FFF;
+    border: 1px solid #CCC;
+    font: 10pt Helvetica;
+    padding: 4px;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    box-shadow: inset 1px 1px 3px #DDD;
+}
+
+input[type=submit] {
+    box-shadow: inset -1px -1px 2px #DDD;
+}
+
+input[type=submit]:active {
+    box-shadow: inset 1px 1px 2px #DDD;
+}
+
+
+#content, .head, .footer {
+    border-left: 1px solid #DDD;
+    border-right: 1px solid #DDD;
+    margin: 0 auto;
+}
+
+.head {
+    width: 500px;
+    background: #068 url(../gui/img/headBg.png);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    height: 50px;
+}
+
+#content {
+    width: 498px;
+}
+
+.content {
+    padding: 5px;
+}
+
+.footer {
+    height: 20px;
+    width: 498px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-bottom: 1px solid #DDD;
+}
+
+.false {
+    color: #F00;
+}
+
+.true {
+    color: #2DB300;
+}
+
+.formRow
+{
+    float: left;
+    width: 100%;
+    margin-bottom: 2px;
+}
+
+.formLabel
+{
+    float: left;
+    width: 160px;
+}
+
+.formValue
+{
+    float: left;
+}
+
+.clearfix {
+    clear: both;
+}
+
+#mysqlChosen {
+    display: none;
+}
