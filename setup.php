@@ -27,7 +27,7 @@ class main extends F3instance {
     function install() {
         $admname = $this->get('POST.name');
         $admpw = $this->get('POST.pw');
-        $admpwre = $this->get()
+        $admpwre = $this->get();
         
         if($this->get('POST.dbtype') == 'mysqldb') {
             $host = $this->get('POST.sqlhost');
