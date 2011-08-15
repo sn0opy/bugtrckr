@@ -53,27 +53,29 @@ class cuser extends Controller
     /**
      *
      */
-    function registerUser()
+    function registerUser($name = false, $password = false, $email = false, $admin = false)
     {
         $salt = helper::randStr();
 
         $user = new user();
-        $user->name = $this->get('POST.name');
-        $user->email = $this->get('POST.email');
-        $user->password = helper::salting($salt, $this->get('POST.password'));
+        $user->name = $name ? $name : $this->get('POST.name');
+        $user->email = $email ? $email : $this->get('POST.email');
+        $user->password = $password ? helper::salting($salt, $password) : helper::salting($salt, $this->get('POST.password'));
         $user->salt = $salt;
         $user->hash = helper::getFreeHash('User');
-        $user->admin = 0;
+        $user->admin = $admin ? 1 : 0;
         $user->save();
 
         if (!$user->_id)
         {
-            $this->tpfail("Failure while saving User");
+            $this->tpfail("Failure while creating User");
             return;
         }
 
-        $this->set('SESSION.SUCCESS', 'User registred successfully');
-        $this->reroute($this->get('BASE') . '/');
+        if(!isset($name)) {
+            $this->set('SESSION.SUCCESS', 'User registred successfully');
+            $this->reroute($this->get('BASE') . '/');
+        }
     }
 
     /**
