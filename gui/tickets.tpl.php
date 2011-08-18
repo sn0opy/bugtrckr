@@ -1,5 +1,11 @@
 <h2 class="floatleft">{{@lng.tickets}}</h2>
 
+<div class="floatright ticketSearch">
+	<form action="/search" method="post" id="searchForm">
+		<input type="input" name="search" value="{{@SESSION.ticketSearch}}" id="searchInput" /> <input type="submit" value="{{@lng.search}}"/> <button type="button" title="Suche löschen" id="delSearch">x</button>
+	</form>
+</div>
+
 <F3:check if="{{@getPermission('iss_addIssues')}}">
     <button type="button" class="floatright"
         onclick="document.getElementById('add').style.display = 'block'" >
@@ -10,7 +16,7 @@
 <div class="add" id="add">
     <h3 class="floatleft">{{@lng.addticket}}</h3>
     <a class="closeButton" href="#" onclick="document.getElementById('add').style.display = 'none'; return false;">
-		X
+		x
 	</a>
 
 	<form method="POST" action="{{@BASE}}/ticket/">
@@ -79,12 +85,6 @@
 		</div>
 	</form>
 	<br class="clearfix" />
-</div>
-
-<div>
-	<form action="/search" method="POST">
-		<input type="input" name="search" value="{{@SESSION.ticketSearch}}" /><input type="submit" value="Suchen"/>
-	</form>
 </div>
 
 <table class="overview">

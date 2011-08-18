@@ -97,5 +97,6 @@ return array('lng' => array(
     'edited' => 'wurde geändert',
     'newProject' => 'Neues Projekt',
     'comment' => 'Kommentar',
-    'by' => 'von'
+    'by' => 'von',
+    'search' => 'Suchen'
 ));

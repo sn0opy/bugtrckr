@@ -671,19 +671,19 @@ p.info
 
 button
 {
-    border: 1px solid #999;
-    padding: 5px;
-    background: #DDD;
+    color: #555;
+    background: #FFF;
+    border: 1px solid #CCC;
+    font: 10pt Helvetica;
+    padding: 4px;
     border-radius: 3px;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
-
+    box-shadow: inset -1px -1px 2px #DDD;
 }
 
-button:hover
-{
-    background: #EEE;
-    border: 1px solid #CCC;
+button:active {
+    box-shadow: inset 1px 1px 2px #DDD;
 }
 
 .ticketComment 
@@ -717,4 +717,8 @@ button:hover
 
 .home p {
     margin-bottom: 5px;
+}
+
+.ticketSearch {
+    margin-left: 10px;
 }

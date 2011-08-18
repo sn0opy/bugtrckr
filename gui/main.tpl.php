@@ -16,6 +16,11 @@
                 $("#"+content_show).show();  
                 return false;
             });  
+            
+            $('#delSearch').click(function() {
+               $('#searchInput').val("");
+               $('#searchForm').submit();
+            });
         }); 
         </script>
 	</head>
