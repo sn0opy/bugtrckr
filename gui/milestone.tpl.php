@@ -20,7 +20,7 @@
     </F3:false>
 </F3:check>
 
-<p class="info">{{@stats.openTickets}} {{@lng.ticketsleft}}</p>
+<p class="rminfo">{{@stats.openTickets}} {{@lng.ticketsleft}}</p>
 <p>{{nl2br(@milestone->description)}}</p>
 
 <div class="milestoneTickets">

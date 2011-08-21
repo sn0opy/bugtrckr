@@ -22,32 +22,37 @@ class cmilestone extends Controller
 
         $helper = new helper();
 
-        $milestones = new Milestone();
-        $milestones = $milestones->find('project = ' . $this->get('SESSION.project'));
+        $project = $this->get('SESSION.project');
+        
+        if($project) {
+            $milestones = new Milestone();
+            $milestones = $milestones->find(array('project = :project', array(':project' => $project)));
 
-        foreach ($milestones as $milestone)
-        {
-            $ms[$milestone->id]['infos'] = $milestone;
-            $ms[$milestone->id]['ticketCount'] = $helper->getTicketCount($milestone->id);
-
-            $ms[$milestone->id]['fullTicketCount'] = 0;
-            foreach ($ms[$milestone->id]['ticketCount'] as $cnt)
-                $ms[$milestone->id]['fullTicketCount'] += $cnt['count'];
-
-            $ms[$milestone->id]['openTickets'] = 0;
-            foreach ($ms[$milestone->id]['ticketCount'] as $j => $cnt)
+            foreach ($milestones as $milestone)
             {
-                $ms[$milestone->id]['ticketCount'][$j]['percent'] = round($cnt['count'] * 100 / $ms[$milestone->id]['fullTicketCount']);
+                $ms[$milestone->id]['infos'] = $milestone;
+                $ms[$milestone->id]['ticketCount'] = $helper->getTicketCount($milestone->id);
 
-                if ($ms[$milestone->id]['ticketCount'][$j]['state'] != 5)
-                    $ms[$milestone->id]['openTickets'] += $ms[$milestone->id]['ticketCount'][$j]['count'];
+                $ms[$milestone->id]['fullTicketCount'] = 0;
+                foreach ($ms[$milestone->id]['ticketCount'] as $cnt)
+                    $ms[$milestone->id]['fullTicketCount'] += $cnt['count'];
+
+                $ms[$milestone->id]['openTickets'] = 0;
+                foreach ($ms[$milestone->id]['ticketCount'] as $j => $cnt)
+                {
+                    $ms[$milestone->id]['ticketCount'][$j]['percent'] = round($cnt['count'] * 100 / $ms[$milestone->id]['fullTicketCount']);
+
+                    if ($ms[$milestone->id]['ticketCount'][$j]['state'] != 5)
+                        $ms[$milestone->id]['openTickets'] += $ms[$milestone->id]['ticketCount'][$j]['count'];
+                }
             }
-        }
 
-        $this->set('road', $ms);
+            $this->set('road', $ms);
+        }
+            
         $this->set('pageTitle', '{{@lng.roadmap}}');
         $this->set('template', 'roadmap.tpl.php');
-        $this->tpserve();
+        $this->tpserve();            
     }
 
     function showMilestone()

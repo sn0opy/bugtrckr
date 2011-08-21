@@ -159,6 +159,18 @@ h3 a:hover
     margin-bottom: 5px;
 }
 
+.info {
+    background: #CCF2FF;
+    border: solid 1px #80DFFF;
+    color: #333;
+    padding: 5px;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    margin-top: 5px;
+    margin-bottom: 5px;  
+}
+
 .projectText
 {
     width: 400px;
@@ -170,8 +182,15 @@ h3 a:hover
     margin-top: 20px;
 }
 
+.tab 
+{
+    padding-top: 2px;
+    padding-bottom: 5px;
+}
+
 .tabs
 {
+    padding-bottom: 5px;
     border-bottom: 1px solid #CCC;
 }
 
@@ -184,6 +203,8 @@ h3 a:hover
     border-right: 1px solid #CCC;
     padding-left: 10px;
     padding-right: 10px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
 }
 
 td.manageMember input, td.manageMember select
@@ -225,7 +246,7 @@ td.manageMember input, td.manageMember select
 
 .tabContent
 {
-    padding: 10px; 
+    padding: 40px; 
 }
 
 #tabContent_2, #tabContent_3, #tabContent_4, #tabContent_5
@@ -663,7 +684,7 @@ ul.sublist
     padding: 10px;
 }
 
-p.info
+.rminfo
 {
     color:	green;
     font-weight: bold;

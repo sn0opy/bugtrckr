@@ -34,7 +34,7 @@ $app->set('getPermission', function($permission) {
     $helper = new helper();
     return $helper->getPermission($permission);
 });
-        
+
 $app->route('GET /', 'cmain->start');
 $app->route('GET /roadmap', 'cmilestone->showRoadmap');
 $app->route('GET /timeline', 'ctimeline->showTimeline');

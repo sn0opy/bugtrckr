@@ -37,28 +37,35 @@ class cticket extends Controller
         
         $project = $this->get('SESSION.project');
 
-        $milestones = new Milestone();
-        $milestones = $milestones->find('project = ' . $project);
+        if($project) {        
+            $milestones = new Milestone();
+            $milestones = $milestones->find('project = ' . $project);
 
-		$msids = array();
-        foreach ($milestones as $ms)
-            $msids[] = $ms->id;
-		$string = implode($msids, ',');
+            $msids = array();
+            foreach ($milestones as $ms)
+                $msids[] = $ms->id;
+            $string = implode($msids, ',');
 
-        $tickets = new DisplayableTicket();
-        $tickets = $tickets->find('milestone IN (' . $string . ') AND ' .
-					'title LIKE \'%'.$search.'%\'' .
-			 		'ORDER BY ' . $order);
+            $tickets = new DisplayableTicket();
+            $tickets = $tickets->find('milestone IN (' . $string . ') AND ' .
+                        'title LIKE \'%'.$search.'%\'' .
+                        'ORDER BY ' . $order);
 
-        $categories = new Category();
-        $categories = $categories->find();
+            $categories = new Category();
+            $categories = $categories->find();
 
-        $this->set('milestones', $milestones);
-        $this->set('tickets', $tickets);
-        $this->set('categories', $categories);
-        $this->set('pageTitle', '{{@lng.tickets}}');
-        $this->set('template', 'tickets.tpl.php');
-        $this->tpserve();
+            $this->set('milestones', $milestones);
+            $this->set('tickets', $tickets);
+            $this->set('categories', $categories);
+            $this->set('pageTitle', '{{@lng.tickets}}');
+            $this->set('template', 'tickets.tpl.php');
+            $this->tpserve();
+        } else {
+            $this->set('pageTitle', '{{@lng.tickets}}');
+            $this->set('template', 'tickets.tpl.php');
+            $this->set('SESSION.failure', '{{@lng.noProject}}');
+            $this->tpserve();
+        }
     }
 
     /**

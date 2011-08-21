@@ -86,36 +86,42 @@
 	</form>
 	<br class="clearfix" />
 </div>
+<F3:check if="{{count(@tickets)}}">
+    <F3:true>
+        <table class="overview">
+            <thead>
+                <tr>
+                    <th><a href="{{@BASE}}/tickets/id">#</a></th>
+                    <th><a href="{{@BASE}}/tickets/title">{{@lng.title}}</a></th>
+                    <th><a href="{{@BASE}}/tickets/type">{{@lng.type}}</a></th>
+                    <th><a href="{{@BASE}}/tickets/state">{{@lng.status}}</a></th>
+                    <th><a href="{{@BASE}}/tickets/priority">{{@lng.priority}}</a></th>
+                    <th><a href="{{@BASE}}/tickets/created">{{@lng.created}}</a></th>
+                    <th>{{@lng.owner}}</th>
+                    <th>{{@lng.assigned}}</th>
+                </tr>
+            </thead>
 
-<table class="overview">
-    <thead>
-        <tr>
-            <th><a href="{{@BASE}}/tickets/id">#</a></th>
-			<th><a href="{{@BASE}}/tickets/title">{{@lng.title}}</a></th>
-			<th><a href="{{@BASE}}/tickets/type">{{@lng.type}}</a></th>
-			<th><a href="{{@BASE}}/tickets/state">{{@lng.status}}</a></th>
-            <th><a href="{{@BASE}}/tickets/priority">{{@lng.priority}}</a></th>
-            <th><a href="{{@BASE}}/tickets/created">{{@lng.created}}</a></th>
-            <th>{{@lng.owner}}</th>
-            <th>{{@lng.assigned}}</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        <F3:repeat group="{{@tickets}}" key="{{@i}}" value="{{@ticket}}">
-        <tr class="tr{{@i%2}}">
-            <td class="id">{{@i+1}}</td>
-            <td class="title">
-                <a href="{{@BASE}}/ticket/{{@ticket->tickethash}}">{{@ticket->title}}</a>
-			</td>
-			<td class="type">{{@ticket->typename}}</td>
-            <td class="state color{{@ticket->state}}">
-                {{@ticket->statusname}}</td>
-            <td class="priority">{{@ticket->priorityname}}</td>
-            <td class="created">{{date('d.m.Y H:i', @ticket->created)}}</td>
-            <td class="owner"><a href="{{@BASE}}/user/{{@ticket->username}}">{{@ticket->username}}</a></td>
-            <td class="owner"><a href="{{@BASE}}/user/{{@ticket->assignedname}}">{{@ticket->assignedname}}</a></td>
-        </tr>
-        </F3:repeat>
-    </tbody>
-</table>
+            <tbody>
+                <F3:repeat group="{{@tickets}}" key="{{@i}}" value="{{@ticket}}">
+                <tr class="tr{{@i%2}}">
+                    <td class="id">{{@i+1}}</td>
+                    <td class="title">
+                        <a href="{{@BASE}}/ticket/{{@ticket->tickethash}}">{{@ticket->title}}</a>
+                    </td>
+                    <td class="type">{{@ticket->typename}}</td>
+                    <td class="state color{{@ticket->state}}">
+                        {{@ticket->statusname}}</td>
+                    <td class="priority">{{@ticket->priorityname}}</td>
+                    <td class="created">{{date('d.m.Y H:i', @ticket->created)}}</td>
+                    <td class="owner"><a href="{{@BASE}}/user/{{@ticket->username}}">{{@ticket->username}}</a></td>
+                    <td class="owner"><a href="{{@BASE}}/user/{{@ticket->assignedname}}">{{@ticket->assignedname}}</a></td>
+                </tr>
+                </F3:repeat>
+            </tbody>
+        </table>
+    </F3:true>
+    <F3:false>
+        <div class="info clearfix">Sorry, couldn't find any tickets.</div>
+    </F3:false>
+</F3:check>

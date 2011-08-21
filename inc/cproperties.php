@@ -22,39 +22,46 @@ class cproperties extends Controller
     {
         $projectId = $this->get('SESSION.project');
 
-        $project = new Project;
-        $project->load(array('id = :id', array(':id' => $projectId)));
+        if($projectId) {      
+            $project = new Project;
+            $project->load(array('id = :id', array(':id' => $projectId)));
 
-        $role = new Role();
-        $roles = $role->find('projectId = ' . $projectId);
+            $role = new Role();
+            $roles = $role->find('projectId = ' . $projectId);
 
-        $projPerms = new user_perms();
-        $projPerms = $projPerms->find('projectId = ' . $projectId);
+            $projPerms = new user_perms();
+            $projPerms = $projPerms->find('projectId = ' . $projectId);
 
-        $milestone = new Milestone();
-        $milestones = $milestone->find('project = ' . $projectId);
+            $milestone = new Milestone();
+            $milestones = $milestone->find('project = ' . $projectId);
 
-        $user = new User();
-        $users = $user->find();
+            $user = new User();
+            $users = $user->find();
 
-        $categories = new Category();
-        $categories = $categories->find();
+            $categories = new Category();
+            $categories = $categories->find();
 
-        if (!$project->id) //|| !$roles || !$milestones || !$users || !$categories)
-        {
-            $this->tpfail("Failure while open Project");
-            return;
+            if (!$project->id) //|| !$roles || !$milestones || !$users || !$categories)
+            {
+                $this->tpfail("Failure while open Project");
+                return;
+            }
+
+            $this->set('users', $users);
+            $this->set('projMilestones', $milestones);
+            $this->set('projRoles', $roles);
+            $this->set('projMembers', $projPerms);
+            $this->set('projDetails', $project);
+            $this->set('projCategories', $categories);
+            $this->set('template', 'projectSettings.tpl.php');
+            $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}}');
+            $this->tpserve();
+        } else {
+            $this->set('SESSION.FAILURE', 'No project set.');
+            $this->set('template', 'projectSettings.tpl.php');
+            $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}}');
+            $this->tpserve();
         }
-
-        $this->set('users', $users);
-        $this->set('projMilestones', $milestones);
-        $this->set('projRoles', $roles);
-        $this->set('projMembers', $projPerms);
-        $this->set('projDetails', $project);
-        $this->set('projCategories', $categories);
-        $this->set('template', 'projectSettings.tpl.php');
-        $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}}');
-        $this->tpserve();
     }
 
     function projectAddMember()

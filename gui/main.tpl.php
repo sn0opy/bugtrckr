@@ -52,7 +52,9 @@
 				<li class="project_selector">
 					<form method="post" action="{{@BASE}}/project/select">
 						<select name="project" size="1" onBlur="submit();">
-                            <option value="new">{{@lng.newProject}}</option>
+                            <F3:check if="{{@SESSION.user.id}}">
+                                <option value="new">{{@lng.newProject}}</option>
+                            </F3:check>
 							<F3:repeat group="{{@projects}}" value="{{@project}}">
                                 <option value="{{@project->hash}}" {{(@project->id == @SESSION.project)?'selected="selected"':''}}>{{@project->name}}</option>
 							</F3:repeat>

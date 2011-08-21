@@ -79,6 +79,7 @@ return array('lng' => array(
     'settings' => 'Einstellungen',
     'project' => 'Projekt',
     'noAccess' => 'Du hast keinen Zugriff auf diesen Bereich.',
+    'noProject' => 'Du hast noch kein Projekt ausgewählt.',
     'members' => 'Mitglieder',
     'projectname' => 'Projektname',
     'projectdescription' => 'Prohjektbeschreibung',
@@ -98,5 +99,6 @@ return array('lng' => array(
     'newProject' => 'Neues Projekt',
     'comment' => 'Kommentar',
     'by' => 'von',
-    'search' => 'Suchen'
+    'search' => 'Suchen',
+    'noMilestones' => 'Zu diesem Projekt gibt es keine Meilensteine.'
 ));
