@@ -26,12 +26,24 @@
             $('.sortable').tablesorter({
                 sortList: [[5,1]] 
             });
+            
+            $('.showLayer').click(function() {
+               $('#darkBg').show();
+               $('.layer').fadeIn();
+               return false;
+            });
+            
+            $('.closeButton').click(function() {
+                $('.layer').fadeOut();
+                $('#darkBg').hide();
+                return false;
+            });
         }); 
         </script>
 	</head>
 
 	<body>
-        {{@PARAMS.tickets?'menuActive':''}}
+        <div id="darkBg"></div>
         <div id="head">
    			<h1><a href="{{@BASE}}/">{{@title}}</a></h1>
             <div id="menu">
@@ -68,38 +80,39 @@
                     </li>
                     <F3:check if="{{@SESSION.user}}">
                         <F3:true>
-                            <li class="alignright">Eingeloggt als <a href="{{@BASE}}/user/{{@SESSION.user->name}}" class="normLink"><strong class="normalText">{{@SESSION.user->name}}</strong></a> [<a href="/{{@BASE}}user/logout" class="normalText normLink">{{@lng.logout}}</a>]</li>
+                            <li class="alignright llfix">{{@lng.loggedInAs}} <a href="{{@BASE}}/user/{{@SESSION.user->name}}" class="normLink"><strong class="normalText">{{@SESSION.user->name}}</strong></a> [<a href="/{{@BASE}}user/logout" class="normalText normLink">{{@lng.logout}}</a>]</li>
                         </F3:true>
                         <F3:false>
-                            <li class="alignright"><a href="{{@BASE}}/user/login" onclick="document.getElementById('login').style.display = 'block'; return false" class="normLink">{{@lng.login}}</a></li>
+                            <li class="alignright llfix"><a href="{{@BASE}}/user/login" class="normLink showLayer">{{@lng.login}}</a></li>
                         </F3:false>
                     </F3:check>
                 </ul>
                 <br class="clearfix" />
-                <F3:check if="{{!@SESSION.user}}">
-                    <div id="login">
-                        <h3 class="floatleft">{{@lng.login}}</h3>
-                        <a class="closeButton" href="#" onclick="document.getElementById('login').style.display = 'none'">×</a>
-
-                        <form action="{{@BASE}}/user/login" method="post">
-                            <div class="formRow">
-                                <div class="formLabel">{{@lng.email}}: </div>
-                                <div class="formValue"><input type="text" name="email" /></div>
-                            </div>
-                            <div class="formRow">
-                                <div class="formLabel">{{@lng.password}}: </div>
-                                <div class="formValue"><input type="password" name="password" /></div>
-                            </div>
-                            <div class="formRow">
-                                <div class="formLabel"><input type="submit" value="{{@lng.login}}" /></div>
-                                <div class="formValue"><a href="{{@BASE}}/user/new">{{@lng.noaccount}}</a></div>
-                            </div>
-                        </form>
-                        <br class="clearfix" />
-                    </div>
-                </F3:check>
             </div>
         </div>
+        
+        <F3:check if="{{!@SESSION.user}}">
+            <div id="login" class="layer">
+                <h3 class="floatleft">{{@lng.login}}</h3>
+                <a class="closeButton" href="#">×</a>
+
+                <form action="{{@BASE}}/user/login" method="post" class="clearfix">
+                    <div class="formRow">
+                        <div class="formLabel">{{@lng.email}}: </div>
+                        <div class="formValue"><input type="text" name="email" /></div>
+                    </div>
+                    <div class="formRow">
+                        <div class="formLabel">{{@lng.password}}: </div>
+                        <div class="formValue"><input type="password" name="password" /></div>
+                    </div>
+                    <div class="formRow">
+                        <div class="formLabel"><input type="submit" value="{{@lng.login}}" /></div>
+                        <div class="formValue"><a href="{{@BASE}}/user/new">{{@lng.noaccount}}</a></div>
+                    </div>
+                </form>
+                <br class="clearfix" />
+            </div>
+        </F3:check>
 
         <div id="content">
 			<div id="innerContentLOL">

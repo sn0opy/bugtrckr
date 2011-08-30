@@ -7,15 +7,12 @@
 </div>
 
 <F3:check if="{{@getPermission('iss_addIssues')}}">
-    <button type="button" class="floatright"
-        onclick="document.getElementById('add').style.display = 'block'" >
-        {{@lng.addticket}}
-    </button>
+    <button type="button" class="floatright showLayer">{{@lng.addticket}}</button>
 </F3:check>
 
-<div class="add" id="add">
+<div class="layer" id="add">
     <h3 class="floatleft">{{@lng.addticket}}</h3>
-    <a class="closeButton" href="#" onclick="document.getElementById('add').style.display = 'none'; return false;">×</a>
+    <a class="closeButton" href="#">×</a>
 
 	<form method="post" action="{{@BASE}}/ticket/">
 		<div class="formRow">
@@ -103,13 +100,10 @@
             <tbody>
                 <F3:repeat group="{{@tickets}}" value="{{@ticket}}">
                 <tr>
-                    <td class="id">{{substr(@ticket->tickethash,0,5)}}</td>
-                    <td class="title">
-                        <a href="{{@BASE}}/ticket/{{@ticket->tickethash}}">{{@ticket->title}}</a>
-                    </td>
+                    <td class="id"><a href="{{@BASE}}/ticket/{{@ticket->tickethash}}">{{substr(@ticket->tickethash,0,5)}}</a></td>
+                    <td class="title"><a href="{{@BASE}}/ticket/{{@ticket->tickethash}}">{{@ticket->title}}</a></td>
                     <td class="type">{{@ticket->typename}}</td>
-                    <td class="state color{{@ticket->state}}">
-                        {{@ticket->statusname}}</td>
+                    <td class="state color{{@ticket->state}}">{{@ticket->statusname}}</td>
                     <td class="priority">{{@ticket->priorityname}}</td>
                     <td class="created">{{date('d.m.Y H:i', @ticket->created)}}</td>
                     <td class="owner"><a href="{{@BASE}}/user/{{@ticket->username}}">{{@ticket->username}}</a></td>

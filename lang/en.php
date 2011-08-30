@@ -99,5 +99,6 @@ return array('lng' => array(
     'comment' => 'Comment',
     'by' => 'by',
     'search' => 'Search',
-    'noMilestones' => 'This project does not have any milestones.'
+    'noMilestones' => 'This project does not have any milestones.',
+    'loggedInAs' => 'Logged in as'
 ));

@@ -100,5 +100,6 @@ return array('lng' => array(
     'comment' => 'Kommentar',
     'by' => 'von',
     'search' => 'Suchen',
-    'noMilestones' => 'Zu diesem Projekt gibt es keine Meilensteine.'
+    'noMilestones' => 'Zu diesem Projekt gibt es keine Meilensteine.',
+    'loggedInAs' => 'Eingeloggt als'
 ));
