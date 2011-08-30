@@ -24,7 +24,6 @@ $app->set('EXTEND', true);
 $app->set('GUI','gui/');
 $app->set('AUTOLOAD', 'inc/|inc/models/');
 $app->set('LOCALES','lang/');
-$app->set('LANGUAGE', 'de'); // TODO: remove this line when english localization is done too
 $app->set('PROXY', 1);
 
 F3::set('DB', new DB('sqlite:' .$dbFile));
@@ -39,7 +38,6 @@ $app->route('GET /', 'cmain->start');
 $app->route('GET /roadmap', 'cmilestone->showRoadmap');
 $app->route('GET /timeline', 'ctimeline->showTimeline');
 $app->route('GET /tickets', 'cticket->showTickets');
-$app->route('GET /tickets/@order', 'cticket->showTickets');
 $app->route('GET /ticket/@hash', 'cticket->showTicket');
 $app->route('GET /user/@name', 'cuser->showUser');
 $app->route('GET /user/new', 'cuser->showUserRegister');

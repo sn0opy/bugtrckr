@@ -32,6 +32,6 @@
         </form>
     </F3:true>
     <F3:false>
-        <div class="info">{{@lng.noAccess}}</div>
+        <div class="info message">{{@lng.noAccess}}</div>
     </F3:false>
 </F3:check>

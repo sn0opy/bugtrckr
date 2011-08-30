@@ -1,7 +1,7 @@
 <h2 class="floatleft">{{@lng.tickets}}</h2>
 
 <div class="floatright ticketSearch">
-	<form action="/search" method="post" id="searchForm">
+	<form action="{{@BASE}}/search" method="post" id="searchForm">
 		<input type="input" name="search" value="{{@SESSION.ticketSearch}}" id="searchInput" /> <input type="submit" value="{{@lng.search}}"/> <button type="button" title="Suche löschen" id="delSearch">x</button>
 	</form>
 </div>
@@ -15,11 +15,9 @@
 
 <div class="add" id="add">
     <h3 class="floatleft">{{@lng.addticket}}</h3>
-    <a class="closeButton" href="#" onclick="document.getElementById('add').style.display = 'none'; return false;">
-		x
-	</a>
+    <a class="closeButton" href="#" onclick="document.getElementById('add').style.display = 'none'; return false;">×</a>
 
-	<form method="POST" action="{{@BASE}}/ticket/">
+	<form method="post" action="{{@BASE}}/ticket/">
 		<div class="formRow">
 			<div class="formLabel">{{@lng.title}}</div>
 			<div class="formValue"><input type="text" name="title" /></div>
@@ -88,24 +86,24 @@
 </div>
 <F3:check if="{{count(@tickets)}}">
     <F3:true>
-        <table class="overview">
+        <table class="sortable zebra">
             <thead>
                 <tr>
-                    <th><a href="{{@BASE}}/tickets/id">#</a></th>
-                    <th><a href="{{@BASE}}/tickets/title">{{@lng.title}}</a></th>
-                    <th><a href="{{@BASE}}/tickets/type">{{@lng.type}}</a></th>
-                    <th><a href="{{@BASE}}/tickets/state">{{@lng.status}}</a></th>
-                    <th><a href="{{@BASE}}/tickets/priority">{{@lng.priority}}</a></th>
-                    <th><a href="{{@BASE}}/tickets/created">{{@lng.created}}</a></th>
+                    <th>#</th>
+                    <th>{{@lng.title}}</th>
+                    <th>{{@lng.type}}</th>
+                    <th>{{@lng.status}}</th>
+                    <th>{{@lng.priority}}</th>
+                    <th>{{@lng.created}}</th>
                     <th>{{@lng.owner}}</th>
                     <th>{{@lng.assigned}}</th>
                 </tr>
             </thead>
 
             <tbody>
-                <F3:repeat group="{{@tickets}}" key="{{@i}}" value="{{@ticket}}">
-                <tr class="tr{{@i%2}}">
-                    <td class="id">{{@i+1}}</td>
+                <F3:repeat group="{{@tickets}}" value="{{@ticket}}">
+                <tr>
+                    <td class="id">{{substr(@ticket->tickethash,0,5)}}</td>
                     <td class="title">
                         <a href="{{@BASE}}/ticket/{{@ticket->tickethash}}">{{@ticket->title}}</a>
                     </td>
@@ -122,6 +120,6 @@
         </table>
     </F3:true>
     <F3:false>
-        <div class="info clearfix">Sorry, couldn't find any tickets.</div>
+        <div class="info message clearfix">Sorry, couldn't find any tickets.</div>
     </F3:false>
 </F3:check>

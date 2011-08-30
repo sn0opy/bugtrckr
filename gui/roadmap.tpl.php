@@ -32,6 +32,6 @@
         </F3:repeat>
     </F3:true>
     <F3:false>
-        <p class="info clearfix">{{@lng.noMilestones}}</p>
+        <p class="info message clearfix">{{@lng.noMilestones}}</p>
     </F3:false>
 </F3:check>

@@ -55,6 +55,7 @@ class cproperties extends Controller
             $this->set('projCategories', $categories);
             $this->set('template', 'projectSettings.tpl.php');
             $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}}');
+            $this->set('onpage', 'settings');
             $this->tpserve();
         } else {
             $this->set('SESSION.FAILURE', 'No project set.');
@@ -210,6 +211,7 @@ class cproperties extends Controller
         $this->set('roleData', $role);
         $this->set('template', 'projectSettingsRole.tpl.php');
         $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.role}} › {{@roleData->name}}');
+        $this->set('onpage', 'settings');
         $this->tpserve();
     }
 
@@ -232,6 +234,7 @@ class cproperties extends Controller
         $this->set('msData', $milestone);
         $this->set('template', 'projectSettingsMilestone.tpl.php');
         $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.milestone}} › {{@msData->name}}');
+        $this->set('onpage', 'settings');
         $this->tpserve();
     }
 
@@ -300,6 +303,7 @@ class cproperties extends Controller
     {
         $this->set('template', 'projectSettingsRoleAdd.tpl.php');
         $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.addrole}}');
+        $this->set('onpage', 'settings');
         $this->tpserve();
     }
 
@@ -311,6 +315,7 @@ class cproperties extends Controller
         $this->set('today', date('Y-m-d', time()));
         $this->set('template', 'projectSettingsMilestoneAdd.tpl.php');
         $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.addmilestone}}');
+        $this->set('onpage', 'settings');
         $this->tpserve();
     }
 
@@ -321,6 +326,7 @@ class cproperties extends Controller
     {
         $this->set('template', 'projectSettingsCategoryAdd.tpl.php');
         $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.addcategory}}');
+        $this->set('onpage', 'settings');
         $this->tpserve();
     }
     
@@ -331,6 +337,7 @@ class cproperties extends Controller
     {
         $this->set('template', 'projectAdd.tpl.php');
         $this->set('pageTitle', '{{@lng.project}} › {{@lng.add}}');
+        $this->set('onpage', 'settings');
         $this->tpserve();
     }
     

@@ -31,7 +31,7 @@ class ctimeline extends Controller
         $this->set('activities', $activities);
         $this->set('pageTitle', '{{@lng.timeline}}');
         $this->set('template', 'timeline.tpl.php');
-
+        $this->set('onpage', 'timeline');
         $this->tpserve();
     }
 

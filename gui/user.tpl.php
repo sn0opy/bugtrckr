@@ -7,8 +7,8 @@
 </div>
 
 <h3>{{@lng.tickets}}:</h3>
-<table class="overview">
-<thead>
+<table class="zebra sortable">
+    <thead>
         <tr>
             <th>#</th>
 			<th>{{@lng.title}}</th>
@@ -22,9 +22,9 @@
     </thead>
 
     <tbody>
-        <F3:repeat group="{{@tickets}}" key="{{@i}}" value="{{@ticket}}">
-        <tr class="tr{{@i%2}}">
-            <td class="id">{{@i+1}}</td>
+        <F3:repeat group="{{@tickets}}" value="{{@ticket}}">
+        <tr>
+            <td class="id">{{substr(@ticket->tickethash,0,5)}}</td>
             <td class="title">
                 <a href="{{@BASE}}/ticket/{{@ticket->tickethash}}">{{@ticket->title}}</a>
 			</td>

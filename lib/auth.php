@@ -12,7 +12,7 @@
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package Auth
-		@version 2.0.0
+		@version 2.0.5
 **/
 
 //! Plugin for various user authentication methods
@@ -29,7 +29,7 @@ class Auth extends Base {
 	/**
 		Authenticate against SQL database;
 			AUTH global array elements:
-				db:<SQL-database> (default:'DB'),
+				db:<database-id> (default:'DB'),
 				table:<table-name>,
 				id:<userID-field>,
 				pw:<password-field>
@@ -39,7 +39,7 @@ class Auth extends Base {
 			@public
 	**/
 	static function sql($id,$pw) {
-		$auth=self::$vars['AUTH'];
+		$auth=&self::$vars['AUTH'];
 		foreach (array('table','id','pw') as $param)
 			if (!isset($auth[$param])) {
 				trigger_error(self::TEXT_AuthSetup);
@@ -47,8 +47,14 @@ class Auth extends Base {
 			}
 		if (!isset($auth['db']))
 			$auth['db']=self::ref('DB');
-		$axon=new Axon($auth['table'],$auth['db']);
-		$axon->load('{{@AUTH.id}}="'.$id.'" AND {{@AUTH.pw}}="'.$pw.'"');
+		$axon=new Axon($auth['table'],self::ref('AUTH.db'));
+		$axon->load(
+			array(
+				self::ref('AUTH.id').'=:id AND '.
+				self::ref('AUTH.pw').'=:pw',
+				array(':id'=>$id,':pw'=>$pw)
+			)
+		);
 		return $axon->dry()?FALSE:$axon;
 	}
 
@@ -65,7 +71,7 @@ class Auth extends Base {
 			@public
 	**/
 	static function nosql($id,$pw) {
-		$auth=self::$vars['AUTH'];
+		$auth=&self::$vars['AUTH'];
 		foreach (array('collection','id','pw') as $param)
 			if (!isset($auth[$param])) {
 				trigger_error(self::TEXT_AuthSetup);
@@ -73,7 +79,7 @@ class Auth extends Base {
 			}
 		if (!isset($auth['db']))
 			$auth['db']=self::ref('DB');
-		$m2=new M2($auth['collection'],$auth['db']);
+		$m2=new M2($auth['collection'],self::ref('AUTH.db'));
 		$m2->load(
 			array(
 				self::ref('AUTH.id')=>$id,
@@ -84,9 +90,9 @@ class Auth extends Base {
 	}
 
 	/**
-		Authenticate against Jig-based flat-file database;
+		Authenticate against Jig-mapped flat-file database;
 			AUTH global array elements:
-				db:<Jig-database> (default:'DB'),
+				db:<database-id> (default:'DB'),
 				table:<table-name>,
 				id:<userID-field>,
 				pw:<password-field>
@@ -96,7 +102,7 @@ class Auth extends Base {
 			@public
 	**/
 	static function jig($id,$pw) {
-		$auth=self::$vars['AUTH'];
+		$auth=&self::$vars['AUTH'];
 		foreach (array('table','id','pw') as $param)
 			if (!isset($auth[$param])) {
 				trigger_error(self::TEXT_AuthSetup);
@@ -104,7 +110,7 @@ class Auth extends Base {
 			}
 		if (!isset($auth['db']))
 			$auth['db']=self::ref('DB');
-		$jig=new Jig($auth['table'],$auth['db']);
+		$jig=new Jig($auth['table'],self::ref('AUTH.db'));
 		$jig->load(
 			array(
 				self::ref('AUTH.id')=>$id,

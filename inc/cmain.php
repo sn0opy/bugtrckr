@@ -19,6 +19,7 @@ class cmain extends Controller
     {
         $this->set('pageTitle', '{{@lng.home}}');
         $this->set('template', 'home.tpl.php');
+        $this->set('onpage', 'start');
         $this->tpserve();
     }
  

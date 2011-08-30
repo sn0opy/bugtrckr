@@ -52,6 +52,7 @@ class cmilestone extends Controller
             
         $this->set('pageTitle', '{{@lng.roadmap}}');
         $this->set('template', 'roadmap.tpl.php');
+        $this->set('onpage', 'roadmap');
         $this->tpserve();            
     }
 
@@ -93,6 +94,7 @@ class cmilestone extends Controller
         $this->set('milestone', $milestone);
         $this->set('pageTitle', '{{@lng.milestone}} › ' . $milestone->name);
         $this->set('template', 'milestone.tpl.php');
+        $this->set('onpage', 'roadmap');
         $this->tpserve();
     }
 

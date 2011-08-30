@@ -17,17 +17,11 @@ class cticket extends Controller
 
     function showTickets()
     {     
-        $order = 'id';
+        $order = 'created';
 		$search = '';
         
-        if($this->exists('SESSION.ticketOrder'))
-            $order = $this->get('SESSION.ticketOrder'); // we could also reroute to /tickets/@SESSION.ticketOrder
-
 		if ($this->exists('SESSION.ticketSearch'))
 			$search = $this->get('SESSION.ticketSearch');
-        
-        if($this->exists('PARAMS.order'))
-            $order = $this->get('PARAMS.order');
 
 		if($this->exists('POST.search'))
 			$search = $this->get('POST.search');
@@ -39,17 +33,17 @@ class cticket extends Controller
 
         if($project) {        
             $milestones = new Milestone();
-            $milestones = $milestones->find('project = ' . $project);
+            $milestones = $milestones->find(array('project = :project', array(':project' => $project)));
 
             $msids = array();
             foreach ($milestones as $ms)
                 $msids[] = $ms->id;
             $string = implode($msids, ',');
-
+            
             $tickets = new DisplayableTicket();
             $tickets = $tickets->find('milestone IN (' . $string . ') AND ' .
                         'title LIKE \'%'.$search.'%\'' .
-                        'ORDER BY ' . $order);
+                        'ORDER BY ' . $order. ' DESC');
 
             $categories = new Category();
             $categories = $categories->find();
@@ -59,6 +53,7 @@ class cticket extends Controller
             $this->set('categories', $categories);
             $this->set('pageTitle', '{{@lng.tickets}}');
             $this->set('template', 'tickets.tpl.php');
+            $this->set('onpage', 'tickets');
             $this->tpserve();
         } else {
             $this->set('pageTitle', '{{@lng.tickets}}');
@@ -105,6 +100,7 @@ class cticket extends Controller
         $this->set('states', $state->find('lang = "' .$this->get('LANGUAGE'). '"'));
         $this->set('pageTitle', '{{@lng.tickets}} › ' . $ticket->title);
         $this->set('template', 'ticket.tpl.php');
+        $this->set('onpage', 'tickets');
         $this->tpserve();
     }
 
