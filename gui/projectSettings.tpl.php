@@ -146,6 +146,7 @@
                     <thead>
                         <tr>
                             <th>{{@lng.role}}</th>
+                            <th>{{@lng.actions}}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -153,6 +154,9 @@
                         <tr>
                             <td class="title">
                                 <a href="{{@BASE}}/project/settings/role/{{@role->hash}}">{{@role->name}}</a>
+                            </td>
+                            <td class="action">
+                                <a href="{{@BASE}}/project/settings/role/delete/{{@role->hash}}">{{@lng.delete}}</a>
                             </td>
                         </tr>
                     </F3:repeat>

@@ -246,7 +246,7 @@ class cproperties extends Controller
         $roleHash = $this->get('POST.hash') ? $this->get('POST.hash') : helper::getFreeHash('Role');
 
         $role = new role();
-        if (F3::exists('POST.hash'))
+        if ($this->exists('POST.hash'))
         {
             $role->load(array('hash = :hash', array(':hash' => $roleHash)));
 
@@ -279,6 +279,31 @@ class cproperties extends Controller
             return $role->_id;
         else
             $this->reroute($this->get('BASE') . '/project/settings/role/' . $roleHash);
+    }
+    
+    
+    function deleteRole()
+    {
+        $hash = $this->get('PARAMS.hash');
+        
+        if(helper::getPermission('proj_manageRoles')) {
+            $ax = new Axon('Role');
+            $ax->load(array('hash = :hash', array(':hash' => $hash)));
+
+            $ax2 = new Axon('ProjectPermission');
+
+            if($ax2->found('roleId = '.$ax->id))
+            {
+                $this->tpfail('Role cannot be deleted because it\'s being used in another location.');
+                return;
+            }       
+
+            $ax->erase();
+            $this->set('SESSION.success', 'Role has been deleted.');
+            $this->reroute($this->get('BASE'). '/project/settings');     
+        } else {
+            $this->tpfail("You don't have permission to do this.");
+        }
     }
 
     /**

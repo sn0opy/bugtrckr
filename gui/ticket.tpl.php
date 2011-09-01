@@ -86,7 +86,13 @@
                         <select name="userId" size="1">
                             <option value=""></option>
                             <F3:repeat group="{{@users}}" value="{{@user}}">
-                                <option value="{{@user->id}}">{{@user->name}}</option>
+                                <F3:check if="{{@user->id==@ticket->assigned}}">
+                                    <F3:true>
+                                        <option value="{{@user->id}}" selected="selected">{{@user->name}}</option>
+                                    </F3:true>
+                                    <F3:false>
+                                        <option value="{{@user->id}}">{{@user->name}}</option>
+                                    </F3:false>
                             </F3:repeat>
                         </select>
                     </div>

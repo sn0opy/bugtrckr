@@ -101,5 +101,7 @@ return array('lng' => array(
     'by' => 'von',
     'search' => 'Suchen',
     'noMilestones' => 'Zu diesem Projekt gibt es keine Meilensteine.',
-    'loggedInAs' => 'Eingeloggt als'
+    'loggedInAs' => 'Eingeloggt als',
+    'actions' => 'Aktionen'
+    
 ));

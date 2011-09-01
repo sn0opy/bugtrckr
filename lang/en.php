@@ -100,5 +100,6 @@ return array('lng' => array(
     'by' => 'by',
     'search' => 'Search',
     'noMilestones' => 'This project does not have any milestones.',
-    'loggedInAs' => 'Logged in as'
+    'loggedInAs' => 'Logged in as',
+    'actions' => 'Actions'
 ));
