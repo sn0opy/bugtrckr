@@ -37,6 +37,7 @@ class cuser extends Controller
         $this->set('tickets', $tickets);
         $this->set('template', 'user.tpl.php');
         $this->set('pageTitle', '{{@lng.user}} › ' . $name);
+        $this->set('onpage', 'user');
         $this->tpserve();
     }
     
@@ -47,6 +48,7 @@ class cuser extends Controller
     {
         $this->set('template', 'userRegister.tpl.php');
         $this->set('pageTitle', '{{@lng.user}} › {{@lng.registration}}');
+        $this->set('onpage', 'registration');
         $this->tpserve();
     }
 
@@ -85,6 +87,7 @@ class cuser extends Controller
     {
         $this->set('template', 'userLogin.tpl.php');
         $this->set('pageTitle', '{{@lng.user}} › {{@lng.login}}');
+        $this->set('onpage', 'login');
         $this->tpserve();
     }
 

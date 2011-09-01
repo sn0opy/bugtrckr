@@ -38,6 +38,10 @@
                 $('#darkBg').hide();
                 return false;
             });
+            
+            $('.succes').live(function() {
+                $(this).fadeOut();
+            });
         }); 
         </script>
 	</head>
@@ -63,7 +67,7 @@
                     </F3:check>
                     <F3:check if="{{@SESSION.user}}">
                         <F3:false>
-                            <li><a href="{{@BASE}}/user/new">{{@lng.registration}}</a></li>
+                            <li><a href="{{@BASE}}/user/new" {{@onpage=='registration'?'class="menuActive"':''}}>{{@lng.registration}}</a></li>
                         </F3:false>
                     </F3:check>                
                     <li class="project_selector">

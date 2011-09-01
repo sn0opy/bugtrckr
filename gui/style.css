@@ -10,7 +10,6 @@ body
     font-size: 11pt;
     font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
     min-width: 900px;
-    background: #FFF;
 }
 
 a:hover
@@ -225,18 +224,12 @@ td.manageMember input, td.manageMember select
 
 .tabs .active
 {
-    background: #FFF;
     font-weight: bold;
 }
 
 .tabs .active a
 {
     border-bottom: 1px solid #FFF;
-}
-
-.tabs li:hover
-{
-    background: #FFF;
 }
 
 .tabContent
