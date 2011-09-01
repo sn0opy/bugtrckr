@@ -41,22 +41,22 @@
     <hr />
 
     <h3>{{@lng.description}}</h3>
-
-    <p>
-		{{nl2br(@ticket->description)}}
-    </p>
+    <p>{{nl2br(@ticket->description)}}</p>
 
 </div>
 
 <div class="ticket_timeline">
     <h3>Ticket Timeline</h3>
 
-    <table class="overview">
+    <table>
+        <thead>
         <tr>
             <th>{{@lng.description}}</th>
             <th>{{@lng.changed}}</th>
             <th>{{@lng.by}}</th>
         </tr>
+        </thead>
+        <tbody>
         <F3:repeat group="{{@activities}}" key="{{@i}}" value="{{@activity}}">
             <tr class="tr{{@i%2}}">
                 <td>{{@activity->description}}
@@ -68,6 +68,7 @@
                 <td><a href="{{@BASE}}/user/{{@activity->username}}">{{@activity->username}}</a></td>
             </tr>
         </F3:repeat>
+        </tbody>
     </table>
 </div>
 

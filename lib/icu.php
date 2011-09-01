@@ -12,7 +12,7 @@
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package ICU
-		@version 2.0.2
+		@version 2.0.5
 **/
 
 //! Language support tools
@@ -206,6 +206,9 @@ class ICU extends Base {
 			'zh'=>'Chinese',
 			'zu'=>'Zulu'
 		);
+	static
+		//! Current locale
+		$locale;
 
 	/**
 		Load appropriate dictionary files
@@ -240,8 +243,10 @@ class ICU extends Base {
 			array_unshift($list,$match[0]);
 			if (extension_loaded('intl'))
 				Locale::setDefault($match[0]);
-			else
+			else {
+				self::$locale=setlocale(LC_ALL,NULL);
 				setlocale(LC_ALL,self::$languages[$match[0]]);
+			}
 		}
 		// Add English as fallback
 		array_unshift($list,'en');
@@ -252,6 +257,8 @@ class ICU extends Base {
 				// Combine dictionaries and assign key/value pairs
 				F3::mset($trans);
 		}
+		if (!extension_loaded('intl'))
+			setlocale(LC_ALL,NULL);
 	}
 
 	/**
@@ -266,6 +273,9 @@ class ICU extends Base {
 		if (extension_loaded('intl'))
 			return msgfmt_format_message(Locale::getDefault(),$str,
 				is_array($args)?$args:array($args));
+		self::$locale=setlocale(LC_ALL,NULL);
+		if (preg_match('/\w+\b/',self::$vars['LANGUAGE'],$match))
+			setlocale(LC_ALL,self::$languages[$match[0]]);
 		$info=localeconv();
 		return preg_replace_callback(
 			'/{(\d+)(?:,(\w+)(?:,(\w+))?)?}/',
@@ -298,6 +308,7 @@ class ICU extends Base {
 			},
 			$str
 		);
+		setlocale(LC_ALL,NULL);
 	}
 
 }

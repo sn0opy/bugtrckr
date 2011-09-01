@@ -44,7 +44,7 @@
                 </form>
             </F3:true>
             <F3:false>
-                <div class="error">{{@lng.noAccess}}</div>
+                <div class="failure message">{{@lng.noAccess}}</div>
             </F3:false>
         </F3:check>
     </div>
@@ -52,16 +52,16 @@
         {{* members *}}
         <F3:check if="{{@getPermission('proj_manageMembers')}}">
             <F3:true>
-                <table class="overview">
+                <table class="sortable zebra">
                     <thead>
                         <tr>
-                            <th><a href="#">Name</a></th>
-                            <th><a href="#">Rolle</a></th> 
+                            <th>Name</th>
+                            <th>Rolle</th> 
                         </tr>
                     </thead>
                     <tbody>
-                    <F3:repeat group="{{@projMembers}}" key="{{@i}}" value="{{@member}}">
-                        <tr class="tr{{@i%2}}">
+                    <F3:repeat group="{{@projMembers}}" value="{{@member}}">
+                        <tr>
                             <td class="title">
                                 <a href="{{@BASE}}/user/{{@member->name}}">{{@member->name}} {{@member->role}}</a>
                             </td>
@@ -106,7 +106,7 @@
                 </form>
             </F3:true>
             <F3:false>
-                <div class="error">{{@lng.noAccess}}</div>
+                <div class="failure message">{{@lng.noAccess}}</div>
             </F3:false>
         </F3:check>
     </div>
@@ -114,10 +114,10 @@
         {{* milestones *}}
         <F3:check if="{{@getPermission('proj_manageMilestones')}}">
             <F3:true>
-                <table class="overview">
+                <table>
                     <thead>
                         <tr>
-                            <th><a href="#">{{@lng.milestone}}</a></th>
+                            <th>{{@lng.milestone}}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -133,7 +133,7 @@
                 <a href="{{@BASE}}/project/settings/milestone/add">{{@lng.addmilestone}}</a>
             </F3:true>
             <F3:false>
-                <div class="error">{{@lng.noAccess}}</div>
+                <div class="failure message">{{@lng.noAccess}}</div>
             </F3:false>
         </F3:check>
     </div>
@@ -142,15 +142,15 @@
         {{* roles *}}
         <F3:check if="{{@getPermission('proj_manageRoles')}}">
             <F3:true>
-                <table class="overview">
+                <table class="zebra sortable">
                     <thead>
                         <tr>
-                            <th><a href="#">{{@lng.role}}</a></th>
+                            <th>{{@lng.role}}</th>
                         </tr>
                     </thead>
                     <tbody>
-                    <F3:repeat group="{{@projRoles}}" key="{{@i}}" value="{{@role}}">
-                        <tr class="tr{{@i%2}}">
+                    <F3:repeat group="{{@projRoles}}" value="{{@role}}">
+                        <tr>
                             <td class="title">
                                 <a href="{{@BASE}}/project/settings/role/{{@role->hash}}">{{@role->name}}</a>
                             </td>
@@ -161,7 +161,7 @@
                 <a href="{{@BASE}}/project/settings/role/add">{{@lng.addrole}}</a>
             </F3:true>
             <F3:false>
-                <div class="error">{{@lng.noAccess}}
+                <div class="failure message">{{@lng.noAccess}}
             </F3:false>
         </F3:check>
     </div>
@@ -171,15 +171,15 @@
         {{* roles *}}
         <F3:check if="{{@getPermission('proj_manageCategories')}}">
             <F3:true>
-                <table class="overview">
+                <table class="sortable zebra">
                     <thead>
                         <tr>
-                            <th><a href="#">{{@lng.category}}</a></th>
+                            <th>{{@lng.category}}</th>
                         </tr>
                     </thead>
                     <tbody>
-                    <F3:repeat group="{{@projCategories}}" key="{{@i}}" value="{{@category}}">
-                        <tr class="tr{{@i%2}}">
+                    <F3:repeat group="{{@projCategories}}" value="{{@category}}">
+                        <tr>
                             <td class="title">
                                 {{@category->name}}
                             </td>
@@ -190,7 +190,7 @@
                 <a href="{{@BASE}}/project/settings/category/add">{{@lng.addcategory}}</a>
             </F3:true>
             <F3:false>
-                <div class="error">{{@lng.noAccess}}</div>
+                <div class="failure message">{{@lng.noAccess}}</div>
             </F3:false>
         </F3:check>
     </div>

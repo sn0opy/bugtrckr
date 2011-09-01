@@ -20,29 +20,29 @@
     </F3:false>
 </F3:check>
 
-<p class="info">{{@stats.openTickets}} {{@lng.ticketsleft}}</p>
+<p class="rminfo">{{@stats.openTickets}} {{@lng.ticketsleft}}</p>
 <p>{{nl2br(@milestone->description)}}</p>
 
 <div class="milestoneTickets">
     <h3>{{@lng.tickets}}:</h3>
-    <table class="overview">
+    <table class="sortable zebra">
         <thead>
             <tr>
-                <th><a href="{{@BASE}}/tickets/id">#</a></th>
-                <th><a href="{{@BASE}}/tickets/title">{{@lng.title}}</a></th>
-                <th><a href="{{@BASE}}/tickets/type">{{@lng.type}}</a></th>
-                <th><a href="{{@BASE}}/tickets/state">{{@lng.status}}</a></th>
-                <th><a href="{{@BASE}}/tickets/priority">{{@lng.priority}}</a></th>
-                <th><a href="{{@BASE}}/tickets/created">{{@lng.created}}</a></th>
+                <th>#</a></th>
+                <th>{{@lng.title}}</th>
+                <th>{{@lng.type}}</th>
+                <th>{{@lng.status}}</th>
+                <th>{{@lng.priority}}</th>
+                <th>{{@lng.created}}</th>
                 <th>{{@lng.owner}}</th>
                 <th>{{@lng.assigned}}</th>
             </tr>
         </thead>
 
         <tbody>
-        <F3:repeat group="{{@tickets}}" key="{{@i}}" value="{{@ticket}}">
-            <tr class="tr{{@i%2}}">
-                <td class="id">{{@i+1}}</td>
+        <F3:repeat group="{{@tickets}}" value="{{@ticket}}">
+            <tr>
+                <td class="id">{{substr(@ticket->tickethash,0,5)}}</td>
                 <td class="title">
                     <a href="{{@BASE}}/ticket/{{@ticket->tickethash}}">{{@ticket->title}}</a>
                 </td>

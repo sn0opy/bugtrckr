@@ -1,7 +1,7 @@
 <?php
 
 
-DB::sql('CREATE TABLE Ticket (id INTEGER PRIMARY KEY AUTO_INCREMENT, hash VARCHAR(12) UNIQUE, title varchar(40), description text, created int, owner int, assigned int, type int, state int, priority int, category int, milestone int);');
+DB::sql('CREATE TABLE Ticket (id INTEGER PRIMARY KEY AUTOINCREMENT, hash VARCHAR(12) UNIQUE, title varchar(40), description text, created int, owner int, assigned int, type int, state int, priority int, category int, milestone int);');
 DB::sql('CREATE TABLE User (id integer PRIMARY KEY AUTOINCREMENT, name VARCHAR(45), hash varchar(12) UNIQUE, password varchar, salt varchar, email varchar, admin bool, lastProject int);');
 DB::sql('CREATE TABLE Project (id INTEGER PRIMARY KEY AUTOINCREMENT, hash VARCHAR(12) UNIQUE, name VARCHAR, description TEXT, public BOOL);');
 DB::sql('CREATE TABLE Milestone (id INTEGER PRIMARY KEY AUTOINCREMENT, hash VARCHAR(12) UNIQUE, name varchar, description text, finished int, project int);');

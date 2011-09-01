@@ -12,7 +12,7 @@
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package Template
-		@version 2.0.3
+		@version 2.0.5
 **/
 
 //! Template engine
@@ -20,54 +20,8 @@ class Template extends Base {
 
 	//@{ Locale-specific error/exception messages
 	const
-		TEXT_Render='Template %s cannot be rendered',
-		TEXT_Recursive='Recursive <include %s> detected';
+		TEXT_Render='Template %s cannot be rendered';
 	//@}
-
-	private static
-		//! Tracker for included files
-		$includes=array();
-
-	/**
-		Render markup string
-			@return string
-			@param $text string
-			@param $globals boolean
-			@public
-	**/
-	static function markup($text,$globals=TRUE) {
-		// Parse raw template
-		$doc=new F3markup($globals);
-		$text=$doc->load($text);
-		// Render in a sandbox
-		$instance=new F3instance;
-		ob_start();
-		if (ini_get('allow_url_fopen') && ini_get('allow_url_include'))
-			// Stream wrap
-			$instance->sandbox('data:text/plain,'.urlencode($text));
-		else {
-			// Save PHP-equivalent file in temporary folder
-			if (!is_dir(self::$vars['TEMP']))
-				self::mkdir(self::$vars['TEMP']);
-			$hmd5=self::hash(md5($text));
-			$hash='tpl.'.$hmd5;
-			$temp=self::$vars['TEMP'].$_SERVER['SERVER_NAME'].'.'.$hash;
-			// Create semaphore
-			$hash='sem.'.$hmd5;
-			$cached=Cache::cached($hash);
-			while ($cached)
-				// Locked by another process
-				usleep(mt_rand(0,100));
-			Cache::set($hash,TRUE);
-			file_put_contents($temp,$text,LOCK_EX);
-			// Remove semaphore
-			Cache::clear($hash);
-			$instance->sandbox($temp);
-		}
-		$out=ob_get_clean();
-		unset($instance);
-		return self::$vars['TIDY']?self::tidy($out):$out;
-	}
 
 	/**
 		Render template
@@ -88,30 +42,27 @@ class Template extends Base {
 			}
 		}
 		if (!$found) {
-			if (!self::$includes)
-				trigger_error(sprintf(self::TEXT_Render,$file));
+			trigger_error(sprintf(self::TEXT_Render,$file));
 			return '';
 		}
-		if (in_array($view,self::$includes)) {
-			trigger_error(sprintf(self::TEXT_Recursive,$file));
-			return '';
-		}
-		if (PHP_SAPI!='cli' && !headers_sent() && !self::$includes)
+		if (PHP_SAPI!='cli' && !headers_sent())
 			// Send HTTP header with appropriate character set
 			header(self::HTTP_Content.': '.$mime.'; '.
 				'charset='.self::$vars['ENCODING']);
-		self::$includes[]=$view;
 		$hash='tpl.'.self::hash($view);
 		$cached=Cache::cached($hash);
-		if ($cached && filemtime($view)<$cached)
-			// Retrieve PHP-compiled template from cache
-			$text=Cache::get($hash);
+		if ($cached && filemtime($view)<$cached) {
+			if (self::$vars['CACHE'])
+				// Retrieve PHP-compiled template from cache
+				$text=Cache::get($hash);
+		}
 		else {
 			// Parse raw template
-			$doc=new F3markup($globals);
-			$text=$doc->load(file_get_contents($view));
-			// Save PHP-compiled template to cache
-			Cache::set($hash,$text);
+			$doc=new F3markup($mime,$globals);
+			$text=$doc->load(self::getfile($view));
+			if (self::$vars['CACHE'] && $doc->cache)
+				// Save PHP-compiled template to cache
+				Cache::set($hash,$text);
 		}
 		// Render in a sandbox
 		$instance=new F3instance;
@@ -133,7 +84,7 @@ class Template extends Base {
 					// Locked by another process
 					usleep(mt_rand(0,100));
 				Cache::set($hash,TRUE);
-				file_put_contents($temp,$text,LOCK_EX);
+				self::putfile($temp,$text);
 				// Remove semaphore
 				Cache::clear($hash);
 			}
@@ -141,8 +92,7 @@ class Template extends Base {
 		}
 		$out=ob_get_clean();
 		unset($instance);
-		unset(self::$includes[array_search($view,self::$includes)]);
-		return !self::$includes && self::$vars['TIDY']?self::tidy($out):$out;
+		return self::$vars['TIDY']?self::tidy($out):$out;
 	}
 
 }
@@ -158,8 +108,13 @@ class F3markup extends Base {
 	//@}
 
 	public
+		//! MIME type
+		$mime,
 		//! Enable/disable PHP globals
-		$globals=TRUE;
+		$globals=TRUE,
+		//! Enable/disable template caching
+		$cache=TRUE;
+
 	private
 		//! Parsed markup string
 		$tree=array(),
@@ -180,7 +135,7 @@ class F3markup extends Base {
 				'/{{(.+?)}}/s',
 				function($expr) use(&$syms,$self,$echo) {
 					$out=preg_replace_callback('/(?!\w)'.
-						'@(\w+(?:\[[^\]]+\]|\.\w+(?![\w\(]))*'.
+						'@(\w+(?:\[[^@\]]+\]|\.\w+(?![\w\(]))*'.
 						'(?:\s*->\s*\w+)?)(\s*\([^\)]*\))?(?:\s*\\\(.+))?/',
 						function($var) use(&$syms,$self) {
 							//Return stringified framework variable
@@ -193,10 +148,12 @@ class F3markup extends Base {
 								);
 								return FALSE;
 							}
+							$isfunc=isset($var[2]) && $var[2];
 							if (in_array($match[1],$syms))
-								return '$_'.$self::remix($var[1]);
+								return '$_'.$self::remix($var[1]).
+									($isfunc?$var[2]:'');
 							$str='F3::get('.var_export($var[1],TRUE).')';
-							if (isset($var[2]) && $var[2])
+							if ($isfunc)
 								$str='call_user_func_array('.$str.','.
 									'array'.$var[2].')';
 							elseif (isset($var[3]))
@@ -208,11 +165,11 @@ class F3markup extends Base {
 								$syms[]=$match[1];
 								$str='($_'.$match[1].'='.$str.')';
 							}
-							return $str;
+							return trim($str);
 						},
 						$expr[1]
 					);
-					return $echo?('<?php echo '.$out.'; ?>'):$out;
+					return $echo?('<?php echo '.trim($out).'; ?>'):$out;
 				},
 			$str
 		);
@@ -276,10 +233,19 @@ class F3markup extends Base {
 									return;
 								}
 							}
-							$out.='<?php '.(isset($ival)?
-								('if ('.$cond.') '):'').
-								'echo Template::serve('.
-									var_export($hvar,TRUE).'); ?>';
+							$doc=new F3markup($this->mime,$this->globals);
+							$file=self::resolve($hvar);
+							if ($hvar!=$file)
+								$this->cache=FALSE;
+							$file=self::$vars['GUI'].$file;
+							if (is_file($file)) {
+								$text=$doc->load(
+									self::getfile($file),$this->syms
+								);
+								$out.=isset($ival)?
+									('<?php if ('.trim($cond).'): ?>'.
+										$text.'<?php endif; ?>'):$text;
+							}
 							break;
 						case 'loop':
 							// <loop> directive
@@ -340,7 +306,6 @@ class F3markup extends Base {
 								}
 							}
 							unset($nval['@attrib']);
-							unset($nval['@attrib']);
 							if (isset($vvar))
 								$this->syms[]=$vvar;
 							else
@@ -351,7 +316,7 @@ class F3markup extends Base {
 								$this->syms[]=$cvar;
 							$out.='<?php '.
 								(isset($cvar)?('$_'.$cvar.'=0; '):'').
-								'foreach (('.$gstr.'?:array()) as '.
+								'foreach (('.trim($gstr).'?:array()) as '.
 								(isset($kvar)?('$_'.$kvar.'=>'):'').
 									'$_'.$vvar.'): '.
 								(isset($cvar)?('$_'.$cvar.'++; '):'').'?>'.
@@ -371,7 +336,21 @@ class F3markup extends Base {
 									'if="'.addcslashes($ival,'"').'"'));
 								return;
 							}
-							$out.='<?php if ('.$cond.'): ?>'.
+							// Is <true> is defined ahead of <false>?
+							foreach ($nval as $pos=>$blk)
+								if (is_array($blk))
+									foreach ($blk as $ckey=>$cval)
+										if (preg_match('/(?:F3:)?'.
+											'(?:true|false)/i',$ckey))
+											${$ckey[0].'block'}=
+												array($pos,$blk);
+							if (isset($tblock) && isset($fblock) &&
+								$tblock[0]>$fblock[0])
+								// Swap <true> and <false> blocks
+								// <false> is defined ahead of <true>
+								list($nval[$tblock[0]],$nval[$fblock[0]])=
+									array($fblock[1],$tblock[1]);
+							$out.='<?php if ('.trim($cond).'): ?>'.
 								$this->build($nval).
 								'<?php endif; ?>';
 							break;
@@ -397,9 +376,12 @@ class F3markup extends Base {
 		Load markup from string
 			@return string
 			@param $text string
+			@param $syms array
 			@public
 	**/
-	function load($text) {
+	function load($text,array $syms=NULL) {
+		if ($syms)
+			$this->syms=$syms;
 		// Remove PHP code and alternative exclude-tokens
 		$text=preg_replace(
 			'/<\?(?:php)?.+?\?>|{{\*.+?\*}}/is','',trim($text));
@@ -412,9 +394,9 @@ class F3markup extends Base {
 		$len=strlen($text);
 		$ptr=0;
 		$temp='';
-		while ($ptr<$len) {
+		while ($ptr<$len)
 			if (preg_match('/^<(\/?)'.
-				'(?:F3+:)?(include|exclude|loop|repeat|check|true|false)\b'.
+				'(?:F3:)?(include|exclude|loop|repeat|check|true|false)\b'.
 				'((?:\s+\w+s*=\s*(?:"(?:.+?)"|\'(?:.+?)\'))*)\s*(\/?)>/is',
 				substr($text,$ptr),$match)) {
 				if (strlen($temp))
@@ -464,7 +446,6 @@ class F3markup extends Base {
 				$temp.=$text[$ptr];
 				$ptr++;
 			}
-		}
 		if (strlen($temp))
 			$node[]=$temp;
 		unset($node);
@@ -474,10 +455,12 @@ class F3markup extends Base {
 
 	/**
 		Override base constructor
+			@param $mime string
 			@param $globals boolean
 			@public
 	**/
-	function __construct($globals) {
+	function __construct($mime,$globals) {
+		$this->mime=$mime;
 		$this->globals=$globals;
 	}
 

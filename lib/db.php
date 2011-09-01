@@ -12,7 +12,7 @@
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package DB
-		@version 2.0.3
+		@version 2.0.5
 **/
 
 //! SQL data access layer
@@ -275,6 +275,7 @@ class DB extends Base {
 	function session($table='sessions') {
 		$self=$this;
 		session_set_save_handler(
+			// Open
 			function($path,$name) use($self,$table) {
 				// Support these engines
 				$cmd=array(
@@ -307,14 +308,17 @@ class DB extends Base {
 				register_shutdown_function('session_commit');
 				return TRUE;
 			},
+			// Close
 			function() {
 				return TRUE;
 			},
+			// Read
 			function($id) use($table) {
 				$axon=new Axon($table);
 				$axon->load(array('id=:id',array(':id'=>$id)));
 				return $axon->dry()?FALSE:$axon->data;
 			},
+			// Write
 			function($id,$data) use($table) {
 				$axon=new Axon($table);
 				$axon->load(array('id=:id',array(':id'=>$id)));
@@ -324,11 +328,13 @@ class DB extends Base {
 				$axon->save();
 				return TRUE;
 			},
+			// Delete
 			function($id) use($table) {
 				$axon=new Axon($table);
 				$axon->erase(array('id=:id',array(':id'=>$id)));
 				return TRUE;
 			},
+			// Cleanup
 			function($max) use($table) {
 				$axon=new Axon($table);
 				$axon->erase('stamp+'.$max.'<'.time());

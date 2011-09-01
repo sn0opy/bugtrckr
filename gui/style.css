@@ -4,44 +4,22 @@
     padding: 0px;
 }
 
-@font-face {
-    font-family: 'OpenSans';
-    src: url('misc/opensans-webfont.eot');
-    src: url('misc/opensans-webfont.eot?#iefix') format('embedded-opentype'),
-         url('misc/opensans-webfont.woff') format('woff'),
-         url('misc/opensans-webfont.ttf') format('truetype'),
-         url('misc/opensans-webfont.svg#OpenSans') format('svg');
-    font-weight: normal;
-    font-style: normal;
-}
-
 body
 {
     color: #333;
-    font-size: 10pt;
-    font-family: OpenSans, Helvetica, Calibri, sans-serif;
+    font-size: 11pt;
+    font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
     min-width: 900px;
-    background: #FFF;
-}
-
-a
-{
-    border-bottom: 1px dotted #333;
 }
 
 a:hover
 {
-    border-bottom: none;
+    text-decoration: underline;
 }
 
-h1 a, h2 a, h3 a
+h1 a, h2 a, h3 a, #menu a
 {
-    border-bottom: none;
-}
-
-h3 a:hover
-{
-    border-bottom: 1px dotted #333;
+    text-decoration: none !important;
 }
 
 /* 
@@ -49,18 +27,29 @@ h3 a:hover
  */
 #head
 {
-    background: #068 url(img/headBg.png);
+    background: #068 url(img/headBgN.png);
     height: 50px;
-    font: 10pt Georgia;
+    line-height: 50px;
+    padding-left: 20px;
+    box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.4);
+}
+
+#head h1 {
+    font-size: 18pt;
+    font-family: Georgia;
+}
+
+.llfix {
+    padding-right: 10px;
 }
 
 #menu
 {
-    background: #068 url(img/headBg.png);
     padding: 10px;
-    border-bottom: 1px solid #333;
+    line-height: 30px;
     color: #FFF;
     text-shadow: 1px 1px 1px #000;
+    font-size: 10pt;
 }
 
 #menu ul
@@ -71,36 +60,41 @@ h3 a:hover
 #menu li
 {
     float: left;
-    margin-right: 10px;
-    margin-left: 10px;
-    border-bottom: 3px solid #068;
+    margin-right: 5px;
+    margin-left: 5px;
+    border-bottom: 3px solid transparent;
 }
 
 #menu li.project_selector
 {
 	border-bottom: 0px;
+    background: none !important;
 }
 
 #menu a
 {
-    text-transform: uppercase;
     border: none;
     color: #FFF;
+    padding: 6px;
+    padding-top: 15px;
+    padding-bottom: 15px;
 }
 
-#menu li:hover a
+#menu li:hover a, .menuActive
 {
-    border-bottom: 2px solid #FFF;
+    background: rgba(0,0,0,0.2);
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    box-shadow: inset 1px 1px 3px rgba(0,0,0,0.4);
 }
 
-#menu li:hover a.normLink
+#menu li a.normLink
 {
     border-bottom: none;
-}
-
-#menu li a.normLink:hover
-{
-    border-bottom: 1px dotted #FFF;
+    padding: 0px;
+    background: none;
+    box-shadow: none;
 }
 
 #menu select
@@ -127,16 +121,17 @@ h3 a:hover
 {
     clear: both;
     text-align: center;
-    border-top: 1px dotted #DDD;
     padding-top: 10px;
     color: #CCC;
+    font-size: 8pt;
 }
 
-.failure
-{
-    background: #FAA;
-    border: solid 1px #F54;
-    color: #333;
+.message {
+    background-repeat: repeat-x;
+    border: rgba(0, 0, 0, 0.102);
+    border-bottom-color: rgba(0, 0, 0, 0.251);
+    text-shadow: 0px -1px 0px rgba(0, 0, 0, 0.251);
+    color: #FFF;
     margin: 0 auto;
     padding: 5px;
     border-radius: 3px;
@@ -144,19 +139,30 @@ h3 a:hover
     -webkit-border-radius: 3px;
     margin-top: 5px;
     margin-bottom: 5px;
+    width: 90%;
+}
+
+.failure
+{
+    background-color: #c43c35;
+    background-image: -o-linear-gradient(top, #ee5f5b, #c43c35);
+    background-image: -webkit-linear-gradient(top, #ee5f5b, #c43c35); 
+    background-image: -moz-linear-gradient(top, #ee5f5b, #c43c35);
 }
 
 .success
 {
-    background: #D6FFD6;
-    border: solid 1px #00D600;
-    color: #333;
-    padding: 5px;
-    border-radius: 3px;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    margin-top: 5px;
-    margin-bottom: 5px;
+    background-color: #57a957;
+    background-image: -o-linear-gradient(top, #62c462, #57a957);
+    background-image: -webkit-linear-gradient(top, #62c462, #57a957); 
+    background-image: -moz-linear-gradient(top, #62c462, #57a957);
+}
+
+.info {
+    background-color: #339bb9; 
+    background-image: -o-linear-gradient(top, #5bc0de, #339bb9);
+    background-image: -webkit-linear-gradient(top, #5bc0de, #339bb9); 
+    background-image: -moz-linear-gradient(top, #5bc0de, #339bb9);
 }
 
 .projectText
@@ -170,8 +176,15 @@ h3 a:hover
     margin-top: 20px;
 }
 
+.tab 
+{
+    padding-top: 2px;
+    padding-bottom: 5px;
+}
+
 .tabs
 {
+    padding-bottom: 5px;
     border-bottom: 1px solid #CCC;
 }
 
@@ -184,6 +197,8 @@ h3 a:hover
     border-right: 1px solid #CCC;
     padding-left: 10px;
     padding-right: 10px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
 }
 
 td.manageMember input, td.manageMember select
@@ -209,7 +224,6 @@ td.manageMember input, td.manageMember select
 
 .tabs .active
 {
-    background: #FFF;
     font-weight: bold;
 }
 
@@ -218,14 +232,9 @@ td.manageMember input, td.manageMember select
     border-bottom: 1px solid #FFF;
 }
 
-.tabs li:hover
-{
-    background: #FFF;
-}
-
 .tabContent
 {
-    padding: 10px; 
+    padding: 40px; 
 }
 
 #tabContent_2, #tabContent_3, #tabContent_4, #tabContent_5
@@ -305,14 +314,13 @@ input[type=submit]:active {
 /* 
  *	
 */
-h1
+h1 a
 {
-    line-height: 50px;
-    text-align: right;
-    margin-right: 60px;
+    margin-right: 40px;
     color: #FFF;
     font-style: italic;
-    text-shadow: 1px 1px 3px #000;
+    text-shadow: 1px 1px 3px rgba(0,0,0,1);
+    float: left;
 }
 
 h2
@@ -338,78 +346,35 @@ a
 /* 
  *	
 */
-table.overview
-{
-    color: #222;
+
+table {
     width: 100%;
 }
 
-table.overview a
-{
-    color: #444;
-}
-
-table.overview th
+th
 {
     text-transform: lowercase;
     font-weight: normal;
-    background: #333;
     color: #FFF;
-    padding: 5px 0px 3px 5px;
     border-bottom: 3px solid #068;
     letter-spacing: 1px;
     text-align: left;
+    background: #333 url(img/bg.gif) center right no-repeat;
+    cursor: pointer; 
 }
 
-table.overview th a
-{
-    color: #FFF !important;
-}
+th.headerSortUp { 
+    background-image: url(img/asc.gif); 
+    background-color: #068; 
+} 
 
-table.overview tr:hover
-{
-    background: #AAA;
-}
+th.headerSortDown { 
+    background-image: url(img/desc.gif); 
+    background-color: #068; 
+} 
 
-table.overview .tr0
-{
-    background: #FAFAFA;
-}
-
-table.overview .tr1
-{
+.zebra tbody tr:nth-child(2n+1) td {
     background:	#EEE;
-}
-
-table.overview .id
-{
-    width: 3%;
-
-}
-table.overview .state
-{
-    width: 5%;
-}
-
-
-table.overview .state
-{
-    width: 10%;
-}
-
-table.overview .priority
-{
-    width: 8%;
-}
-
-table.overview .created
-{
-    width: 12%;
-}
-
-table.overview .owner
-{
-    width: 7%;
 }
 
 /*
@@ -584,14 +549,25 @@ table.ticket th
     text-align: left;
 }
 
-.add, #login
+#darkBg {
+	display: none;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	background: rgba(0,0,0,0.6);
+	z-index: 4;
+}
+
+.layer
 {
-    background: #F9F9F9;
-    border: 1px solid #BBB;
+    background: #FFF;
+    border: 1px solid rgba(0,0,0,0.3);
     border-radius: 5px;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
-    box-shadow: 0px 0px 5px rgba(0,0,0,0.3);
+    box-shadow: 0px 3px 7px rgba(0, 0, 0, 0.3);
     display: none;
     position: absolute;
     width: 400px; 
@@ -601,15 +577,21 @@ table.ticket th
     padding: 20px;
     color: #333;
     text-shadow: none;
+    top: 100px;
+    font-size: 9pt;
 }
 
-.add a, #login a
+.layer h3 {
+    margin-bottom: 30px;
+}
+
+.layer a
 {
     color: #333 !important;
     text-transform: none;
 }
 
-.add a:hover, #login a:hover {
+.layer a:hover {
     text-decoration: underline;
 }
 
@@ -626,25 +608,9 @@ table.ticket th
 .closeButton
 {
     float: right;
-    border-radius: 3px;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    text-align: center;
-    box-shadow: inset -1px -1px 2px #DDD;
-    font: 10pt Helvetica;
-    padding: 4px;
-    border: 1px solid #CCC !important;
-    background: #FFF;
-    padding-left: 8px;
-    padding-right: 8px;
-}
-
-.closeButton:hover {
     text-decoration: none !important;
-}
-
-.closeButton:active {
-    box-shadow: inset 1px 1px 2px #DDD;
+    border: none;
+    font-size: 13pt;
 }
 
 #add .formRow
@@ -663,7 +629,7 @@ ul.sublist
     padding: 10px;
 }
 
-p.info
+.rminfo
 {
     color:	green;
     font-weight: bold;
@@ -671,19 +637,19 @@ p.info
 
 button
 {
-    border: 1px solid #999;
-    padding: 5px;
-    background: #DDD;
+    color: #555;
+    background: #FFF;
+    border: 1px solid #CCC;
+    font: 10pt Helvetica;
+    padding: 4px;
     border-radius: 3px;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
-
+    box-shadow: inset -1px -1px 2px #DDD;
 }
 
-button:hover
-{
-    background: #EEE;
-    border: 1px solid #CCC;
+button:active {
+    box-shadow: inset 1px 1px 2px #DDD;
 }
 
 .ticketComment 
@@ -717,4 +683,8 @@ button:hover
 
 .home p {
     margin-bottom: 5px;
+}
+
+.ticketSearch {
+    margin-left: 10px;
 }

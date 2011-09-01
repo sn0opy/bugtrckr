@@ -22,39 +22,47 @@ class cproperties extends Controller
     {
         $projectId = $this->get('SESSION.project');
 
-        $project = new Project;
-        $project->load(array('id = :id', array(':id' => $projectId)));
+        if($projectId) {      
+            $project = new Project;
+            $project->load(array('id = :id', array(':id' => $projectId)));
 
-        $role = new Role();
-        $roles = $role->find('projectId = ' . $projectId);
+            $role = new Role();
+            $roles = $role->find('projectId = ' . $projectId);
 
-        $projPerms = new user_perms();
-        $projPerms = $projPerms->find('projectId = ' . $projectId);
+            $projPerms = new user_perms();
+            $projPerms = $projPerms->find('projectId = ' . $projectId);
 
-        $milestone = new Milestone();
-        $milestones = $milestone->find('project = ' . $projectId);
+            $milestone = new Milestone();
+            $milestones = $milestone->find('project = ' . $projectId);
 
-        $user = new User();
-        $users = $user->find();
+            $user = new User();
+            $users = $user->find();
 
-        $categories = new Category();
-        $categories = $categories->find();
+            $categories = new Category();
+            $categories = $categories->find();
 
-        if (!$project->id) //|| !$roles || !$milestones || !$users || !$categories)
-        {
-            $this->tpfail("Failure while open Project");
-            return;
+            if (!$project->id) //|| !$roles || !$milestones || !$users || !$categories)
+            {
+                $this->tpfail("Failure while open Project");
+                return;
+            }
+
+            $this->set('users', $users);
+            $this->set('projMilestones', $milestones);
+            $this->set('projRoles', $roles);
+            $this->set('projMembers', $projPerms);
+            $this->set('projDetails', $project);
+            $this->set('projCategories', $categories);
+            $this->set('template', 'projectSettings.tpl.php');
+            $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}}');
+            $this->set('onpage', 'settings');
+            $this->tpserve();
+        } else {
+            $this->set('SESSION.FAILURE', 'No project set.');
+            $this->set('template', 'projectSettings.tpl.php');
+            $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}}');
+            $this->tpserve();
         }
-
-        $this->set('users', $users);
-        $this->set('projMilestones', $milestones);
-        $this->set('projRoles', $roles);
-        $this->set('projMembers', $projPerms);
-        $this->set('projDetails', $project);
-        $this->set('projCategories', $categories);
-        $this->set('template', 'projectSettings.tpl.php');
-        $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}}');
-        $this->tpserve();
     }
 
     function projectAddMember()
@@ -203,6 +211,7 @@ class cproperties extends Controller
         $this->set('roleData', $role);
         $this->set('template', 'projectSettingsRole.tpl.php');
         $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.role}} › {{@roleData->name}}');
+        $this->set('onpage', 'settings');
         $this->tpserve();
     }
 
@@ -225,6 +234,7 @@ class cproperties extends Controller
         $this->set('msData', $milestone);
         $this->set('template', 'projectSettingsMilestone.tpl.php');
         $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.milestone}} › {{@msData->name}}');
+        $this->set('onpage', 'settings');
         $this->tpserve();
     }
 
@@ -293,6 +303,7 @@ class cproperties extends Controller
     {
         $this->set('template', 'projectSettingsRoleAdd.tpl.php');
         $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.addrole}}');
+        $this->set('onpage', 'settings');
         $this->tpserve();
     }
 
@@ -304,6 +315,7 @@ class cproperties extends Controller
         $this->set('today', date('Y-m-d', time()));
         $this->set('template', 'projectSettingsMilestoneAdd.tpl.php');
         $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.addmilestone}}');
+        $this->set('onpage', 'settings');
         $this->tpserve();
     }
 
@@ -314,6 +326,7 @@ class cproperties extends Controller
     {
         $this->set('template', 'projectSettingsCategoryAdd.tpl.php');
         $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.addcategory}}');
+        $this->set('onpage', 'settings');
         $this->tpserve();
     }
     
@@ -324,6 +337,7 @@ class cproperties extends Controller
     {
         $this->set('template', 'projectAdd.tpl.php');
         $this->set('pageTitle', '{{@lng.project}} › {{@lng.add}}');
+        $this->set('onpage', 'settings');
         $this->tpserve();
     }
     
