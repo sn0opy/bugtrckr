@@ -29,7 +29,7 @@ class cmain extends Controller
     {
         $url = $this->get('SERVER.HTTP_REFERER');
         $projectId = ($hash) ? $hash : $this->get('REQUEST.project');
-        
+
         if($projectId == 'new') 
             $this->reroute($this->get('BASE').'/project/add');
 
