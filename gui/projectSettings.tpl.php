@@ -114,16 +114,16 @@
         {{* milestones *}}
         <F3:check if="{{@getPermission('proj_manageMilestones')}}">
             <F3:true>
-                <table>
+                <table class="sortable zebra">
                     <thead>
                         <tr>
                             <th>{{@lng.milestone}}</th>
-							<th></th>
+							<th>{{@lng.actions}}</th>
                         </tr>
                     </thead>
                     <tbody>
-                    <F3:repeat group="{{@projMilestones}}" key="{{@i}}" value="{{@milestone}}">
-                        <tr class="tr{{@i%2}}">
+                    <F3:repeat group="{{@projMilestones}}" value="{{@milestone}}">
+                        <tr>
                             <td class="title">
                                 <a href="{{@BASE}}/project/settings/milestone/{{@milestone->hash}}">{{@milestone->name}}</a>
                             </td>

@@ -330,12 +330,12 @@ class cproperties extends Controller
 
             if($ax2->found('roleId = '.$ax->id))
             {
-                $this->tpfail('Role cannot be deleted because it\'s being used in another location.');
+                $this->tpfail('Role cannot be deleted.');
                 return;
             }       
 
             $ax->erase();
-            $this->set('SESSION.success', 'Role has been deleted.');
+            $this->set('SESSION.SUCCESS', 'Role has been deleted.');
             $this->reroute($this->get('BASE'). '/project/settings');     
         } else {
             $this->tpfail("You don't have permission to do this.");
@@ -352,7 +352,7 @@ class cproperties extends Controller
         $category->name = $this->get('POST.name');
         $category->save();
 
-        $_SESSION['SUCCESS'] = "Category added successfully";
+        $this->set('SESSION.SUCCESS',"Category added successfully");
 
         $this->reroute($this->get('BASE') . '/project/settings/');
     }

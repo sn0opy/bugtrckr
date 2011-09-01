@@ -121,20 +121,14 @@
         <div id="content">
 			<div id="innerContentLOL">
                 <F3:check if="{{@SESSION.FAILURE}}">
-                    <F3:true>
-                        <div class="failure message">
-                            <p>{{@SESSION.FAILURE}}</p>
-                        </div>
-                    </F3:true>
-                    <F3:false>
-						<F3:check if="{{@SESSION.SUCCESS}}">
-							<F3:true>
-							<div class="success message">
-								<p>{{@SESSION.SUCCESS}}</p>
-							</div>
-							</F3:true>
-						</F3:check>
-                    </F3:false>
+                    <div class="failure message">
+                        <p>{{@SESSION.FAILURE}}</p>
+                    </div>
+                </F3:check>
+                <F3:check if="{{@SESSION.SUCCESS}}">
+                    <div class="success message">
+                        <p>{{@SESSION.SUCCESS}}</p>
+                    </div>
                 </F3:check>
                 <F3:include href="{{@template}}" />
             </div>
