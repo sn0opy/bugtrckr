@@ -118,6 +118,7 @@
                     <thead>
                         <tr>
                             <th>{{@lng.milestone}}</th>
+							<th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -126,6 +127,9 @@
                             <td class="title">
                                 <a href="{{@BASE}}/project/settings/milestone/{{@milestone->hash}}">{{@milestone->name}}</a>
                             </td>
+							<td class="delete">
+								<a href="{{@BASE}}/project/settings/delete/milestone/{{@milestone->hash}}" onclick="return confirm('{{@lng.sure}}');">{{@lng.delete}}</a>
+							</td>
                         </tr>
                     </F3:repeat>
                     </tbody>

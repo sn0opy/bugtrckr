@@ -53,6 +53,7 @@ $app->route('GET /project/settings/role/add', 'cproperties->showAddRole');
 $app->route('GET /project/settings/milestone/@hash', 'cproperties->showProjectSettingsMilestone');
 $app->route('GET /project/settings/milestone/add', 'cproperties->showAddMilestone');
 $app->route('GET /project/settings/category/add', 'cproperties->showAddCategory');
+$app->route('GET /project/settings/delete/milestone/@hash', 'cproperties->deleteProjectSettingsMilestone');
 
 $app->route('POST /search', 'cticket->showTickets');
 $app->route('POST /project/select', 'cmain->selectProject');

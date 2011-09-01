@@ -215,6 +215,7 @@ class cproperties extends Controller
         $this->tpserve();
     }
 
+
     /**
      * 
      */
@@ -237,6 +238,41 @@ class cproperties extends Controller
         $this->set('onpage', 'settings');
         $this->tpserve();
     }
+
+    /**
+     * 
+     */
+    function deleteProjectSettingsMilestone()
+    {
+		if (!helper::getPermission('proj_manageMilestones'))
+		{
+			$this->tpfail("You are not allowed to do this.");
+            return;
+		}
+
+        $msHash = $this->get('PARAMS.hash');
+
+        $milestone = new Milestone();
+        $milestone->load(array('hash = :hash', array(':hash' => $msHash)));
+
+        if (!$milestone->id)
+        {
+            $this->tpfail("Failure while getting Milestone");
+            return;
+        }
+
+		$tickets = new Ticket();
+		$count = $tickets->found('milestone = ' . $milestone->id);
+
+		if ($count > 0)
+		{
+            $this->tpfail("Milestone can not be removed");
+            return;
+		}
+
+		$milestone->erase();
+		$this->reroute($this->get('BASE') . '/project/settings');
+	}
 
     /**
      * 

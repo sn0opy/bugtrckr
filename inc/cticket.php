@@ -145,6 +145,12 @@ class cticket extends Controller
      */
     function editTicket()
     {
+		if (is_int($this->get('POST.state')) && $this->get('POST.state') >= 1 && $this->get('POST.state') <= 5)
+		{
+			$this->tpfail("Failure while saving Ticket");
+            return;
+		}
+
         $hash = $this->get('PARAMS.hash');
 
         $ticket = new Ticket();
