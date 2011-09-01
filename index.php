@@ -24,6 +24,7 @@ $app->set('EXTEND', true);
 $app->set('GUI','gui/');
 $app->set('AUTOLOAD', 'inc/|inc/models/');
 $app->set('LOCALES','lang/');
+$app->set('LANGUAGE', 'de');
 $app->set('PROXY', 1);
 $app->set('LANGUAGE', 'de'); // until we have a better idea for localizing the db stuff
 
