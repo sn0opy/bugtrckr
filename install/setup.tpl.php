@@ -17,8 +17,7 @@
                     $('#sqliteChosen').hide();
                     $('#mysqlChosen').show();                    
                 }
-            });
-            
+            });            
             
             
             $('#newadm').change(function() {
@@ -148,7 +147,7 @@
 
                                     <br class="clearfix" />
                                     <h2>Schritt 3</h2>
-                                    <p>Zu letzt lege noch deinen Adminaccount an</p>
+                                    <p>Zuletzt lege noch deinen Adminaccount an</p>
                                     <div id="newadm">
                                         <div class="formRow">
                                             <div class="formLabel">Name: </div>

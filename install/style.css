@@ -7,23 +7,25 @@
 body
 {
     color: #333;
-    font-size: 11pt;
+    font-size: 9pt;
     font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
     margin-top: 30px;
 }
 
 h1 {
-    font: 17pt Georgia;
+    font: 18pt Georgia;
     line-height: 50px;
     text-align: right;
-    margin-right: 60px;
+    margin-right: 20px;
     color: #FFF;
     font-style: italic;
     text-shadow: 1px 1px 3px #000;
+    font-weight: bold;
 }
 
 h2 {
     margin-top: 20px;
+    font-size: 16pt;
 }
 
 ul {

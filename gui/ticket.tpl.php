@@ -84,6 +84,7 @@
                     <div class="formLabel">{{@lng.assignedTo}}</div>
                     <div class="formValue">
                         <select name="userId" size="1">
+                            <option value=""></option>
                             <F3:repeat group="{{@users}}" value="{{@user}}">
                                 <option value="{{@user->id}}">{{@user->name}}</option>
                             </F3:repeat>
