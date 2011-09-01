@@ -96,7 +96,6 @@
                     <th>{{@lng.assigned}}</th>
                 </tr>
             </thead>
-
             <tbody>
                 <F3:repeat group="{{@tickets}}" value="{{@ticket}}">
                 <tr>

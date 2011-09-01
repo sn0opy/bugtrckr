@@ -8,31 +8,34 @@
             <th>{{@lng.created}}</th>
             <td>{{date('d.m.Y H:i', @ticket->created)}}</td>
         </tr>
-
         <tr>
             <th>{{@lng.priority}}</th>
             <td>{{@ticket->priorityname}}</td>
             <th>{{@lng.assignedTo}}</th>
             <td><a href="{{@BASE}}/user/{{@ticket->assignedname}}">{{@ticket->assignedname}}</a></td>
         </tr>
-
         <tr>
             <th>{{@lng.owner}}</th>
             <td><a href="{{@BASE}}/user/{{@ticket->username}}">{{@ticket->username}}</a></td>
             <th></th>
             <td></td>
         </tr>
-
         <tr>
             <th>{{@lng.category}}</th>
             <td>{{@ticket->categoryname}}</td>
             <th></th>
             <td></td>
         </tr>
-
         <tr>
             <th>{{@lng.milestone}}</th>
-            <td>{{@milestone->name}}</td>
+            <td>
+                {{* this ABSOLUTELY sucks, but works, sorry (TODO) *}}
+                <F3:repeat group="{{@milestones}}" value="{{@milestone}}">
+                    <F3:check if="{{@ticket->milestone==@milestone->id}}">
+                        {{@milestone->name}}
+                    </F3:check>
+                </F3:repeat>
+            </td>
             <th></th>
             <td></td>
         </tr>
@@ -75,7 +78,7 @@
 <F3:check if="{{@SESSION.user}}">
     <F3:true>
         <div class="editTicket">
-            <form method="POST" action="{{@BASE}}/ticket/{{@ticket->tickethash}}">
+            <form method="post" action="{{@BASE}}/ticket/{{@ticket->tickethash}}">
 
                 <div class="formRow">
                     <div class="formLabel">{{@lng.assignedTo}}</div>
@@ -87,6 +90,23 @@
                         </select>
                     </div>
                 </div>
+                
+                 <div class="formRow">
+                    <div class="formLabel">{{@lng.milestone}}</div>
+                    <div class="formValue">
+                        <select name="milestone" size="1">
+                            <F3:repeat group="{{@milestones}}" value="{{@milestone}}">
+                                <F3:check if="{{@milestone->id==@ticket->milestone}}">
+                                    <F3:true>
+                                        <option value="{{@milestone->hash}}" selected="selected">{{@milestone->name}}</option>
+                                    </F3:true>
+                                    <F3:false>
+                                        <option value="{{@milestone->hash}}">{{@milestone->name}}</option>
+                                    </F3:false>
+                            </F3:repeat>
+                        </select>
+                    </div>
+                </div>               
 
                 <div class="formRow">
                     <div class="formLabel">{{@lng.status}}</div>

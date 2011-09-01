@@ -4,20 +4,11 @@
     padding: 0px;
 }
 
-@font-face {
-    font-family: 'OpenSans';
-    src: url('../gui/misc/opensans-webfont.eot');
-    src: url('../gui/misc/opensans-webfont.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
 body
 {
     color: #333;
-    font-size: 10pt;
-    font-family: OpenSans, Helvetica, Calibri, sans-serif;
-    background: #FFF;
+    font-size: 11pt;
+    font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
     margin-top: 30px;
 }
 
@@ -73,7 +64,7 @@ input[type=submit]:active {
 
 .head {
     width: 500px;
-    background: #068 url(../gui/img/headBg.png);
+    background: #068 url(../gui/img/headBgN.png);
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     height: 50px;
