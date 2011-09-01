@@ -59,10 +59,10 @@ class helper extends F3instance
      * @return bool
      * @static
      */
-    public function getPermission($permission)
+    public static function getPermission($permission)
     {
-        $userId = $this->get('SESSION.user->id');
-        $projectId = $this->get('SESSION.project');
+        $userId = F3::get('SESSION.user->id');
+        $projectId = F3::get('SESSION.project');
         
         if ($userId)
         {
@@ -83,7 +83,6 @@ class helper extends F3instance
                 return true;
 
 			if ($role->id > 0)
-//            if (in_array($permission, $permissions))
                 if ($role->$permission == true)
                     return true;
         }

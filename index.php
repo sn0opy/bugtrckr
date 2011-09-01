@@ -54,6 +54,7 @@ $app->route('GET /project/settings/milestone/@hash', 'cproperties->showProjectSe
 $app->route('GET /project/settings/milestone/add', 'cproperties->showAddMilestone');
 $app->route('GET /project/settings/category/add', 'cproperties->showAddCategory');
 $app->route('GET /project/settings/role/delete/@hash', 'cproperties->deleteRole');
+$app->route('GET /project/settings/milestone/delete/@hash', 'cproperties->deleteProjectSettingsMilestone');
 
 $app->route('POST /search', 'cticket->showTickets');
 $app->route('POST /project/select', 'cmain->selectProject');
