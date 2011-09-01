@@ -14,9 +14,16 @@
  */
 class cticket extends Controller
 {
-
+	
+	/**
+	 *	Show a list of tickets of the project
+	 */
     function showTickets()
-    {     
+    {   
+		if (!is_numeric($this->get('SESSION.project')) ||
+			$this->get('SESSION.project') <= 0)
+			return $this->tpfail('Please select a project.');
+
         $order = 'created';
 		$search = '';
         
@@ -31,52 +38,43 @@ class cticket extends Controller
         
         $project = $this->get('SESSION.project');
 
-        if($project) {        
-            $milestones = new Milestone();
-            $milestones = $milestones->find(array('project = :project', array(':project' => $project)));
+        $milestones = new Milestone();
+        $milestones = $milestones->find(array('project = :project', array(':project' => $project)));
 
-            $msids = array();
-            foreach ($milestones as $ms)
-                $msids[] = $ms->id;
-            $string = implode($msids, ',');
+        $msids = array();
+        foreach ($milestones as $ms)
+            $msids[] = $ms->id;
+        $string = implode($msids, ',');
             
-            $tickets = new DisplayableTicket();
-            $tickets = $tickets->find('milestone IN (' . $string . ') AND ' .
-                        'title LIKE \'%'.$search.'%\'' .
-                        'ORDER BY ' . $order. ' DESC');
+        $tickets = new DisplayableTicket();
+        $tickets = $tickets->find('milestone IN (' . $string . ') AND ' .
+                    'title LIKE \'%'.$search.'%\'' .
+                    'ORDER BY ' . $order. ' DESC');
 
-            $categories = new Category();
-            $categories = $categories->find();
+        $categories = new Category();
+        $categories = $categories->find();
 
-            $this->set('milestones', $milestones);
-            $this->set('tickets', $tickets);
-            $this->set('categories', $categories);
-            $this->set('pageTitle', '{{@lng.tickets}}');
-            $this->set('template', 'tickets.tpl.php');
-            $this->set('onpage', 'tickets');
-            $this->tpserve();
-        } else {
-            $this->set('pageTitle', '{{@lng.tickets}}');
-            $this->set('template', 'tickets.tpl.php');
-            $this->set('SESSION.failure', '{{@lng.noProject}}');
-            $this->tpserve();
-        }
+        $this->set('milestones', $milestones);
+        $this->set('tickets', $tickets);
+        $this->set('categories', $categories);
+        $this->set('pageTitle', '{{@lng.tickets}}');
+        $this->set('template', 'tickets.tpl.php');
+        $this->set('onpage', 'tickets');
+        $this->tpserve();
     }
 
     /**
-     *
+     *	Show the details of a ticket 
      */
     function showTicket()
-    {
+	{ 
         $hash = $this->get('PARAMS.hash');
 
         $ticket = new DisplayableTicket();
         $ticket->load(array("tickethash = :hash", array(':hash' => $hash)));
 
-        if($ticket->dry()) {
-            $this->tpfail("There's no such ticket");
-            return;
-        }
+        if($ticket->dry())
+            return $this->tpfail("Ticket doesn't exist.");
 
         $milestone = new Milestone();
 
@@ -84,10 +82,7 @@ class cticket extends Controller
         $activities = $activities->find(array("ticket = :ticket", array(':ticket' => $ticket->id)));
 
         if (!$ticket->id)
-        {
-            $this->tpfail("Can't open ticket");
-            return;
-        }
+            return $this->tpfail("Can't open ticket");
 
         $state = new State();    
         $users = new User();
@@ -104,15 +99,12 @@ class cticket extends Controller
     }
 
     /**
-     *
+     *	Add Ticket into the database
      */
     function addTicket()
     {
         if (!helper::getPermission('iss_addIssues'))
-        {
-            $this->tpfail('You are not allowed to add tickets.');
-            return;
-        }
+            return $this->tpfail('You are not allowed to add tickets.');
 
         $ticket = new Ticket();
         $ticket->hash = helper::getFreeHash('Ticket');
@@ -129,10 +121,7 @@ class cticket extends Controller
         $ticket->save();
 
         if (!$ticket->_id)
-        {
-            $this->tpfail("Failure while saving Ticket");
-            return;
-        }
+            return $this->tpfail("Failure while saving Ticket");
 
         helper::addActivity(
             $this->get('lng.ticket') . " '$ticket->title' " . $this->get('lng.added') . ".", $ticket->_id);
@@ -141,15 +130,14 @@ class cticket extends Controller
     }
 
     /**
-     *
+     *	Updates a Ticket in the database
      */
     function editTicket()
     {
-		if (is_int($this->get('POST.state')) && $this->get('POST.state') >= 1 && $this->get('POST.state') <= 5)
-		{
-			$this->tpfail("Failure while saving Ticket");
-            return;
-		}
+		if (!is_numeric($this->get('POST.state')) || 
+			$this->get('POST.state') <= 0 || 
+			$this->get('POST.state') > 5)
+			return $this->tpfail("Failure while saving Ticket");
 
         $hash = $this->get('PARAMS.hash');
 
@@ -158,9 +146,12 @@ class cticket extends Controller
 
         $milestone = new cmilestone();
         
-        $ticket->assigned = $this->get('POST.userId');
         $ticket->state = $this->get('POST.state');
-        $ticket->milestone = $milestone->getMilestoneID($this->get('POST.milestone'));
+		if (is_numeric($this->get('POST.userId')))
+			$ticket->assigned = $this->get('POST.userId');
+		if (ctype_alnum($this->get('POST.milestone')))
+        	$ticket->milestone = $milestone->getMilestoneID($this->get('POST.milestone'));
+
         $ticket->save();
 
         if (!$ticket->id)

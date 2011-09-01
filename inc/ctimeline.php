@@ -16,13 +16,16 @@ class ctimeline extends Controller
 {
 
     /**
-     *
+     *	Show all activities of a project
      */
     function showTimeline()
     {
+		if (!is_numeric($this->get('SESSION.project')) ||
+			$this->get('SESSION.project') <= 0)
+			return $this->tpfail('Please select a project.');
+
         $timeline = array();
 
-        /* Get Project */
         $project = $this->get('SESSION.project');
 
         $activities = new DisplayableActivity();

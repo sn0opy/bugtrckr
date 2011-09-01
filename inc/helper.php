@@ -90,9 +90,9 @@ class helper extends F3instance
         return false;
     }
 
-    public function getTicketCount($milestone)
+    public static function getTicketCount($milestone)
     {
-        return $this->get('DB')->sql('SELECT state, COUNT(*) AS `count` FROM `Ticket` WHERE milestone = ' . $milestone . ' GROUP BY state');
+        return F3::get('DB')->sql('SELECT state, COUNT(*) AS `count` FROM `Ticket` WHERE milestone = ' . $milestone . ' GROUP BY state');
     }
 
     public static function addActivity($description, $ticket = 0, $comment)
@@ -109,5 +109,12 @@ class helper extends F3instance
         
         $activity->save();
     }
+
+	public static function checkEmail($email)
+	{
+/*		$pattern = "@^[a-z0-9_\+-]+(\.[a-z0-9_\+-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*\.([a-z]{2,4})$@";
+		return preg_match($pattern, $email);*/
+		return 1;
+	}
 
 }

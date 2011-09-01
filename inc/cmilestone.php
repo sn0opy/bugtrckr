@@ -15,66 +15,68 @@
 class cmilestone extends Controller
 {
 
+	/**
+	 *	Display a roadmap that contains the milestones of a project
+	 */
     function showRoadmap()
     {
+		if (!is_numeric($this->get('SESSION.project')) ||
+			$this->get('SESSION.project') <= 0)
+			return $this->tpfail('Please select a project first.');
+
         $ms = array();
         $fullCount = 0;
 
-        $helper = new helper();
+        $project = $this->get('SESSION.project');		// Actual project
 
-        $project = $this->get('SESSION.project');
-        
-        if($project) {
-            $milestones = new Milestone();
-            $milestones = $milestones->find(array('project = :project', array(':project' => $project)));
+		// Get the milestones
+        $milestones = new Milestone();
+        $milestones = $milestones->find(array('project = :project', array(':project' => $project)));
 
-            foreach ($milestones as $milestone)
+		// Calculate the details of each milestone 
+        foreach ($milestones as $milestone)
+        {
+            $ms[$milestone->id]['infos'] = $milestone;
+            $ms[$milestone->id]['ticketCount'] = helper::getTicketCount($milestone->id);
+
+            $ms[$milestone->id]['fullTicketCount'] = 0;
+            foreach ($ms[$milestone->id]['ticketCount'] as $cnt)
+                $ms[$milestone->id]['fullTicketCount'] += $cnt['count'];
+
+            $ms[$milestone->id]['openTickets'] = 0;
+            foreach ($ms[$milestone->id]['ticketCount'] as $j => $cnt)
             {
-                $ms[$milestone->id]['infos'] = $milestone;
-                $ms[$milestone->id]['ticketCount'] = $helper->getTicketCount($milestone->id);
+                $ms[$milestone->id]['ticketCount'][$j]['percent'] = round($cnt['count'] * 100 / $ms[$milestone->id]['fullTicketCount']);
 
-                $ms[$milestone->id]['fullTicketCount'] = 0;
-                foreach ($ms[$milestone->id]['ticketCount'] as $cnt)
-                    $ms[$milestone->id]['fullTicketCount'] += $cnt['count'];
-
-                $ms[$milestone->id]['openTickets'] = 0;
-                foreach ($ms[$milestone->id]['ticketCount'] as $j => $cnt)
-                {
-                    $ms[$milestone->id]['ticketCount'][$j]['percent'] = round($cnt['count'] * 100 / $ms[$milestone->id]['fullTicketCount']);
-
-                    if ($ms[$milestone->id]['ticketCount'][$j]['state'] != 5)
-                        $ms[$milestone->id]['openTickets'] += $ms[$milestone->id]['ticketCount'][$j]['count'];
-                }
+                if ($ms[$milestone->id]['ticketCount'][$j]['state'] != 5)
+                    $ms[$milestone->id]['openTickets'] += $ms[$milestone->id]['ticketCount'][$j]['count'];
             }
-
-            $this->set('road', $ms);
         }
-            
+
+        $this->set('road', $ms);
         $this->set('pageTitle', '{{@lng.roadmap}}');
         $this->set('template', 'roadmap.tpl.php');
         $this->set('onpage', 'roadmap');
         $this->tpserve();            
     }
 
+	/**
+	 *	Displaying the tickets and the status of a milestone
+	 */
     function showMilestone()
     {
         $hash = $this->get('PARAMS.hash');
-
-        $helper = new helper();
 
         $milestone = new Milestone();
         $milestone->load(array('hash = :hash', array(':hash' => $hash)));
 
         if($milestone->dry())
-        {
-            $this->tpfail('No such milestone exists');
-            return;
-        }
+            return $this->tpfail('The milestone doesn\'t exist.');
 
         $ticket = new DisplayableTicket();
         $tickets = $ticket->find(array('milestone = :id', array(':id' => $milestone->id)));
 
-        $ms['ticketCount'] = $helper->getTicketCount($milestone->id);
+        $ms['ticketCount'] = helper::getTicketCount($milestone->id);
 
         $ms['fullTicketCount'] = 0;
         foreach ($ms['ticketCount'] as $cnt)
@@ -99,10 +101,17 @@ class cmilestone extends Controller
     }
 
     /**
-     * 
+     *	Save a milestone to the database
      */
     function addEditMilestone()
     {
+		// This params have to be set
+		if ($this->get('POST.name') == "" ||
+			!is_numeric($this->get('SESSION.project')) ||
+			$this->get('SESSION.project') <= 0)
+			return $this->tpfail('Failure while editing milestone.');
+
+
         $msHash = $this->get('POST.hash') ? $this->get('POST.hash') : helper::getFreeHash('Milestone');
 
         $milestone = new Milestone();
@@ -110,10 +119,7 @@ class cmilestone extends Controller
         {
             $milestone->load(array('hash = :hash', array(':hash' => $msHash)));
             if ($milestone->dry())
-            {
-                $this->tpfail('Failure while editing milestone.');
-                return;
-            }
+                return $this->tpfail('Failure while editing milestone.');
         }
 
         $milestone->name = $this->get('POST.name');
@@ -126,6 +132,11 @@ class cmilestone extends Controller
         $this->reroute($this->get('BASE') . '/project/settings/milestone/' . $msHash);
     }
     
+	/**
+	 *	Returns the id of a milestone
+	 *
+	 *	@param String $hash
+	 */
     function getMilestoneID($hash) 
     {        
         $ax = new Axon('Milestone');
@@ -134,5 +145,4 @@ class cmilestone extends Controller
         if(!$ax->dry())
             return $ax->id;
     }
-
 }

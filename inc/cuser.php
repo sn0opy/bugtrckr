@@ -14,8 +14,8 @@
  */
 class cuser extends Controller
 {
-      /**
-     *
+    /**
+     *	Displays users infopage
      */
     function showUser()
     {
@@ -25,10 +25,7 @@ class cuser extends Controller
         $user->load(array('name = :name', array(':name' => $name)));
 
         if (!$user->id)
-        {
-            $this->tpfail("User not found");
-            return;
-        }
+            return $this->tpfail("User not found");
 
         $ticket = new DisplayableTicket();
         $tickets = $ticket->find('owner = ' . $user->id);
@@ -41,8 +38,8 @@ class cuser extends Controller
         $this->tpserve();
     }
     
-       /**
-     *
+    /**
+     *	Displays a form for registration
      */
     function showUserRegister()
     {
@@ -53,10 +50,15 @@ class cuser extends Controller
     }
 
     /**
-     *
+     *	Adds a new user to the database
      */
     function registerUser($name = false, $password = false, $email = false, $admin = false)
     {
+		if ($this->get('POST.name') == "" ||
+			$this->get('POST.email') == "" ||
+			helper::checkEmail($this->get('POST.email') == 0))
+			return $this->tpfail('Please correct your data.');
+
         $salt = helper::randStr();
 
         $user = new user();
@@ -81,7 +83,7 @@ class cuser extends Controller
     }
 
     /**
-     *
+     *	Show loginform
      */
     function showUserLogin()
     {
@@ -92,7 +94,7 @@ class cuser extends Controller
     }
 
     /**
-     *
+     *	Checks user to log in
      */
     function loginUser()
     {
@@ -120,7 +122,7 @@ class cuser extends Controller
     }
 
     /**
-     *
+     *	Destroy users session 
      */
     function logoutUser()
     {
