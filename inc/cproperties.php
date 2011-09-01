@@ -259,20 +259,20 @@ class cproperties extends Controller
 
         $role->name = ($projId) ? 'Admin' : $this->get('POST.name');
         $role->hash = ($projId) ? helper::getFreeHash('Role') : $roleHash;
-        $role->issuesAssigneable = ($projId) ? 1 : $this->get('POST.issuesAssigneable');
+        $role->issuesAssigneable = ($projId) ? 1 : $this->get('POST.issuesAssigneable') == "on";
         $role->projectId = ($projId) ? $projId : $this->get('SESSION.project');
-        $role->iss_addIssues = ($projId) ? 1 : $this->get('POST.iss_addIssues');
-        $role->proj_editProject = ($projId) ? 1 : $this->get('POST.proj_editProject');
-        $role->proj_manageMembers = ($projId) ? 1 : $this->get('POST.proj_manageMembers');
-        $role->proj_manageMilestones = ($projId) ? 1 : $this->get('POST.proj_manageMilestones');
-        $role->proj_manageRoles = ($projId) ? 1 : $this->get('POST.proj_manageRoles');
-        $role->iss_editIssues = ($projId) ? 1 : $this->get('POST.iss_editIssues');
-        $role->iss_addIssues = ($projId) ? 1 : $this->get('POST.iss_addIssues');
-        $role->iss_deleteIssues = ($projId) ? 1 : $this->get('POST.iss_deleteIssues');
-        $role->iss_moveIssue = ($projId) ? 1 : $this->get('POST.iss_moveIssue');
-        $role->iss_editWatchers = ($projId) ? 1 : $this->get('POST.iss_editWatchers');
-        $role->iss_addWatchers = ($projId) ? 1 : $this->get('POST.iss_addWatchers');
-        $role->iss_viewWatchers = ($projId) ? 1 : $this->get('POST.iss_viewWatchers');
+        $role->iss_addIssues = ($projId) ? 1 : $this->get('POST.iss_addIssues') == "on";
+        $role->proj_editProject = ($projId) ? 1 : $this->get('POST.proj_editProject') == "on";
+        $role->proj_manageMembers = ($projId) ? 1 : $this->get('POST.proj_manageMembers') == "on";
+        $role->proj_manageMilestones = ($projId) ? 1 : $this->get('POST.proj_manageMilestones') == "on";
+        $role->proj_manageRoles = ($projId) ? 1 : $this->get('POST.proj_manageRoles') == "on";
+        $role->iss_editIssues = ($projId) ? 1 : $this->get('POST.iss_editIssues') == "on";
+        $role->iss_addIssues = ($projId) ? 1 : $this->get('POST.iss_addIssues') == "on";
+        $role->iss_deleteIssues = ($projId) ? 1 : $this->get('POST.iss_deleteIssues') == "on";
+        $role->iss_moveIssue = ($projId) ? 1 : $this->get('POST.iss_moveIssue') == "on";
+        $role->iss_editWatchers = ($projId) ? 1 : $this->get('POST.iss_editWatchers') == "on";
+        $role->iss_addWatchers = ($projId) ? 1 : $this->get('POST.iss_addWatchers') == "on";
+        $role->iss_viewWatchers = ($projId) ? 1 : $this->get('POST.iss_viewWatchers') == "on";
         $role->save();
 
         if($projId)
