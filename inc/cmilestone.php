@@ -72,7 +72,7 @@ class cmilestone extends Controller
         }
 
         $ticket = new DisplayableTicket();
-        $tickets = $ticket->find('milestone = ' . $milestone->id);
+        $tickets = $ticket->find(array('milestone = :id', array(':id' => $milestone->id)));
 
         $ms['ticketCount'] = $helper->getTicketCount($milestone->id);
 
@@ -108,7 +108,7 @@ class cmilestone extends Controller
         $milestone = new Milestone();
         if (F3::exists('POST.hash'))
         {
-            $milestone->load('hash = "' . $msHash . '"');
+            $milestone->load(array('hash = :hash', array(':hash' => $msHash)));
             if ($milestone->dry())
             {
                 $this->tpfail('Failure while editing milestone.');
@@ -124,6 +124,15 @@ class cmilestone extends Controller
         $milestone->save();
 
         $this->reroute($this->get('BASE') . '/project/settings/milestone/' . $msHash);
+    }
+    
+    function getMilestoneID($hash) 
+    {        
+        $ax = new Axon('Milestone');
+        $ax->load(array('hash = :hash', array(':hash' => $hash)));
+        
+        if(!$ax->dry())
+            return $ax->id;
     }
 
 }

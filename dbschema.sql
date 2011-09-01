@@ -18,8 +18,8 @@ INSERT INTO Project (id, hash, name, description, public) VALUES (1, 'b026324c69
 --
 -- Milestone
 --
-CREATE TABLE Milestone (id INTEGER PRIMARY KEY AUTOINCREMENT, hash VARCHAR(12) UNIQUE, name varchar, description text, finished int, project int);
-INSERT INTO Milestone (id, hash, name, description, finished, project) VALUES (1, 'b026324c6901', 'First Milestone', 'UUUUAH', 1, 1);
+CREATE TABLE Milestone (id INTEGER PRIMARY KEY AUTOINCREMENT, hash VARCHAR(12) UNIQUE, name varchar, description text, finished date, project int);
+INSERT INTO Milestone (id, hash, name, description, finished, project) VALUES (1, 'b026324c6901', 'First Milestone', 'UUUUAH', '2001-02-02', 1);
 --
 -- Activity
 --
