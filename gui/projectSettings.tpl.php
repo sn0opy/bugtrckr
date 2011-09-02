@@ -148,7 +148,8 @@
                     </F3:repeat>
                     </tbody>
                 </table>
-                <a href="{{@BASE}}/project/settings/milestone/add">{{@lng.addmilestone}}</a>
+                <br class="clearfix" />
+                <a href="{{@BASE}}/project/settings/milestone/add" class="button">{{@lng.addmilestone}}</a>
             </F3:true>
             <F3:false>
                 <div class="failure message">{{@lng.noAccess}}</div>
@@ -185,7 +186,8 @@
                     </F3:repeat>
                     </tbody>
                 </table>
-                <a href="{{@BASE}}/project/settings/role/add">{{@lng.addrole}}</a>
+                <br class="clearfix" />
+                <a href="{{@BASE}}/project/settings/role/add" class="button">{{@lng.addrole}}</a>
             </F3:true>
             <F3:false>
                 <div class="failure message">{{@lng.noAccess}}</div>
@@ -216,7 +218,8 @@
                     </F3:repeat>
                     </tbody>
                 </table>
-                <a href="{{@BASE}}/project/settings/category/add">{{@lng.addcategory}}</a>
+                <br class="clearfix" />
+                <a href="{{@BASE}}/project/settings/category/add" class="button">{{@lng.addcategory}}</a>
             </F3:true>
             <F3:false>
                 <div class="failure message">{{@lng.noAccess}}</div>

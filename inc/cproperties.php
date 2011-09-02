@@ -415,11 +415,10 @@ class cproperties extends Controller
         $ax->public = ($this->get('POST.public') == 'on') ? 1 : 0;
         $ax->hash = $hash;
         $ax->save();
-        
+        $projId = $ax->_id;
+
         $cmain = new cmain();
         $cmain->selectProject($hash, false);
-        
-        $projId = $ax->_id;
         
         $perms = new ProjectPermission();
         $perms->userId = $this->get('SESSION.user.id');

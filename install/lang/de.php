@@ -37,5 +37,6 @@ return array('lng' => array(
     'letsGo' => 'Okay, auf geht\'s' ,
     'noMatch' => 'Stimmt nicht überein',
     'done' => 'Installations abgeschlossen!',
-    'toApp' => 'zur App'
+    'toApp' => 'zur App',
+    'mysqlfailed' => 'Die MySQL Verbindung schlug fehl'
 ));

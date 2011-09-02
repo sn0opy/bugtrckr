@@ -13,10 +13,10 @@
  *   
 **/
 
-if(!file_exists('data/config.inc.php'))
-    header('Location: setup.php');
-
-session_start();
+if(!file_exists('data/config.inc.php')) {
+    echo '<a href="setup.php">Setup</a>';
+    exit;
+}
 
 $app = require(__DIR__.'/lib/base.php');
 require_once('data/config.inc.php');

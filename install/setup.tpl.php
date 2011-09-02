@@ -36,6 +36,11 @@
                     }
                 }
             });
+            
+            <F3:check if="{{@mysqldata}}">
+                $('#sqliteChosen').hide();
+                $('#mysqlChosen').show(); 
+            </F3:check>
         });
         </script>
 	</head>
@@ -50,7 +55,11 @@
                     <p class="failure message">{{@lng.dbexists}}</p>
                 </F3:check>
                 
-                <F3:check if="{{!@INSTALLED}}">
+                <F3:check if="{{@mysqldata}}">
+                    <p class="failure message">{{@lng.mysqlfailed}}</p>
+                </F3:check>
+                
+                <F3:check if="{{@INSTALLED}}">
                     <F3:true>
                         <div class="content">
                             <p class="success message">
@@ -107,7 +116,7 @@
                             </div>
                         </div>
 
-                        <F3:check if="{{@ERROR}}">
+                        <F3:check if="{{@BERROR}}">
                             <true>
                                 <br class="clearfix" />
                                 <h2>{{@lng.error}}</h2>
@@ -119,27 +128,27 @@
                                     <h2>{{@lng.step2}}</h2>
 
                                     <p class="dbtype" style="text-align: center; margin-bottom: 20px;">
-                                        <input type="radio" name="dbtype" class="dbtype" value="sqlitedb" id="sqlitedb" checked="checked" />
+                                        <input type="radio" name="dbtype" class="dbtype" value="sqlitedb" id="sqlitedb" {{@mysqldata?@'':'checked="checked"'}} />
                                         <label for="sqlitedb">SQLite</label>
 
-                                        <input type="radio" name="dbtype" class="dbtype" value="mysqldb" id="mysqldb" />
+                                        <input type="radio" name="dbtype" class="dbtype" value="mysqldb" id="mysqldb" {{@mysqldata?'checked="checked"':''}}/>
                                         <label for="mysqldb">MySQL</label>
                                     </p>
 
                                     <div id="sqliteChosen">
                                         <div class="formRow">
                                             <div class="formLabel">{{@lng.dbname}}: </div>
-                                            <div class="formValue"><input type="text" name="dbname" id="sqlitedb" /> <span class="false" id="sqlitedberr" style="display: none;">{{@lng.notEmpty}}</span></div>
+                                            <div class="formValue"><input type="text" name="dbname" id="sqlitedb" value="bugtrckr.db" /> <span class="false" id="sqlitedberr" style="display: none;">{{@lng.notEmpty}}</span></div>
                                         </div>
                                     </div>
                                     <div id="mysqlChosen">
                                         <div class="formRow">
                                             <div class="formLabel">{{@lng.server}}: </div>
-                                            <div class="formValue"><input type="text" name="sqlhost" value="localhost" /></div>
+                                            <div class="formValue"><input type="text" name="sqlhost" value="{{@mysqldata?@mysqldata.host:'localhost'}}" /></div>
                                         </div>
                                         <div class="formRow">
                                             <div class="formLabel">{{@lng.user}}: </div>
-                                            <div class="formValue"><input type="text" name="sqluser" /></div>
+                                            <div class="formValue"><input type="text" name="sqluser" value="{{@mysqldata?@mysqldata.user:''}}" /></div>
                                         </div>
                                         <div class="formRow">
                                             <div class="formLabel">{{@lng.password}}: </div>
@@ -147,7 +156,7 @@
                                         </div>
                                         <div class="formRow">
                                             <div class="formLabel">{{@lng.dbname}}: </div>
-                                            <div class="formValue"><input type="text" name="sqldb" /></div>
+                                            <div class="formValue"><input type="text" name="sqldb" value="{{@mysqldata?@mysqldata.db:'bugtrckr'}}" /></div>
                                         </div>
                                     </div>
 

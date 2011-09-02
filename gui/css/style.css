@@ -653,7 +653,7 @@ ul.sublist
     font-weight: bold;
 }
 
-button
+button, .button
 {
     color: #555;
     background: #FFF;
@@ -664,9 +664,10 @@ button
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
     box-shadow: inset -1px -1px 2px #DDD;
+    text-decoration: none !important;
 }
 
-button:active {
+button:active, .button:active {
     box-shadow: inset 1px 1px 2px #DDD;
 }
 

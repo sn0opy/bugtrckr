@@ -29,13 +29,13 @@ class cmain extends Controller
     function selectProject($hash = false, $routeBack = true)
     {
         $url = $this->get('SERVER.HTTP_REFERER');
-        $projectId = ($hash) ? $hash : $this->get('REQUEST.project');
+        $projHash = ($hash) ? $hash : $this->get('REQUEST.project');
 
-        if($projectId == 'new') 
+        if($projHash == 'new') 
             $this->reroute($this->get('BASE').'/project/add');
 
         $project = new Project();
-        $project->load("hash = '$projectId'");
+        $project->load(array("hash = :hash", array(':hash' =>$projHash)));
 
         if (!$project->id)
         {
