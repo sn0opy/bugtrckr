@@ -64,6 +64,15 @@ class main extends F3instance {
             
             require_once 'install/mysql.php';
             
+            $usr = new cuser;
+            $usr->registerUser($admname, $admpw, $admemail, true);
+
+            file_put_contents('data/config.inc.php', "<?php F3::set('DB', new DB('mysql:host=".$host.";dbname=".$db."', '".$user."', '".$pass."')); ?>");
+
+            $this->set('INSTALLED', true);            
+            $this->tpserve();
+            print_r($this->get('ERROR'));
+            
         } else {
             $db = $this->get('POST.dbname');
             
@@ -79,7 +88,7 @@ class main extends F3instance {
             $user = new cuser;
             $user->registerUser($admname, $admpw, $admemail, true);
             
-            file_put_contents('data/config.inc.php', '<?php $dbFile = "'.$db.'"; ?>');
+            file_put_contents('data/config.inc.php', "<?php F3::set('DB', new DB('sqlite:data/".$db."')); ?>");
             
             $this->set('INSTALLED', true);            
             $this->tpserve();
