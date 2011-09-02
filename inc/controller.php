@@ -23,6 +23,10 @@ class Controller extends F3instance
         $project = new Project();
         $projects = $project->find();
         $this->set('projects', $projects);
+        
+        if(file_exists('setup.php') || file_exists('install/sqlite.php') || file_exists('install/mysql.php'))
+            $this->set('installWarning', true);
+        
         echo Template::serve('main.tpl.php');
     }
 

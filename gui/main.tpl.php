@@ -2,8 +2,8 @@
 <html>
 	<head>
         <meta charset="UTF-8" />
-		<link href="{{@BASE}}/gui/style.css" rel="stylesheet" type="text/css" />
-		<title>{{@pageTitle}} - {{@title}}</title>
+		<link href="{{@BASE}}/gui/css/style.css" rel="stylesheet" type="text/css" />
+		<title>{{@pageTitle}} - Bugtrckr</title>
         
         <script type="text/javascript" src="{{@BASE}}/gui/js/jquery.js"></script>
         <script type="text/javascript" src="{{@BASE}}/gui/js/jquery.tablesorter.js"></script>
@@ -94,6 +94,10 @@
                 <br class="clearfix" />
             </div>
         </div>
+        
+        <F3:check if="{{@installWarning && @RELEASE}}">
+            <div class="message warning">{{@lng.warningInstallFiles}}</div>
+        </F3:check>
         
         <F3:check if="{{!@SESSION.user}}">
             <div id="login" class="layer">

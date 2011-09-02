@@ -21,13 +21,14 @@ session_start();
 $app = require(__DIR__.'/lib/base.php');
 require_once('data/config.inc.php');
 
-$app->set('CACHE', 'folder=cache/');
+$app->set('RELEASE', false);
+$app->set('CACHE', false);
 $app->set('DEBUG', 3);
 $app->set('EXTEND', true);
 $app->set('GUI','gui/');
 $app->set('AUTOLOAD', 'inc/|inc/models/');
 $app->set('LOCALES','lang/');
-$app->set('PROXY', 1);
+$app->set('PROXY', true);
 $app->set('LANGUAGE', 'de'); // until we have a better idea for localizing the db stuff
 
 F3::set('DB', new DB('sqlite:data/' .$dbFile));

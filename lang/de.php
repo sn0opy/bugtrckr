@@ -105,5 +105,6 @@ return array('lng' => array(
     'actions' => 'Aktionen',
 	'sure' => 'Sind sie sicher?',
     'noTickets' => 'Zu diesem Projekt gibt es keine Tickets.',
-    'edit' => 'Bearbeiten'
+    'edit' => 'Bearbeiten',
+    'warningInstallFiles' => '<strong>Warnung!</strong> Einige Installationsdateien existieren noch und können eventuellen Schaden anrichten!'
 ));
