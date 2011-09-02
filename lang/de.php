@@ -103,5 +103,7 @@ return array('lng' => array(
     'noMilestones' => 'Zu diesem Projekt gibt es keine Meilensteine.',
     'loggedInAs' => 'Eingeloggt als',
     'actions' => 'Aktionen',
-	'sure' => 'Sind sie sicher?'
+	'sure' => 'Sind sie sicher?',
+    'noTickets' => 'Zu diesem Projekt gibt es keine Tickets.',
+    'edit' => 'Bearbeiten'
 ));

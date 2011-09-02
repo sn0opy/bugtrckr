@@ -102,5 +102,7 @@ return array('lng' => array(
     'noMilestones' => 'This project does not have any milestones.',
     'loggedInAs' => 'Logged in as',
     'actions' => 'Actions',
-	'sure' => 'Are you sure?'
+	'sure' => 'Are you sure?',
+    'noTickets' => 'This projekt does not have any tickets.',
+    'edit' => 'Edit'
 ));

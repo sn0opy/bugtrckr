@@ -696,3 +696,9 @@ button:active {
 .ticketSearch {
     margin-left: 10px;
 }
+
+td.action a {
+    display: block;
+    float: left;
+    margin-right: 20px;
+}

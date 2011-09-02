@@ -9,8 +9,12 @@
         </ul>
     </div>
 
+    {{* 
+    
+        Settings 
+            
+    *}}    
     <div class="tabContent" id="tabContent_1">
-        {{* Settings *}}
         <F3:check if="{{@getPermission('proj_editProject')}}">
             <F3:true>
                 <form action="{{@BASE}}/project/settings/main/edit" method="post">
@@ -48,8 +52,12 @@
             </F3:false>
         </F3:check>
     </div>
+    {{* 
+        
+        members 
+        
+    *}}
     <div class="tabContent" id="tabContent_2">
-        {{* members *}}
         <F3:check if="{{@getPermission('proj_manageMembers')}}">
             <F3:true>
                 <table class="sortable zebra">
@@ -110,8 +118,12 @@
             </F3:false>
         </F3:check>
     </div>
+    {{* 
+    
+        milestones 
+    
+    *}}
     <div class="tabContent" id="tabContent_3">
-        {{* milestones *}}
         <F3:check if="{{@getPermission('proj_manageMilestones')}}">
             <F3:true>
                 <table class="sortable zebra">
@@ -127,8 +139,10 @@
                             <td class="title">
                                 <a href="{{@BASE}}/project/settings/milestone/{{@milestone->hash}}">{{@milestone->name}}</a>
                             </td>
-							<td class="delete">
+							<td class="action">
 								<a href="{{@BASE}}/project/settings/delete/milestone/{{@milestone->hash}}" onclick="return confirm('{{@lng.sure}}');">{{@lng.delete}}</a>
+                                <a href="{{@BASE}}/project/settings/milestone/{{@milestone->hash}}">{{@lng.edit}}</a>
+                                <br class="clearfix" />
 							</td>
                         </tr>
                     </F3:repeat>
@@ -141,9 +155,12 @@
             </F3:false>
         </F3:check>
     </div>
-
+    {{* 
+        
+        roles 
+        
+    *}}
     <div class="tabContent" id="tabContent_4">
-        {{* roles *}}
         <F3:check if="{{@getPermission('proj_manageRoles')}}">
             <F3:true>
                 <table class="zebra sortable">
@@ -161,6 +178,8 @@
                             </td>
                             <td class="action">
                                 <a href="{{@BASE}}/project/settings/role/delete/{{@role->hash}}">{{@lng.delete}}</a>
+                                <a href="{{@BASE}}/project/settings/role/{{@role->hash}}">{{@lng.edit}}</a>
+                                <br class="clearfix" />
                             </td>
                         </tr>
                     </F3:repeat>
@@ -169,14 +188,16 @@
                 <a href="{{@BASE}}/project/settings/role/add">{{@lng.addrole}}</a>
             </F3:true>
             <F3:false>
-                <div class="failure message">{{@lng.noAccess}}
+                <div class="failure message">{{@lng.noAccess}}</div>
             </F3:false>
         </F3:check>
     </div>
-</div>
+    {{* 
     
+        categories 
+        
+    *}}
     <div class="tabContent" id="tabContent_5">
-        {{* roles *}}
         <F3:check if="{{@getPermission('proj_manageCategories')}}">
             <F3:true>
                 <table class="sortable zebra">

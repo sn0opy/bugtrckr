@@ -113,6 +113,6 @@
         </table>
     </F3:true>
     <F3:false>
-        <div class="info message clearfix">Sorry, couldn't find any tickets.</div>
+        <div class="info message clearfix">{{@lng.noTickets}}</div>
     </F3:false>
 </F3:check>

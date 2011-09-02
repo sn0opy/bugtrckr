@@ -416,7 +416,7 @@ class cproperties extends Controller
         $ax->hash = $hash;
         $ax->save();
         
-        $cmain = new cmain;
+        $cmain = new cmain();
         $cmain->selectProject($hash, false);
         
         $projId = $ax->_id;
@@ -438,7 +438,7 @@ class cproperties extends Controller
         $project = new Project();
         $project->load(array('id = :id', array(':id' => $this->get('SESSION.project'))));
         $project->name = $this->get('POST.name');
-        $project->public = $this->get('POST.public');
+        $project->public = $this->get('POST.public')=='on';
         $project->description = $this->get('POST.description');
         $project->save();
 

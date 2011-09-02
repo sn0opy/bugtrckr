@@ -21,6 +21,8 @@ $app = require_once(__DIR__.'/lib/base.php');
 $app->set('AUTOLOAD', __DIR__.'/inc/|'.__DIR__.'/inc/models/');
 $app->set('GUI','install/');
 $app->set('DEBUG', 3);
+$app->set('LOCALES','install/lang/');
+$app->set('LANGUAGE', 'de');
 $app->route('GET /setup.php', 'main->start');
 $app->route('POST /setup.php', 'main->install');
 
@@ -53,6 +55,12 @@ class main extends F3instance {
             require_once 'install/mysql.php';
         } else {
             $db = $this->get('POST.dbname');
+            
+            if(file_exists('data/'.$db)) {
+                $this->set('dbexists', true);
+                $this->tpserve();
+                return;
+            }
             
             $this->set('DB', new DB('sqlite:data/'.$db));
             require_once 'install/sqlite.php';

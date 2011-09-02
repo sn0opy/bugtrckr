@@ -49,7 +49,7 @@
 	<body>
         <div id="darkBg"></div>
         <div id="head">
-   			<h1><a href="{{@BASE}}/">{{@title}}</a></h1>
+   			<h1><a href="{{@BASE}}/">Bugtrckr</a></h1>
             <div id="menu">
                 <ul>
                     <li><a href="{{@BASE}}/" {{@onpage=='start'?'class="menuActive"':''}}>{{@lng.home}}</a></li>

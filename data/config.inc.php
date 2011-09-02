@@ -1,0 +1,1 @@
+<?php $dbFile = "bugtrckr.db"; ?>
