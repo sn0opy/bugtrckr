@@ -54,9 +54,10 @@ class cuser extends Controller
      */
     function registerUser($name = false, $password = false, $email = false, $admin = false)
     {
-		if ($this->get('POST.name') == "" ||
-			$this->get('POST.email') == "" ||
-			helper::checkEmail($this->get('POST.email') == 0))
+		if (($this->get('POST.name') == "" && $name == "") ||
+			($this->get('POST.email') == "" && $email == "") ||
+			(helper::checkEmail($this->get('POST.email') == 0) && 
+			 helper::checkEmail($email) == 0))
 			return $this->tpfail('Please correct your data.');
 
         $salt = helper::randStr();
