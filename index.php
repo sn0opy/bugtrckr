@@ -19,7 +19,6 @@ if(!file_exists('data/config.inc.php')) {
 }
 
 $app = require(__DIR__.'/lib/base.php');
-require_once('data/config.inc.php');
 
 $app->set('RELEASE', false);
 $app->set('CACHE', false);
@@ -31,7 +30,7 @@ $app->set('LOCALES','lang/');
 $app->set('PROXY', true);
 $app->set('LANGUAGE', 'de'); // until we have a better idea for localizing the db stuff
 
-F3::set('DB', new DB('sqlite:data/' .$dbFile));
+require_once('data/config.inc.php');
 
 // Template functions
 $app->set('getPermission', function($permission) {
