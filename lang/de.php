@@ -102,6 +102,9 @@ return array('lng' => array(
     'search' => 'Suchen',
     'noMilestones' => 'Zu diesem Projekt gibt es keine Meilensteine.',
     'loggedInAs' => 'Eingeloggt als',
+    'actions' => 'Aktionen',
 	'sure' => 'Sind sie sicher?',
-	'delete' => 'Löschen'
+    'noTickets' => 'Zu diesem Projekt gibt es keine Tickets.',
+    'edit' => 'Bearbeiten',
+    'warningInstallFiles' => '<strong>Warnung!</strong> Einige Installationsdateien existieren noch und können eventuellen Schaden anrichten!'
 ));

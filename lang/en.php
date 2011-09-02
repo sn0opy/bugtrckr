@@ -101,6 +101,9 @@ return array('lng' => array(
     'search' => 'Search',
     'noMilestones' => 'This project does not have any milestones.',
     'loggedInAs' => 'Logged in as',
+    'actions' => 'Actions',
 	'sure' => 'Are you sure?',
-	'delete' => 'Delete'
+    'noTickets' => 'This projekt does not have any tickets.',
+    'edit' => 'Edit',
+    'warningInstallFiles' => '<strong>Warning!</strong> Some installation files still exist and may cause damage!'
 ));

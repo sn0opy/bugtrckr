@@ -9,8 +9,12 @@
         </ul>
     </div>
 
+    {{* 
+    
+        Settings 
+            
+    *}}    
     <div class="tabContent" id="tabContent_1">
-        {{* Settings *}}
         <F3:check if="{{@getPermission('proj_editProject')}}">
             <F3:true>
                 <form action="{{@BASE}}/project/settings/main/edit" method="post">
@@ -48,8 +52,12 @@
             </F3:false>
         </F3:check>
     </div>
+    {{* 
+        
+        members 
+        
+    *}}
     <div class="tabContent" id="tabContent_2">
-        {{* members *}}
         <F3:check if="{{@getPermission('proj_manageMembers')}}">
             <F3:true>
                 <table class="sortable zebra">
@@ -110,46 +118,57 @@
             </F3:false>
         </F3:check>
     </div>
+    {{* 
+    
+        milestones 
+    
+    *}}
     <div class="tabContent" id="tabContent_3">
-        {{* milestones *}}
         <F3:check if="{{@getPermission('proj_manageMilestones')}}">
             <F3:true>
-                <table>
+                <table class="sortable zebra">
                     <thead>
                         <tr>
                             <th>{{@lng.milestone}}</th>
-							<th></th>
+							<th>{{@lng.actions}}</th>
                         </tr>
                     </thead>
                     <tbody>
-                    <F3:repeat group="{{@projMilestones}}" key="{{@i}}" value="{{@milestone}}">
-                        <tr class="tr{{@i%2}}">
+                    <F3:repeat group="{{@projMilestones}}" value="{{@milestone}}">
+                        <tr>
                             <td class="title">
                                 <a href="{{@BASE}}/project/settings/milestone/{{@milestone->hash}}">{{@milestone->name}}</a>
                             </td>
-							<td class="delete">
+							<td class="action">
 								<a href="{{@BASE}}/project/settings/delete/milestone/{{@milestone->hash}}" onclick="return confirm('{{@lng.sure}}');">{{@lng.delete}}</a>
+                                <a href="{{@BASE}}/project/settings/milestone/{{@milestone->hash}}">{{@lng.edit}}</a>
+                                <br class="clearfix" />
 							</td>
                         </tr>
                     </F3:repeat>
                     </tbody>
                 </table>
-                <a href="{{@BASE}}/project/settings/milestone/add">{{@lng.addmilestone}}</a>
+                <br class="clearfix" />
+                <a href="{{@BASE}}/project/settings/milestone/add" class="button">{{@lng.addmilestone}}</a>
             </F3:true>
             <F3:false>
                 <div class="failure message">{{@lng.noAccess}}</div>
             </F3:false>
         </F3:check>
     </div>
-
+    {{* 
+        
+        roles 
+        
+    *}}
     <div class="tabContent" id="tabContent_4">
-        {{* roles *}}
         <F3:check if="{{@getPermission('proj_manageRoles')}}">
             <F3:true>
                 <table class="zebra sortable">
                     <thead>
                         <tr>
                             <th>{{@lng.role}}</th>
+                            <th>{{@lng.actions}}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -158,21 +177,29 @@
                             <td class="title">
                                 <a href="{{@BASE}}/project/settings/role/{{@role->hash}}">{{@role->name}}</a>
                             </td>
+                            <td class="action">
+                                <a href="{{@BASE}}/project/settings/role/delete/{{@role->hash}}">{{@lng.delete}}</a>
+                                <a href="{{@BASE}}/project/settings/role/{{@role->hash}}">{{@lng.edit}}</a>
+                                <br class="clearfix" />
+                            </td>
                         </tr>
                     </F3:repeat>
                     </tbody>
                 </table>
-                <a href="{{@BASE}}/project/settings/role/add">{{@lng.addrole}}</a>
+                <br class="clearfix" />
+                <a href="{{@BASE}}/project/settings/role/add" class="button">{{@lng.addrole}}</a>
             </F3:true>
             <F3:false>
-                <div class="failure message">{{@lng.noAccess}}
+                <div class="failure message">{{@lng.noAccess}}</div>
             </F3:false>
         </F3:check>
     </div>
-</div>
+    {{* 
     
+        categories 
+        
+    *}}
     <div class="tabContent" id="tabContent_5">
-        {{* roles *}}
         <F3:check if="{{@getPermission('proj_manageCategories')}}">
             <F3:true>
                 <table class="sortable zebra">
@@ -191,7 +218,8 @@
                     </F3:repeat>
                     </tbody>
                 </table>
-                <a href="{{@BASE}}/project/settings/category/add">{{@lng.addcategory}}</a>
+                <br class="clearfix" />
+                <a href="{{@BASE}}/project/settings/category/add" class="button">{{@lng.addcategory}}</a>
             </F3:true>
             <F3:false>
                 <div class="failure message">{{@lng.noAccess}}</div>

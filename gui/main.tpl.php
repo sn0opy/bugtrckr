@@ -2,8 +2,8 @@
 <html>
 	<head>
         <meta charset="UTF-8" />
-		<link href="{{@BASE}}/gui/style.css" rel="stylesheet" type="text/css" />
-		<title>{{@pageTitle}} - {{@title}}</title>
+		<link href="{{@BASE}}/gui/css/style.css" rel="stylesheet" type="text/css" />
+		<title>{{@pageTitle}} - Bugtrckr</title>
         
         <script type="text/javascript" src="{{@BASE}}/gui/js/jquery.js"></script>
         <script type="text/javascript" src="{{@BASE}}/gui/js/jquery.tablesorter.js"></script>
@@ -49,7 +49,7 @@
 	<body>
         <div id="darkBg"></div>
         <div id="head">
-   			<h1><a href="{{@BASE}}/">{{@title}}</a></h1>
+   			<h1><a href="{{@BASE}}/">Bugtrckr</a></h1>
             <div id="menu">
                 <ul>
                     <li><a href="{{@BASE}}/" {{@onpage=='start'?'class="menuActive"':''}}>{{@lng.home}}</a></li>
@@ -95,6 +95,10 @@
             </div>
         </div>
         
+        <F3:check if="{{@installWarning && @RELEASE}}">
+            <div class="message warning">{{@lng.warningInstallFiles}}</div>
+        </F3:check>
+        
         <F3:check if="{{!@SESSION.user}}">
             <div id="login" class="layer">
                 <h3 class="floatleft">{{@lng.login}}</h3>
@@ -121,20 +125,14 @@
         <div id="content">
 			<div id="innerContentLOL">
                 <F3:check if="{{@SESSION.FAILURE}}">
-                    <F3:true>
-                        <div class="failure message">
-                            <p>{{@SESSION.FAILURE}}</p>
-                        </div>
-                    </F3:true>
-                    <F3:false>
-						<F3:check if="{{@SESSION.SUCCESS}}">
-							<F3:true>
-							<div class="success message">
-								<p>{{@SESSION.SUCCESS}}</p>
-							</div>
-							</F3:true>
-						</F3:check>
-                    </F3:false>
+                    <div class="failure message">
+                        <p>{{@SESSION.FAILURE}}</p>
+                    </div>
+                </F3:check>
+                <F3:check if="{{@SESSION.SUCCESS}}">
+                    <div class="success message">
+                        <p>{{@SESSION.SUCCESS}}</p>
+                    </div>
                 </F3:check>
                 <F3:include href="{{@template}}" />
             </div>

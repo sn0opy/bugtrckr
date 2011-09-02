@@ -13,22 +13,25 @@
  *   
 **/
 
-session_start();
+if(!file_exists('data/config.inc.php')) {
+    echo '<a href="setup.php">Setup</a>';
+    exit;
+}
 
 $app = require(__DIR__.'/lib/base.php');
-require 'inc/config.inc.php';
+require_once('data/config.inc.php');
 
+$app->set('RELEASE', false);
 $app->set('CACHE', false);
 $app->set('DEBUG', 3);
 $app->set('EXTEND', true);
 $app->set('GUI','gui/');
 $app->set('AUTOLOAD', 'inc/|inc/models/');
 $app->set('LOCALES','lang/');
-$app->set('LANGUAGE', 'de');
-$app->set('PROXY', 1);
+$app->set('PROXY', true);
 $app->set('LANGUAGE', 'de'); // until we have a better idea for localizing the db stuff
 
-F3::set('DB', new DB('sqlite:' .$dbFile));
+F3::set('DB', new DB('sqlite:data/' .$dbFile));
 
 // Template functions
 $app->set('getPermission', function($permission) {
@@ -53,7 +56,8 @@ $app->route('GET /project/settings/role/add', 'cproperties->showAddRole');
 $app->route('GET /project/settings/milestone/@hash', 'cproperties->showProjectSettingsMilestone');
 $app->route('GET /project/settings/milestone/add', 'cproperties->showAddMilestone');
 $app->route('GET /project/settings/category/add', 'cproperties->showAddCategory');
-$app->route('GET /project/settings/delete/milestone/@hash', 'cproperties->deleteProjectSettingsMilestone');
+$app->route('GET /project/settings/role/delete/@hash', 'cproperties->deleteRole');
+$app->route('GET /project/settings/milestone/delete/@hash', 'cproperties->deleteProjectSettingsMilestone');
 
 $app->route('POST /search', 'cticket->showTickets');
 $app->route('POST /project/select', 'cmain->selectProject');

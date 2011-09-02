@@ -21,6 +21,8 @@ $app = require_once(__DIR__.'/lib/base.php');
 $app->set('AUTOLOAD', __DIR__.'/inc/|'.__DIR__.'/inc/models/');
 $app->set('GUI','install/');
 $app->set('DEBUG', 3);
+$app->set('LOCALES','install/lang/');
+$app->set('LANGUAGE', 'de');
 $app->route('GET /setup.php', 'main->start');
 $app->route('POST /setup.php', 'main->install');
 
@@ -33,7 +35,7 @@ class main extends F3instance {
             'configexists' => file_exists('data/config.inc.php')
             ));                
         
-        $this->set('ERROR', $this->doChecks());        
+        $this->set('BERROR', $this->doChecks());        
         $this->tpserve();
     }
     
@@ -48,11 +50,28 @@ class main extends F3instance {
             $user = $this->get('POST.sqluser');
             $pass = $this->get('POST.sqlpw');
             $db = $this->get('POST.sqldb');
-                    
+
+            function errhandler() {
+                F3::set('mysqldata', array('host' => F3::get('POST.sqlhost'), 'user' => F3::get('POST.sqluser'), 'db' => F3::get('POST.sqldb')));
+                $main = new main();
+                $main->start();
+                return;
+            }
+            
+            $this->set('ONERROR', 'errhandler');
             $this->set('DB', new DB('mysql:host=' .$host. ';dbname=' .$db, $user, $pass));
+            $this->get('DB')->sql('SET NAMES utf8'); // just to check whether connection works
+            
             require_once 'install/mysql.php';
+            
         } else {
             $db = $this->get('POST.dbname');
+            
+            if(file_exists('data/'.$db)) {
+                $this->set('dbexists', true);
+                $this->tpserve();
+                return;
+            }
             
             $this->set('DB', new DB('sqlite:data/'.$db));
             require_once 'install/sqlite.php';
@@ -62,12 +81,10 @@ class main extends F3instance {
             
             file_put_contents('data/config.inc.php', '<?php $dbFile = "'.$db.'"; ?>');
             
-            $this->set('INSTALLED', true);
-            
+            $this->set('INSTALLED', true);            
             $this->tpserve();
         }
-    }
-    
+    }           
     
     function doChecks() {
         $error = false;
