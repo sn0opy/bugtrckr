@@ -369,7 +369,7 @@ th
     border-bottom: 3px solid #068;
     letter-spacing: 1px;
     text-align: left;
-    background: #333 url(img/bg.gif) center right no-repeat;
+    background: #333 url(../img/bg.gif) center right no-repeat;
     cursor: pointer; 
 }
 
@@ -383,12 +383,12 @@ th
 }
 
 th.headerSortUp { 
-    background-image: url(img/asc.gif); 
+    background-image: url(../img/asc.gif); 
     background-color: #068; 
 } 
 
 th.headerSortDown { 
-    background-image: url(img/desc.gif); 
+    background-image: url(../img/desc.gif); 
     background-color: #068; 
 } 
 
