@@ -27,7 +27,7 @@ h1 a, h2 a, h3 a, #menu a
  */
 #head
 {
-    background: #068 url(img/headBgN.png);
+    background: #068 url(../img/headBgN.png);
     height: 50px;
     line-height: 50px;
     padding-left: 20px;
