@@ -95,6 +95,27 @@ CREATE TABLE Category
 INSERT INTO Category (id, name) VALUES (1, 'Test');
 INSERT INTO Category (id, name) VALUES (2, 'Test2');
 
+
+--
+-- Wiki Entries
+--
+CREATE TABLE WikiEntry
+(
+	hash CHAR(32) PRIMARY KEY,
+	title VARCHAR(30),
+	content TEXT,
+	project CHAR(32),
+	created DATE,
+	created_by CHAR(32),
+	edited DATE,
+	edited_by CHAR(32)
+);
+
+CREATE TABLE WikiChanges
+(
+	
+);
+
 --
 -- VIEWS
 --

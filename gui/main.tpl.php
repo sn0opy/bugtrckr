@@ -58,6 +58,7 @@
                             <li><a href="{{@BASE}}/tickets" {{@onpage=='tickets'?'class="menuActive"':''}}>{{@lng.tickets}}</a></li>
                             <li><a href="{{@BASE}}/roadmap" {{@onpage=='roadmap'?'class="menuActive"':''}}>{{@lng.roadmap}}</a></li>
                             <li><a href="{{@BASE}}/timeline" {{@onpage=='timeline'?'class="menuActive"':''}}>{{@lng.timeline}}</a></li>
+							<li><a href="{{@BASE}}/wiki" {{@onpage=='wiki'?'class="menuActive"':''}}>{{@lng.wiki}}</a></li>
                             <F3:check if="{{@SESSION.user}}">
                                 <F3:true>
                                     <li><a href="{{@BASE}}/project/settings" {{@onpage=='settings'?'class="menuActive"':''}}>{{@lng.settings}}</a></li>

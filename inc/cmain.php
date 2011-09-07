@@ -1,7 +1,7 @@
 <?php
 
 /**
- * main.php
+ * cmain.php
  * 
  * Everything comes together in here
  * 
@@ -52,6 +52,7 @@ class cmain extends Controller
         }
 
         $this->set('SESSION.project', $project->id);
+		$this->set('SESSION.projectHash', $project->hash);
         
         if($routeBack)
             $this->reroute($url);
