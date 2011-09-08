@@ -155,12 +155,10 @@ class cticket extends Controller
         $ticket->save();
 
         if (!$ticket->id)
-        {
-            $this->tpfail("Failure while saving Ticket");
-            return;
-        }
+            return $this->tpfail("Failure while saving Ticket");
 
-        helper::addActivity($this->get('lng.ticket') . " '" .$ticket->title. "' " .$this->get('lng.edited'), $ticket->id, $this->get('POST.comment'));
+        helper::addActivity(
+			$this->get('lng.ticket') . " '" .$ticket->title. "' " .$this->get('lng.edited'), $ticket->id, $this->get('POST.comment'));
 
         $this->set('PARAMS["hash"]', $hash);
         $this->showTicket($hash);

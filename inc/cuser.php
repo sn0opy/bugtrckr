@@ -56,8 +56,8 @@ class cuser extends Controller
     {
 		if (($this->get('POST.name') == "" && $name == "") ||
 			($this->get('POST.email') == "" && $email == "") ||
-			(helper::checkEmail($this->get('POST.email') == 0) && 
-			 helper::checkEmail($email) == 0))
+			(!Data::validEmail($this->get('POST.email')) && 
+			!Data::validEmail($email)))
 			return $this->tpfail('Please correct your data.');
 
         $salt = helper::randStr();
@@ -72,15 +72,10 @@ class cuser extends Controller
         $user->save();
 
         if (!$user->_id)
-        {
-            $this->tpfail("Failure while creating User");
-            return;
-        }
+            return $this->tpfail("Failure while creating User");
 
-        if(!isset($name)) {
-            $this->set('SESSION.SUCCESS', 'User registred successfully');
-            $this->reroute($this->get('BASE') . '/');
-        }
+        $this->set('SESSION.SUCCESS', 'User registred successfully');
+        $this->reroute($this->get('BASE') . '/');
     }
 
     /**

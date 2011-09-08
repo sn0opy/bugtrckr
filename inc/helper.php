@@ -102,19 +102,11 @@ class helper extends F3instance
         $activity->hash = helper::getFreeHash('Activity');
         $activity->description = $description;
         $activity->comment = $comment;
-        $activity->user = $_SESSION['user']['id'];
+        $activity->user = F3::get('SESSION.user.id');
         $activity->changed = time();
-        $activity->project = $_SESSION['project'];
+        $activity->project = F3::get('SESSION.project');
         $activity->ticket = $ticket;
-        
+
         $activity->save();
     }
-
-	public static function checkEmail($email)
-	{
-/*		$pattern = "@^[a-z0-9_\+-]+(\.[a-z0-9_\+-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*\.([a-z]{2,4})$@";
-		return preg_match($pattern, $email);*/
-		return 1;
-	}
-
 }
