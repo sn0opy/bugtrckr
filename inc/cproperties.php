@@ -345,13 +345,32 @@ class cproperties extends Controller
     /**
      * 
      */
-    function addCategory()
+    function addEditCategory()
     {
-
         $category = new Category();
+
+		if ($this->get('POST.hash') != "")
+			$category->load(array('hash = :hash', array(':hash' => $this->get('POST.hash'))));
+
         $category->name = $this->get('POST.name');
         $category->save();
+
+		if ($this->get('POST.hash') != "")
+			$this->set('SESSION.SUCCESS', 'Category changed successfully');
+		else
+        	$this->set('SESSION.SUCCESS',"Category added successfully");
+
+        $this->reroute($this->get('BASE') . '/project/settings/');
+
     }
+
+	/**
+	 *
+	 */
+	function deleteCategory()
+	{
+
+	}
 
     /**
      * 

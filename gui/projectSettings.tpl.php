@@ -206,6 +206,7 @@
                     <thead>
                         <tr>
                             <th>{{@lng.category}}</th>
+							<th>{{@lng.actions}}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -214,6 +215,10 @@
                             <td class="title">
                                 {{@category->name}}
                             </td>
+							<td>
+								<a href="{{@BASE}}/project/settings/category/delete/{{@category->hash}}">{{@lng.delete}}</a>
+								<a href="{{@BASE}}/project/settings/category/edit/{{@category->hash}}">{{@lng.edit}}</a>
+							</td>
                         </tr>
                     </F3:repeat>
                     </tbody>

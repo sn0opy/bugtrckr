@@ -106,15 +106,7 @@ class helper extends F3instance
         $activity->changed = time();
         $activity->project = F3::get('SESSION.project');
         $activity->ticket = $ticket;
-        
+
         $activity->save();
     }
-
-	public static function checkEmail($email)
-	{
-/*		$pattern = "@^[a-z0-9_\+-]+(\.[a-z0-9_\+-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*\.([a-z]{2,4})$@";
-		return preg_match($pattern, $email);*/
-		return 1;
-	}
-
 }
