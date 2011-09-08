@@ -1,6 +1,6 @@
 <h2>{{@lng.registration}}</h2>
 
-<F3:check if="{{@SESSION.userId}}">
+<F3:check if="{{@SESSION.user.hash}}">
     <F3:true>
         <p>{{@lng.alreadyLoggedIn}}</p>
     </F3:true>

@@ -714,9 +714,33 @@ td.action a {
     margin-right: 20px;
 }
 
+
 .noAcc {
     margin-top: 10px;
     margin-bottom: 10px;
     display: block;
     text-align: center;
+}
+
+#wikicontent {
+	border: solid 1px;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	margin: 5px;
+	min-height: 400px;
+	padding: 5px;
+	width: 600px;
+}
+
+#wikiedit_textarea {
+	display: none;
+	margin: 5px;
+	min-height: 400px;
+	padding: 5px;
+	width: 600px;
+}
+
+#submitbutton, #cancelbutton {
+	display: none;
 }

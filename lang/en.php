@@ -129,5 +129,7 @@ return array('lng' => array(
                     array('id' => 3, 'name' => 'Normal'),
                     array('id' => 4, 'name' => 'Low'),
                     array('id' => 5, 'name' => 'Very low'),
-                )
+                ),
+	'wiki' => 'Wiki',
+	'mainpage' => 'Mainpage'
 ));

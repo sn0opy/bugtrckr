@@ -230,4 +230,4 @@
                 <div class="failure message">{{@lng.noAccess}}</div>
             </F3:false>
         </F3:check>
-    </div>
+   </div>

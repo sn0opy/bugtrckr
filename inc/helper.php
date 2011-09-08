@@ -61,22 +61,22 @@ class helper extends F3instance
      */
     public static function getPermission($permission)
     {
-        $userId = F3::get('SESSION.user->id');
-        $projectId = F3::get('SESSION.project');
+        $userHash = F3::get('SESSION.user.hash');
+        $projectHash = F3::get('SESSION.project');
         
-        if ($userId)
+        if ($userHash)
         {
             $user = new User();
-            $user->load('id = ' . $userId);
+            $user->load(array('hash = :hash', array(':hash' => $userHash)));
 
             $projPerm = new ProjectPermission();
-            $permissions = $projPerm->findone('userId = ' . $userId . ' AND projectId = ' . $projectId);
+            $permissions = $projPerm->findone(array('user = :user AND project = :project', array(':user' => $userHash, ':project' => $projectHash)));
 
 			if ($permissions == null)
 				return false;
 
             $role = new Role();
-            if (!$role->load('id = ' . $permissions->roleId))
+            if (!$role->load('hash = ' . $permissions->role))
 				return false;
 			
             if ($user->admin) // admin has access to everything
@@ -92,7 +92,7 @@ class helper extends F3instance
 
     public static function getTicketCount($milestone)
     {
-        return F3::get('DB')->sql('SELECT state, COUNT(*) AS `count` FROM `Ticket` WHERE milestone = ' . $milestone . ' GROUP BY state');
+        return F3::get('DB')->sql('SELECT state, COUNT(*) AS `count` FROM `Ticket` WHERE milestone = \'' . $milestone . '\' GROUP BY state');
     }
 
     public static function addActivity($description, $ticket = 0, $comment = '')

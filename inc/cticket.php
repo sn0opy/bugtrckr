@@ -20,8 +20,7 @@ class cticket extends Controller
 	 */
     function showTickets()
     {   
-		if (!is_numeric($this->get('SESSION.project')) ||
-			$this->get('SESSION.project') <= 0)
+		if (!ctype_alnum($this->get('SESSION.project')))
 			return $this->tpfail('Please select a project.');
 
         $order = 'created';
@@ -41,13 +40,13 @@ class cticket extends Controller
         $milestones = new Milestone();
         $milestones = $milestones->find(array('project = :project', array(':project' => $project)));
 
-        $msids = array();
+        $mshashs = array();
         foreach ($milestones as $ms)
-            $msids[] = $ms->id;
-        $string = implode($msids, ',');
+            $mshashs[] = $ms->hash;
+        $string = implode($mshashs, '\',\'');
             
         $tickets = new DisplayableTicket();
-        $tickets = $tickets->find('milestone IN (' . $string . ') AND ' .
+        $tickets = $tickets->find('milestone IN (\'' . $string . '\') AND ' .
                     'title LIKE \'%'.$search.'%\'' .
                     'ORDER BY ' . $order. ' DESC');
 
@@ -79,9 +78,9 @@ class cticket extends Controller
         $milestone = new Milestone();
 
         $activities = new DisplayableActivity();
-        $activities = $activities->find(array("ticket = :ticket", array(':ticket' => $ticket->id)));
+        $activities = $activities->find(array("ticket = :ticket", array(':ticket' => $ticket->hash)));
 
-        if (!$ticket->id)
+        if (!$ticket->hash)
             return $this->tpfail("Can't open ticket");
    
         $users = new User();
@@ -145,20 +144,19 @@ class cticket extends Controller
         $milestone = new cmilestone();
         
         $ticket->state = $this->get('POST.state');
-		if (is_numeric($this->get('POST.userId')))
-			$ticket->assigned = $this->get('POST.userId');
+		if (is_numeric($this->get('POST.user')))
+			$ticket->assigned = $this->get('POST.user');
 		if (ctype_alnum($this->get('POST.milestone')))
         	$ticket->milestone = $milestone->getMilestoneID($this->get('POST.milestone'));
 
         $ticket->save();
 
-        if (!$ticket->id)
+        if (!$ticket->hash)
             return $this->tpfail($this->get('lng.failTicketSave'));
 
         helper::addActivity(
-			$this->get('lng.ticket') . " '" .$ticket->title. "' " .$this->get('lng.edited'), $ticket->id, $this->get('POST.comment'));
+			$this->get('lng.ticket') . " '" .$ticket->title. "' " .$this->get('lng.edited'), $ticket->hash, $this->get('POST.comment'));
 
         $this->reroute($this->get('BASE').'/ticket/'.$hash);
     }
-
 }

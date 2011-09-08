@@ -57,7 +57,10 @@ $app->route('GET /project/settings/milestone/add', 'cproperties->showAddMileston
 $app->route('GET /project/settings/category/add', 'cproperties->showAddCategory');
 $app->route('GET /project/settings/role/delete/@hash', 'cproperties->deleteRole');
 $app->route('GET /project/settings/milestone/delete/@hash', 'cproperties->deleteProjectSettingsMilestone');
-$app->route('GET /project/settings/category/delete', 'cproperties->deleteCategory');
+$app->route('GET /project/settings/category/delete/@hash', 'cproperties->deleteCategory');
+$app->route('GET /wiki/@title', 'cwiki->showEntry');
+$app->route('GET /wiki', 'cwiki->showEntry');
+
 
 $app->route('POST /search', 'cticket->showTickets');
 $app->route('POST /project/select', 'cmain->selectProject');
@@ -74,6 +77,7 @@ $app->route('POST /project/settings/main/edit', 'cproperties->projectEditMain');
 $app->route('POST /project/settings/milestone/edit', 'cmilestone->addEditMilestone');
 $app->route('POST /project/settings/member/add', 'cproperties->projectAddMember');
 $app->route('POST /project/setttings/member/delete', 'cproperties->projectDelMember');
+$app->route('POST /wiki', 'cwiki->editEntry');
 
 $app->run();
 

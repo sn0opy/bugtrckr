@@ -1,5 +1,5 @@
 <h2>{{@lng.project}} › {{@lng.add}}</h2>
-<F3:check if="{{@SESSION.user.id}}">
+<F3:check if="{{@SESSION.user.hash}}">
     <F3:true>
         <form action="{{@BASE}}/project/add" method="post">
             <div class="formRow">

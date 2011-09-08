@@ -24,11 +24,11 @@ class cuser extends Controller
         $user = new User();
         $user->load(array('name = :name', array(':name' => $name)));
 
-        if (!$user->id)
+        if (!$user->hash)
             return $this->tpfail("User not found");
 
         $ticket = new DisplayableTicket();
-        $tickets = $ticket->find('owner = ' . $user->id);
+        $tickets = $ticket->find(array('owner = :owner', array(':owner' => $user->hash)));
 
         $this->set('user', $user);
         $this->set('tickets', $tickets);
@@ -95,8 +95,8 @@ class cuser extends Controller
     function loginUser()
     {
         $user = new User();        
-        $user->load(array('email = :email', array(':email' => $this->get('POST.email'))));
-        $user->load(array('email = :email AND password = :password',
+//        $user->load(array('email = :email', array(':email' => $this->get('POST.email'))));
+        $user->load(array('email = \':email\' AND password = \':password\'',
             array(':email' => $this->get('POST.email'),
                 ':password' => helper::salting($user->salt, $this->get('POST.password')))));
 
@@ -106,13 +106,11 @@ class cuser extends Controller
             $this->reroute($this->get('BASE') . '/user/login');
         }
 
-        echo $this->get('SESSION.project');
-
         // enable user's last used project if he hasn't already chosen one
         if($user->lastProject && !$this->get('SESSION.project'))
             $this->set('SESSION.project', $user->lastProject);
 
-        $this->set('SESSION.user', array('name' => $user->name, 'id' => $user->id, 'admin' => $user->admin, 'hash' => $user->hash));
+        $this->set('SESSION.user', array('name' => $user->name, 'admin' => $user->admin, 'hash' => $user->hash));
         $this->set('SESSION.SUCCESS', 'Login successful');
         $this->reroute($this->get('BASE') . '/');
     }
@@ -122,10 +120,9 @@ class cuser extends Controller
      */
     function logoutUser()
     {
-        $this->set('SESSION.userName', NULL);
-        $this->set('SESSION.userPassword', NULL);
-        $this->set('SESSION.userHash', NULL);
-        $this->set('SESSION.userId', NULL);
+        $this->set('SESSION.user', NULL);
+        $this->set('SESSION.user', NULL);
+        $this->set('SESSION.user', NULL);
         session_destroy();
 
         $this->set('SESSION.SUCCESS', 'User logged out');

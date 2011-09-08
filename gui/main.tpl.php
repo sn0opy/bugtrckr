@@ -58,6 +58,7 @@
                             <li><a href="{{@BASE}}/tickets" {{@onpage=='tickets'?'class="menuActive"':''}}>{{@lng.tickets}}</a></li>
                             <li><a href="{{@BASE}}/roadmap" {{@onpage=='roadmap'?'class="menuActive"':''}}>{{@lng.roadmap}}</a></li>
                             <li><a href="{{@BASE}}/timeline" {{@onpage=='timeline'?'class="menuActive"':''}}>{{@lng.timeline}}</a></li>
+							<li><a href="{{@BASE}}/wiki" {{@onpage=='wiki'?'class="menuActive"':''}}>{{@lng.wiki}}</a></li>
                             <F3:check if="{{@SESSION.user}}">
                                 <F3:true>
                                     <li><a href="{{@BASE}}/project/settings" {{@onpage=='settings'?'class="menuActive"':''}}>{{@lng.settings}}</a></li>
@@ -73,11 +74,11 @@
                     <li class="project_selector">
                         <form method="post" action="{{@BASE}}/project/select">
                             <select name="project" size="1" onBlur="submit();">
-                                <F3:check if="{{@SESSION.user.id}}">
+                                <F3:check if="{{@SESSION.user.hash}}">
                                     <option value="new">{{@lng.newProject}}</option>
                                 </F3:check>
                                 <F3:repeat group="{{@projects}}" value="{{@project}}">
-                                    <option value="{{@project->hash}}" {{(@project->id == @SESSION.project)?'selected="selected"':''}}>{{@project->name}}</option>
+                                    <option value="{{@project->hash}}" {{(@project->hash == @SESSION.project)?'selected="selected"':''}}>{{@project->name}}</option>
                                 </F3:repeat>
                             </select>
                         </form>
