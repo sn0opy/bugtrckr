@@ -73,11 +73,11 @@
                     <li class="project_selector">
                         <form method="post" action="{{@BASE}}/project/select">
                             <select name="project" size="1" onBlur="submit();">
-                                <F3:check if="{{@SESSION.user.id}}">
+                                <F3:check if="{{@SESSION.user.hash}}">
                                     <option value="new">{{@lng.newProject}}</option>
                                 </F3:check>
                                 <F3:repeat group="{{@projects}}" value="{{@project}}">
-                                    <option value="{{@project->hash}}" {{(@project->id == @SESSION.project)?'selected="selected"':''}}>{{@project->name}}</option>
+                                    <option value="{{@project->hash}}" {{(@project->hash == @SESSION.project)?'selected="selected"':''}}>{{@project->name}}</option>
                                 </F3:repeat>
                             </select>
                         </form>

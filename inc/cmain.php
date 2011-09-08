@@ -37,21 +37,21 @@ class cmain extends Controller
         $project = new Project();
         $project->load(array("hash = :hash", array(':hash' =>$projHash)));
 
-        if (!$project->id)
+        if (!$project->hash)
         {
             $this->tpfail("Failure while changing Project");
             return;
         }
 
-        if ($this->get('SESSION.user.id'))
+        if ($this->get('SESSION.user.hash'))
         {
             $user = new User();
-            $user->load("id = " . $this->get('SESSION.user.id'));
-            $user->lastProject = $project->id;
+            $user->load("hash = " . $this->get('SESSION.user.hash'));
+            $user->lastProject = $project->hash;
             $user->save();
         }
 
-        $this->set('SESSION.project', $project->id);
+        $this->set('SESSION.project', $project->hash);
         
         if($routeBack)
             $this->reroute($url);

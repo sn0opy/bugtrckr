@@ -32,7 +32,7 @@
 			<div class="formValue">
                 <select name="category" size="1">
                     <F3:repeat group="{{@categories}}" value="{{@category}}">
-                        <option value="{{@category->id}}">{{@category->name}}</option>
+                        <option value="{{@category->hash}}">{{@category->name}}</option>
                     </F3:repeat>
                 </select>
             </div>
@@ -66,7 +66,7 @@
 			<div class="formValue">
 				<select name="milestone" size="1">
 				<F3:repeat group="{{@milestones}}" value="{{@milestone}}">
-                    <option value="{{@milestone->id}}">{{@milestone->name}}</option>
+                    <option value="{{@milestone->hash}}">{{@milestone->name}}</option>
 				</F3:repeat>
 				</select>
 			</div>

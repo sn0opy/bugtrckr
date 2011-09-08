@@ -31,7 +31,7 @@
             <td>
                 {{* this ABSOLUTELY sucks, but works, sorry (TODO) *}}
                 <F3:repeat group="{{@milestones}}" value="{{@milestone}}">
-                    <F3:check if="{{@ticket->milestone==@milestone->id}}">
+                    <F3:check if="{{@ticket->milestone==@milestone->hash}}">
                         {{@milestone->name}}
                     </F3:check>
                 </F3:repeat>
@@ -83,15 +83,15 @@
                 <div class="formRow">
                     <div class="formLabel">{{@lng.assignedTo}}</div>
                     <div class="formValue">
-                        <select name="userId" size="1">
+                        <select name="user" size="1">
                             <option value=""></option>
                             <F3:repeat group="{{@users}}" value="{{@user}}">
-                                <F3:check if="{{@user->id==@ticket->assigned}}">
+                                <F3:check if="{{@user->hash==@ticket->assigned}}">
                                     <F3:true>
-                                        <option value="{{@user->id}}" selected="selected">{{@user->name}}</option>
+                                        <option value="{{@user->hash}}" selected="selected">{{@user->name}}</option>
                                     </F3:true>
                                     <F3:false>
-                                        <option value="{{@user->id}}">{{@user->name}}</option>
+                                        <option value="{{@user->hash}}">{{@user->name}}</option>
                                     </F3:false>
                             </F3:repeat>
                         </select>
@@ -103,7 +103,7 @@
                     <div class="formValue">
                         <select name="milestone" size="1">
                             <F3:repeat group="{{@milestones}}" value="{{@milestone}}">
-                                <F3:check if="{{@milestone->id==@ticket->milestone}}">
+                                <F3:check if="{{@milestone->hash==@ticket->milestone}}">
                                     <F3:true>
                                         <option value="{{@milestone->hash}}" selected="selected">{{@milestone->name}}</option>
                                     </F3:true>
@@ -121,8 +121,8 @@
                         <select name="state" size="1">
                             <F3:repeat group="{{@states}}" key="{{@i}}" value="{{@state}}">
                                 <F3:check if="{{@state->name == @ticket->statusname}}">
-                                    <F3:true><option value="{{@state->id}}" selected="selected">{{@state->name}}</option></F3:true>
-                                    <F3:false><option value="{{@state->id}}">{{@state->name}}</option></F3:false>
+                                    <F3:true><option value="{{@state->hash}}" selected="selected">{{@state->name}}</option></F3:true>
+                                    <F3:false><option value="{{@state->hash}}">{{@state->name}}</option></F3:false>
                                 </F3:check>
                             </F3:repeat>
                         </select>

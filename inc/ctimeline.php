@@ -20,8 +20,7 @@ class ctimeline extends Controller
      */
     function showTimeline()
     {
-		if (!is_numeric($this->get('SESSION.project')) ||
-			$this->get('SESSION.project') <= 0)
+		if (!ctype_alnum($this->get('SESSION.project')))
 			return $this->tpfail('Please select a project.');
 
         $timeline = array();
@@ -29,7 +28,7 @@ class ctimeline extends Controller
         $project = $this->get('SESSION.project');
 
         $activities = new DisplayableActivity();
-        $activities = $activities->find("project = $project");
+        $activities = $activities->find("project = '$project'");
 
         $this->set('activities', $activities);
         $this->set('pageTitle', '{{@lng.timeline}}');

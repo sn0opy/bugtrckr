@@ -20,20 +20,21 @@ class cproperties extends Controller
      */
     function showProjectSettings()
     {
-        $projectId = $this->get('SESSION.project');
+        $projectHash = $this->get('SESSION.project');
 
-        if($projectId) {      
+        if($projectHash != "") {      
             $project = new Project;
-            $project->load(array('id = :id', array(':id' => $projectId)));
+            $project->load(array('hash = :hash', array(':hash' => $projectHash)));
 
             $role = new Role();
-            $roles = $role->find('projectId = ' . $projectId);
+            $roles = $role->find(array('project = :hash', array(':hash' => $projectHash)));
 
             $projPerms = new user_perms();
-            $projPerms = $projPerms->find('projectId = ' . $projectId);
+            $projPerms = $projPerms->find(array('project = :hash', array(':hash' => $projectHash)));
+
 
             $milestone = new Milestone();
-            $milestones = $milestone->find('project = ' . $projectId);
+            $milestones = $milestone->find(array('project = :hash', array(':hash' => $projectHash)));
 
             $user = new User();
             $users = $user->find();
@@ -41,7 +42,7 @@ class cproperties extends Controller
             $categories = new Category();
             $categories = $categories->find();
 
-            if (!$project->id) //|| !$roles || !$milestones || !$users || !$categories)
+            if ($project->hash == "") //|| !$roles || !$milestones || !$users || !$categories)
             {
                 $this->tpfail("Failure while open Project");
                 return;
@@ -75,7 +76,7 @@ class cproperties extends Controller
             return;
         }
 
-        $projectId = $this->get('SESSION.project');
+        $projectHash = $this->get('SESSION.project');
         $userHash = $this->get('POST.member');
         $roleHash = $this->get('POST.role');
 
@@ -98,8 +99,8 @@ class cproperties extends Controller
         }
 
         $projPerms = new ProjectPermission();
-        $projPerms->load(array('userId = :userId AND projectId = :projectId',
-            array(':userId' => $user->id, ':projectId' => $projectId)));
+        $projPerms->load(array('user = :user AND project = :project',
+            array(':user' => $user->hash, ':project' => $projectHash)));
 
         if (!$projPerms->dry())
         {
@@ -107,9 +108,9 @@ class cproperties extends Controller
             return;
         }
 
-        $projPerms->userId = $user->id;
-        $projPerms->roleId = $role->id;
-        $projPerms->projectId = $projectId;
+        $projPerms->user = $user->hash;
+        $projPerms->role = $role->hash;
+        $projPerms->project = $projectHash;
         $projPerms->save();
 
         $this->reroute($this->get('BASE') . '/project/settings');
@@ -126,7 +127,7 @@ class cproperties extends Controller
         }
 
         $userHash = $this->get('POST.user');
-        $projectId = $this->get('SESSION.project');
+        $projectHash = $this->get('SESSION.project');
 
         $user = new User();
         $user->load(array('hash = :hash', array(':hash' => $userHash)));
@@ -138,7 +139,7 @@ class cproperties extends Controller
         }
 
         $projPerms = new ProjectPermission();
-        $projPerms->load('userId = ' . $user->id . ' AND projectId = ' . $projectId);
+        $projPerms->load('user = :user AND project = :project', array(':user' => $user->hash, ':project' => $projectHash));
         $projPerms->erase();
 
         $this->set('SESSION.SUCCESS', 'Member has been removed from the project.');
@@ -156,12 +157,12 @@ class cproperties extends Controller
             return;
         }
 
-        $projectId = $this->get('SESSION.project');
+        $projectHash = $this->get('SESSION.project');
 
         $user = new user();
         $user->load(array('hash = :hash', array(':hash' => $this->get('POST.user'))));
 
-        if (!$user->id)
+        if (!$user->hash)
         {
             $this->tpfail("Failure while getting User");
             return;
@@ -170,23 +171,23 @@ class cproperties extends Controller
         $role = new Role();
         $role->load(array('hash = :hash', array(':hash' => $this->get('POST.role'))));
 
-        if (!$role->id)
+        if (!$role->hash)
         {
             $this->tpfail("Failure while getting Role");
             return;
         }
 
-        if ($role->projectId != $projectId)
+        if ($role->project != $projectHash)
         {
             $this->tpfail("Role does not belong to this project.");
             return;
         }
 
         $perms = new ProjectPermission();
-        $perms->load(array('projectId = :proj AND userId = :user',
-            array(':proj' => $projectId,
-                ':user' => $user->id)));
-        $perms->roleId = $role->id;
+        $perms->load(array('project = :proj AND user = :user',
+            array(':proj' => $projectHash,
+                ':user' => $user->hash)));
+        $perms->role = $role->hash;
         $perms->save();
 
         $this->reroute($this->get('BASE') . '/project/settings');
@@ -202,7 +203,7 @@ class cproperties extends Controller
         $role = new role();
         $role->load(array('hash = :hash', array(':hash' => $roleHash)));
 
-        if (!$role->id)
+        if (!$role->hash)
         {
             $this->tpfail("Failure while getting Role");
             return;
@@ -226,7 +227,7 @@ class cproperties extends Controller
         $milestone = new Milestone();
         $milestone->load(array('hash = :hash', array(':hash' => $msHash)));
 
-        if (!$milestone->id)
+        if (!$milestone->hash)
         {
             $this->tpfail("Failure while getting Milestone");
             return;
@@ -255,14 +256,14 @@ class cproperties extends Controller
         $milestone = new Milestone();
         $milestone->load(array('hash = :hash', array(':hash' => $msHash)));
 
-        if (!$milestone->id)
+        if (!$milestone->hash)
         {
             $this->tpfail("Failure while getting Milestone");
             return;
         }
 
 		$tickets = new Ticket();
-		$count = $tickets->found('milestone = ' . $milestone->id);
+		$count = $tickets->found('milestone = ' . $milestone->hash);
 
 		if ($count > 0)
 		{
@@ -277,7 +278,7 @@ class cproperties extends Controller
     /**
      * 
      */
-    function addEditRole($projId = false)
+    function addEditRole($projHash = false)
     {
         $roleHash = $this->get('POST.hash') ? $this->get('POST.hash') : helper::getFreeHash('Role');
 
@@ -293,25 +294,25 @@ class cproperties extends Controller
             }
         }
 
-        $role->name = ($projId) ? 'Admin' : $this->get('POST.name');
-        $role->hash = ($projId) ? helper::getFreeHash('Role') : $roleHash;
-        $role->issuesAssigneable = ($projId) ? 1 : $this->get('POST.issuesAssigneable') == "on";
-        $role->projectId = ($projId) ? $projId : $this->get('SESSION.project');
-        $role->iss_addIssues = ($projId) ? 1 : $this->get('POST.iss_addIssues') == "on";
-        $role->proj_editProject = ($projId) ? 1 : $this->get('POST.proj_editProject') == "on";
-        $role->proj_manageMembers = ($projId) ? 1 : $this->get('POST.proj_manageMembers') == "on";
-        $role->proj_manageMilestones = ($projId) ? 1 : $this->get('POST.proj_manageMilestones') == "on";
-        $role->proj_manageRoles = ($projId) ? 1 : $this->get('POST.proj_manageRoles') == "on";
-        $role->iss_editIssues = ($projId) ? 1 : $this->get('POST.iss_editIssues') == "on";
-        $role->iss_addIssues = ($projId) ? 1 : $this->get('POST.iss_addIssues') == "on";
-        $role->iss_deleteIssues = ($projId) ? 1 : $this->get('POST.iss_deleteIssues') == "on";
+        $role->name = ($projHash) ? 'Admin' : $this->get('POST.name');
+        $role->hash = ($projHash) ? helper::getFreeHash('Role') : $roleHash;
+        $role->issuesAssigneable = ($projHash) ? 1 : $this->get('POST.issuesAssigneable') == "on";
+        $role->projectId = ($projHash) ? $projHash : $this->get('SESSION.project');
+        $role->iss_addIssues = ($projHash) ? 1 : $this->get('POST.iss_addIssues') == "on";
+        $role->proj_editProject = ($projHash) ? 1 : $this->get('POST.proj_editProject') == "on";
+        $role->proj_manageMembers = ($projHash) ? 1 : $this->get('POST.proj_manageMembers') == "on";
+        $role->proj_manageMilestones = ($projHash) ? 1 : $this->get('POST.proj_manageMilestones') == "on";
+        $role->proj_manageRoles = ($projHash) ? 1 : $this->get('POST.proj_manageRoles') == "on";
+        $role->iss_editIssues = ($projHash) ? 1 : $this->get('POST.iss_editIssues') == "on";
+        $role->iss_addIssues = ($projHash) ? 1 : $this->get('POST.iss_addIssues') == "on";
+        $role->iss_deleteIssues = ($projHash) ? 1 : $this->get('POST.iss_deleteIssues') == "on";
         $role->iss_moveIssue = ($projId) ? 1 : $this->get('POST.iss_moveIssue') == "on";
-        $role->iss_editWatchers = ($projId) ? 1 : $this->get('POST.iss_editWatchers') == "on";
-        $role->iss_addWatchers = ($projId) ? 1 : $this->get('POST.iss_addWatchers') == "on";
-        $role->iss_viewWatchers = ($projId) ? 1 : $this->get('POST.iss_viewWatchers') == "on";
+        $role->iss_editWatchers = ($projHash) ? 1 : $this->get('POST.iss_editWatchers') == "on";
+        $role->iss_addWatchers = ($projHash) ? 1 : $this->get('POST.iss_addWatchers') == "on";
+        $role->iss_viewWatchers = ($projHash) ? 1 : $this->get('POST.iss_viewWatchers') == "on";
         $role->save();
 
-        if($projId)
+        if($projHash)
             return $role->_id;
         else
             $this->reroute($this->get('BASE') . '/project/settings/role/' . $roleHash);
@@ -328,7 +329,7 @@ class cproperties extends Controller
 
             $ax2 = new Axon('ProjectPermission');
 
-            if($ax2->found('roleId = '.$ax->id))
+            if($ax2->found('role = '.$ax->hash))
             {
                 $this->tpfail('Role cannot be deleted.');
                 return;
@@ -351,6 +352,11 @@ class cproperties extends Controller
 
 		if ($this->get('POST.hash') != "")
 			$category->load(array('hash = :hash', array(':hash' => $this->get('POST.hash'))));
+		else
+		{
+			$category->project = $this->get('SESSION.projectHash');
+			$category->hash = helper::getFreeHash('Category');
+		}
 
         $category->name = $this->get('POST.name');
         $category->save();
@@ -368,7 +374,19 @@ class cproperties extends Controller
 	 */
 	function deleteCategory()
 	{
+		$hash = $this->get('PARAMS.hash');
 
+		if (helper::getPermission('proj_editProject'))
+		{
+			$category = new Category();
+			$category->load(array('hash = :hash', array(':hash' => $hash)));
+
+			$category->erase();
+			$this->set('SESSION.SUCCESS', 'Category has been deleted.');
+			$this->reroute($this->get('BASE') . '/project/settings');
+		}
+		else
+			$this->tpfail('You don\'t have permissions to do this.');
 	}
 
     /**
@@ -429,15 +447,15 @@ class cproperties extends Controller
         $ax->public = ($this->get('POST.public') == 'on') ? 1 : 0;
         $ax->hash = $hash;
         $ax->save();
-        $projId = $ax->_id;
+        $proj = $ax->_id;
 
         $cmain = new cmain();
         $cmain->selectProject($hash, false);
         
         $perms = new ProjectPermission();
-        $perms->userId = $this->get('SESSION.user.id');
-        $perms->projectId = $projId;
-        $perms->roleId = self::addEditRole($projId);
+        $perms->user = $this->get('SESSION.user.hash');
+        $perms->project = $proj;
+        $perms->role = self::addEditRole($proj);
         $perms->save();
         
         $this->reroute($this->get('BASE').'/');        
@@ -449,13 +467,13 @@ class cproperties extends Controller
     function projectEditMain()
     {
         $project = new Project();
-        $project->load(array('id = :id', array(':id' => $this->get('SESSION.project'))));
+        $project->load(array('hash = :hash', array(':hash' => $this->get('SESSION.project'))));
         $project->name = $this->get('POST.name');
         $project->public = $this->get('POST.public')=='on';
         $project->description = $this->get('POST.description');
         $project->save();
 
-        if (!$project->id)
+        if (!$project->hash)
         {
             $this->tpfail("Failure while saving Project");
             return;
@@ -463,5 +481,4 @@ class cproperties extends Controller
 
         $this->reroute($this->get('BASE') . '/project/settings');
     }
-
 }
