@@ -87,6 +87,26 @@ CREATE TABLE Category
 );
 
 --
+-- Wiki Entries
+--
+CREATE TABLE WikiEntry
+(
+	hash CHAR(32) PRIMARY KEY,
+	title VARCHAR(30),
+	content TEXT,
+	project CHAR(32),
+	created DATE,
+	created_by CHAR(32),
+	edited DATE,
+	edited_by CHAR(32)
+);
+
+CREATE TABLE WikiChanges
+(
+	
+);
+
+--
 -- VIEWS
 --
 CREATE VIEW user_perms as SELECT * FROM user, projectpermission WHERE user = projectpermission.user;
