@@ -83,15 +83,13 @@ class cticket extends Controller
 
         if (!$ticket->id)
             return $this->tpfail("Can't open ticket");
-
-        $state = new State();    
+   
         $users = new User();
         
         $this->set('ticket', $ticket);
         $this->set('milestones', $milestone->find());
         $this->set('activities', $activities);        
         $this->set('users', $users = $users->find());
-        $this->set('states', $state->find('lang = "' .$this->get('LANGUAGE'). '"'));
         $this->set('pageTitle', '{{@lng.tickets}} › ' .$ticket->title);
         $this->set('template', 'ticket.tpl.php');
         $this->set('onpage', 'tickets');
@@ -155,13 +153,12 @@ class cticket extends Controller
         $ticket->save();
 
         if (!$ticket->id)
-            return $this->tpfail("Failure while saving Ticket");
+            return $this->tpfail($this->get('lng.failTicketSave'));
 
         helper::addActivity(
 			$this->get('lng.ticket') . " '" .$ticket->title. "' " .$this->get('lng.edited'), $ticket->id, $this->get('POST.comment'));
 
-        $this->set('PARAMS["hash"]', $hash);
-        $this->showTicket($hash);
+        $this->reroute($this->get('BASE').'/ticket/'.$hash);
     }
 
 }

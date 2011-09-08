@@ -45,7 +45,7 @@ return array('lng' => array(
     'addmilestone' => 'Add milestone',
     'ticketsleft' => 'Ticket/s left',
     'addticket' => 'Add ticket',
-    'milestone' => 'Milesotne',
+    'milestone' => 'Milestone',
     'milestones' => 'Milestones',
     'registration' => 'Registration',
     'timeline' => 'Timeline',
@@ -94,7 +94,7 @@ return array('lng' => array(
     'delete' => 'Delete',
     'ticket' => 'Ticket',
     'added' => 'added',
-    'edited' => 'added',
+    'edited' => 'edited',
     'newProject' => 'New project',
     'comment' => 'Comment',
     'by' => 'by',
@@ -110,5 +110,24 @@ return array('lng' => array(
     'categoryAdded' => 'Category successfully added',
     'uncategorized' => 'Uncategorized',
     'memberRemoved' => 'Member has been removed from the project.',
-    'addMemberNotAllowed' => 'You are not allowed to add new members.'
+    'addMemberNotAllowed' => 'You are not allowed to add new members.',
+    'failTicketSave' => 'Failure while saving Ticket.',
+    'states' => array(
+                    array('id' => 1, 'name' => 'New'), 
+                    array('id' => 2, 'name' => 'Assigned'), 
+                    array('id' => 3, 'name' => 'in progress'),
+                    array('id' => 4, 'name' => 'Testing'),
+                    array('id' => 5, 'name' => 'Closed')
+                ),
+    'types' => array(
+                    array('id' => 1, 'name' => 'Bug'), 
+                    array('id' => 2, 'name' => 'Feature'),
+                ),
+    'priorities' => array(
+                    array('id' => 1, 'name' => 'Very high'), 
+                    array('id' => 2, 'name' => 'High'),
+                    array('id' => 3, 'name' => 'Normal'),
+                    array('id' => 4, 'name' => 'Low'),
+                    array('id' => 5, 'name' => 'Very low'),
+                )
 ));

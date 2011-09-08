@@ -111,5 +111,24 @@ return array('lng' => array(
     'categoryAdded' => 'Kategorie erfolgreich hinzugefügt',
     'uncategorized' => 'Unkategorisiert',
     'memberRemoved' => 'Das Mitglied wurde aus dem Projekt entfernt.',
-    'addMemberNotAllowed' => 'Du darfst keine Mitglieder dem Projekt hinzufügen.'
+    'addMemberNotAllowed' => 'Du darfst keine Mitglieder dem Projekt hinzufügen.',
+    'failTicketSave' => 'Fehler beim Speichern des Tickets.',
+    'states' => array(
+                    array('id' => 1, 'name' => 'Neu'), 
+                    array('id' => 2, 'name' => 'Zugewiesen'), 
+                    array('id' => 3, 'name' => 'in Bearbeitung'),
+                    array('id' => 4, 'name' => 'Test'),
+                    array('id' => 5, 'name' => 'Geschlossen')
+                ),
+    'types' => array(
+                    array('id' => 1, 'name' => 'Bug'), 
+                    array('id' => 2, 'name' => 'Feature'),
+                ),
+    'priorities' => array(
+                    array('id' => 1, 'name' => 'Sehr hoch'), 
+                    array('id' => 2, 'name' => 'Hoch'),
+                    array('id' => 3, 'name' => 'Normal'),
+                    array('id' => 4, 'name' => 'Niedrig'),
+                    array('id' => 5, 'name' => 'Sehr niedrig'),
+                ) 
 ));

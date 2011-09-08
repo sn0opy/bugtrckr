@@ -42,8 +42,9 @@
 			<div class="formLabel">{{@lng.type}}</div>
 			<div class="formValue">
 				<select name="type" size="1">
-					<option value="1">{{@lng.bug}}</option>
-					<option value="2">{{@lng.feature}}</option>
+                    <F3:repeat group="{{@lng.types}}" value="{{@type}}">
+                        <option value="{{@type.id}}">{{@type.name}}</option>
+                    </F3:repeat>
 				</select>
 			</div>
 		</div>
@@ -52,11 +53,9 @@
 			<div class="formLabel">{{@lng.priority}}</div>
 			<div class="formValue">
 				<select name="priority" size="1">
-					<option value="1">1 - {{@lng.veryhigh}}</option>
-					<option value="2">2 - {{@lng.high}}</option>
-					<option value="3" selected="selected">3 - {{@lng.normal}}</option>
-					<option value="4">4 - {{@lng.low}}</option>
-					<option value="5">5 - {{@lng.verylow}}</option>
+                    <F3:repeat group="{{@lng.priorities}}" value="{{@priority}}">
+                        <option value="{{@priority.id}}" {{(@priority.id==3)?'selected="selected"':''}}>{{@priority.id}} - {{@priority.name}}</option>
+                    </F3:repeat>
 				</select>
 			</div>
 		</div>

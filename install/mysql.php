@@ -11,24 +11,6 @@ DB::sql('CREATE TABLE ProjectPermission (userId INTEGER, projectId INTEGER, role
 DB::sql('CREATE TABLE ProjectAdmins (id INTEGER PRIMARY KEY AUTO_INCREMENT, userID INTEGER, projectID INTEGER);');
 DB::sql('CREATE TABLE Category( id INTEGER PRIMARY KEY, name VARCHAR(20), projectId INT(11));');
 
-DB::sql('CREATE TABLE Priority ( id INTEGER PRIMARY KEY, name VARCHAR(20), lang VARCHAR(5));');
-DB::sql("INSERT INTO Priority (id, name, lang) VALUES (1, 'sehr hoch', 'de');");
-DB::sql("INSERT INTO Priority (id, name, lang) VALUES (2, 'hoch', 'de');");
-DB::sql("INSERT INTO Priority (id, name, lang) VALUES (3, 'normal', 'de');");
-DB::sql("INSERT INTO Priority (id, name, lang) VALUES (4, 'niedrig', 'de');");
-DB::sql("INSERT INTO Priority (id, name, lang) VALUES (5, 'sehr niedrig', 'de');");
-
-DB::sql('CREATE TABLE Status(id INTEGER PRIMARY KEY, name VARCHAR(20), lang VARCHAR(5));');
-DB::sql("INSERT INTO Status (id, name, lang) VALUES (1, 'Neu', 'de');");
-DB::sql("INSERT INTO Status (id, name, lang) VALUES (2, 'Zugewiesen', 'de');");
-DB::sql("INSERT INTO Status (id, name, lang) VALUES (3, 'in Bearbeitung', 'de');");
-DB::sql("INSERT INTO Status (id, name, lang) VALUES (4, 'Test', 'de');");
-DB::sql("INSERT INTO Status (id, name, lang) VALUES (5, 'Geschlossen', 'de');");
-
-DB::sql('CREATE TABLE Type( id INTEGER PRIMARY KEY, name VARCHAR(20), lang VARCHAR(5));');
-DB::sql("INSERT INTO Type (id, name, lang) VALUES (1, 'Bug', 'de');");
-DB::sql("INSERT INTO Type (id, name, lang) VALUES (2, 'Feature', 'de');");
-
 DB::sql('CREATE VIEW user_perms as SELECT * FROM user, projectpermission WHERE user.id = projectpermission.userId;');
 DB::sql('CREATE VIEW user_ticket AS SELECT user.hash as userhash, ticket.hash as tickethash FROM user, ticket WHERE user.id = ticket.owner;');
 
