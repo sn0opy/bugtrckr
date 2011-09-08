@@ -349,13 +349,13 @@ class cproperties extends Controller
     {
         $category = new Category();
 
-		if (isset($this->get('POST.hash')))
+		if ($this->get('POST.hash') != "")
 			$category->load(array('hash = :hash', array(':hash' => $this->get('POST.hash'))));
 
         $category->name = $this->get('POST.name');
         $category->save();
 
-		if (isset($this->get('POST.hash')))
+		if ($this->get('POST.hash') != "")
 			$this->set('SESSION.SUCCESS', 'Category changed successfully');
 		else
         	$this->set('SESSION.SUCCESS',"Category added successfully");
