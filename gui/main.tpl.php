@@ -24,7 +24,7 @@
             });
             
             $('.sortable').tablesorter({
-                sortList: [[5,1]] 
+                sortList: [[3,1]] 
             });
             
             $('.showLayer').click(function() {
@@ -111,11 +111,11 @@
                     </div>
                     <div class="formRow">
                         <div class="formLabel">{{@lng.password}}: </div>
-                        <div class="formValue"><input type="password" name="password" /></div>
+                        <div class="formValue"><input type="password" name="password" /><br/><a href="{{@BASE}}/user/new" class="noAcc">{{@lng.noaccount}}</a></div>
                     </div>
                     <div class="formRow">
                         <div class="formLabel"><input type="submit" value="{{@lng.login}}" /></div>
-                        <div class="formValue"><a href="{{@BASE}}/user/new">{{@lng.noaccount}}</a></div>
+                        <div class="formValue"> </div>
                     </div>
                 </form>
                 <br class="clearfix" />

@@ -95,16 +95,16 @@ class helper extends F3instance
         return F3::get('DB')->sql('SELECT state, COUNT(*) AS `count` FROM `Ticket` WHERE milestone = ' . $milestone . ' GROUP BY state');
     }
 
-    public static function addActivity($description, $ticket = 0, $comment)
+    public static function addActivity($description, $ticket = 0, $comment = '')
     {
         $activity = new Activity();
         
         $activity->hash = helper::getFreeHash('Activity');
         $activity->description = $description;
         $activity->comment = $comment;
-        $activity->user = $_SESSION['user']['id'];
+        $activity->user = F3::get('SESSION.user.id');
         $activity->changed = time();
-        $activity->project = $_SESSION['project'];
+        $activity->project = F3::get('SESSION.project');
         $activity->ticket = $ticket;
         
         $activity->save();

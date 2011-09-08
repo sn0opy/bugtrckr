@@ -9,7 +9,7 @@ DB::sql('CREATE TABLE Activity (id INTEGER PRIMARY KEY AUTO_INCREMENT, hash VARC
 DB::sql('CREATE TABLE Role (id INTEGER PRIMARY KEY AUTO_INCREMENT , projectId int(11), hash VARCHAR(12), name VARCHAR(45), issuesAssigneable int(1), proj_editProject int(1), proj_manageMembers int(1), proj_manageRoles int(1), iss_editIssues int(1), iss_addIssues int(1), iss_deleteIssues int(1), iss_moveIssue int(1), iss_editWatchers int(1), iss_addWatchers int(1), iss_viewWatchers int(1));');
 DB::sql('CREATE TABLE ProjectPermission (userId INTEGER, projectId INTEGER, roleId INTEGER, PRIMARY KEY (userId, projectId));');
 DB::sql('CREATE TABLE ProjectAdmins (id INTEGER PRIMARY KEY AUTO_INCREMENT, userID INTEGER, projectID INTEGER);');
-DB::sql('CREATE TABLE Category( id INTEGER PRIMARY KEY, name VARCHAR(20));');
+DB::sql('CREATE TABLE Category( id INTEGER PRIMARY KEY, name VARCHAR(20), projectId INT(11));');
 
 DB::sql('CREATE TABLE Priority ( id INTEGER PRIMARY KEY, name VARCHAR(20), lang VARCHAR(5));');
 DB::sql("INSERT INTO Priority (id, name, lang) VALUES (1, 'sehr hoch', 'de');");

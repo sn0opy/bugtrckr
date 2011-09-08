@@ -66,7 +66,7 @@ class main extends F3instance {
             
             $usr = new cuser;
             $usr->registerUser($admname, $admpw, $admemail, true);
-
+            
             file_put_contents('data/config.inc.php', "<?php F3::set('DB', new DB('mysql:host=".$host.";dbname=".$db."', '".$user."', '".$pass."')); ?>");
 
             $this->set('INSTALLED', true);            

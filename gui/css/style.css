@@ -613,12 +613,12 @@ table.ticket th
     text-decoration: underline;
 }
 
-.add input, .add textarea
+.layer input, .layer textarea
 {
     width: 400px;
 }
 
-.add textarea
+.layer textarea
 {
     height: 120px;
 }
@@ -712,4 +712,11 @@ td.action a {
     display: block;
     float: left;
     margin-right: 20px;
+}
+
+.noAcc {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    display: block;
+    text-align: center;
 }

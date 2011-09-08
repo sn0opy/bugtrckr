@@ -105,5 +105,10 @@ return array('lng' => array(
 	'sure' => 'Are you sure?',
     'noTickets' => 'This projekt does not have any tickets.',
     'edit' => 'Edit',
-    'warningInstallFiles' => '<strong>Warning!</strong> Some installation files still exist and may cause damage!'
+    'warningInstallFiles' => '<strong>Warning!</strong> Some installation files still exist and may cause damage!',
+    'projCreated' => 'Project created',
+    'categoryAdded' => 'Category successfully added',
+    'uncategorized' => 'Uncategorized',
+    'memberRemoved' => 'Member has been removed from the project.',
+    'addMemberNotAllowed' => 'You are not allowed to add new members.'
 ));

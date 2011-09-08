@@ -41,7 +41,7 @@ class cproperties extends Controller
             $categories = new Category();
             $categories = $categories->find();
 
-            if (!$project->id) //|| !$roles || !$milestones || !$users || !$categories)
+            if (!$project->id)
             {
                 $this->tpfail("Failure while open Project");
                 return;
@@ -121,7 +121,7 @@ class cproperties extends Controller
         
         if (!$helper->getPermission('proj_manageMembers'))
         {
-            $this->tpfail('You are not allowed to add new members.');
+            $this->tpfail($this->get('lng.addMemberNotAllowed'));
             return;
         }
 
@@ -138,10 +138,10 @@ class cproperties extends Controller
         }
 
         $projPerms = new ProjectPermission();
-        $projPerms->load('userId = ' . $user->id . ' AND projectId = ' . $projectId);
+        $projPerms->load(array('userId = :userId AND projectId = :projectId', array(':userId' => $user->id, ':projectId' => $projectId)));
         $projPerms->erase();
 
-        $this->set('SESSION.SUCCESS', 'Member has been removed from the project.');
+        $this->set('SESSION.SUCCESS', $this->get('lng.memberRemoved'));
         $this->reroute($this->get('BASE') . '/project/settings');
     }
 
@@ -351,10 +351,6 @@ class cproperties extends Controller
         $category = new Category();
         $category->name = $this->get('POST.name');
         $category->save();
-
-        $this->set('SESSION.SUCCESS',"Category added successfully");
-
-        $this->reroute($this->get('BASE') . '/project/settings/');
     }
 
     /**
@@ -425,6 +421,13 @@ class cproperties extends Controller
         $perms->projectId = $projId;
         $perms->roleId = self::addEditRole($projId);
         $perms->save();
+        
+        $milestone = new cmilestone;
+        $milestone->addEditMilestone($projId);
+        
+        #$this->addCategory($this->get('lng.uncategorized'), $projId);
+        
+        helper::addActivity(F3::get('lng.projCreated'));
         
         $this->reroute($this->get('BASE').'/');        
     }

@@ -103,14 +103,17 @@ class cmilestone extends Controller
     /**
      *	Save a milestone to the database
      */
-    function addEditMilestone()
+    function addEditMilestone($projId = false)
     {
-		// This params have to be set
-		if ($this->get('POST.name') == "" ||
-			!is_numeric($this->get('SESSION.project')) ||
-			$this->get('SESSION.project') <= 0)
-			return $this->tpfail('Failure while editing milestone.');
-
+        $name = ($projId) ? 'First milestone' : $this->get('POST.name');
+        
+        if(!isset($projId)) {
+            // This params have to be set
+            if ($this->get('POST.name') == "" ||
+                !is_numeric($this->get('SESSION.project')) ||
+                $this->get('SESSION.project') <= 0)
+                return $this->tpfail('Failure while editing milestone.');
+        }
 
         $msHash = $this->get('POST.hash') ? $this->get('POST.hash') : helper::getFreeHash('Milestone');
 
@@ -122,14 +125,15 @@ class cmilestone extends Controller
                 return $this->tpfail('Failure while editing milestone.');
         }
 
-        $milestone->name = $this->get('POST.name');
+        $milestone->name = $name;
         $milestone->hash = $msHash;
-        $milestone->description = $this->get('POST.description');
-        $milestone->project = $this->get('SESSION.project');
-        $milestone->finished = $this->get('POST.finished');
+        $milestone->description = ($projId) ? 'My first milestone' : $this->get('POST.description');
+        $milestone->project = ($projId) ? $projId : $this->get('SESSION.project');
+        $milestone->finished = ($projId) ? time()+2629743 : $this->get('POST.finished');
         $milestone->save();
 
-        $this->reroute($this->get('BASE') . '/project/settings/milestone/' . $msHash);
+        if(!$projId)
+            $this->reroute($this->get('BASE') . '/project/settings/milestone/' . $msHash);
     }
     
 	/**
