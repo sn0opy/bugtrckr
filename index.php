@@ -57,6 +57,7 @@ $app->route('GET /project/settings/milestone/add', 'cproperties->showAddMileston
 $app->route('GET /project/settings/category/add', 'cproperties->showAddCategory');
 $app->route('GET /project/settings/role/delete/@hash', 'cproperties->deleteRole');
 $app->route('GET /project/settings/milestone/delete/@hash', 'cproperties->deleteProjectSettingsMilestone');
+$app->route('GET /project/settings/category/delete', 'cproperties->deleteCategory');
 
 $app->route('POST /search', 'cticket->showTickets');
 $app->route('POST /project/select', 'cmain->selectProject');
@@ -66,7 +67,8 @@ $app->route('POST /ticket', 'cticket->addTicket');
 $app->route('POST /ticket/@hash', 'cticket->editTicket');
 $app->route('POST /project/add', 'cproperties->projectAdd');
 $app->route('POST /project/settings/member/setrole', 'cproperties->projectSetRole');
-$app->route('POST /project/settings/category/add', 'cproperties->addCategory');
+$app->route('POST /project/settings/category/add', 'cproperties->addEditCategory');
+$app->route('POST /project/settings/category/edit', 'cproperties->addEditCategory');
 $app->route('POST /project/settings/role/edit', 'cproperties->addEditRole');
 $app->route('POST /project/settings/main/edit', 'cproperties->projectEditMain');
 $app->route('POST /project/settings/milestone/edit', 'cmilestone->addEditMilestone');
