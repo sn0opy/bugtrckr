@@ -118,7 +118,7 @@ class cticket extends Controller
         $ticket->save();
 
         if (!$ticket->_id)
-            return $this->tpfail("Failure while saving Ticket");
+            return $this->tpfail($this->get('lng.failTicketSave'));
 
         helper::addActivity(
             $this->get('lng.ticket') . " '$ticket->title' " . $this->get('lng.added') . ".", $ticket->_id);
@@ -134,7 +134,7 @@ class cticket extends Controller
 		if (!is_numeric($this->get('POST.state')) || 
 			$this->get('POST.state') <= 0 || 
 			$this->get('POST.state') > 5)
-			return $this->tpfail("Failure while saving Ticket");
+			return $this->tpfail($this->get('lng.failTicketSave'));
 
         $hash = $this->get('PARAMS.hash');
 
@@ -147,7 +147,7 @@ class cticket extends Controller
 		if (is_numeric($this->get('POST.user')))
 			$ticket->assigned = $this->get('POST.user');
 		if (ctype_alnum($this->get('POST.milestone')))
-        	$ticket->milestone = $milestone->getMilestoneID($this->get('POST.milestone'));
+        	$ticket->milestone = $this->get('POST.milestone');
 
         $ticket->save();
 

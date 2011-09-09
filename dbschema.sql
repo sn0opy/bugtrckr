@@ -21,7 +21,7 @@ CREATE TABLE Activity (hash CHAR(12) PRIMARY KEY, description text, user CHAR(12
 --
 -- Role
 --
-CREATE TABLE Role (project CHAR(12), hash CHAR(12), name VARCHAR(40), "issuesAssigneable" BOOL, "proj_editProject" BOOL, "proj_manageMembers" BOOL, proj_manageRoles BOOL, "iss_editIssues" BOOL, "iss_addIssues" BOOL, "iss_deleteIssues" BOOL, "iss_moveIssue" BOOL, "iss_editWatchers" BOOL, "iss_addWatchers" BOOL, "iss_viewWatchers" BOOL);
+CREATE TABLE Role (project CHAR(12), hash CHAR(12), name VARCHAR(40), issuesAssigneable BOOL, proj_editProject BOOL, proj_manageMembers BOOL, proj_manageRoles BOOL, iss_editIssues BOOL, iss_addIssues BOOL, iss_deleteIssues BOOL, iss_moveIssue BOOL, iss_editWatchers BOOL, iss_addWatchers BOOL, iss_viewWatchers BOOL);
 --
 -- ProjectPermission
 --
@@ -33,27 +33,12 @@ CREATE TABLE ProjectAdmins (hash CHAR(12) PRIMARY KEY, user CHAR(12), project CH
 
 -- Category
 --
-CREATE TABLE Category
-(
-    hash CHAR(12) PRIMARY KEY,
-	project CHAR(12),
-    name VARCHAR(40)
-);
+CREATE TABLE Category (hash CHAR(12) PRIMARY KEY, project CHAR(12), name VARCHAR(40));
 
 --
 -- Wiki Entries
 --
-CREATE TABLE WikiEntry
-(
-	hash CHAR(32) PRIMARY KEY,
-	title VARCHAR(30),
-	content TEXT,
-	project CHAR(32),
-	created DATE,
-	created_by CHAR(32),
-	edited DATE,
-	edited_by CHAR(32)
-);
+CREATE TABLE WikiEntry (hash CHAR(32) PRIMARY KEY, title VARCHAR(30), content TEXT, project CHAR(32), created DATE, created_by CHAR(32), edited DATE, edited_by CHAR(32) );
 
 CREATE TABLE WikiChanges
 (
@@ -65,7 +50,7 @@ CREATE TABLE WikiChanges
 --
 CREATE VIEW user_perms as SELECT * FROM user, projectpermission WHERE user = projectpermission.user;
 
-CREATE VIEW user_ticket AS SELECT user.hash as userhash, ticket.hash as tickethash, * FROM user, ticket WHERE user.hash = ticket.owner; -- modified: 13.5. 19:30
+CREATE VIEW user_ticket AS SELECT user.hash as userhash, ticket.hash as tickethash, * FROM user, ticket WHERE user.hash = ticket.owner;
 
 CREATE VIEW displayableticket AS 
     SELECT priority.name as priorityname, status.name as statusname, type.name as typename,

@@ -102,14 +102,13 @@ class cmilestone extends Controller
     /**
      *	Save a milestone to the database
      */
-    function addEditMilestone($projId = false)
+    function addEditMilestone($projHash = false)
     {
-        $name = ($projId) ? 'First milestone' : $this->get('POST.name');
+        $name = ($projHash) ? 'First milestone' : $this->get('POST.name');
         
-        if(!isset($projId)) {
+        if(!isset($projHash)) {
             // This params have to be set
             if ($this->get('POST.name') == "" ||
-                !is_numeric($this->get('SESSION.project')) ||
                 $this->get('SESSION.project') <= 0)
                 return $this->tpfail('Failure while editing milestone.');
         }
@@ -126,26 +125,12 @@ class cmilestone extends Controller
 
         $milestone->name = $name;
         $milestone->hash = $msHash;
-        $milestone->description = ($projId) ? 'My first milestone' : $this->get('POST.description');
-        $milestone->project = ($projId) ? $projId : $this->get('SESSION.project');
-        $milestone->finished = ($projId) ? time()+2629743 : $this->get('POST.finished');
+        $milestone->description = ($projHash) ? 'My first milestone' : $this->get('POST.description');
+        $milestone->project = ($projHash) ? $projHash : $this->get('SESSION.project');
+        $milestone->finished = ($projHash) ? time()+2629743 : $this->get('POST.finished');
         $milestone->save();
 
-        if(!$projId)
+        if(!$projHash)
             $this->reroute($this->get('BASE') . '/project/settings/milestone/' . $msHash);
-    }
-    
-	/**
-	 *	Returns the id of a milestone
-	 *
-	 *	@param String $hash
-	 */
-    function getMilestoneID($hash) 
-    {        
-        $ax = new Axon('Milestone');
-        $ax->load(array('hash = :hash', array(':hash' => $hash)));
-        
-        if(!$ax->dry())
-            return $ax->id;
     }
 }

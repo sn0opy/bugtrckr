@@ -36,6 +36,7 @@ class cproperties extends Controller
             $milestone = new Milestone();
             $milestones = $milestone->find(array('project = :hash', array(':hash' => $projectHash)));
 
+            // TODO: this here is wrong!
             $user = new User();
             $users = $user->find();
 
@@ -295,9 +296,9 @@ class cproperties extends Controller
         }
 
         $role->name = ($projHash) ? 'Admin' : $this->get('POST.name');
-        $role->hash = ($projHash) ? helper::getFreeHash('Role') : $roleHash;
+        $role->hash = $roleHash;
         $role->issuesAssigneable = ($projHash) ? 1 : $this->get('POST.issuesAssigneable') == "on";
-        $role->projectId = ($projHash) ? $projHash : $this->get('SESSION.project');
+        $role->project = ($projHash) ? $projHash : $this->get('SESSION.project');
         $role->iss_addIssues = ($projHash) ? 1 : $this->get('POST.iss_addIssues') == "on";
         $role->proj_editProject = ($projHash) ? 1 : $this->get('POST.proj_editProject') == "on";
         $role->proj_manageMembers = ($projHash) ? 1 : $this->get('POST.proj_manageMembers') == "on";
@@ -313,7 +314,7 @@ class cproperties extends Controller
         $role->save();
 
         if($projHash)
-            return $role->_id;
+            return $roleHash;
         else
             $this->reroute($this->get('BASE') . '/project/settings/role/' . $roleHash);
     }
@@ -448,19 +449,18 @@ class cproperties extends Controller
         $ax->public = ($this->get('POST.public') == 'on') ? 1 : 0;
         $ax->hash = $hash;
         $ax->save();
-        $proj = $ax->_id;
 
         $cmain = new cmain();
         $cmain->selectProject($hash, false);
         
         $perms = new ProjectPermission();
         $perms->user = $this->get('SESSION.user.hash');
-        $perms->project = $proj;
-        $perms->role = self::addEditRole($proj);
+        $perms->project = $hash;
+        $perms->role = $this->addEditRole($hash);
         $perms->save();
         
         $milestone = new cmilestone;
-        $milestone->addEditMilestone($projId);
+        $milestone->addEditMilestone($hash);
         
         #$this->addCategory($this->get('lng.uncategorized'), $projId);
         

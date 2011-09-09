@@ -69,22 +69,23 @@ class helper extends F3instance
             $user = new User();
             $user->load(array('hash = :hash', array(':hash' => $userHash)));
 
+            if($user->admin) // admin has access to everything
+                return true;
+            
             $projPerm = new ProjectPermission();
             $permissions = $projPerm->findone(array('user = :user AND project = :project', array(':user' => $userHash, ':project' => $projectHash)));
-
-			if ($permissions == null)
+            
+			if($permissions == null)
 				return false;
 
             $role = new Role();
-            if (!$role->load('hash = ' . $permissions->role))
+            $role->load(array('hash = :hash', array(':hash' => $permissions->role)));
+            
+            if($role->dry())
 				return false;
-			
-            if ($user->admin) // admin has access to everything
-                return true;
 
-			if ($role->id > 0)
-                if ($role->$permission == true)
-                    return true;
+            if($role->$permission == true)
+                return true;
         }
 
         return false;

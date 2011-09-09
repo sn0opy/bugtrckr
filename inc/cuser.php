@@ -94,12 +94,16 @@ class cuser extends Controller
      */
     function loginUser()
     {
+        $email = $this->get('POST.email');
+        
         $user = new User();        
-//        $user->load(array('email = :email', array(':email' => $this->get('POST.email'))));
-        $user->load(array('email = \':email\' AND password = \':password\'',
+        $user->load(array('email = :email', array(':email' => $email))); // to get a user's salt first
+        
+        $user->load(array('email = :email AND password = :password',
             array(':email' => $this->get('POST.email'),
                 ':password' => helper::salting($user->salt, $this->get('POST.password')))));
 
+        
         if ($user->dry())
         {
             $this->set('SESSION.FAILURE', 'Password or Email is incorrect');
