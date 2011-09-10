@@ -1,9 +1,9 @@
 <?php
 
 /**
- * de.php
+ * en.php
  * 
- * i81n language file - german
+ * i81n language file - english
  * 
  * @package i18n
  * @author Sascha Ohms
@@ -81,10 +81,10 @@ return array('lng' => array(
     'noAccess' => 'You don\'t have access to this area.',
     'noProject' => 'You didn\'t choose a project yet.',
     'members' => 'Members',
-    'projectname' => 'Projectname',
+    'projectname' => 'Project name',
     'projectdescription' => 'Project description',
     'publicproject' => 'Public project',
-    'dosettings' => 'Do settings',
+    'dosettings' => 'Apply settings',
     'roles' => 'Roles',
     'role' => 'Role',
     'addrole' => 'Add role',
@@ -103,7 +103,7 @@ return array('lng' => array(
     'loggedInAs' => 'Logged in as',
     'actions' => 'Actions',
 	'sure' => 'Are you sure?',
-    'noTickets' => 'This projekt does not have any tickets.',
+    'noTickets' => 'This project does not have any tickets.',
     'edit' => 'Edit',
     'warningInstallFiles' => '<strong>Warning!</strong> Some installation files still exist and may cause damage!',
     'projCreated' => 'Project created',
