@@ -12,7 +12,7 @@
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package Graphics
-		@version 2.0.0
+		@version 2.0.5
 **/
 
 //! Graphics plugin
@@ -20,6 +20,7 @@ class Graphics extends Base {
 
 	//@{ Locale-specific error/exception messages
 	const
+		TEXT_Image='Unsupported image format',
 		TEXT_Color='Invalid color specified';
 	//@}
 
@@ -61,10 +62,11 @@ class Graphics extends Base {
 			@param $len integer
 			@param $ttfs string
 			@param $var string
+			@param $die boolean
 			@public
 	**/
-	static function
-		captcha($dimx=150,$dimy=50,$len=5,$ttfs='cube',$var='captcha') {
+	static function captcha(
+		$dimx=150,$dimy=50,$len=5,$ttfs='cube',$var='captcha',$die=TRUE) {
 		$base=self::rgb(self::$vars['BGCOLOR']);
 		$trans=self::$vars['FGTRANS'];
 		// Specify Captcha seed
@@ -117,43 +119,54 @@ class Graphics extends Base {
 		// Make the background transparent
 		imagecolortransparent($captcha,$bg);
 		// Send output as PNG image
-		if (PHP_SAPI!='cli')
+		if (PHP_SAPI!='cli' && !headers_sent()) {
 			header(self::HTTP_Content.': image/png');
+			header(self::HTTP_Powered.': '.self::TEXT_AppName.' '.
+				'('.self::TEXT_AppURL.')');
+		}
 		imagepng($captcha,NULL,self::PNG_Compress,PNG_NO_FILTER);
+		if ($die)
+			die;
 	}
 
 	/**
 		Invert colors of specified image
-			@param $file
+			@param $file string
+			@param $die boolean
 			@public
 	**/
-	static function invert($file) {
+	static function invert($file,$die=TRUE) {
 		preg_match('/\.(gif|jp[e]*g|png)$/',$file,$ext);
 		$ext[1]=str_replace('jpg','jpeg',$ext[1]);
 		$file=self::fixslashes(self::resolve($file));
-		$img=imagecreatefromstring(file_get_contents($file));
+		$img=imagecreatefromstring(self::getfile($file));
 		imagefilter($img,IMG_FILTER_NEGATE);
-		if (PHP_SAPI!='cli')
+		if (PHP_SAPI!='cli' && !headers_sent())
 			header(self::HTTP_Content.': image/'.$ext[1]);
 		// Send output in same graphics format as original
 		eval('image'.$ext[1].'($img);');
+		if ($die)
+			die;
 	}
 
 	/**
 		Apply grayscale filter on specified image
-			@param $file
+			@param $file string
+			@param $die boolean
 			@public
 	**/
-	static function grayscale($file) {
+	static function grayscale($file,$die=TRUE) {
 		preg_match('/\.(gif|jp[e]*g|png)$/',$file,$ext);
 		$ext[1]=str_replace('jpg','jpeg',$ext[1]);
 		$file=self::fixslashes(self::resolve($file));
-		$img=imagecreatefromstring(file_get_contents($file));
+		$img=imagecreatefromstring(self::getfile($file));
 		imagefilter($img,IMG_FILTER_GRAYSCALE);
-		if (PHP_SAPI!='cli')
+		if (PHP_SAPI!='cli' && !headers_sent())
 			header(self::HTTP_Content.': image/'.$ext[1]);
 		// Send output in same graphics format as original
 		eval('image'.$ext[1].'($img);');
+		if ($die)
+			die;
 	}
 
 	/**
@@ -161,51 +174,62 @@ class Graphics extends Base {
 			@param $file string
 			@param $dimx integer
 			@param $dimy integer
+			@param $die boolean
 			@public
 	**/
-	static function thumb($file,$dimx,$dimy) {
+	static function thumb($file,$dimx,$dimy,$die=TRUE) {
 		preg_match('/\.(gif|jp[e]*g|png)$/',$file,$ext);
-		$ext[1]=str_replace('jpg','jpeg',$ext[1]);
-		$file=self::fixslashes(self::resolve($file));
-		$img=imagecreatefromstring(file_get_contents($file));
-		// Get image dimensions
-		$oldx=imagesx($img);
-		$oldy=imagesy($img);
-		// Adjust dimensions; retain aspect ratio
-		$ratio=$oldx/$oldy;
-		if ($dimx<=$oldx && $dimx/$ratio<=$dimy)
-			// Adjust height
-			$dimy=$dimx/$ratio;
-		elseif ($dimy<=$oldy && $dimy*$ratio<=$dimx)
-			// Adjust width
-			$dimx=$dimy*$ratio;
-		else {
-			// Retain size if dimensions exceed original image
-			$dimx=$oldx;
-			$dimy=$oldy;
+		if ($ext) {
+			$ext[1]=str_replace('jpg','jpeg',$ext[1]);
+			$file=self::fixslashes(self::resolve($file));
+			$img=imagecreatefromstring(self::getfile($file));
+			// Get image dimensions
+			$oldx=imagesx($img);
+			$oldy=imagesy($img);
+			// Adjust dimensions; retain aspect ratio
+			$ratio=$oldx/$oldy;
+			if ($dimx<=$oldx && $dimx/$ratio<=$dimy)
+				// Adjust height
+				$dimy=$dimx/$ratio;
+			elseif ($dimy<=$oldy && $dimy*$ratio<=$dimx)
+				// Adjust width
+				$dimx=$dimy*$ratio;
+			else {
+				// Retain size if dimensions exceed original image
+				$dimx=$oldx;
+				$dimy=$oldy;
+			}
+			// Create blank image
+			$tmp=imagecreatetruecolor($dimx,$dimy);
+			list($r,$g,$b)=self::rgb(self::$vars['BGCOLOR']);
+			$bg=imagecolorallocate($tmp,$r,$g,$b);
+			imagefill($tmp,0,0,$bg);
+			// Resize
+			imagecopyresampled($tmp,$img,0,0,0,0,$dimx,$dimy,$oldx,$oldy);
+			// Make the background transparent
+			imagecolortransparent($tmp,$bg);
+			if (PHP_SAPI!='cli' && !headers_sent()) {
+				header(self::HTTP_Content.': image/'.$ext[1]);
+				header(self::HTTP_Powered.': '.self::TEXT_AppName.' '.
+					'('.self::TEXT_AppURL.')');
+			}
+			// Send output in same graphics format as original
+			eval('image'.$ext[1].'($tmp);');
 		}
-		// Create blank image
-		$tmp=imagecreatetruecolor($dimx,$dimy);
-		list($r,$g,$b)=self::rgb(self::$vars['BGCOLOR']);
-		$bg=imagecolorallocate($tmp,$r,$g,$b);
-		imagefill($tmp,0,0,$bg);
-		// Resize
-		imagecopyresampled($tmp,$img,0,0,0,0,$dimx,$dimy,$oldx,$oldy);
-		// Make the background transparent
-		imagecolortransparent($tmp,$bg);
-		if (PHP_SAPI!='cli')
-			header(self::HTTP_Content.': image/'.$ext[1]);
-		// Send output in same graphics format as original
-		eval('image'.$ext[1].'($tmp);');
+		else
+			trigger_error(self::TEXT_Image);
+		if ($die)
+			die;
 	}
 
 	/**
 		Generate identicon from an MD5 hash value
 			@param $hash string
 			@param $size integer
+			@param $die boolean
 			@public
 	**/
-	static function identicon($hash,$size=NULL) {
+	static function identicon($hash,$size=NULL,$die=TRUE) {
 		$hash=self::resolve($hash);
 		$blox=self::$vars['IBLOCKS'];
 		if (is_null($size))
@@ -319,9 +343,14 @@ class Graphics extends Base {
 			$size*$blox,$size*$blox);
 		// Make the background transparent
 		imagecolortransparent($resized,$bg);
-		if (PHP_SAPI!='cli')
+		if (PHP_SAPI!='cli' && !headers_sent()) {
 			header(self::HTTP_Content.': image/png');
+			header(self::HTTP_Powered.': '.self::TEXT_AppName.' '.
+				'('.self::TEXT_AppURL.')');
+		}
 		imagepng($resized,NULL,self::PNG_Compress,PNG_NO_FILTER);
+		if ($die)
+			die;
 	}
 
 	/**
@@ -329,16 +358,70 @@ class Graphics extends Base {
 			@param $dimx integer
 			@param $dimy integer
 			@param $bg string
+			@param $die boolean
 			@public
 	**/
-	static function fakeImage($dimx,$dimy,$bg=0xEEE) {
+	static function fakeImage($dimx,$dimy,$bg=0xEEE,$die=TRUE) {
 		list($r,$g,$b)=self::rgb($bg);
 		$img=imagecreatetruecolor($dimx,$dimy);
 		$bg=imagecolorallocate($img,$r,$g,$b);
 		imagefill($img,0,0,$bg);
-		if (PHP_SAPI!='cli')
+		if (PHP_SAPI!='cli' && !headers_sent()) {
 			header(self::HTTP_Content.': image/png');
+			header(self::HTTP_Powered.': '.self::TEXT_AppName.' '.
+				'('.self::TEXT_AppURL.')');
+		}
 		imagepng($img,NULL,self::PNG_Compress,PNG_NO_FILTER);
+		if ($die)
+			die;
+	}
+
+	/**
+		Grab HTML page and render using WebKit engine;
+		Crop image and generate thumbnail, if specified
+			@param $url string
+			@param $dimx integer
+			@param $dimy integer
+			@param $cropw integer
+			@param $croph integer
+			@param $die boolean
+			@public
+	**/
+	static function screenshot(
+		$url,$dimx=0,$dimy=0,$cropw=0,$croph=0,$die=TRUE) {
+		$file=self::$vars['TEMP'].$_SERVER['SERVER_NAME'].
+			'.scr.'.self::hash($url).'.jpg';
+		// Map OS to folder location
+		$exec=array(
+			'Windows|WINNT'=>'windows',
+			'Darwin'=>'osx',
+			'Linux'=>'linux'
+		);
+		foreach ($exec as $os=>$dir)
+			if (preg_match('/'.$os.'/i',PHP_OS)) {
+				$win=($dir=='windows');
+				// Suppress text output
+				$null=$win?'nul':'null';
+				exec(($win?'start /b ':'').
+					self::$vars['EXTERNAL'].$dir.'/wkhtmltoimage '.
+					($cropw?('--crop-w '.$cropw.' '):'').
+					($croph?('--crop-h '.$croph.' '):'').
+					$url.' '.$file.' >'.$null.' 2>'.$null);
+				break;
+			}
+		if (is_file($file)) {
+			if ($dimx && $dimy)
+				self::thumb($file,$dimx,$dimy,FALSE);
+			elseif (PHP_SAPI!='cli' && !headers_sent()) {
+				header(self::HTTP_Content.': image/png');
+				header(self::HTTP_Powered.': '.self::TEXT_AppName.' '.
+					'('.self::TEXT_AppURL.')');
+				echo self::getfile($file);
+			}
+			unlink($file);
+		}
+		if ($die)
+			die;
 	}
 
 	/**
@@ -350,6 +433,8 @@ class Graphics extends Base {
 			// GD extension required
 			trigger_error(sprintf(self::TEXT_PHPExt,'gd'));
 		}
+		if (!isset(self::$vars['EXTERNAL']))
+			self::$vars['EXTERNAL']=self::$vars['ROOT'];
 		if (!isset(self::$vars['FONTS']))
 			self::$vars['FONTS']=self::$vars['ROOT'];
 		if (!isset(self::$vars['BGCOLOR']))

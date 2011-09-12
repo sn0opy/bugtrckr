@@ -12,7 +12,7 @@
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package Expansion
-		@version 2.0.0
+		@version 2.0.5
 **/
 
 //! Web pack
@@ -44,16 +44,18 @@ class Web extends Base {
 	/**
 		Strip Javascript/CSS files of extraneous whitespaces and comments;
 		Return combined output as a minified string
+			@return string
 			@param $base string
 			@param $files array
+			@param $echo bool
 			@public
 	**/
-	static function minify($base,array $files) {
+	static function minify($base,array $files,$echo=TRUE) {
 		preg_match('/\.(js|css)$/',$files[0],$ext);
 		if (!$ext[1]) {
 			// Not a JavaSript/CSS file
 			error(404);
-			return;
+			return $echo?NULL:FALSE;
 		}
 		$mime=array(
 			'js'=>'application/x-javascript',
@@ -63,20 +65,20 @@ class Web extends Base {
 		foreach ($files as $file)
 			if (!is_file($path.$file)) {
 				trigger_error(sprintf(self::TEXT_Minify,$file));
-				return;
+				return $echo?NULL:FALSE;
 			}
 		$src='';
-		if (PHP_SAPI!='cli')
-			header(self::HTTP_Content.': '.$mime[$ext[1]].'; '.
-				'charset='.self::$vars['ENCODING']);
 		foreach ($files as $file) {
 			$stats=&self::ref('STATS');
 			$stats['FILES']['minified']
 				[basename($file)]=filesize($path.$file);
 			// Rewrite relative URLs in CSS
 			$src.=preg_replace_callback(
-				'/\b(?<=url)\(([\"\'])*([^\1]+?)\1*\)/',
+				'/\b(?<=url)\(([\"\'])*([^\1]+?)\1\)/',
 				function($url) use($path,$file) {
+					// Ignore absolute URLs
+					if (preg_match('/https?:/',$url[2]))
+						return $url[0];
 					$fdir=dirname($file);
 					$rewrite=explode(
 						'/',$path.($fdir!='.'?$fdir.'/':'').$url[2]
@@ -99,7 +101,7 @@ class Web extends Base {
 						'('.implode('/',array_merge($rewrite,array())).')';
 				},
 				// Retrieve CSS/Javascript file
-				file_get_contents($path.$file)
+				self::getfile($path.$file)
 			);
 		}
 		$ptr=0;
@@ -203,7 +205,14 @@ class Web extends Base {
 				$ptr++;
 			}
 		}
-		echo $dst;
+		if ($echo) {
+			if (PHP_SAPI!='cli' && !headers_sent())
+				header(self::HTTP_Content.': '.$mime[$ext[1]].'; '.
+					'charset='.self::$vars['ENCODING']);
+			echo $dst;
+			die;
+		}
+		return $dst;
 	}
 
 	/**
@@ -230,8 +239,8 @@ class Web extends Base {
 			@param $pattern string
 			@param $query string
 			@param $reqhdrs array
-			@param $follow boolean
-			@param $forward boolean
+			@param $follow bool
+			@param $forward bool
 			@public
 	**/
 	static function http(
@@ -241,7 +250,7 @@ class Web extends Base {
 		// Content divider
 		$div=chr(0);
 		$url=parse_url($route);
-		if (!$url['path'])
+		if (!isset($url['path']))
 			// Set to Web root
 			$url['path']='/';
 		if ($method!='GET') {
@@ -262,12 +271,12 @@ class Web extends Base {
 		if (isset($url['scheme']) && $url['scheme']=='https') {
 			if (!isset($url['port']))
 				$url['port']=443;
-			$target='ssl://'.$url['host'].':'.$url['port'];
+			$target='ssl://'.$url['host'];
 		}
 		else {
 			if (!isset($url['port']))
 				$url['port']=80;
-			$target=$url['host'].':'.$url['port'];
+			$target=$url['host'];
 		}
 		$socket=@fsockopen($target,$url['port'],$errno,$text);
 		if (!$socket) {
@@ -280,7 +289,7 @@ class Web extends Base {
 		stream_set_timeout($socket,ini_get('default_socket_timeout'));
 		// Send HTTP request
 		fputs($socket,
-			$method.' '.$url['path'].
+			$method.' '.(isset($url['path'])?$url['path']:'').
 				(isset($url['query']) && $url['query']?
 					('?'.$url['query']):'').' '.
 					'HTTP/1.0'.self::EOL.
@@ -315,8 +324,9 @@ class Web extends Base {
 					preg_match('/HTTP\/1\.\d\s30\d/',$rcvhdrs)) {
 					// Redirection
 					preg_match('/'.self::HTTP_Location.
-						':\s*(.+?)/',$rcvhdrs,$loc);
-					return self::http($method.' '.$loc[1],$query,$reqhdrs);
+						':\s*(.+)/',$rcvhdrs,$loc);
+					return self::http($method.' '.trim($loc[1]),
+						$query,$reqhdrs);
 				}
 				foreach (explode(self::EOL,$rcvhdrs) as $hdr) {
 					self::$vars['HEADERS'][]=$hdr;
@@ -354,9 +364,9 @@ class Web extends Base {
 	static function sitemap($url=NULL) {
 		if (is_null($url))
 			$url=self::$vars['BASE'].'/';
-		if (isset(self::$vars['SITEMAP'][$url]) &&
+		if ($url=='#' || isset(self::$vars['SITEMAP'][$url]) &&
 			is_bool(self::$vars['SITEMAP'][$url]['status']))
-			// Already crawled
+			// Skip
 			return;
 		$response=self::http('GET '.self::$vars['PROTOCOL'].'://'.
 			$_SERVER['SERVER_NAME'].$url);
@@ -444,18 +454,19 @@ class Web extends Base {
 					sprintf('%1.1f',1-$ref['level']/$depth));
 			}
 			// Send output
-			if (PHP_SAPI!='cli')
+			if (PHP_SAPI!='cli' && !headers_sent())
 				header(self::HTTP_Content.': application/xml; '.
 					'charset='.self::$vars['ENCODING']);
 			$xml=dom_import_simplexml($xml)->ownerDocument;
 			$xml->formatOutput=TRUE;
 			echo $xml->saveXML();
+			die;
 		}
 	}
 
 	/**
 		Return TRUE if HTTP request origin is AJAX
-			@return boolean
+			@return bool
 			@public
 	**/
 	static function isajax() {

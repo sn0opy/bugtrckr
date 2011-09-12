@@ -12,7 +12,7 @@
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package Data
-		@version 2.0.0
+		@version 2.0.5
 **/
 
 //! Data validators
