@@ -12,7 +12,9 @@
  * @license http://www.gnu.org/licenses/lgpl.txt
  *   
  */
-class ctimeline extends Controller
+namespace timeline;
+
+class view
 {
 
     /**

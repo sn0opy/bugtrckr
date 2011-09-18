@@ -12,7 +12,10 @@
  * @license http://www.gnu.org/licenses/lgpl.txt
  *   
  */
-class cmain extends Controller
+
+namespace misc;
+
+class main extends \misc\controller
 {
 
     function start()
@@ -34,7 +37,7 @@ class cmain extends Controller
         if($projHash == 'new') 
             $this->reroute($this->get('BASE').'/project/add');
 
-        $project = new Project();
+        $project = new \project\model();
         $project->load(array("hash = :hash", array(':hash' =>$projHash)));
 
         if (!$project->hash)
@@ -45,7 +48,7 @@ class cmain extends Controller
 
         if ($this->get('SESSION.user.hash'))
         {
-            $user = new User();
+            $user = new \user\model();
             $user->load("hash = " . $this->get('SESSION.user.hash'));
             $user->lastProject = $project->hash;
             $user->save();

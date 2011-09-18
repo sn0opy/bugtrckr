@@ -21,6 +21,7 @@ $app = require_once(__DIR__.'/lib/base.php');
 $app->set('AUTOLOAD', __DIR__.'/inc/|'.__DIR__.'/inc/models/');
 $app->set('GUI','install/');
 $app->set('DEBUG', 3);
+$app->set('RELEASE', false);
 $app->set('LOCALES','install/lang/');
 $app->set('LANGUAGE', 'de');
 $app->route('GET /setup.php', 'main->start');
@@ -71,7 +72,6 @@ class main extends F3instance {
 
             $this->set('INSTALLED', true);            
             $this->tpserve();
-            print_r($this->get('ERROR'));
             
         } else {
             $db = $this->get('POST.dbname');
@@ -81,12 +81,17 @@ class main extends F3instance {
                 $this->tpserve();
                 return;
             }
-            
+
             $this->set('DB', new DB('sqlite:data/'.$db));
             require_once 'install/sqlite.php';
             
             $user = new cuser;
-            $user->registerUser($admname, $admpw, $admemail, true);
+            if($user->registerUser($admname, $admpw, $admemail, true)) {
+                $this->set('usererror', true);
+                $this->tpserve();
+                return;
+            }
+            
             
             file_put_contents('data/config.inc.php', "<?php F3::set('DB', new DB('sqlite:data/".$db."')); ?>");
             

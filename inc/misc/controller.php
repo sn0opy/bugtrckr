@@ -12,7 +12,9 @@
  * @license http://www.gnu.org/licenses/lgpl.txt
  *   
  */
-class Controller extends F3instance
+namespace misc;
+
+class controller extends \F3instance
 {
 
     /**
@@ -20,14 +22,14 @@ class Controller extends F3instance
      */
     protected function tpserve()
     {
-        $project = new Project();
+        $project = new \project\model;
         $projects = $project->find();
         $this->set('projects', $projects);
         
         if(file_exists('setup.php') || file_exists('install/sqlite.php') || file_exists('install/mysql.php'))
             $this->set('installWarning', true);
         
-        echo Template::serve('main.tpl.php');
+        echo \Template::serve('main.tpl.php');
     }
 
     /**
@@ -35,7 +37,7 @@ class Controller extends F3instance
      */
     protected function tpdeny()
     {
-        echo Template::serve('main.tpl.php');
+        echo \Template::serve('main.tpl.php');
     }
 
     /**

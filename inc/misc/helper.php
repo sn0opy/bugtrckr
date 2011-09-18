@@ -12,7 +12,9 @@
  * @license http://www.gnu.org/licenses/lgpl.txt
  *   
  */
-class helper extends F3instance
+namespace misc;
+
+class helper extends \F3instance
 {
 
     public static function randStr($length = 5)
@@ -100,7 +102,7 @@ class helper extends F3instance
     {
         $activity = new Activity();
         
-        $activity->hash = helper::getFreeHash('Activity');
+        $activity->hash = \misc\helper::getFreeHash('Activity');
         $activity->description = $description;
         $activity->comment = $comment;
         $activity->user = F3::get('SESSION.user.id');

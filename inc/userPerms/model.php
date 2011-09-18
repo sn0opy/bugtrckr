@@ -14,10 +14,12 @@
  *   
 */
 
-	class User_perms extends Axon 
-	{
-		public function __construct()
-		{
-			$this->sync('user_perms');
-		}
-	}
+namespace userPerms;
+
+class model extends Axon 
+{
+    public function __construct()
+    {
+        $this->sync('user_perms');
+    }
+}

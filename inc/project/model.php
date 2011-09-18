@@ -1,11 +1,11 @@
 <?php
 
 /**
- * milestone.php
+ * project.php
  * 
  * wrapper class for Axon
  * 
- * @package Milestone
+ * @package Project
  * @author Sascha Ohms
  * @author Philipp Hirsch
  * @copyright Copyright 2011, Bugtrckr-Team
@@ -13,10 +13,12 @@
  *   
 */
 
-	class Milestone extends Axon 
-	{
-		public function __construct()
-		{
-			$this->sync('Milestone');		
-		}
-	}
+namespace project;
+
+class Model extends \Axon 
+{
+    public function __construct()
+    {
+        $this->sync('Project');			
+    }
+}

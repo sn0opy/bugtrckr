@@ -1,21 +1,22 @@
 <?php
 
 /**
- * user.php
+ * ticket.php
  * 
  * wrapper class for Axon
  * 
- * @package User
+ * @package Ticket
  * @author Sascha Ohms
  * @author Philipp Hirsch
  * @copyright Copyright 2011, Bugtrckr-Team
  * @license http://www.gnu.org/licenses/lgpl.txt
  *   
 */
-	class User extends Axon 
-	{
-		public function __construct()
-		{
-			$this->sync('User');
-		}
-	}
+
+class Ticket extends \Axon 
+{
+    public function __construct()
+    {
+        $this->sync('Ticket');
+    }
+}

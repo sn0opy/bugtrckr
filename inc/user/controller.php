@@ -12,42 +12,10 @@
  * @license http://www.gnu.org/licenses/lgpl.txt
  *   
  */
-class cuser extends Controller
+namespace user;
+
+class controller extends \misc\Controller
 {
-    /**
-     *	Displays users infopage
-     */
-    function showUser()
-    {
-        $name = $this->get('PARAMS.name');
-
-        $user = new User();
-        $user->load(array('name = :name', array(':name' => $name)));
-
-        if (!$user->hash)
-            return $this->tpfail("User not found");
-
-        $ticket = new DisplayableTicket();
-        $tickets = $ticket->find(array('owner = :owner', array(':owner' => $user->hash)));
-
-        $this->set('user', $user);
-        $this->set('tickets', $tickets);
-        $this->set('template', 'user.tpl.php');
-        $this->set('pageTitle', '{{@lng.user}} › ' . $name);
-        $this->set('onpage', 'user');
-        $this->tpserve();
-    }
-    
-    /**
-     *	Displays a form for registration
-     */
-    function showUserRegister()
-    {
-        $this->set('template', 'userRegister.tpl.php');
-        $this->set('pageTitle', '{{@lng.user}} › {{@lng.registration}}');
-        $this->set('onpage', 'registration');
-        $this->tpserve();
-    }
 
     /**
      *	Adds a new user to the database
@@ -60,34 +28,30 @@ class cuser extends Controller
 			!Data::validEmail($email)))
 			return $this->tpfail('Please correct your data.');
 
-        $salt = helper::randStr();
+        $salt = \misc\helper::randStr();
 
-        $user = new user();
+        $user = new \user\model();
         $user->name = $name ? $name : $this->get('POST.name');
         $user->email = $email ? $email : $this->get('POST.email');
-        $user->password = $password ? helper::salting($salt, $password) : helper::salting($salt, $this->get('POST.password'));
+        $user->password = $password ? \misc\helper::salting($salt, $password) : \misc\helper::salting($salt, $this->get('POST.password'));
         $user->salt = $salt;
-        $user->hash = helper::getFreeHash('User');
+        $user->hash = \misc\helper::getFreeHash('User');
         $user->admin = $admin ? 1 : 0;
         $user->save();
 
+        echo $user->_id;
+        
         if (!$user->_id)
             return $this->tpfail("Failure while creating User");
+        elseif(!$user->_id && $name != false)
+            return true;
 
-        $this->set('SESSION.SUCCESS', 'User registred successfully');
-        $this->reroute($this->get('BASE') . '/');
+        if(!$name) {
+            $this->set('SESSION.SUCCESS', 'User registred successfully');
+            $this->reroute($this->get('BASE') . '/');
+        }
     }
 
-    /**
-     *	Show loginform
-     */
-    function showUserLogin()
-    {
-        $this->set('template', 'userLogin.tpl.php');
-        $this->set('pageTitle', '{{@lng.user}} › {{@lng.login}}');
-        $this->set('onpage', 'login');
-        $this->tpserve();
-    }
 
     /**
      *	Checks user to log in
@@ -96,12 +60,12 @@ class cuser extends Controller
     {
         $email = $this->get('POST.email');
         
-        $user = new User();        
+        $user = new \user\model();        
         $user->load(array('email = :email', array(':email' => $email))); // to get a user's salt first
         
         $user->load(array('email = :email AND password = :password',
             array(':email' => $this->get('POST.email'),
-                ':password' => helper::salting($user->salt, $this->get('POST.password')))));
+                ':password' => \misc\helper::salting($user->salt, $this->get('POST.password')))));
 
         
         if ($user->dry())

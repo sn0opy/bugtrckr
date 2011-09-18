@@ -1,19 +1,8 @@
 <?php
 
-/**
- * cmilestone.php
- * 
- * Milestone controller
- * 
- * @package milestone
- * @author Sascha Ohms
- * @author Philipp Hirsch
- * @copyright Copyright 2011, Bugtrckr-Team
- * @license http://www.gnu.org/licenses/lgpl.txt
- *   
- */
-class cmilestone extends Controller
-{
+namespace milestone;
+
+class view {
 
 	/**
 	 *	Display a roadmap that contains the milestones of a project
@@ -29,14 +18,14 @@ class cmilestone extends Controller
         $project = $this->get('SESSION.project');		// Actual project
 
 		// Get the milestones
-        $milestones = new Milestone();
+        $milestones = new \milestone\model();
         $milestones = $milestones->find(array('project = :project', array(':project' => $project)));
 
 		// Calculate the details of each milestone 
         foreach ($milestones as $milestone)
         {
             $ms[$milestone->id]['infos'] = $milestone;
-            $ms[$milestone->id]['ticketCount'] = helper::getTicketCount($milestone->hash);
+            $ms[$milestone->id]['ticketCount'] = \misc\helper::getTicketCount($milestone->hash);
 
             $ms[$milestone->id]['fullTicketCount'] = 0;
             foreach ($ms[$milestone->id]['ticketCount'] as $cnt)
@@ -66,7 +55,7 @@ class cmilestone extends Controller
     {
         $hash = $this->get('PARAMS.hash');
 
-        $milestone = new Milestone();
+        $milestone = new \milestone\model();
         $milestone->load(array('hash = :hash', array(':hash' => $hash)));
 
         if($milestone->dry())
@@ -75,7 +64,7 @@ class cmilestone extends Controller
         $ticket = new DisplayableTicket();
         $tickets = $ticket->find(array('milestone = :hash', array(':hash' => $milestone->hash)));
 
-        $ms['ticketCount'] = helper::getTicketCount($milestone->hash);
+        $ms['ticketCount'] = \misc\helper::getTicketCount($milestone->hash);
 
         $ms['fullTicketCount'] = 0;
         foreach ($ms['ticketCount'] as $cnt)
@@ -98,39 +87,5 @@ class cmilestone extends Controller
         $this->set('onpage', 'roadmap');
         $this->tpserve();
     }
-
-    /**
-     *	Save a milestone to the database
-     */
-    function addEditMilestone($projHash = false)
-    {
-        $name = ($projHash) ? 'First milestone' : $this->get('POST.name');
-        
-        if(!isset($projHash)) {
-            // This params have to be set
-            if ($this->get('POST.name') == "" ||
-                $this->get('SESSION.project') <= 0)
-                return $this->tpfail('Failure while editing milestone.');
-        }
-
-        $msHash = $this->get('POST.hash') ? $this->get('POST.hash') : helper::getFreeHash('Milestone');
-
-        $milestone = new Milestone();
-        if (F3::exists('POST.hash'))
-        {
-            $milestone->load(array('hash = :hash', array(':hash' => $msHash)));
-            if ($milestone->dry())
-                return $this->tpfail('Failure while editing milestone.');
-        }
-
-        $milestone->name = $name;
-        $milestone->hash = $msHash;
-        $milestone->description = ($projHash) ? 'My first milestone' : $this->get('POST.description');
-        $milestone->project = ($projHash) ? $projHash : $this->get('SESSION.project');
-        $milestone->finished = ($projHash) ? time()+2629743 : $this->get('POST.finished');
-        $milestone->save();
-
-        if(!$projHash)
-            $this->reroute($this->get('BASE') . '/project/settings/milestone/' . $msHash);
-    }
 }
+?>

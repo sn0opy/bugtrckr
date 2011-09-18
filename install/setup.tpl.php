@@ -59,6 +59,11 @@
                     <p class="failure message">{{@lng.mysqlfailed}}</p>
                 </F3:check>
                 
+                
+                <F3:check if="{{@usererror}}">
+                    <p class="failure message">{{@lng.usererror}}</p>
+                </F3:check>
+                
                 <F3:check if="{{@INSTALLED}}">
                     <F3:true>
                         <div class="content">

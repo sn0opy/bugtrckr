@@ -38,5 +38,6 @@ return array('lng' => array(
     'noMatch' => 'Stimmt nicht überein',
     'done' => 'Installations abgeschlossen!',
     'toApp' => 'zur App',
-    'mysqlfailed' => 'Die MySQL Verbindung schlug fehl'
+    'mysqlfailed' => 'Die MySQL Verbindung schlug fehl',
+    'usererror' => 'Beim registrieren des Users ist ein Fehler aufgetreten.'
 ));
