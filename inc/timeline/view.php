@@ -14,7 +14,7 @@
  */
 namespace timeline;
 
-class view
+class view extends \F3instance
 {
 
     /**

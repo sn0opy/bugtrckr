@@ -14,7 +14,7 @@
  */
 namespace project;
 
-class view {
+class view extends \F3instance {
     /**
      * 
      */
@@ -23,10 +23,10 @@ class view {
         $projectHash = $this->get('SESSION.project');
 
         if($projectHash != "") {      
-            $project = new \project\view();
+            $project = new \project\model();
             $project->load(array('hash = :hash', array(':hash' => $projectHash)));
 
-            $role = new \role\view();
+            $role = new \role\model();
             $roles = $role->find(array('project = :hash', array(':hash' => $projectHash)));
 
             $projPerms = new \userPerms\model();

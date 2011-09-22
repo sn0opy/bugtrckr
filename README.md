@@ -17,6 +17,7 @@ Features:
 * SQLite
 * PDO
 * PDO SQLite
+* PHP5 Sockets (only for the Remember The Milk integration)
 
 ## Bugtrckr-Team
 * Sascha 'sn0opy' Ohms 

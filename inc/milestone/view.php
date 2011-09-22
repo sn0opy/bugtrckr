@@ -2,7 +2,7 @@
 
 namespace milestone;
 
-class view {
+class view extends \misc\controller {
 
 	/**
 	 *	Display a roadmap that contains the milestones of a project

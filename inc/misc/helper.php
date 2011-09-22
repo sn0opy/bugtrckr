@@ -95,7 +95,7 @@ class helper extends \F3instance
 
     public static function getTicketCount($milestone)
     {
-        return F3::get('DB')->sql('SELECT state, COUNT(*) AS `count` FROM `Ticket` WHERE milestone = \'' . $milestone . '\' GROUP BY state');
+        return \F3::get('DB')->sql('SELECT state, COUNT(*) AS `count` FROM `Ticket` WHERE milestone = \'' . $milestone . '\' GROUP BY state');
     }
 
     public static function addActivity($description, $ticket = 0, $comment = '')

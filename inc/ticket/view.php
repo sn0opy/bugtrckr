@@ -15,7 +15,7 @@
 
 namespace ticket;
 
-class view extends \ticket\controller {
+class view extends \F3instance {
 	/**
 	 *	Show a list of tickets of the project
 	 */

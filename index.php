@@ -57,8 +57,8 @@ $app->route('GET /project/settings/category/add', 'project\view->showAddCategory
 $app->route('GET /project/settings/role/delete/@hash', 'project\view->deleteRole');
 $app->route('GET /project/settings/milestone/delete/@hash', 'project\view->deleteProjectSettingsMilestone');
 $app->route('GET /project/settings/category/delete/@hash', 'project\view->deleteCategory');
-$app->route('GET /wiki/@title', 'cwiki->showEntry');
-$app->route('GET /wiki', 'cwiki->showEntry');
+$app->route('GET /wiki/@title', '\wiki\view->showEntry');
+$app->route('GET /wiki', '\wiki\view->showEntry');
 
 $app->route('GET /user/logout', '\user\controller->logoutUser');
 $app->route('POST /search', '\ticket\view->showTickets');
