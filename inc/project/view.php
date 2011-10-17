@@ -14,7 +14,8 @@
  */
 namespace project;
 
-class view extends \F3instance {
+class view extends \misc\controller
+{
     /**
      * 
      */

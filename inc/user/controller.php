@@ -23,9 +23,7 @@ class controller extends \misc\Controller
     function registerUser($name = false, $password = false, $email = false, $admin = false)
     {
 		if (($this->get('POST.name') == "" && $name == "") ||
-			($this->get('POST.email') == "" && $email == "") ||
-			(!Data::validEmail($this->get('POST.email')) && 
-			!Data::validEmail($email)))
+			($this->get('POST.email') == "" && $email == ""))
 			return $this->tpfail('Please correct your data.');
 
         $salt = \misc\helper::randStr();

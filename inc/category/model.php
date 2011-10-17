@@ -15,7 +15,7 @@
 
 namespace category;
 
-class model extends Axon
+class model extends \Axon
 {
     public function __construct()
     {

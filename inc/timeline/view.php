@@ -14,7 +14,7 @@
  */
 namespace timeline;
 
-class view extends \F3instance
+class view extends \misc\controller
 {
 
     /**
@@ -29,7 +29,7 @@ class view extends \F3instance
 
         $project = $this->get('SESSION.project');
 
-        $activities = new DisplayableActivity();
+        $activities = new \activity\displayable();
         $activities = $activities->find("project = '$project'");
 
         $this->set('activities', $activities);

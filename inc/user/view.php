@@ -2,7 +2,8 @@
 
 namespace user;
 
-class view {
+class view extends \misc\controller
+{
     /**
      *	Displays users infopage
      */
@@ -16,7 +17,7 @@ class view {
         if (!$user->hash)
             return $this->tpfail("User not found");
 
-        $ticket = new DisplayableTicket();
+        $ticket = new \ticket\displayable();
         $tickets = $ticket->find(array('owner = :owner', array(':owner' => $user->hash)));
 
         $this->set('user', $user);

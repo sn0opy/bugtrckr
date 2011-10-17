@@ -15,7 +15,8 @@
 
 namespace ticket;
 
-class view extends \F3instance {
+class view extends \misc\controller 
+{
 	/**
 	 *	Show a list of tickets of the project
 	 */
@@ -46,7 +47,7 @@ class view extends \F3instance {
             $mshashs[] = $ms->hash;
         $string = implode($mshashs, '\',\'');
             
-        $tickets = new DisplayableTicket();
+        $tickets = new \ticket\displayable();
         $tickets = $tickets->find('milestone IN (\'' . $string . '\') AND ' .
                     'title LIKE \'%'.$search.'%\'' .
                     'ORDER BY ' . $order. ' DESC');
@@ -70,7 +71,7 @@ class view extends \F3instance {
 	{ 
         $hash = $this->get('PARAMS.hash');
 
-        $ticket = new DisplayableTicket();
+        $ticket = new \ticket\displayable();
         $ticket->load(array("tickethash = :hash", array(':hash' => $hash)));
 
         if($ticket->dry())

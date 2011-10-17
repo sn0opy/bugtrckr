@@ -31,7 +31,7 @@ class helper extends \F3instance
 
     public static function getFreeHash($table, $length = 12)
     {
-        $ax = new Axon($table);
+        $ax = new \Axon($table);
         do
         {
             $hash = self::randStr($length);
