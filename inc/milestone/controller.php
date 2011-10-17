@@ -34,7 +34,7 @@ class controller extends \misc\controller
         $msHash = $this->get('POST.hash') ? $this->get('POST.hash') : \misc\helper::getFreeHash('Milestone');
 
         $milestone = new \milestone\model();
-        if (F3::exists('POST.hash'))
+        if ($this->exists('POST.hash'))
         {
             $milestone->load(array('hash = :hash', array(':hash' => $msHash)));
             if ($milestone->dry())

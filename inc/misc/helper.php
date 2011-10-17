@@ -51,7 +51,7 @@ class helper extends \F3instance
             $title .= $seperator . $sub;
         }
 
-        F3::set('title', $title . ' - ' . F3::get('title'));
+        F3::set('title', $title . ' - ' . \F3::get('title'));
     }
 
     /**
@@ -63,24 +63,24 @@ class helper extends \F3instance
      */
     public static function getPermission($permission)
     {
-        $userHash = F3::get('SESSION.user.hash');
-        $projectHash = F3::get('SESSION.project');
+        $userHash = \F3::get('SESSION.user.hash');
+        $projectHash = \F3::get('SESSION.project');
         
         if ($userHash)
         {
-            $user = new User();
+            $user = new \user\model();
             $user->load(array('hash = :hash', array(':hash' => $userHash)));
 
             if($user->admin) // admin has access to everything
                 return true;
             
-            $projPerm = new ProjectPermission();
+            $projPerm = new \userPerms\model();
             $permissions = $projPerm->findone(array('user = :user AND project = :project', array(':user' => $userHash, ':project' => $projectHash)));
             
 			if($permissions == null)
 				return false;
 
-            $role = new Role();
+            $role = new \role\model();
             $role->load(array('hash = :hash', array(':hash' => $permissions->role)));
             
             if($role->dry())
@@ -100,14 +100,14 @@ class helper extends \F3instance
 
     public static function addActivity($description, $ticket = 0, $comment = '')
     {
-        $activity = new Activity();
+        $activity = new \activity\model();
         
         $activity->hash = \misc\helper::getFreeHash('Activity');
         $activity->description = $description;
         $activity->comment = $comment;
-        $activity->user = F3::get('SESSION.user.id');
+        $activity->user = \F3::get('SESSION.user.id');
         $activity->changed = time();
-        $activity->project = F3::get('SESSION.project');
+        $activity->project = \F3::get('SESSION.project');
         $activity->ticket = $ticket;
 
         $activity->save();

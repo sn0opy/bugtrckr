@@ -46,7 +46,7 @@ class view extends \misc\controller
         foreach ($milestones as $ms)
             $mshashs[] = $ms->hash;
         $string = implode($mshashs, '\',\'');
-            
+
         $tickets = new \ticket\displayable();
         $tickets = $tickets->find('milestone IN (\'' . $string . '\') AND ' .
                     'title LIKE \'%'.$search.'%\'' .
@@ -79,7 +79,7 @@ class view extends \misc\controller
 
         $milestone = new \milestone\model();
 
-        $activities = new DisplayableActivity();
+        $activities = new \activity\displayable();
         $activities = $activities->find(array("ticket = :ticket", array(':ticket' => $ticket->hash)));
 
         if (!$ticket->hash)

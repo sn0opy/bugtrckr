@@ -11,23 +11,21 @@ DB::sql('CREATE TABLE ProjectAdmins (hash CHAR(12) PRIMARY KEY, user CHAR(12), p
 DB::sql('CREATE TABLE Category (hash CHAR(12) PRIMARY KEY, project CHAR(12), name VARCHAR(40));');
 DB::sql('CREATE TABLE WikiEntry (hash CHAR(32) PRIMARY KEY, title VARCHAR(30), content TEXT, project CHAR(32), created DATE, created_by CHAR(32), edited DATE, edited_by CHAR(32));');
 
+
 DB::sql('CREATE VIEW user_perms as SELECT * FROM user, projectpermission WHERE user = projectpermission.user;');
 DB::sql('CREATE VIEW user_ticket AS SELECT user.hash as userhash, ticket.hash as tickethash, * FROM user, ticket WHERE user.hash = ticket.owner;');
 
 DB::sql('CREATE VIEW displayableticket AS 
-    SELECT priority.name as priorityname, status.name as statusname, type.name as typename,
-            owner.hash as userhash, owner.name as username, ticket.hash as tickethash,
+    SELECT owner.hash as userhash, owner.name as username, ticket.hash as tickethash,
             assigned.hash as assignedhash, assigned.name as assignedname, category.name as categoryname, * 
-    FROM ticket, user as owner, status, priority, type, category LEFT OUTER JOIN user as assigned
-        ON assigned.id = ticket.assigned
-    WHERE owner.id = ticket.owner AND ticket.state = status.id AND ticket.priority = priority.id 
-        AND type.id = ticket.type AND category.id = ticket.category;');
+    FROM ticket, user as owner, category LEFT OUTER JOIN user as assigned
+        ON assigned.hash = ticket.assigned
+    WHERE owner.hash = ticket.owner AND category.hash = ticket.category;');
 
 DB::sql('CREATE VIEW displayableactivity AS
-    SELECT activity.id, activity.hash, activity.description, activity.changed, activity.ticket, activity.project, activity.comment,
+    SELECT activity.hash, activity.description, activity.changed, activity.ticket, activity.project, activity.comment,
            user.name as username, user.hash as userhash
     FROM activity, user 
-    WHERE activity.user = user.id;');
-
+    WHERE activity.user = user.hash;');
 
 ?>

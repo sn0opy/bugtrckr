@@ -14,7 +14,7 @@
  */
 namespace project;
 
-class controller extends \misc\Controller
+class controller extends \misc\controller
 {
     function projectAddMember()
     {
@@ -30,7 +30,7 @@ class controller extends \misc\Controller
         $userHash = $this->get('POST.member');
         $roleHash = $this->get('POST.role');
 
-        $role = new Role();
+        $role = new \role\model();
         $role->load(array('hash = :hash', array(':hash' => $roleHash)));
 
         if ($role->dry())
@@ -39,7 +39,7 @@ class controller extends \misc\Controller
             return;
         }
 
-        $user = new User();
+        $user = new \user\model();
         $user->load(array('hash = :hash', array(':hash' => $userHash)));
 
         if ($user->dry())
@@ -48,7 +48,7 @@ class controller extends \misc\Controller
             return;
         }
 
-        $projPerms = new ProjectPermission();
+        $projPerms = new \projPerms\model();
         $projPerms->load(array('user = :user AND project = :project',
             array(':user' => $user->hash, ':project' => $projectHash)));
 
@@ -79,7 +79,7 @@ class controller extends \misc\Controller
         $userHash = $this->get('POST.user');
         $projectHash = $this->get('SESSION.project');
 
-        $user = new User();
+        $user = new \user\model();
         $user->load(array('hash = :hash', array(':hash' => $userHash)));
 
         if ($user->dry())
@@ -88,7 +88,7 @@ class controller extends \misc\Controller
             return;
         }
 
-        $projPerms = new ProjectPermission();
+        $projPerms = new \projPerms\model();
         $projPerms->load(array('user = :user AND project = :project', array(':user' => $user->hash, ':project' => $projectHash)));
         $projPerms->erase();
 
@@ -109,31 +109,22 @@ class controller extends \misc\Controller
 
         $projectHash = $this->get('SESSION.project');
 
-        $user = new user();
+        $user = new \user\model();
         $user->load(array('hash = :hash', array(':hash' => $this->get('POST.user'))));
 
         if (!$user->hash)
-        {
-            $this->tpfail("Failure while getting User");
-            return;
-        }
+            return $this->tpfail("Failure while getting User");
 
-        $role = new Role();
+        $role = new \role\model();
         $role->load(array('hash = :hash', array(':hash' => $this->get('POST.role'))));
 
         if (!$role->hash)
-        {
-            $this->tpfail("Failure while getting Role");
-            return;
-        }
+            return $this->tpfail("Failure while getting Role");
 
         if ($role->project != $projectHash)
-        {
-            $this->tpfail("Role does not belong to this project.");
-            return;
-        }
+            return $this->tpfail("Role does not belong to this project.");
 
-        $perms = new ProjectPermission();
+        $perms = new \projPerms\model();
         $perms->load(array('project = :proj AND user = :user',
             array(':proj' => $projectHash,
                 ':user' => $user->hash)));
@@ -150,30 +141,21 @@ class controller extends \misc\Controller
     function deleteProjectSettingsMilestone()
     {
 		if (!\misc\helper::getPermission('proj_manageMilestones'))
-		{
-			$this->tpfail("You are not allowed to do this.");
-            return;
-		}
+			return $this->tpfail("You are not allowed to do this.");
 
         $msHash = $this->get('PARAMS.hash');
 
-        $milestone = new Milestone();
+        $milestone = new \milestone\model();
         $milestone->load(array('hash = :hash', array(':hash' => $msHash)));
 
         if (!$milestone->hash)
-        {
-            $this->tpfail("Failure while getting Milestone");
-            return;
-        }
+            return $this->tpfail("Failure while getting Milestone");
 
-		$tickets = new Ticket();
+		$tickets = new \ticket\model();
 		$count = $tickets->found('milestone = ' . $milestone->hash);
 
 		if ($count > 0)
-		{
-            $this->tpfail("Milestone can not be removed");
-            return;
-		}
+            return $this->tpfail("Milestone can not be removed");
 
 		$milestone->erase();
 		$this->reroute($this->get('BASE') . '/project/settings');
@@ -186,16 +168,13 @@ class controller extends \misc\Controller
     {
         $roleHash = $this->get('POST.hash') ? $this->get('POST.hash') : \misc\helper::getFreeHash('Role');
 
-        $role = new role();
+        $role = new \role\model();
         if ($this->exists('POST.hash'))
         {
             $role->load(array('hash = :hash', array(':hash' => $roleHash)));
 
             if ($role->dry())
-            {
-                $this->tpfail('Failure while editing role.');
-                return;
-            }
+                return $this->tpfail('Failure while editing role.');
         }
 
         $role->name = ($projHash) ? 'Admin' : $this->get('POST.name');
@@ -210,7 +189,7 @@ class controller extends \misc\Controller
         $role->iss_editIssues = ($projHash) ? 1 : $this->get('POST.iss_editIssues') == "on";
         $role->iss_addIssues = ($projHash) ? 1 : $this->get('POST.iss_addIssues') == "on";
         $role->iss_deleteIssues = ($projHash) ? 1 : $this->get('POST.iss_deleteIssues') == "on";
-        $role->iss_moveIssue = ($projId) ? 1 : $this->get('POST.iss_moveIssue') == "on";
+        $role->iss_moveIssue = ($projHash) ? 1 : $this->get('POST.iss_moveIssue') == "on";
         $role->iss_editWatchers = ($projHash) ? 1 : $this->get('POST.iss_editWatchers') == "on";
         $role->iss_addWatchers = ($projHash) ? 1 : $this->get('POST.iss_addWatchers') == "on";
         $role->iss_viewWatchers = ($projHash) ? 1 : $this->get('POST.iss_viewWatchers') == "on";
@@ -231,13 +210,10 @@ class controller extends \misc\Controller
             $ax = new Axon('Role');
             $ax->load(array('hash = :hash', array(':hash' => $hash)));
 
-            $ax2 = new Axon('ProjectPermission');
+            $ax2 = new \Axon('ProjectPermission');
 
             if($ax2->found('role = '.$ax->hash))
-            {
-                $this->tpfail('Role cannot be deleted.');
-                return;
-            }       
+	            return $this->tpfail('Role cannot be deleted.');
 
             $ax->erase();
             $this->set('SESSION.SUCCESS', 'Role has been deleted.');
@@ -252,7 +228,7 @@ class controller extends \misc\Controller
      */
     function addEditCategory()
     {
-        $category = new Category();
+        $category = new \category\model();
 
 		if ($this->get('POST.hash') != "")
 			$category->load(array('hash = :hash', array(':hash' => $this->get('POST.hash'))));
@@ -283,7 +259,7 @@ class controller extends \misc\Controller
 
 		if (\misc\helper::getPermission('proj_editProject'))
 		{
-			$category = new Category();
+			$category = new \category\model();
 			$category->load(array('hash = :hash', array(':hash' => $hash)));
 
 			$category->erase();
@@ -301,28 +277,28 @@ class controller extends \misc\Controller
     {
         $hash = \misc\helper::getFreeHash('Project');
         
-        $ax = new Axon('Project');
+        $ax = new \Axon('Project');
         $ax->name = $this->get('POST.name');
         $ax->description = $this->get('POST.description');
         $ax->public = ($this->get('POST.public') == 'on') ? 1 : 0;
         $ax->hash = $hash;
         $ax->save();
 
-        $cmain = new cmain();
-        $cmain->selectProject($hash, false);
+ //       $cmain = new \misc\main();
+ //       $cmain->selectProject($hash, false);
         
-        $perms = new ProjectPermission();
+        $perms = new \projPerms\model();
         $perms->user = $this->get('SESSION.user.hash');
         $perms->project = $hash;
         $perms->role = $this->addEditRole($hash);
         $perms->save();
         
-        $milestone = new cmilestone;
+        $milestone = new \milestone\controller;
         $milestone->addEditMilestone($hash);
         
-        #$this->addCategory($this->get('lng.uncategorized'), $projId);
+        //$this->addCategory($this->get('lng.uncategorized'), $projId);
         
-        \misc\helper::addActivity(F3::get('lng.projCreated'));
+        \misc\helper::addActivity($this->get('lng.projCreated'));
         
         $this->reroute($this->get('BASE').'/');        
     }
@@ -332,7 +308,7 @@ class controller extends \misc\Controller
      */
     function projectEditMain()
     {
-        $project = new Project();
+        $project = new \project\model();
         $project->load(array('hash = :hash', array(':hash' => $this->get('SESSION.project'))));
         $project->name = $this->get('POST.name');
         $project->public = $this->get('POST.public')=='on';

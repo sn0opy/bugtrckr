@@ -24,20 +24,20 @@ class view extends \misc\controller {
 		// Calculate the details of each milestone 
         foreach ($milestones as $milestone)
         {
-            $ms[$milestone->id]['infos'] = $milestone;
-            $ms[$milestone->id]['ticketCount'] = \misc\helper::getTicketCount($milestone->hash);
+            $ms[$milestone->hash]['infos'] = $milestone;
+            $ms[$milestone->hash]['ticketCount'] = \misc\helper::getTicketCount($milestone->hash);
 
-            $ms[$milestone->id]['fullTicketCount'] = 0;
-            foreach ($ms[$milestone->id]['ticketCount'] as $cnt)
-                $ms[$milestone->id]['fullTicketCount'] += $cnt['count'];
+            $ms[$milestone->hash]['fullTicketCount'] = 0;
+            foreach ($ms[$milestone->hash]['ticketCount'] as $cnt)
+                $ms[$milestone->hash]['fullTicketCount'] += $cnt['count'];
 
-            $ms[$milestone->id]['openTickets'] = 0;
-            foreach ($ms[$milestone->id]['ticketCount'] as $j => $cnt)
+            $ms[$milestone->hash]['openTickets'] = 0;
+            foreach ($ms[$milestone->hash]['ticketCount'] as $j => $cnt)
             {
-                $ms[$milestone->id]['ticketCount'][$j]['percent'] = round($cnt['count'] * 100 / $ms[$milestone->hash]['fullTicketCount']);
+                $ms[$milestone->hash]['ticketCount'][$j]['percent'] = round($cnt['count'] * 100 / $ms[$milestone->hash]['fullTicketCount']);
 
-                if ($ms[$milestone->id]['ticketCount'][$j]['state'] != 5)
-                    $ms[$milestone->id]['openTickets'] += $ms[$milestone->id]['ticketCount'][$j]['count'];
+                if ($ms[$milestone->hash]['ticketCount'][$j]['state'] != 5)
+                    $ms[$milestone->hash]['openTickets'] += $ms[$milestone->hash]['ticketCount'][$j]['count'];
             }
         }
 
@@ -61,8 +61,11 @@ class view extends \misc\controller {
         if($milestone->dry())
             return $this->tpfail('The milestone doesn\'t exist.');
 
-        $ticket = new DisplayableTicket();
+        $ticket = new \ticket\displayable();
         $tickets = $ticket->find(array('milestone = :hash', array(':hash' => $milestone->hash)));
+
+        if($milestone->dry())
+            return $this->tpfail('The milestone tickets can\'t be loaded.');
 
         $ms['ticketCount'] = \misc\helper::getTicketCount($milestone->hash);
 

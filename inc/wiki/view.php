@@ -38,13 +38,16 @@ class view extends \misc\controller {
         }
 
         if ($entry->title == '{{main}}')
-            $entry->title = $this->get('lng.mainpage');
+            $pagetitle = $this->get('lng.mainpage');
+		else
+			$pagetitle = $entry->title;
 
         $this->set('entry', $entry);
         $controller = new \wiki\controller;
         $this->set('displayablecontent', $controller->translateHTML($entry->content));
 
-        $this->set('pageTitle', '{{@lng.wiki}} › ' . $entry->title);
+        $this->set('pageTitle', $this->get('lng.wiki') . ' › ' . $pagetitle);
+		$this->set('title', $pagetitle);
         $this->set('template', 'wiki.tpl.php');
         $this->set('onpage', 'wiki');
         $this->tpserve();

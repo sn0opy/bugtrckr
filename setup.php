@@ -65,7 +65,7 @@ class main extends F3instance {
             
             require_once 'install/mysql.php';
             
-            $usr = new cuser;
+            $usr = new \user\controller;
             $usr->registerUser($admname, $admpw, $admemail, true);
             
             file_put_contents('data/config.inc.php', "<?php F3::set('DB', new DB('mysql:host=".$host.";dbname=".$db."', '".$user."', '".$pass."')); ?>");
@@ -85,7 +85,7 @@ class main extends F3instance {
             $this->set('DB', new DB('sqlite:data/'.$db));
             require_once 'install/sqlite.php';
             
-            $user = new cuser;
+            $user = new \user\controller;
             if($user->registerUser($admname, $admpw, $admemail, true)) {
                 $this->set('usererror', true);
                 $this->tpserve();

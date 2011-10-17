@@ -99,7 +99,7 @@ class view extends \misc\controller
     {
         $msHash = $this->get('PARAMS.hash');
 
-        $milestone = new Milestone();
+        $milestone = new \milestone\model();
         $milestone->load(array('hash = :hash', array(':hash' => $msHash)));
 
         if (!$milestone->hash)

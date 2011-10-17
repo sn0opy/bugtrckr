@@ -25,11 +25,11 @@ class controller extends \misc\controller
         if (!\misc\helper::getPermission('iss_addIssues'))
             return $this->tpfail('You are not allowed to add tickets.');
 
-        $ticket = new Ticket();
+        $ticket = new \ticket\model();
         $ticket->hash = \misc\helper::getFreeHash('Ticket');
         $ticket->title = $this->get('POST.title');
         $ticket->description = $this->get('POST.description');
-        $ticket->owner = $this->get('SESSION.user.id');
+        $ticket->owner = $this->get('SESSION.user.hash');
         $ticket->assigned = 0; // do not assign to anyone
         $ticket->type = $this->get('POST.type');
         $ticket->state = 1;
@@ -63,10 +63,8 @@ class controller extends \misc\controller
         $ticket = new \ticket\model();
         $ticket->load(array('hash = :hash', array(':hash' => $hash)));
 
-        $milestone = new \milestone\controller();
-        
         $ticket->state = $this->get('POST.state');
-		if (is_numeric($this->get('POST.user')))
+		if (ctype_alnum($this->get('POST.user')))
 			$ticket->assigned = $this->get('POST.user');
 		if (ctype_alnum($this->get('POST.milestone')))
         	$ticket->milestone = $this->get('POST.milestone');

@@ -33,13 +33,13 @@ class controller extends \misc\controller
             $entry->hash = \misc\helper::getFreeHash('WikiEntry');
             $entry->title = $title;
             $entry->created = date();
-            $entry->created_by = 1;
+            $entry->created_by = $this->get('SESSION.user.hash');
             $entry->project = $project;
         }
 
         $entry->content = $content;
         $entry->edited = date();
-        $entry->edited_by = 1;
+        $entry->edited_by = $this->get('SESSION.user.hash');
 
         $entry->save();
 

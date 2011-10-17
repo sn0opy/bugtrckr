@@ -24,7 +24,7 @@
 </script>
 
 
-<h1>{{@entry->title}}</h1>
+<h1>{{@title}}</h1>
 
 <div id="wikicontent">
 	{{@displayablecontent}}

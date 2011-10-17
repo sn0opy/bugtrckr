@@ -36,8 +36,6 @@ class controller extends \misc\Controller
         $user->hash = \misc\helper::getFreeHash('User');
         $user->admin = $admin ? 1 : 0;
         $user->save();
-
-        echo $user->_id;
         
         if (!$user->_id)
             return $this->tpfail("Failure while creating User");
@@ -86,8 +84,6 @@ class controller extends \misc\Controller
      */
     function logoutUser()
     {
-        $this->set('SESSION.user', NULL);
-        $this->set('SESSION.user', NULL);
         $this->set('SESSION.user', NULL);
         session_destroy();
 
