@@ -121,4 +121,13 @@ class helper extends \F3instance
 
 		return $user->name;
 	}
+
+	public static function getName($type, $id)
+	{
+		$arr = \F3::get('lng.' . $type);
+		if (array_key_exists($id, $arr))
+			return $arr[$id]['name'];
+		else
+			return "";
+	}
 }

@@ -14,7 +14,7 @@
 **/
 
 if(!file_exists('data/config.inc.php')) {
-    echo '<a href="setup.php">Setup</a>';
+    echo '<a href="/' . $this->get('BASE') . 'setup.php">Setup</a>';
     exit;
 }
 

@@ -4,13 +4,13 @@
     <table class="ticket">
         <tr>
             <th>{{@lng.status}}</th>
-            <td>{{@ticket->state}}</td>
+            <td>{{\misc\Helper::getName('states', @ticket->state)}}</td>
             <th>{{@lng.created}}</th>
             <td>{{date('d.m.Y H:i', @ticket->created)}}</td>
         </tr>
         <tr>
             <th>{{@lng.priority}}</th>
-            <td>{{@ticket->priority}}</td>
+            <td>{{\misc\Helper::getName('priorities', @ticket->priority)}}</td>
             <th>{{@lng.assignedTo}}</th>
             <td><a href="{{@BASE}}/user/{{@ticket->assignedname}}">{{@ticket->assignedname}}</a></td>
         </tr>
