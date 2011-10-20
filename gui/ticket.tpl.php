@@ -4,7 +4,7 @@
     <table class="ticket">
         <tr>
             <th>{{@lng.status}}</th>
-            <td>{{@ticket->statusname}}</td>
+            <td>{{@ticket->state}}</td>
             <th>{{@lng.created}}</th>
             <td>{{date('d.m.Y H:i', @ticket->created)}}</td>
         </tr>
@@ -120,7 +120,7 @@
                     <div class="formValue">
                         <select name="state" size="1">
                             <F3:repeat group="{{@lng.states}}" key="{{@i}}" value="{{@state}}">
-                                <F3:check if="{{@state.name == @ticket->statusname}}">
+                                <F3:check if="{{@state.id == @ticket->state}}">
                                     <F3:true><option value="{{@state.id}}" selected="selected">{{@state.name}}</option></F3:true>
                                     <F3:false><option value="{{@state.id}}">{{@state.name}}</option></F3:false>
                                 </F3:check>
