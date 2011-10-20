@@ -88,7 +88,7 @@ class view extends \misc\controller
         
         if (!$ticket->hash)
             return $this->tpfail($this->get('tpl.cannotOpenTicket'));
-   
+
         $users = new \user\model();
         
         $this->set('ticket', $ticket);

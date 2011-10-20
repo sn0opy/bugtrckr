@@ -96,6 +96,7 @@ return array('lng' => array(
     'ticket' => 'Ticket',
     'added' => 'wurde hinzugefügt',
     'edited' => 'wurde geändert',
+	'edited_by' => 'wurde geändert von',
     'newProject' => 'Neues Projekt',
     'comment' => 'Kommentar',
     'by' => 'von',

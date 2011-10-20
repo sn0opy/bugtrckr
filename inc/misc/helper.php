@@ -105,7 +105,7 @@ class helper extends \F3instance
         $activity->hash = \misc\helper::getFreeHash('Activity');
         $activity->description = $description;
         $activity->comment = $comment;
-        $activity->user = \F3::get('SESSION.user.id');
+        $activity->user = \F3::get('SESSION.user.hash');
         $activity->changed = time();
         $activity->project = \F3::get('SESSION.project');
         $activity->ticket = $ticket;

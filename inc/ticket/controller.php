@@ -43,7 +43,7 @@ class controller extends \misc\controller
             return $this->tpfail($this->get('lng.failTicketSave'));
 
         \misc\helper::addActivity(
-            $this->get('lng.ticket') . " '$ticket->title' " . $this->get('lng.added') . ".", $ticket->_id);
+            $this->get('lng.ticket') . " '$ticket->title' " . $this->get('lng.added') . ".", $ticket->hash);
 
         $this->reroute($this->get('BASE') . '/ticket/' . $ticket->hash);
     }
@@ -89,7 +89,7 @@ class controller extends \misc\controller
         if (!$ticket->hash)
             return $this->tpfail($this->get('lng.failTicketSave'));
 
-        \misc\helper::addActivity($this->get('lng.ticket') . " '" .$ticket->title. "' " .$this->get('lng.edited'), $ticket->hash, $this->get('POST.comment'), json_encode($changed));
+        \misc\helper::addActivity($this->get('lng.ticket') . " '" .$ticket->title. "' " .$this->get('lng.edited_by') . " " . $this->get('SESSION.user.name'), $ticket->hash, $this->get('POST.comment'), json_encode($changed));
         
         $this->reroute($this->get('BASE').'/ticket/'.$hash);
     }

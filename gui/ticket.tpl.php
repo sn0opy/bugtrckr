@@ -10,7 +10,7 @@
         </tr>
         <tr>
             <th>{{@lng.priority}}</th>
-            <td>{{@ticket->priorityname}}</td>
+            <td>{{@ticket->priority}}</td>
             <th>{{@lng.assignedTo}}</th>
             <td><a href="{{@BASE}}/user/{{@ticket->assignedname}}">{{@ticket->assignedname}}</a></td>
         </tr>
