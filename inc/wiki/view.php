@@ -28,7 +28,7 @@ class view extends \misc\controller {
 
         // Load Entry
         $entry = new \wiki\wikiEntry();
-        $entry->load(array("title = :title AND project = :project", array(":title" => $title, ":project" => $project)));
+        $entry->load(array("title = :title AND project = :project ORDER BY created", array(":title" => $title, ":project" => $project)));
 
         // Entry does not exist
         if ($entry->dry())
@@ -52,5 +52,32 @@ class view extends \misc\controller {
         $this->set('onpage', 'wiki');
         $this->tpserve();
     }
-    
+
+	public function showDiscussion()
+	{
+		$hash = $this->get('PARAMS.hash');
+
+		$d = new \wiki\WikiDiscussion;
+		$discussions = $d->find(array('entry = :hash', array(':hash' => $hash)));
+
+		$entry = new \wiki\WikiEntry;
+		$entry->load(array('hash = :hash', array(':hash' => $hash)));
+
+		$controller = new \wiki\controller;
+		foreach ($discussions as $discussion)
+			$discussion->content = $controller->translateHTML($discussion->content);
+
+        if ($entry->title == '{{main}}')
+            $pagetitle = $this->get('lng.mainpage');
+		else
+			$pagetitle = $entry->title;
+
+		$this->set('entry', $entry);
+		$this->set('discussions', $discussions);
+        $this->set('pageTitle', $this->get('lng.wiki') . ' › ' . $pagetitle);
+		$this->set('title', $pagetitle);
+        $this->set('template', 'wikidiscussion.tpl.php');
+        $this->set('onpage', 'wiki');
+        $this->tpserve();
+	}
 }

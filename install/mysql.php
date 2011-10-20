@@ -10,6 +10,7 @@ DB::sql('CREATE TABLE ProjectPermission (user CHAR(12), project CHAR(12), role C
 DB::sql('CREATE TABLE ProjectAdmins (hash CHAR(12) PRIMARY KEY, user CHAR(12), project CHAR(12));');
 DB::sql('CREATE TABLE Category (hash CHAR(12) PRIMARY KEY, project CHAR(12), name VARCHAR(40));');
 DB::sql('CREATE TABLE WikiEntry (hash CHAR(32) PRIMARY KEY, title VARCHAR(30), content TEXT, project CHAR(32), created DATE, created_by CHAR(32), edited DATE, edited_by CHAR(32));');
+DB::sql('CREATE TABLE WikiDiscussion (hash CHAR(32) PRIMARY KEY, entry CHAR(32), content TEXT, created DATE, created_by CHAR(32));');
 
 DB::sql('CREATE VIEW user_perms as SELECT * FROM user, projectpermission WHERE user.id = projectpermission.userId;');
 DB::sql('CREATE VIEW user_ticket AS SELECT user.hash as userhash, ticket.hash as tickethash FROM user, ticket WHERE user.id = ticket.owner;');

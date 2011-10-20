@@ -113,4 +113,12 @@ class helper extends \F3instance
 
         $activity->save();
     }
+
+	public static function getUsername($hash)
+	{
+		$user = new \user\model;
+		$user->load(array('hash = :hash', array(':hash' => $hash)));
+
+		return $user->name;
+	}
 }

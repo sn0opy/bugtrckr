@@ -86,7 +86,7 @@ class main extends F3instance {
             require_once 'install/sqlite.php';
             
             $user = new \user\controller;
-            if($user->registerUser($admname, $admpw, $admemail, true)) {
+            if(!$user->registerUser($admname, $admpw, $admemail, true)) {
                 $this->set('usererror', true);
                 $this->tpserve();
                 return;

@@ -49,9 +49,13 @@ class main extends \misc\controller
         if ($this->get('SESSION.user.hash'))
         {
             $user = new \user\model();
-            $user->load("hash = " . $this->get('SESSION.user.hash'));
-            $user->lastProject = $project->hash;
-            $user->save();
+            $user->load(array('hash = :hash', array(':hash' => $this->get('SESSION.user.hash'))));
+			
+			if (!$user->dry())
+			{
+           		$user->lastProject = $project->hash;
+            	$user->save();
+			}
         }
 
         $this->set('SESSION.project', $project->hash);

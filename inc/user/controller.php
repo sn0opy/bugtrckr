@@ -45,7 +45,9 @@ class controller extends \misc\Controller
         if(!$name) {
             $this->set('SESSION.SUCCESS', 'User registred successfully');
             $this->reroute($this->get('BASE') . '/');
-        }
+        } 
+
+		return true;
     }
 
 

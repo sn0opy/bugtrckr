@@ -113,6 +113,7 @@ return array('lng' => array(
     'memberRemoved' => 'Das Mitglied wurde aus dem Projekt entfernt.',
     'addMemberNotAllowed' => 'Du darfst keine Mitglieder dem Projekt hinzufügen.',
     'failTicketSave' => 'Fehler beim Speichern des Tickets.',
+	'written_by' => 'Geschrieben von',
     'states' => array(
                     array('id' => 1, 'name' => 'Neu'), 
                     array('id' => 2, 'name' => 'Zugewiesen'), 
