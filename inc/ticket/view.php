@@ -23,7 +23,7 @@ class view extends \misc\controller
     function showTickets()
     {   
 		if (!ctype_alnum($this->get('SESSION.project')))
-			return $this->tpfail('Please select a project.');
+			return $this->tpfail($this->get('lng.noProject'));
 
         $order = 'created';
 		$search = '';
@@ -82,8 +82,12 @@ class view extends \misc\controller
         $activities = new \activity\displayable();
         $activities = $activities->find(array("ticket = :ticket", array(':ticket' => $ticket->hash)));
 
+        foreach($activities as $key => $activity) {
+            $activities[$key]->fields = json_decode($activity->fields);
+        }
+        
         if (!$ticket->hash)
-            return $this->tpfail("Can't open ticket");
+            return $this->tpfail($this->get('tpl.cannotOpenTicket'));
    
         $users = new \user\model();
         

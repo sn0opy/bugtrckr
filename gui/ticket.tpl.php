@@ -53,16 +53,25 @@
 
     <table>
         <thead>
-        <tr>
-            <th>{{@lng.description}}</th>
-            <th>{{@lng.changed}}</th>
-            <th>{{@lng.by}}</th>
-        </tr>
+            <tr>
+                <th>{{@lng.description}}</th>
+                <th>{{@lng.changed}}</th>
+                <th>{{@lng.by}}</th>
+            </tr>
         </thead>
         <tbody>
         <F3:repeat group="{{@activities}}" key="{{@i}}" value="{{@activity}}">
             <tr class="tr{{@i%2}}">
-                <td>{{@activity->description}}
+                <td>
+                    <F3:check if="{{@activity->fields > 0}}">
+                        <ul>
+                            <F3:repeat group="{{@activity->fields}}" value="{{@field}}">
+                                <li>{{@tld.changedfrom}} {{@field->from}} {{@lng.to}} {{@field->to}}</li>
+                            </F3:repeat>
+                        </ul>
+                    </F3:check>
+                    
+                    {{@activity->description}}
                     <F3:check if="{{@activity->comment}}">
                         <br/><span class="acitivityCmnt">{{@lng.comment}}: <em>{{nl2br(@activity->comment)}}</em></span>
                     </F3:check>

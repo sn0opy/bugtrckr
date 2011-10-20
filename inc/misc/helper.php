@@ -98,7 +98,7 @@ class helper extends \F3instance
         return \F3::get('DB')->sql('SELECT state, COUNT(*) AS `count` FROM `Ticket` WHERE milestone = \'' . $milestone . '\' GROUP BY state');
     }
 
-    public static function addActivity($description, $ticket = 0, $comment = '')
+    public static function addActivity($description, $ticket = 0, $comment = '', $fields = '')
     {
         $activity = new \activity\model();
         
@@ -109,6 +109,7 @@ class helper extends \F3instance
         $activity->changed = time();
         $activity->project = \F3::get('SESSION.project');
         $activity->ticket = $ticket;
+        $activity->fields = $fields;
 
         $activity->save();
     }

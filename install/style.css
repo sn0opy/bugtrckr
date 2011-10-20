@@ -79,7 +79,7 @@ input[type=submit]:active {
 }
 
 .head {
-    width: 500px;
+    width: 540px;
     background: #068 url(../gui/img/headBgN.png);
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
@@ -87,7 +87,7 @@ input[type=submit]:active {
 }
 
 #content {
-    width: 498px;
+    width: 538px;
 }
 
 .content {
@@ -96,7 +96,7 @@ input[type=submit]:active {
 
 .footer {
     height: 10px;
-    width: 498px;
+    width: 538px;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
     border-bottom: 1px solid #DDD;

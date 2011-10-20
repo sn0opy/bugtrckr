@@ -82,7 +82,7 @@ return array('lng' => array(
     'noProject' => 'Du hast noch kein Projekt ausgewählt.',
     'members' => 'Mitglieder',
     'projectname' => 'Projektname',
-    'projectdescription' => 'Prohjektbeschreibung',
+    'projectdescription' => 'Projektbeschreibung',
     'publicproject' => 'Öffentliches Projekt',
     'dosettings' => 'Einstellungen vornehmen',
     'roles' => 'Rollen',
@@ -133,5 +133,7 @@ return array('lng' => array(
                 ),
 
 	'wiki' => 'Wiki',
-	'mainpage' => 'Hauptseite'
+	'mainpage' => 'Hauptseite',
+    'changedfrom' => 'geändert von',
+    'to' => 'zu'
 ));
