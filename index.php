@@ -54,11 +54,13 @@ $app->route('GET /project/settings/role/add', 'project\view->showAddRole');
 $app->route('GET /project/settings/milestone/@hash', 'project\view->showProjectSettingsMilestone');
 $app->route('GET /project/settings/milestone/add', 'project\view->showAddMilestone');
 $app->route('GET /project/settings/category/add', 'project\view->showAddCategory');
+$app->route('GET /project/settings/category/edit/@hash', 'project\view->showEditCategory');
 $app->route('GET /project/settings/role/delete/@hash', 'project\view->deleteRole');
 $app->route('GET /project/settings/milestone/delete/@hash', 'project\view->deleteProjectSettingsMilestone');
-$app->route('GET /project/settings/category/delete/@hash', 'project\view->deleteCategory');
+$app->route('GET /project/settings/category/delete/@hash', 'project\controller->deleteCategory');
 $app->route('GET /wiki/@title', '\wiki\view->showEntry');
 $app->route('GET /wiki', '\wiki\view->showEntry');
+$app->route('GET /wikidiscussion/@hash', '\wiki\view->showDiscussion');
 
 $app->route('GET /user/logout', '\user\controller->logoutUser');
 $app->route('POST /search', '\ticket\view->showTickets');
@@ -77,6 +79,7 @@ $app->route('POST /project/settings/milestone/edit', '\milestone\controller->add
 $app->route('POST /project/settings/member/add', '\project\controller->projectAddMember');
 $app->route('POST /project/setttings/member/delete', '\project\controller->projectDelMember');
 $app->route('POST /wiki', '\wiki\controller->editEntry');
+$app->route('POST /wikidiscussion', '\wiki\controller->addDiscussion');
 
 $app->run();
 

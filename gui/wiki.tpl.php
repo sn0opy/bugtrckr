@@ -26,6 +26,10 @@
 
 <h1>{{@title}}</h1>
 
+<F3:check if="{{@entry->hash}}">
+	<a href="/{{@BASE}}wikidiscussion/{{@entry->hash}}">Diskussion betrachten</a>
+</F3:check>
+
 <div id="wikicontent">
 	{{@displayablecontent}}
 </div>

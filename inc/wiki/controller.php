@@ -32,13 +32,13 @@ class controller extends \misc\controller
         {
             $entry->hash = \misc\helper::getFreeHash('WikiEntry');
             $entry->title = $title;
-            $entry->created = date();
+            $entry->created = date("Y-m-d H:i:s");
             $entry->created_by = $this->get('SESSION.user.hash');
             $entry->project = $project;
         }
 
         $entry->content = $content;
-        $entry->edited = date();
+        $entry->edited = date("Y-m-d H:i:s");
         $entry->edited_by = $this->get('SESSION.user.hash');
 
         $entry->save();
@@ -49,15 +49,33 @@ class controller extends \misc\controller
             $this->reroute($this->get('BASE') . '/wiki/' . $entry->title);
     }
 
+	public function addDiscussion()
+	{
+		$disc = new \wiki\WikiDiscussion;
+
+		$entry = $this->get('POST.entry');
+		$content = $this->get('POST.content');
+
+		$disc->hash = \misc\helper::getFreeHash('WikiDiscussion');
+		$disc->entry = $entry;
+		$disc->content = $content;
+		$disc->created = date("Y-m-d H:i:s");
+		$disc->created_by = $this->get('SESSION.user.hash');
+
+		$disc->save();
+
+		$this->reroute($this->get('BASE') . '/wikidiscussion/' . $disc->entry);
+	}
 
     public function translateHTML($string)
     {
         $string = preg_replace('/===(.+)===/', '<h3>${1}</h3>', $string);
         $string = preg_replace('/==(.+)==/', '<h2>${1}</h2>', $string);
-        $string = preg_replace('/\'\'\'(.+)\'\'\'/', '<b>${1}</b>', $string);			$string = preg_replace('/\'\'(.+)\'\'/', '<i>${1}</i>', $string);
+        $string = preg_replace('/\'\'\'(.+)\'\'\'/', '<b>${1}</b>', $string);			
+		$string = preg_replace('/\'\'(.+)\'\'/', '<i>${1}</i>', $string);
         $string = preg_replace('/----/', '<hr />', $string);
+		$string = preg_replace('/\[\[(.+) (.+)\]\]/', '<a href="${1}">${2}</a>', $string);
         $string = preg_replace('/\[\[(.+)\]\]/', '<a href="' . $this->get('BASE') . '/wiki/${1}">${1}</a>', $string);
-//			$string = preg_replace('/\[\[(.+) (.+)\]\]/', '<a href="${1}">${2}</a>', $string);
         $string = preg_replace('/\~\~(.+)\~\~/', '<pre>${1}</pre>', $string);
         $string = preg_replace('/\n/', '<br />', $string);
 

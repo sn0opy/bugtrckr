@@ -40,10 +40,7 @@ CREATE TABLE Category (hash CHAR(12) PRIMARY KEY, project CHAR(12), name VARCHAR
 --
 CREATE TABLE WikiEntry (hash CHAR(32) PRIMARY KEY, title VARCHAR(30), content TEXT, project CHAR(32), created DATE, created_by CHAR(32), edited DATE, edited_by CHAR(32) );
 
-CREATE TABLE WikiChanges
-(
-	
-);
+CREATE TABLE WikiDiscussion (hash CHAR(32) PRIMARY KEY, entry CHAR(32), content TEXT, created DATE, created_by CHAR(32));
 
 --
 -- VIEWS
