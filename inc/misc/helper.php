@@ -109,7 +109,7 @@ class helper extends \F3instance
         $activity->changed = time();
         $activity->project = \F3::get('SESSION.project');
         $activity->ticket = $ticket;
-        $activity->fields = $fields;
+        $activity->changedFields = $fields;
 
         $activity->save();
     }
@@ -119,15 +119,26 @@ class helper extends \F3instance
 		$user = new \user\model;
 		$user->load(array('hash = :hash', array(':hash' => $hash)));
 
+        if($user->dry())
+            return \F3::get('lng.nobody');
+            
 		return $user->name;
 	}
 
 	public static function getName($type, $id)
 	{
-		$arr = \F3::get('lng.' . $type);
-		if (array_key_exists($id, $arr))
-			return $arr[$id]['name'];
-		else
-			return "";
+        $arr = \F3::get('lng.' . $type);
+        
+        foreach($arr as $elem)
+            if($elem['id'] == $id)
+                return $elem['name'];
+        
+        return '';
 	}
+    
+    public static function getMsName($hash) {
+        $ms = new \milestone\model();
+        $ms->load(array('hash = :hash', array(':hash' => $hash)));
+        return $ms->name;
+    }
 }

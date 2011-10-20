@@ -29,12 +29,7 @@
         <tr>
             <th>{{@lng.milestone}}</th>
             <td>
-                {{* this ABSOLUTELY sucks, but works, sorry (TODO) *}}
-                <F3:repeat group="{{@milestones}}" value="{{@milestone}}">
-                    <F3:check if="{{@ticket->milestone==@milestone->hash}}">
-                        {{@milestone->name}}
-                    </F3:check>
-                </F3:repeat>
+                {{\misc\Helper::getMsName(@ticket->milestone)}}
             </td>
             <th></th>
             <td></td>
@@ -62,16 +57,23 @@
         <tbody>
         <F3:repeat group="{{@activities}}" key="{{@i}}" value="{{@activity}}">
             <tr class="tr{{@i%2}}">
-                <td>
-                    <F3:check if="{{@activity->fields > 0}}">
-                        <ul>
-                            <F3:repeat group="{{@activity->fields}}" value="{{@field}}">
-                                <li>{{@tld.changedfrom}} {{@field->from}} {{@lng.to}} {{@field->to}}</li>
+                <td>                    
+                    {{@activity->description}}
+                    <F3:check if="{{@activity->changedFields > 0}}">
+                        <ul class="changedFields">
+                            <F3:repeat group="{{@activity->changedFields}}" value="{{@changedField}}">
+                                <F3:check if="{{@changedField->field=='state'}}">
+                                    <li><strong>{{@lng.status}}</strong> {{@lng.changedfrom}} <em>{{\misc\Helper::getName('states', @changedField->from)}}</em> {{@lng.to}} <em>{{\misc\Helper::getName('states', @changedField->to)}}</em></li>
+                                </F3:check>
+                                <F3:check if="{{@changedField->field=='milestone'}}">
+                                    <li><strong>{{@lng.milestone}}</strong> {{@lng.changedfrom}} <em>{{\misc\Helper::getMsName(@changedField->from)}}</em> {{@lng.to}} <em>{{\misc\Helper::getMsName(@changedField->to)}}</em></li>
+                                </F3:check>
+                                <F3:check if="{{@changedField->field=='assigned'}}">
+                                    <li>Ticket von <em>{{\misc\Helper::getUserName(@changedField->from)}}</em> an <em>{{\misc\Helper::getUserName(@changedField->to)}}</em> <strong>{{strtolower(@lng.assigned)}}</strong></li>
+                                </F3:check>
                             </F3:repeat>
                         </ul>
                     </F3:check>
-                    
-                    {{@activity->description}}
                     <F3:check if="{{@activity->comment}}">
                         <br/><span class="acitivityCmnt">{{@lng.comment}}: <em>{{nl2br(@activity->comment)}}</em></span>
                     </F3:check>

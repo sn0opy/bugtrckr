@@ -83,7 +83,7 @@ class view extends \misc\controller
         $activities = $activities->find(array("ticket = :ticket", array(':ticket' => $ticket->hash)));
 
         foreach($activities as $key => $activity) {
-            $activities[$key]->fields = json_decode($activity->fields);
+            $activities[$key]->changedFields = json_decode($activity->changedFields);
         }
         
         if (!$ticket->hash)

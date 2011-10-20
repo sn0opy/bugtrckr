@@ -137,5 +137,6 @@ return array('lng' => array(
 	'wiki' => 'Wiki',
 	'mainpage' => 'Hauptseite',
     'changedfrom' => 'geändert von',
-    'to' => 'zu'
+    'to' => 'zu',
+    'nobody' => 'Niemanden'
 ));

@@ -744,3 +744,7 @@ td.action a {
 #submitbutton, #cancelbutton {
 	display: none;
 }
+
+.changedFields {
+    margin-left: 40px;
+}
