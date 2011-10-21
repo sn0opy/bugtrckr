@@ -28,7 +28,7 @@ $app->set('GUI','gui/');
 $app->set('AUTOLOAD', 'inc/|inc/models/');
 $app->set('LOCALES','lang/');
 $app->set('PROXY', true);
-$app->set('LANGUAGE', 'de'); // until we have a better idea for localizing the db stuff
+$app->set('LANGUAGE', 'de'); // currently forcing to German
 
 require_once('data/config.inc.php');
 
