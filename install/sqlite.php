@@ -24,7 +24,7 @@ DB::sql('CREATE VIEW displayableticket AS
     WHERE owner.hash = ticket.owner AND category.hash = ticket.category;');
 
 DB::sql('CREATE VIEW displayableactivity AS
-    SELECT activity.hash, activity.description, activity.changed, activity.ticket, activity.project, activity.comment,
+    SELECT activity.hash, activity.description, activity.changed, activity.ticket, activity.project, activity.comment, activity.fields,
            user.name as username, user.hash as userhash
     FROM activity, user 
     WHERE activity.user = user.hash;');

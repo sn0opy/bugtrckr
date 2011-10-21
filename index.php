@@ -13,12 +13,12 @@
  *   
 **/
 
+$app = require(__DIR__.'/lib/base.php');
+
 if(!file_exists('data/config.inc.php')) {
-    echo '<a href="/' . $this->get('BASE') . 'setup.php">Setup</a>';
+    echo '<a href="/' . F3::get('BASE') . 'setup.php">Setup</a>';
     exit;
 }
-
-$app = require(__DIR__.'/lib/base.php');
 
 $app->set('RELEASE', false);
 $app->set('CACHE', false);
