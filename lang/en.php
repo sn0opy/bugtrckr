@@ -95,6 +95,7 @@ return array('lng' => array(
     'ticket' => 'Ticket',
     'added' => 'added',
     'edited' => 'edited',
+	'edited_by' => 'edited by',
     'newProject' => 'New project',
     'comment' => 'Comment',
     'by' => 'by',
@@ -112,6 +113,7 @@ return array('lng' => array(
     'memberRemoved' => 'Member has been removed from the project.',
     'addMemberNotAllowed' => 'You are not allowed to add new members.',
     'failTicketSave' => 'Failure while saving Ticket.',
+	'written_by' => 'written by',
     'states' => array(
                     array('id' => 1, 'name' => 'New'), 
                     array('id' => 2, 'name' => 'Assigned'), 
