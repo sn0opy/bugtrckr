@@ -150,23 +150,23 @@ class view extends \misc\controller
         $this->tpserve();
     }
 
-	/**
-	 *
-	 */
-	function showEditCategory()
-	{
-		$hash = $this->get('PARAMS.hash');
+    /**
+     *
+     */
+    function showEditCategory()
+    {
+        $hash = $this->get('PARAMS.hash');
 
-		$category = new \category\model;
-		$category->load(array('hash = :hash', array(':hash' => $hash)));
+        $category = new \category\model();
+        $category->load(array('hash = :hash', array(':hash' => $hash)));
 
-		$this->set('category', $category);
-		$this->set('template', 'projectSettingsCategoryEdit.tpl.php');
+        $this->set('category', $category);
+        $this->set('template', 'projectSettingsCategoryEdit.tpl.php');
         $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.editcategory}}');
         $this->set('onpage', 'settings');
         $this->tpserve();
 
-	}
+    }
     
     /**
      * 

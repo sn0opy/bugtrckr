@@ -51,15 +51,15 @@ class main extends \misc\controller
             $user = new \user\model();
             $user->load(array('hash = :hash', array(':hash' => $this->get('SESSION.user.hash'))));
 			
-			if (!$user->dry())
-			{
-           		$user->lastProject = $project->hash;
+            if (!$user->dry())
+            {
+                $user->lastProject = $project->hash;
             	$user->save();
-			}
+            }
         }
 
         $this->set('SESSION.project', $project->hash);
-		$this->set('SESSION.projectHash', $project->hash);
+        $this->set('SESSION.projectHash', $project->hash);
 
         if($routeBack)
             $this->reroute($url);

@@ -1,9 +1,9 @@
 <!doctype html>
 <html>
-	<head>
+    <head>
         <meta charset="UTF-8" />
-		<title>Bugtrckr Setup</title>
-		<link href="{{@BASE}}/install/style.css" rel="stylesheet" type="text/css" />
+        <title>Bugtrckr Setup</title>
+        <link href="{{@BASE}}/install/style.css" rel="stylesheet" type="text/css" />
         <script type="text/javascript" src="{{@BASE}}/gui/js/jquery.js"></script>
         <script type="text/javascript">
         $(document).ready(function(){
@@ -43,7 +43,7 @@
             </F3:check>
         });
         </script>
-	</head>
+    </head>
 
     <body>
         <div class="container">

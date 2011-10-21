@@ -22,9 +22,9 @@ class controller extends \misc\Controller
      */
     function registerUser($name = false, $password = false, $email = false, $admin = false)
     {
-		if (($this->get('POST.name') == "" && $name == "") ||
-			($this->get('POST.email') == "" && $email == ""))
-			return $this->tpfail('Please correct your data.');
+        if (($this->get('POST.name') == "" && $name == "") ||
+                ($this->get('POST.email') == "" && $email == ""))
+                return $this->tpfail('Please correct your data.');
 
         $salt = \misc\helper::randStr();
 
@@ -47,7 +47,7 @@ class controller extends \misc\Controller
             $this->reroute($this->get('BASE') . '/');
         } 
 
-		return true;
+        return true;
     }
 
 

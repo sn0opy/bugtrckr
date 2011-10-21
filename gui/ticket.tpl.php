@@ -46,7 +46,7 @@
 <div class="ticket_timeline">
     <h3>Ticket Timeline</h3>
 
-    <table>
+    <table class="zebra">
         <thead>
             <tr>
                 <th>{{@lng.description}}</th>
@@ -56,7 +56,7 @@
         </thead>
         <tbody>
         <F3:repeat group="{{@activities}}" key="{{@i}}" value="{{@activity}}">
-            <tr class="tr{{@i%2}}">
+            <tr>
                 <td>                    
                     {{@activity->description}}
                     <F3:check if="{{@activity->changedFields > 0}}">

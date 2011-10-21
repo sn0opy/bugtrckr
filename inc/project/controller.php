@@ -63,7 +63,7 @@ class controller extends \misc\controller
         $projPerms->project = $projectHash;
         $projPerms->save();
 
-        $this->reroute($this->get('BASE') . '/project/settings');
+        $this->reroute($this->get('BASE') . '/project/settings#members');
     }
 
     function projectDelMember()
@@ -93,7 +93,7 @@ class controller extends \misc\controller
         $projPerms->erase();
 
         $this->set('SESSION.SUCCESS', $this->get('lng.memberRemoved'));
-        $this->reroute($this->get('BASE') . '/project/settings');
+        $this->reroute($this->get('BASE') . '/project/settings#members');
     }
 
     /**
@@ -103,7 +103,7 @@ class controller extends \misc\controller
     {
         if (!\misc\helper::getPermission('proj_manageMembers'))
         {
-            $this->tpfail('You are not allowed to edit members.');
+            $this->tpfail($this->get('lng.insuffPermissions'));
             return;
         }
 
@@ -131,7 +131,7 @@ class controller extends \misc\controller
         $perms->role = $role->hash;
         $perms->save();
 
-        $this->reroute($this->get('BASE') . '/project/settings');
+        $this->reroute($this->get('BASE') . '/project/settings#roles');
     }
 
 
@@ -140,8 +140,8 @@ class controller extends \misc\controller
      */
     function deleteProjectSettingsMilestone()
     {
-		if (!\misc\helper::getPermission('proj_manageMilestones'))
-			return $this->tpfail("You are not allowed to do this.");
+        if (!\misc\helper::getPermission('proj_manageMilestones'))
+            return $this->tpfail($this->get('lng.insuffPermissions'));
 
         $msHash = $this->get('PARAMS.hash');
 
@@ -151,15 +151,15 @@ class controller extends \misc\controller
         if (!$milestone->hash)
             return $this->tpfail("Failure while getting Milestone");
 
-		$tickets = new \ticket\model();
-		$count = $tickets->found('milestone = ' . $milestone->hash);
+        $tickets = new \ticket\model();
+        $count = $tickets->found('milestone = ' . $milestone->hash);
 
-		if ($count > 0)
+        if ($count > 0)
             return $this->tpfail("Milestone can not be removed");
 
-		$milestone->erase();
-		$this->reroute($this->get('BASE') . '/project/settings');
-	}
+        $milestone->erase();
+        $this->reroute($this->get('BASE') . '/project/settings#milestones');
+    }
 
     /**
      * 
@@ -198,7 +198,7 @@ class controller extends \misc\controller
         if($projHash)
             return $roleHash;
         else
-            $this->reroute($this->get('BASE') . '/project/settings/role/' . $roleHash);
+            $this->reroute($this->get('BASE') . '/project/settings#roles');
     }
     
     
@@ -217,36 +217,38 @@ class controller extends \misc\controller
 
             $ax->erase();
             $this->set('SESSION.SUCCESS', 'Role has been deleted.');
-            $this->reroute($this->get('BASE'). '/project/settings');     
+            $this->reroute($this->get('BASE'). '/project/settings#roles');     
         } else {
-            $this->tpfail("You don't have permission to do this.");
+            $this->tpfail($this->get('lng.insuffPermissions'));
         }
     }
 
     /**
      * 
      */
-    function addEditCategory()
-    {
+    function addEditCategory($projHash = false, $name = false)
+    {     
         $category = new \category\model();
 
-		if ($this->get('POST.hash') != "")
-			$category->load(array('hash = :hash', array(':hash' => $this->get('POST.hash'))));
-		else
-		{
-			$category->project = $this->get('SESSION.projectHash');
-			$category->hash = \misc\helper::getFreeHash('Category');
-		}
+        if ($this->get('POST.hash') != "")
+            $category->load(array('hash = :hash', array(':hash' => $this->get('POST.hash'))));
+        else
+        {
+            $category->project = ($projHash) ? $projHash : $this->get('SESSION.projectHash');
+            $category->hash = \misc\helper::getFreeHash('Category');
+        }
 
-        $category->name = $this->get('POST.name');
+        $category->name = ($name) ? $name : $this->get('POST.name');
         $category->save();
 
-		if ($this->get('POST.hash') != "")
-			$this->set('SESSION.SUCCESS', 'Category changed successfully');
-		else
-        	$this->set('SESSION.SUCCESS',"Category added successfully");
+        if ($this->get('POST.hash') != "")
+            $this->set('SESSION.SUCCESS', $this->get('lng.categoryEdited'));
+        else
+            if(!$projHash)
+                $this->set('SESSION.SUCCESS', $this->get('lng.categoryAdded'));
 
-        $this->reroute($this->get('BASE') . '/project/settings/');
+        if(!$projHash)
+            $this->reroute($this->get('BASE') . '/project/settings#categories');
 
     }
 
@@ -255,19 +257,19 @@ class controller extends \misc\controller
 	 */
 	function deleteCategory()
 	{
-		$hash = $this->get('PARAMS.hash');
+            $hash = $this->get('PARAMS.hash');
 
-		if (\misc\helper::getPermission('proj_editProject'))
-		{
-			$category = new \category\model();
-			$category->load(array('hash = :hash', array(':hash' => $hash)));
+            if (\misc\helper::getPermission('proj_editProject'))
+            {
+                $category = new \category\model();
+                $category->load(array('hash = :hash', array(':hash' => $hash)));
 
-			$category->erase();
-			$this->set('SESSION.SUCCESS', 'Category has been deleted.');
-			$this->reroute($this->get('BASE') . '/project/settings');
-		}
-		else
-			$this->tpfail('You don\'t have permissions to do this.');
+                $category->erase();
+                $this->set('SESSION.SUCCESS', $this->get('lng.categoryDeleted'));
+                $this->reroute($this->get('BASE') . '/project/settings#categories');
+            }
+            else
+                $this->tpfail($this->get('lng.insuffPermissions'));
 	}
     
     /**
@@ -284,8 +286,8 @@ class controller extends \misc\controller
         $ax->hash = $hash;
         $ax->save();
 
- //       $cmain = new \misc\main();
- //       $cmain->selectProject($hash, false);
+        $cmain = new \misc\main();
+        $cmain->selectProject($hash, false);
         
         $perms = new \projPerms\model();
         $perms->user = $this->get('SESSION.user.hash');
@@ -296,9 +298,9 @@ class controller extends \misc\controller
         $milestone = new \milestone\controller;
         $milestone->addEditMilestone($hash);
         
-        //$this->addCategory($this->get('lng.uncategorized'), $projId);
+        $this->addEditCategory($hash, $this->get('lng.uncategorized'));
         
-        \misc\helper::addActivity($this->get('lng.projCreated'));
+        \misc\helper::addActivity($this->get('lng.projCreated'), 0, '', '', $hash);
         
         $this->reroute($this->get('BASE').'/');        
     }

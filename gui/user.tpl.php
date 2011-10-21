@@ -25,10 +25,8 @@
         <F3:repeat group="{{@tickets}}" value="{{@ticket}}">
         <tr>
             <td class="id">{{substr(@ticket->tickethash,0,5)}}</td>
-            <td class="title">
-                <a href="{{@BASE}}/ticket/{{@ticket->tickethash}}">{{@ticket->title}}</a>
-			</td>
-			<td class="type">{{@ticket->typename}}</td>
+            <td class="title"><a href="{{@BASE}}/ticket/{{@ticket->tickethash}}">{{@ticket->title}}</a></td>
+            <td class="type">{{@ticket->typename}}</td>
             <td class="state color{{@ticket->state}}">{{@ticket->statusname}}</td>
             <td class="priority">{{@ticket->priorityname}}</td>
             <td class="created">{{date('d.m.Y H:i', @ticket->created)}}</td>

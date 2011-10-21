@@ -2,10 +2,10 @@
     <div class="tabs">
         <ul>
             <li class="active"><a href="#" title="tabContent_1" class="tab">{{@lng.settings}}</a></li>
-            <li><a href="#" title="tabContent_2" class="tab">{{@lng.members}}</a></li>
-            <li><a href="#" title="tabContent_3" class="tab">{{@lng.milestones}}</a></li>
-            <li><a href="#" title="tabContent_4" class="tab">{{@lng.roles}}</a></li>
-            <li><a href="#" title="tabContent_5" class="tab">{{@lng.categories}}</a></li>
+            <li><a href="#members" id="members" title="tabContent_2" class="tab">{{@lng.members}}</a></li>
+            <li><a href="#milestones" id="milestones" title="tabContent_3" class="tab">{{@lng.milestones}}</a></li>
+            <li><a href="#roles" id="roles" title="tabContent_4" class="tab">{{@lng.roles}}</a></li>
+            <li><a href="#categories" id="categories" title="tabContent_5" class="tab">{{@lng.categories}}</a></li>
         </ul>
     </div>
 
@@ -71,7 +71,7 @@
                     <F3:repeat group="{{@projMembers}}" value="{{@member}}">
                         <tr>
                             <td class="title">
-                                <a href="{{@BASE}}/user/{{@member->name}}">{{@member->name}} {{@member->role}}</a>
+                                <a href="{{@BASE}}/user/{{@member->name}}">{{@member->name}}</a>
                             </td>
                             <td class="type manageMember">
                                 <p>
