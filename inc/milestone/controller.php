@@ -49,6 +49,6 @@ class controller extends \misc\controller
         $milestone->save();
 
         if(!$projHash)
-            $this->reroute($this->get('BASE') . '/project/settings/milestone/' . $msHash);
+            $this->reroute($this->get('BASE') . '/project/settings#milestones');
     }
 }

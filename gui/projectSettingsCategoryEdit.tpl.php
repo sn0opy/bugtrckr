@@ -1,4 +1,4 @@
-<h2>{{@lng.category}} › {{@lng.addcategory}}</h2>
+<h2>{{@lng.category}} › {{@lng.editcategory}}</h2>
 
 <div class="msSettings">
     <form action="{{@BASE}}/project/settings/category/edit" method="post">

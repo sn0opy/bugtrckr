@@ -85,7 +85,6 @@
         <table class="sortable zebra">
             <thead>
                 <tr>
-                    <th>#</th>
                     <th>{{@lng.title}}</th>
                     <th>{{@lng.type}}</th>
                     <th>{{@lng.status}}</th>
@@ -98,7 +97,6 @@
             <tbody>
                 <F3:repeat group="{{@tickets}}" value="{{@ticket}}">
                 <tr>
-                    <td class="id"><a href="{{@BASE}}/ticket/{{@ticket->tickethash}}">{{substr(@ticket->tickethash,0,5)}}</a></td>
                     <td class="title"><a href="{{@BASE}}/ticket/{{@ticket->tickethash}}">{{@ticket->title}}</a></td>
                     <td class="type">{{\misc\Helper::getName('types', @ticket->type)}}</td>
                     <td class="state color{{@ticket->state}}">{{\misc\Helper::getName('states', @ticket->state)}}</td>

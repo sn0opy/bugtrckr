@@ -53,10 +53,8 @@ class controller extends \misc\controller
      */
     function editTicket()
     {
-		if (!is_numeric($this->get('POST.state')) || 
-			$this->get('POST.state') <= 0 || 
-			$this->get('POST.state') > 5)
-			return $this->tpfail($this->get('lng.failTicketSave'));
+        if (!is_numeric($this->get('POST.state')) || $this->get('POST.state') <= 0 || $this->get('POST.state') > 5)
+            return $this->tpfail($this->get('lng.failTicketSave'));
 
         $hash = $this->get('PARAMS.hash');
 
@@ -75,14 +73,17 @@ class controller extends \misc\controller
         if($ticket->milestone != $this->get('POST.milestone'))
             $changed[] = array('field' => 'milestone', 'from' => $ticket->milestone, 'to' => $this->get('POST.milestone'));
         
+        if($ticket->priority != $this->get('POST.priority'))
+            $changed[] = array('field' => 'priority', 'from' => $ticket->priority, 'to' => $this->get('POST.priority'));
         
         $ticket->state = $this->get('POST.state');
+        $ticket->priority = $this->get('POST.priority');
         
-		if (ctype_alnum($this->get('POST.user')))
-			$ticket->assigned = $this->get('POST.user');
-        
-		if (ctype_alnum($this->get('POST.milestone')))
-        	$ticket->milestone = $this->get('POST.milestone');
+        if (ctype_alnum($this->get('POST.assigned')))
+            $ticket->assigned = $this->get('POST.assigned');
+
+        if (ctype_alnum($this->get('POST.milestone')))
+            $ticket->milestone = $this->get('POST.milestone');
 
         $ticket->save();
 
@@ -91,6 +92,6 @@ class controller extends \misc\controller
 
         \misc\helper::addActivity($this->get('lng.ticket') . " '" .$ticket->title. "' " .$this->get('lng.edited'), $ticket->hash, $this->get('POST.comment'), json_encode($changed));
         
-        $this->reroute($this->get('BASE').'/ticket/'.$hash);
+       $this->reroute($this->get('BASE').'/ticket/'.$hash);
     }
 }

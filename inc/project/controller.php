@@ -22,7 +22,7 @@ class controller extends \misc\controller
         
         if (!$helper->getPermission('proj_manageMembers'))
         {
-            $this->tpfail('You are not allowed to add new members.');
+            $this->tpfail($this->get('lng.insuffPermissions'));
             return;
         }
 
@@ -131,7 +131,7 @@ class controller extends \misc\controller
         $perms->role = $role->hash;
         $perms->save();
 
-        $this->reroute($this->get('BASE') . '/project/settings#roles');
+        $this->reroute($this->get('BASE') . '/project/settings#members');
     }
 
 

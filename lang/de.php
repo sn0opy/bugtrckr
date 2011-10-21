@@ -142,5 +142,7 @@ return array('lng' => array(
     'categoryAdded' => 'Kategorie erfolgreich hinzugefügt',
     'categoryEdited' => 'Kategorie erfolgreich editiert',
     'categoryDeleted' => 'Kategorie erfolgreich gelöscht',
-    'insuffPermissions' => 'Unzureichende Rechte'
+    'insuffPermissions' => 'Unzureichende Rechte',
+    'editcategory' => 'Kategorie bearbeiten',
+    'theprioritychanged' => 'Die Priorität wurde geändert von'
 ));

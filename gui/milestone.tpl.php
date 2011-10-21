@@ -39,23 +39,23 @@
                         <th>{{@lng.assigned}}</th>
                     </tr>
                 </thead>
-				<tbody>
-				<F3:repeat group="{{@tickets}}" value="{{@ticket}}">
-					<tr>
-						<td class="id">{{substr(@ticket->tickethash,0,5)}}</td>
-						<td class="title">
-							<a href="{{@BASE}}/ticket/{{@ticket->tickethash}}">{{@ticket->title}}</a>
-						</td>
-						<td class="type">{{\misc\Helper::getName('types', @ticket->type)}}</td>
-						<td class="state color{{@ticket->state}}">{{\misc\Helper::getName('states', @ticket->state)}}</td>
-						<td class="priority">{{\misc\Helper::getName('priorities', @ticket->priority)}}</td>
-						<td class="created">{{date('d.m.Y H:i', @ticket->created)}}</td>
-						<td class="owner"><a href="{{@BASE}}/user/{{@ticket->username}}">{{@ticket->username}}</a></td>
-						<td class="owner"><a href="{{@BASE}}/user/{{@ticket->assignedname}}">{{@ticket->assignedname}}</a></td>
-					</tr>
-				</F3:repeat>
-				</tbody>
-			</table>
+                <tbody>
+                <F3:repeat group="{{@tickets}}" value="{{@ticket}}">
+                    <tr>
+                        <td class="id">{{substr(@ticket->tickethash,0,5)}}</td>
+                        <td class="title">
+                                <a href="{{@BASE}}/ticket/{{@ticket->tickethash}}">{{@ticket->title}}</a>
+                        </td>
+                        <td class="type">{{\misc\Helper::getName('types', @ticket->type)}}</td>
+                        <td class="state color{{@ticket->state}}">{{\misc\Helper::getName('states', @ticket->state)}}</td>
+                        <td class="priority">{{\misc\Helper::getName('priorities', @ticket->priority)}}</td>
+                        <td class="created">{{date('d.m.Y H:i', @ticket->created)}}</td>
+                        <td class="owner"><a href="{{@BASE}}/user/{{@ticket->username}}">{{@ticket->username}}</a></td>
+                        <td class="owner"><a href="{{@BASE}}/user/{{@ticket->assignedname}}">{{@ticket->assignedname}}</a></td>
+                    </tr>
+                </F3:repeat>
+                </tbody>
+            </table>
         </F3:true>
         <F3:false>
             <div class="message info">{{@lng.noTickets}}</div>

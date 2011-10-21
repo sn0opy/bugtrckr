@@ -63,13 +63,16 @@
                         <ul class="changedFields">
                             <F3:repeat group="{{@activity->changedFields}}" value="{{@changedField}}">
                                 <F3:check if="{{@changedField->field=='state'}}">
-                                    <li><strong>{{@lng.status}}</strong> {{@lng.changedfrom}} <em>{{\misc\Helper::getName('states', @changedField->from)}}</em> {{@lng.to}} <em>{{\misc\Helper::getName('states', @changedField->to)}}</em></li>
+                                    <li>{{@lng.status}} {{@lng.changedfrom}} <strong>{{\misc\Helper::getName('states', @changedField->from)}}</strong> {{@lng.to}} <strong>{{\misc\Helper::getName('states', @changedField->to)}}</strong></li>
+                                </F3:check>
+                                <F3:check if="{{@changedField->field=='priority'}}">
+                                    <li>{{@lng.theprioritychanged}} <strong>{{\misc\Helper::getName('priorities', @changedField->from)}}</strong> {{@lng.to}} <strong>{{\misc\Helper::getName('priorities', @changedField->to)}}</strong></li>
                                 </F3:check>
                                 <F3:check if="{{@changedField->field=='milestone'}}">
-                                    <li><strong>{{@lng.milestone}}</strong> {{@lng.changedfrom}} <em>{{\misc\Helper::getMsName(@changedField->from)}}</em> {{@lng.to}} <em>{{\misc\Helper::getMsName(@changedField->to)}}</em></li>
+                                    <li>{{@lng.milestone}} {{@lng.changedfrom}} <strong>{{\misc\Helper::getMsName(@changedField->from)}}</strong> {{@lng.to}} <strong>{{\misc\Helper::getMsName(@changedField->to)}}</strong></li>
                                 </F3:check>
                                 <F3:check if="{{@changedField->field=='assigned'}}">
-                                    <li>Ticket von <em>{{\misc\Helper::getUserName(@changedField->from)}}</em> an <em>{{\misc\Helper::getUserName(@changedField->to)}}</em> <strong>{{strtolower(@lng.assigned)}}</strong></li>
+                                    <li>Ticket von <strong>{{\misc\Helper::getUserName(@changedField->from)}}</strong> an <strong>{{\misc\Helper::getUserName(@changedField->to)}}</strong> {{strtolower(@lng.assigned)}}</li>
                                 </F3:check>
                             </F3:repeat>
                         </ul>
@@ -94,7 +97,7 @@
                 <div class="formRow">
                     <div class="formLabel">{{@lng.assignedTo}}</div>
                     <div class="formValue">
-                        <select name="user" size="1">
+                        <select name="assigned" size="1">
                             <option value=""></option>
                             <F3:repeat group="{{@users}}" value="{{@user}}">
                                 <F3:check if="{{@user->hash==@ticket->assigned}}">
@@ -134,6 +137,20 @@
                                 <F3:check if="{{@state.id == @ticket->state}}">
                                     <F3:true><option value="{{@state.id}}" selected="selected">{{@state.name}}</option></F3:true>
                                     <F3:false><option value="{{@state.id}}">{{@state.name}}</option></F3:false>
+                                </F3:check>
+                            </F3:repeat>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="formRow">
+                    <div class="formLabel">{{@lng.priority}}</div>
+                    <div class="formValue">
+                        <select name="priority" size="1">
+                            <F3:repeat group="{{@lng.priorities}}" key="{{@i}}" value="{{@priority}}">
+                                <F3:check if="{{@priority.id == @ticket->priority}}">
+                                    <F3:true><option value="{{@priority.id}}" selected="selected">{{@priority.name}}</option></F3:true>
+                                    <F3:false><option value="{{@priority.id}}">{{@priority.name}}</option></F3:false>
                                 </F3:check>
                             </F3:repeat>
                         </select>
