@@ -748,3 +748,7 @@ td.action a {
 .changedFields {
     margin-left: 40px;
 }
+
+.pinOnTop tbody td {
+    vertical-align: top;
+}

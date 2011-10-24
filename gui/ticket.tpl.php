@@ -46,7 +46,7 @@
 <div class="ticket_timeline">
     <h3>Ticket Timeline</h3>
 
-    <table class="zebra">
+    <table class="zebra pinOnTop">
         <thead>
             <tr>
                 <th>{{@lng.description}}</th>
