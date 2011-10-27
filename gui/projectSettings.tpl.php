@@ -140,7 +140,7 @@
                                 <a href="{{@BASE}}/project/settings/milestone/{{@milestone->hash}}">{{@milestone->name}}</a>
                             </td>
 							<td class="action">
-								<a href="{{@BASE}}/project/settings/delete/milestone/{{@milestone->hash}}" onclick="return confirm('{{@lng.sure}}');">{{@lng.delete}}</a>
+								<a href="{{@BASE}}/project/settings/milestone/delete/{{@milestone->hash}}" onclick="return confirm('{{@lng.sure}}');">{{@lng.delete}}</a>
                                 <a href="{{@BASE}}/project/settings/milestone/{{@milestone->hash}}">{{@lng.edit}}</a>
                                 <br class="clearfix" />
 							</td>

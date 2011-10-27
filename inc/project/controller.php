@@ -93,7 +93,7 @@ class controller extends \misc\controller
         $projPerms->erase();
 
         $this->set('SESSION.SUCCESS', $this->get('lng.memberRemoved'));
-        $this->reroute($this->get('BASE') . '/project/settings#members');
+        $this->reroute('/project/settings#members');
     }
 
     /**
@@ -131,7 +131,7 @@ class controller extends \misc\controller
         $perms->role = $role->hash;
         $perms->save();
 
-        $this->reroute($this->get('BASE') . '/project/settings#members');
+        $this->reroute('/project/settings#members');
     }
 
 
@@ -158,7 +158,7 @@ class controller extends \misc\controller
             return $this->tpfail("Milestone can not be removed");
 
         $milestone->erase();
-        $this->reroute($this->get('BASE') . '/project/settings#milestones');
+        $this->reroute('/project/settings#milestones');
     }
 
     /**
@@ -198,7 +198,7 @@ class controller extends \misc\controller
         if($projHash)
             return $roleHash;
         else
-            $this->reroute($this->get('BASE') . '/project/settings#roles');
+            $this->reroute('/project/settings#roles');
     }
     
     
@@ -217,7 +217,7 @@ class controller extends \misc\controller
 
             $ax->erase();
             $this->set('SESSION.SUCCESS', 'Role has been deleted.');
-            $this->reroute($this->get('BASE'). '/project/settings#roles');     
+            $this->reroute('/project/settings#roles');     
         } else {
             $this->tpfail($this->get('lng.insuffPermissions'));
         }
@@ -248,7 +248,7 @@ class controller extends \misc\controller
                 $this->set('SESSION.SUCCESS', $this->get('lng.categoryAdded'));
 
         if(!$projHash)
-            $this->reroute($this->get('BASE') . '/project/settings#categories');
+            $this->reroute('/project/settings#categories');
 
     }
 
@@ -266,7 +266,7 @@ class controller extends \misc\controller
 
                 $category->erase();
                 $this->set('SESSION.SUCCESS', $this->get('lng.categoryDeleted'));
-                $this->reroute($this->get('BASE') . '/project/settings#categories');
+                $this->reroute('/project/settings#categories');
             }
             else
                 $this->tpfail($this->get('lng.insuffPermissions'));

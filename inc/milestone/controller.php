@@ -26,8 +26,7 @@ class controller extends \misc\controller
         
         if(!isset($projHash)) {
             // This params have to be set
-            if ($this->get('POST.name') == "" ||
-                $this->get('SESSION.project') <= 0)
+            if ($this->get('POST.name') == "" || $this->get('SESSION.project') <= 0)
                 return $this->tpfail('Failure while editing milestone.');
         }
 
@@ -49,6 +48,24 @@ class controller extends \misc\controller
         $milestone->save();
 
         if(!$projHash)
-            $this->reroute($this->get('BASE') . '/project/settings#milestones');
+            $this->reroute('/project/settings#milestones');
+    }
+    
+    function deleteMilestone() 
+    {
+        $msHash = $this->get('PARAMS.hash');
+        
+        $tickets = new \ticket\model();
+        $milestones = new \milestone\model();
+        
+        if($tickets->found(array('milestone = :ms', array(':ms' => $msHash))) < 1 && $milestones->found() > 1) {            
+            $milestones->load(array('hash = :hash', array(':hash' => $msHash)));
+            $milestones->erase();
+            
+            $this->set('SESSION.SUCCESS', 'Milestone has been deleted.');
+            $this->reroute('/project/settings#milestones');
+        } else {
+            $this->tpfail('You cannot delete this milestone, because it still contains tickets or is at least the last one.');
+        }
     }
 }

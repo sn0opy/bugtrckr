@@ -56,7 +56,7 @@ $app->route('GET /project/settings/milestone/add', 'project\view->showAddMilesto
 $app->route('GET /project/settings/category/add', 'project\view->showAddCategory');
 $app->route('GET /project/settings/category/edit/@hash', 'project\view->showEditCategory');
 $app->route('GET /project/settings/role/delete/@hash', 'project\view->deleteRole');
-$app->route('GET /project/settings/milestone/delete/@hash', 'project\view->deleteProjectSettingsMilestone');
+$app->route('GET /project/settings/milestone/delete/@hash', 'milestone\controller->deleteMilestone');
 $app->route('GET /project/settings/category/delete/@hash', 'project\controller->deleteCategory');
 $app->route('GET /wiki/@title', '\wiki\view->showEntry');
 $app->route('GET /wiki', '\wiki\view->showEntry');
