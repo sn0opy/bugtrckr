@@ -44,7 +44,9 @@
                                     <option value="new">{{@lng.newProject}}</option>
                                 </F3:check>
                                 <F3:repeat group="{{@projects}}" value="{{@project}}">
+									<F3:check if="{{\misc\helper::canRead(@project->hash)}}">
                                     <option value="{{@project->hash}}" {{(@project->hash == @SESSION.project)?'selected="selected"':''}}>{{@project->name}}</option>
+									</F3:check>
                                 </F3:repeat>
                             </select>
                         </form>

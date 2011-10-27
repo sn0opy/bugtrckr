@@ -22,6 +22,9 @@ class controller extends \misc\controller
      */
     function addEditMilestone($projHash = false)
     {
+		if (!\misc\helper::getPermission('proj_editProject'))
+			return $this->tpfail('You don\'t have the permissions to do this');
+
         $name = ($projHash) ? 'First milestone' : $this->get('POST.name');
         
         if(!isset($projHash)) {

@@ -16,7 +16,6 @@ namespace misc;
 
 class controller extends \F3instance
 {
-
     /**
      * 
      */

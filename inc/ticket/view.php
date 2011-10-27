@@ -21,9 +21,12 @@ class view extends \misc\controller
 	 *	Show a list of tickets of the project
 	 */
     function showTickets()
-    {   
+    {
 		if (!ctype_alnum($this->get('SESSION.project')))
 			return $this->tpfail($this->get('lng.noProject'));
+
+		if (!\misc\helper::canRead($this->get('SESSION.project')))
+			return $this->tpfail('You don\'t have the permissions to do this');
 
         $order = 'created';
 		$search = '';
@@ -68,7 +71,7 @@ class view extends \misc\controller
      *	Show the details of a ticket 
      */
     function showTicket()
-	{ 
+	{
         $hash = $this->get('PARAMS.hash');
 
         $ticket = new \ticket\displayable();
@@ -76,6 +79,9 @@ class view extends \misc\controller
 
         if($ticket->dry())
             return $this->tpfail("Ticket doesn't exist.");
+
+		if (!\misc\helper::canRead($this->get('SESSION.project')))
+			return $this->tpfail('You don\'t have the permissions to do this');
 
         $milestone = new \milestone\model();
 

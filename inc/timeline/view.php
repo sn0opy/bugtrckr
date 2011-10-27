@@ -25,6 +25,9 @@ class view extends \misc\controller
 		if (!ctype_alnum($this->get('SESSION.project')))
 			return $this->tpfail('Please select a project.');
 
+		if (!\misc\helper::canRead($this->get('SESSION.project')))
+			return $this->tpfail('You don\'t have the permissions to do this');
+
         $timeline = array();
 
         $project = $this->get('SESSION.project');

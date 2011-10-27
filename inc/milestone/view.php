@@ -12,6 +12,9 @@ class view extends \misc\controller {
 		if (!ctype_alnum($this->get('SESSION.project')))
 			return $this->tpfail('Please select a project first.');
 
+		if (!\misc\helper::canRead($this->get('SESSION.project')))
+			return $this->tpfail('You don\'t have the permissions to do this');
+
         $ms = array();
         $fullCount = 0;
 
@@ -53,6 +56,12 @@ class view extends \misc\controller {
 	 */
     function showMilestone()
     {
+		if (!ctype_alnum($this->get('SESSION.project')))
+			return $this->tpfail('Please select a project first.');
+
+		if (!\misc\helper::canRead($this->get('SESSION.project')))
+			return $this->tpfail('You don\'t have the permissions to do this');
+
         $hash = $this->get('PARAMS.hash');
 
         $milestone = new \milestone\model();

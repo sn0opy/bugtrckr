@@ -173,6 +173,9 @@ class view extends \misc\controller
      */
     function showAddProject()
     {
+		if (!\misc\helper::getPermission('proj_editProject'))
+			return $this->tpfail('You don\'t have the permissions to do this');			
+
         $this->set('template', 'projectAdd.tpl.php');
         $this->set('pageTitle', '{{@lng.project}} › {{@lng.add}}');
         $this->set('onpage', 'settings');
