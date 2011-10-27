@@ -93,6 +93,24 @@ class helper extends \F3instance
         return false;
     }
 
+	/**
+	 *	
+	 */
+	public static function canRead($hash)
+	{
+		$project = new \project\model;
+		$project->load(array('hash = :hash', array(':hash' => $hash)));
+
+		if ($project->public)
+			return true;
+
+		$perm = new \projPerms\model;
+		return $perm->found(array('user = :user AND project = :project', array(':user' => \F3::get('SESSION.user.hash'), ':project' => \F3::get('SESSION.project'))));
+	}
+
+	/**
+	 *
+	 */
     public static function getTicketCount($milestone)
     {
         return \F3::get('DB')->sql('SELECT state, COUNT(*) AS `count` FROM `Ticket` WHERE milestone = \'' . $milestone . '\' GROUP BY state');

@@ -228,6 +228,9 @@ class controller extends \misc\controller
      */
     function addEditCategory($projHash = false, $name = false)
     {     
+		if (!\misc\helper::getPermission('proj_editProject'))
+			return $this->tpfail('You don\'t have the permissions to do this');
+
         $category = new \category\model();
 
         if ($this->get('POST.hash') != "")
@@ -257,6 +260,9 @@ class controller extends \misc\controller
 	 */
 	function deleteCategory()
 	{
+		if (!\misc\helper::getPermission('proj_editProject'))
+			return $this->tpfail('You don\'t have the permissions to do this');			
+
             $hash = $this->get('PARAMS.hash');
 
             if (\misc\helper::getPermission('proj_editProject'))
@@ -277,6 +283,9 @@ class controller extends \misc\controller
      */
     function projectAdd() 
     {
+		if (!$this->get('SESSION.user.admin'))
+			return $this->tpfail('You don\'t have the permissions to do this');			
+
         $hash = \misc\helper::getFreeHash('Project');
         
         $ax = new \Axon('Project');
@@ -310,6 +319,9 @@ class controller extends \misc\controller
      */
     function projectEditMain()
     {
+		if (!\misc\helper::getPermission('proj_editProject'))
+			return $this->tpfail('You don\'t have the permissions to do this');
+
         $project = new \project\model();
         $project->load(array('hash = :hash', array(':hash' => $this->get('SESSION.project'))));
         $project->name = $this->get('POST.name');

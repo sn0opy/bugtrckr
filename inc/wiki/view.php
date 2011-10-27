@@ -17,6 +17,9 @@ class view extends \misc\controller {
     
     public function showEntry()
     {
+		if (!\misc\helper::canRead($this->get('SESSION.project')))
+			return $this->tpfail('You don\'t have the permissions to do this');
+
         $title = $this->get('PARAMS.title');
         $project = $this->get('SESSION.projectHash');
 
@@ -55,6 +58,9 @@ class view extends \misc\controller {
 
 	public function showDiscussion()
 	{
+		if (!\misc\helper::canRead($this->get('SESSION.project')))
+			return $this->tpfail('You don\'t have the permissions to do this');
+
 		$hash = $this->get('PARAMS.hash');
 
 		$d = new \wiki\WikiDiscussion;

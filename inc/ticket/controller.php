@@ -56,6 +56,9 @@ class controller extends \misc\controller
         if (!is_numeric($this->get('POST.state')) || $this->get('POST.state') <= 0 || $this->get('POST.state') > 5)
             return $this->tpfail($this->get('lng.failTicketSave'));
 
+		if (!\misc\helper::getPermission('iss_editIssues'))
+			return $this->tpfail('You don\'t have the permissions to do this');	
+
         $hash = $this->get('PARAMS.hash');
 
         $ticket = new \ticket\model();

@@ -20,6 +20,9 @@ class controller extends \misc\controller
 
     public function editEntry()
     {
+		if (!\misc\helper::getPermission('wiki_editWiki'))
+			return $this->tpfail('You don\'t have the permissions to do this');
+
         $hash = $this->get('POST.hash');
         $content = $this->get('POST.content');
         $title = $this->get('POST.title');
@@ -51,6 +54,9 @@ class controller extends \misc\controller
 
 	public function addDiscussion()
 	{
+		if (!\misc\helper::getPermission('wiki_editWiki'))
+			return $this->tpfail('You don\'t have the permissions to do this');
+
 		$disc = new \wiki\WikiDiscussion;
 
 		$entry = $this->get('POST.entry');
