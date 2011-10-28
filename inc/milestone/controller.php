@@ -22,15 +22,15 @@ class controller extends \misc\controller
      */
     function addEditMilestone($projHash = false)
     {
-		if (!\misc\helper::getPermission('proj_editProject'))
-			return $this->tpfail('You don\'t have the permissions to do this');
+        if (!\misc\helper::getPermission('proj_manageMilestones'))
+            return $this->tpfail($this->get('lng.insuffPermissions'));
 
-        $name = ($projHash) ? 'First milestone' : $this->get('POST.name');
+        $name = ($projHash) ? $this->get('lng.firstMilestone') : $this->get('POST.name');
         
         if(!isset($projHash)) {
             // This params have to be set
             if ($this->get('POST.name') == "" || $this->get('SESSION.project') <= 0)
-                return $this->tpfail('Failure while editing milestone.');
+                return $this->tpfail($this->get('lng.failMilestoneSave'));
         }
 
         $msHash = $this->get('POST.hash') ? $this->get('POST.hash') : \misc\helper::getFreeHash('Milestone');
@@ -40,12 +40,12 @@ class controller extends \misc\controller
         {
             $milestone->load(array('hash = :hash', array(':hash' => $msHash)));
             if ($milestone->dry())
-                return $this->tpfail('Failure while editing milestone.');
+                return $this->tpfail($this->get('lng.failMilestoneSave'));
         }
 
         $milestone->name = $name;
         $milestone->hash = $msHash;
-        $milestone->description = ($projHash) ? 'My first milestone' : $this->get('POST.description');
+        $milestone->description = ($projHash) ? $this->get('lng.firstMilestone') : $this->get('POST.description');
         $milestone->project = ($projHash) ? $projHash : $this->get('SESSION.project');
         $milestone->finished = ($projHash) ? time()+2629743 : $this->get('POST.finished');
         $milestone->save();
@@ -56,6 +56,9 @@ class controller extends \misc\controller
     
     function deleteMilestone() 
     {
+        if (!\misc\helper::getPermission('proj_manageMilestones'))
+            return $this->tpfail($this->get('lng.insuffPermissions'));
+        
         $msHash = $this->get('PARAMS.hash');
         
         $tickets = new \ticket\model();
@@ -65,10 +68,10 @@ class controller extends \misc\controller
             $milestones->load(array('hash = :hash', array(':hash' => $msHash)));
             $milestones->erase();
             
-            $this->set('SESSION.SUCCESS', 'Milestone has been deleted.');
+            $this->set('SESSION.SUCCESS', $this->set('lng.milestonedDeleted'));
             $this->reroute('/project/settings#milestones');
         } else {
-            $this->tpfail('You cannot delete this milestone, because it still contains tickets or is at least the last one.');
+            $this->tpfail($this->get('lng.cannotDeleteMilestone'));
         }
     }
 }

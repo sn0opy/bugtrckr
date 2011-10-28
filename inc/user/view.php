@@ -1,5 +1,18 @@
 <?php
 
+/**
+ * user\view.php
+ * 
+ * wrapper class for Axon
+ * 
+ * @package User
+ * @author Sascha Ohms
+ * @author Philipp Hirsch
+ * @copyright Copyright 2011, Bugtrckr-Team
+ * @license http://www.gnu.org/licenses/lgpl.txt
+ *   
+*/
+
 namespace user;
 
 class view extends \misc\controller
@@ -15,7 +28,7 @@ class view extends \misc\controller
         $user->load(array('name = :name', array(':name' => $name)));
 
         if (!$user->hash)
-            return $this->tpfail("User not found");
+            return $this->tpfail($this->get('lng.userNotFound'));
 
         $ticket = new \ticket\displayable();
         $tickets = $ticket->find(array('owner = :owner', array(':owner' => $user->hash)));

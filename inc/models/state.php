@@ -1,7 +1,7 @@
 <?php
 
 /**
- * state.php
+ * models\state.php
  * 
  * wrapper class for Axon
  * 
@@ -13,10 +13,10 @@
  *   
 */
 
-	class State extends Axon
-	{
-		public function __construct()
-		{
-			$this->sync('Status'); // was too lazy to rename the table
-		}
-	}
+class State extends Axon
+{
+    public function __construct()
+    {
+        $this->sync('Status'); // was too lazy to rename the table
+    }
+}

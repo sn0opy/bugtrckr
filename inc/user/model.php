@@ -1,7 +1,7 @@
 <?php
 
 /**
- * user.php
+ * user\model.php
  * 
  * wrapper class for Axon
  * 

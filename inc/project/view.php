@@ -46,7 +46,7 @@ class view extends \misc\controller
 
             if (!$project->hash)
             {
-                $this->tpfail("Failure while open Project");
+                $this->tpfail($this->get('lng.openProjectFail'));
                 return;
             }
 
@@ -61,7 +61,7 @@ class view extends \misc\controller
             $this->set('onpage', 'settings');
             $this->tpserve();
         } else {
-            $this->set('SESSION.FAILURE', 'No project set.');
+            $this->set('SESSION.FAILURE', $this->get('lng.noProject'));
             $this->set('template', 'projectSettings.tpl.php');
             $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}}');
             $this->tpserve();
@@ -104,7 +104,7 @@ class view extends \misc\controller
 
         if (!$milestone->hash)
         {
-            $this->tpfail("Failure while getting Milestone");
+            $this->tpfail($this->get('lng.gettingMSFail'));
             return;
         }
 
@@ -174,7 +174,7 @@ class view extends \misc\controller
     function showAddProject()
     {
 		if (!\misc\helper::getPermission('proj_editProject'))
-			return $this->tpfail('You don\'t have the permissions to do this');			
+			return $this->tpfail($this->get('lng.insuffPermissions'));			
 
         $this->set('template', 'projectAdd.tpl.php');
         $this->set('pageTitle', '{{@lng.project}} › {{@lng.add}}');

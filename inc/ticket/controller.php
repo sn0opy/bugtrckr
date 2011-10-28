@@ -23,7 +23,7 @@ class controller extends \misc\controller
     function addTicket()
     {
         if (!\misc\helper::getPermission('iss_addIssues'))
-            return $this->tpfail('You are not allowed to add tickets.');
+            return $this->tpfail($this->get('lng.insuffPermissions'));
 
         $ticket = new \ticket\model();
         $ticket->hash = \misc\helper::getFreeHash('Ticket');
@@ -40,12 +40,11 @@ class controller extends \misc\controller
         $ticket->save();
 
         if (!$ticket->_id)
-            return $this->tpfail($this->get('lng.failTicketSave'));
+            return $this->tpfail($this->get('lng.saveTicketFail'));
 
-        \misc\helper::addActivity(
-            $this->get('lng.ticket') . " '$ticket->title' " . $this->get('lng.added') . ".", $ticket->hash);
+        \misc\helper::addActivity($this->get('lng.ticket') . " '$ticket->title' " . $this->get('lng.added') . ".", $ticket->hash);
 
-        $this->reroute($this->get('BASE') . '/ticket/' . $ticket->hash);
+        $this->reroute('/ticket/' . $ticket->hash);
     }
 
     /**
@@ -54,10 +53,10 @@ class controller extends \misc\controller
     function editTicket()
     {
         if (!is_numeric($this->get('POST.state')) || $this->get('POST.state') <= 0 || $this->get('POST.state') > 5)
-            return $this->tpfail($this->get('lng.failTicketSave'));
+            return $this->tpfail($this->get('lng.saveTicketFail'));
 
 		if (!\misc\helper::getPermission('iss_editIssues'))
-			return $this->tpfail('You don\'t have the permissions to do this');	
+			return $this->tpfail($this->get('lng.insuffPermissions'));	
 
         $hash = $this->get('PARAMS.hash');
 
@@ -91,10 +90,10 @@ class controller extends \misc\controller
         $ticket->save();
 
         if (!$ticket->hash)
-            return $this->tpfail($this->get('lng.failTicketSave'));
+            return $this->tpfail($this->get('lng.saveTicketFail'));
 
         \misc\helper::addActivity($this->get('lng.ticket') . " '" .$ticket->title. "' " .$this->get('lng.edited'), $ticket->hash, $this->get('POST.comment'), json_encode($changed));
         
-       $this->reroute($this->get('BASE').'/ticket/'.$hash);
+       $this->reroute('/ticket/'.$hash);
     }
 }

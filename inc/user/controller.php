@@ -1,7 +1,7 @@
 <?php
 
 /**
- * cuser.php
+ * user\controller.php
  * 
  * User controller
  * 
@@ -24,7 +24,7 @@ class controller extends \misc\Controller
     {
         if (($this->get('POST.name') == "" && $name == "") ||
                 ($this->get('POST.email') == "" && $email == ""))
-                return $this->tpfail('Please correct your data.');
+                return $this->tpfail($this->get('lng.noCorretdata'));
 
         $salt = \misc\helper::randStr();
 
@@ -38,12 +38,12 @@ class controller extends \misc\Controller
         $user->save();
         
         if (!$user->_id)
-            return $this->tpfail("Failure while creating User");
+            return $this->tpfail($this->get('lng.createUserFail'));
         elseif(!$user->_id && $name != false)
             return true;
 
         if(!$name) {
-            $this->set('SESSION.SUCCESS', 'User registred successfully');
+            $this->set('SESSION.SUCCESS', $this->get('lng.userRegSuccessfull'));
             $this->reroute($this->get('BASE') . '/');
         } 
 
@@ -67,18 +67,16 @@ class controller extends \misc\Controller
 
         
         if ($user->dry())
-        {
-            $this->set('SESSION.FAILURE', 'Password or Email is incorrect');
-            $this->reroute($this->get('BASE') . '/user/login');
-        }
+            return $this->tpfail($this->get('lng.pwMailWrong'));
+
 
         // enable user's last used project if he hasn't already chosen one
         if($user->lastProject && !$this->get('SESSION.project'))
             $this->set('SESSION.project', $user->lastProject);
 
         $this->set('SESSION.user', array('name' => $user->name, 'admin' => $user->admin, 'hash' => $user->hash));
-        $this->set('SESSION.SUCCESS', 'Login successful');
-        $this->reroute($this->get('BASE') . '/');
+        $this->set('SESSION.SUCCESS', $this->get('lng.loginSuccess'));
+        $this->reroute('/');
     }
 
     /**
@@ -89,7 +87,7 @@ class controller extends \misc\Controller
         $this->set('SESSION.user', NULL);
         session_destroy();
 
-        $this->set('SESSION.SUCCESS', 'User logged out');
-        $this->reroute($this->get('BASE') . '/');
+        $this->set('SESSION.SUCCESS', $this->get('lng.logoutSuccess'));
+        $this->reroute('/');
     }
 }

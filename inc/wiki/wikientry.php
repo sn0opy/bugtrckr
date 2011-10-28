@@ -1,7 +1,7 @@
 <?php
 
 /**
- * wikientry.php
+ * wiki\wikientry.php
  * 
  * wrapper class for Axon
  * 

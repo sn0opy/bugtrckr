@@ -1,9 +1,9 @@
 <?php
 
 /**
- * cwiki.php
+ * wiki\controller.php
  * 
- * Everything comes together in here
+ * Wiki controller
  * 
  * @package Wiki
  * @author Sascha Ohms
@@ -21,7 +21,7 @@ class controller extends \misc\controller
     public function editEntry()
     {
 		if (!\misc\helper::getPermission('wiki_editWiki'))
-			return $this->tpfail('You don\'t have the permissions to do this');
+			return $this->tpfail($this->get('lng.insuffPermissions'));
 
         $hash = $this->get('POST.hash');
         $content = $this->get('POST.content');
@@ -47,15 +47,15 @@ class controller extends \misc\controller
         $entry->save();
 
         if ($entry->title == '{{main}}')
-            $this->reroute($this->get('BASE') . '/wiki');
+            $this->reroute('/wiki');
         else
-            $this->reroute($this->get('BASE') . '/wiki/' . $entry->title);
+            $this->reroute('/wiki/' . $entry->title);
     }
 
 	public function addDiscussion()
 	{
 		if (!\misc\helper::getPermission('wiki_editWiki'))
-			return $this->tpfail('You don\'t have the permissions to do this');
+			return $this->tpfail($this->get('lng.insuffPermissions'));
 
 		$disc = new \wiki\WikiDiscussion;
 
@@ -70,7 +70,7 @@ class controller extends \misc\controller
 
 		$disc->save();
 
-		$this->reroute($this->get('BASE') . '/wikidiscussion/' . $disc->entry);
+		$this->reroute('/wiki/discussion/' . $disc->entry);
 	}
 
     public function translateHTML($string)

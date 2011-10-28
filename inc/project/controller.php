@@ -54,7 +54,7 @@ class controller extends \misc\controller
 
         if (!$projPerms->dry())
         {
-            $this->tpfail('User already exists in this project.');
+            $this->tpfail($this->get('lng.userExistsInProj'));
             return;
         }
 
@@ -63,7 +63,7 @@ class controller extends \misc\controller
         $projPerms->project = $projectHash;
         $projPerms->save();
 
-        $this->reroute($this->get('BASE') . '/project/settings#members');
+        $this->reroute('/project/settings#members');
     }
 
     function projectDelMember()
@@ -113,21 +113,20 @@ class controller extends \misc\controller
         $user->load(array('hash = :hash', array(':hash' => $this->get('POST.user'))));
 
         if (!$user->hash)
-            return $this->tpfail("Failure while getting User");
+            return $this->tpfail($this->get('lng.gettingUserFail'));
 
         $role = new \role\model();
         $role->load(array('hash = :hash', array(':hash' => $this->get('POST.role'))));
 
         if (!$role->hash)
-            return $this->tpfail("Failure while getting Role");
+            return $this->tpfail($this->get('lng.gettingRoleFail'));
 
         if ($role->project != $projectHash)
-            return $this->tpfail("Role does not belong to this project.");
+            return $this->tpfail($this->get('lng.roleDoesNotBelong'));
 
         $perms = new \projPerms\model();
         $perms->load(array('project = :proj AND user = :user',
-            array(':proj' => $projectHash,
-                ':user' => $user->hash)));
+            array(':proj' => $projectHash, ':user' => $user->hash)));
         $perms->role = $role->hash;
         $perms->save();
 
@@ -149,13 +148,13 @@ class controller extends \misc\controller
         $milestone->load(array('hash = :hash', array(':hash' => $msHash)));
 
         if (!$milestone->hash)
-            return $this->tpfail("Failure while getting Milestone");
+            return $this->tpfail($this->get('lng.gettingMSFail'));
 
         $tickets = new \ticket\model();
-        $count = $tickets->found('milestone = ' . $milestone->hash);
+        $count = $tickets->found(array('milestone = :ms', array(':ms' => $milestone->hash)));
 
         if ($count > 0)
-            return $this->tpfail("Milestone can not be removed");
+            return $this->tpfail($this->get('lng.removeMSFail'));
 
         $milestone->erase();
         $this->reroute('/project/settings#milestones');
@@ -174,7 +173,7 @@ class controller extends \misc\controller
             $role->load(array('hash = :hash', array(':hash' => $roleHash)));
 
             if ($role->dry())
-                return $this->tpfail('Failure while editing role.');
+                return $this->tpfail($this->get('lng.editRoleFail'));
         }
 
         $role->name = ($projHash) ? 'Admin' : $this->get('POST.name');
@@ -213,10 +212,10 @@ class controller extends \misc\controller
             $ax2 = new \Axon('ProjectPermission');
 
             if($ax2->found('role = '.$ax->hash))
-	            return $this->tpfail('Role cannot be deleted.');
+	            return $this->tpfail($this->get('lng.deleteRoleFail'));
 
             $ax->erase();
-            $this->set('SESSION.SUCCESS', 'Role has been deleted.');
+            $this->set('SESSION.SUCCESS', $this->get('lng.roleDeleted'));
             $this->reroute('/project/settings#roles');     
         } else {
             $this->tpfail($this->get('lng.insuffPermissions'));
@@ -229,7 +228,7 @@ class controller extends \misc\controller
     function addEditCategory($projHash = false, $name = false)
     {     
 		if (!\misc\helper::getPermission('proj_editProject'))
-			return $this->tpfail('You don\'t have the permissions to do this');
+			return $this->tpfail($this->get('lng.insuffPermissions'));
 
         $category = new \category\model();
 
@@ -261,7 +260,7 @@ class controller extends \misc\controller
 	function deleteCategory()
 	{
 		if (!\misc\helper::getPermission('proj_editProject'))
-			return $this->tpfail('You don\'t have the permissions to do this');			
+			return $this->tpfail($this->get('lng.insuffPermissions'));			
 
             $hash = $this->get('PARAMS.hash');
 
@@ -284,7 +283,7 @@ class controller extends \misc\controller
     function projectAdd() 
     {
 		if (!$this->get('SESSION.user.admin'))
-			return $this->tpfail('You don\'t have the permissions to do this');			
+			return $this->tpfail($this->get('lng.insuffPermissions'));			
 
         $hash = \misc\helper::getFreeHash('Project');
         
@@ -311,7 +310,7 @@ class controller extends \misc\controller
         
         \misc\helper::addActivity($this->get('lng.projCreated'), 0, '', '', $hash);
         
-        $this->reroute($this->get('BASE').'/');        
+        $this->reroute('/');        
     }
 
     /**
@@ -320,7 +319,7 @@ class controller extends \misc\controller
     function projectEditMain()
     {
 		if (!\misc\helper::getPermission('proj_editProject'))
-			return $this->tpfail('You don\'t have the permissions to do this');
+			return $this->tpfail($this->get('lng.insuffPermissions'));
 
         $project = new \project\model();
         $project->load(array('hash = :hash', array(':hash' => $this->get('SESSION.project'))));
@@ -331,10 +330,10 @@ class controller extends \misc\controller
 
         if (!$project->hash)
         {
-            $this->tpfail("Failure while saving Project");
+            $this->tpfail($this->get('lng.saveProjectFail'));
             return;
         }
 
-        $this->reroute($this->get('BASE') . '/project/settings');
+        $this->reroute('/project/settings');
     }
 }

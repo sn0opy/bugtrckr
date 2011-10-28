@@ -1,7 +1,7 @@
 <?php
 
 /**
- * view.php
+ * wiki\view.php
  * 
  * @package Wiki
  * @author Sascha Ohms
@@ -18,7 +18,7 @@ class view extends \misc\controller {
     public function showEntry()
     {
 		if (!\misc\helper::canRead($this->get('SESSION.project')))
-			return $this->tpfail('You don\'t have the permissions to do this');
+			return $this->tpfail($this->get('lng.insuffPermissions'));
 
         $title = $this->get('PARAMS.title');
         $project = $this->get('SESSION.projectHash');
@@ -37,7 +37,7 @@ class view extends \misc\controller {
         if ($entry->dry())
         {
             $entry->title = $title;
-            $entry->content = "Insert your content here.";
+            $entry->content = $this->get('lng.insertContent');
         }
 
         if ($entry->title == '{{main}}')
@@ -59,7 +59,7 @@ class view extends \misc\controller {
 	public function showDiscussion()
 	{
 		if (!\misc\helper::canRead($this->get('SESSION.project')))
-			return $this->tpfail('You don\'t have the permissions to do this');
+			return $this->tpfail($this->get('lng.insuffPermissions'));
 
 		$hash = $this->get('PARAMS.hash');
 

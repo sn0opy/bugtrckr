@@ -1,11 +1,22 @@
 <?php
 
-	namespace wiki;
+/**
+ * wiki\wikidiscussion.php
+ * 
+ * @package Wiki
+ * @author Sascha Ohms
+ * @author Philipp Hirsch
+ * @copyright Copyright 2011, Bugtrckr-Team
+ * @license http://www.gnu.org/licenses/lgpl.txt
+ *   
+ */
 
-	class WikiDiscussion extends \Axon
-	{
-		public function __construct()
-		{
-			$this->sync('WikiDiscussion');
-		}
-	}
+namespace wiki;
+
+class WikiDiscussion extends \Axon
+{
+    public function __construct()
+    {
+        $this->sync('WikiDiscussion');
+    }
+}

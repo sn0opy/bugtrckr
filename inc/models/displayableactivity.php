@@ -1,7 +1,7 @@
 <?php
 
 /**
- * displayableticket.php
+ * models\displayableactivity.php
  * 
  * wrapper class for Axon (table is a VIEW)
  * 
@@ -13,10 +13,10 @@
  *   
 */
 
-	class DisplayableActivity extends Axon 
-	{
-		public function __construct()
-		{
-			$this->sync('displayableactivity');
-		}
-	}
+class DisplayableActivity extends Axon 
+{
+    public function __construct()
+    {
+        $this->sync('displayableactivity');
+    }
+}

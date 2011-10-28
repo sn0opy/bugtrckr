@@ -1,7 +1,7 @@
 <?php
 
 /**
- * projectpermission.php
+ * models\projectpermission.php
  * 
  * wrapper class for Axon
  * 
@@ -13,10 +13,10 @@
  *   
 */
 
-	class ProjectPermission extends Axon
-	{
-		public function __construct()
-		{
-			$this->sync('ProjectPermission');
-		}
-	}
+class ProjectPermission extends Axon
+{
+    public function __construct()
+    {
+        $this->sync('ProjectPermission');
+    }
+}

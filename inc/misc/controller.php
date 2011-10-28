@@ -44,7 +44,7 @@ class controller extends \F3instance
      */
     protected function tpfail($msg)
     {
-        $this->set('pageTitle', 'Error');
+        $this->set('pageTitle', $this->get('lng.error'));
         $this->set('SESSION.FAILURE', $msg);
         $this->tpserve();
     }

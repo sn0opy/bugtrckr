@@ -13,10 +13,10 @@
  *   
 */
 
-	class Activity extends Axon
-	{
-		public function __construct()
-		{
-			$this->sync('Activity');
-		}
-	}
+class Activity extends Axon
+{
+    public function __construct()
+    {
+        $this->sync('Activity');
+    }
+}

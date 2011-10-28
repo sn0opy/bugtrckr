@@ -2,7 +2,7 @@
 
 
 /**
- * user_perms.php
+ * user_perms\model.php
  * 
  * wrapper class for Axon (table is a VIEW)
  * 

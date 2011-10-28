@@ -60,7 +60,7 @@ $app->route('GET /project/settings/milestone/delete/@hash', 'milestone\controlle
 $app->route('GET /project/settings/category/delete/@hash', 'project\controller->deleteCategory');
 $app->route('GET /wiki/@title', '\wiki\view->showEntry');
 $app->route('GET /wiki', '\wiki\view->showEntry');
-$app->route('GET /wikidiscussion/@hash', '\wiki\view->showDiscussion');
+$app->route('GET /wiki/discussion/@hash', '\wiki\view->showDiscussion');
 
 $app->route('GET /user/logout', '\user\controller->logoutUser');
 $app->route('POST /search', '\ticket\view->showTickets');

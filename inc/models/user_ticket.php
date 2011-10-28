@@ -1,7 +1,7 @@
 <?php
 
 /**
- * user_ticket.php
+ * mdoels\user_ticket.php
  * 
  * wrapper class for Axon (table is a VIEW)
  * 
@@ -13,10 +13,10 @@
  *   
 */
 
-	class User_ticket extends Axon 
-	{
-		public function __construct()
-		{
-			$this->sync('user_ticket');
-		}
-	}
+class User_ticket extends Axon 
+{
+    public function __construct()
+    {
+        $this->sync('user_ticket');
+    }
+}

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ctimeline.php
+ * timeline\view.php
  * 
  * timeline controller
  * 
@@ -23,17 +23,17 @@ class view extends \misc\controller
     function showTimeline()
     {
 		if (!ctype_alnum($this->get('SESSION.project')))
-			return $this->tpfail('Please select a project.');
+			return $this->tpfail($this->get('lng.noProject'));
 
 		if (!\misc\helper::canRead($this->get('SESSION.project')))
-			return $this->tpfail('You don\'t have the permissions to do this');
+			return $this->tpfail($this->get('lng.insuffPermissions'));
 
         $timeline = array();
 
         $project = $this->get('SESSION.project');
 
         $activities = new \activity\displayable();
-        $activities = $activities->find("project = '$project'");
+        $activities = $activities->find(array("project = :proj", array(':proj' => $project)));
 
         $this->set('activities', $activities);
         $this->set('pageTitle', '{{@lng.timeline}}');

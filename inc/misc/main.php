@@ -35,14 +35,14 @@ class main extends \misc\controller
         $projHash = ($hash) ? $hash : $this->get('REQUEST.project');
 
         if($projHash == 'new') 
-            $this->reroute($this->get('BASE').'/project/add');
+            $this->reroute('/project/add');
 
         $project = new \project\model();
         $project->load(array("hash = :hash", array(':hash' =>$projHash)));
 
         if (!$project->hash)
         {
-            $this->tpfail("Failure while changing Project");
+            $this->tpfail($this->get('lng.changeProjectFail'));
             return;
         }
 

@@ -1,19 +1,32 @@
 <?php
 
+/**
+ * milestone\view.php
+ * 
+ * milestone view
+ * 
+ * @package Milestone
+ * @author Sascha Ohms
+ * @author Philipp Hirsch
+ * @copyright Copyright 2011, Bugtrckr-Team
+ * @license http://www.gnu.org/licenses/lgpl.txt
+ *   
+*/
+
 namespace milestone;
 
 class view extends \misc\controller {
 
-	/**
-	 *	Display a roadmap that contains the milestones of a project
-	 */
+    /**
+     *	Display a roadmap that contains the milestones of a project
+     */
     function showRoadmap()
     {
 		if (!ctype_alnum($this->get('SESSION.project')))
-			return $this->tpfail('Please select a project first.');
+			return $this->tpfail($this->get('lng.noProject'));
 
 		if (!\misc\helper::canRead($this->get('SESSION.project')))
-			return $this->tpfail('You don\'t have the permissions to do this');
+			return $this->tpfail($this->get('lng.insuffPermissions'));
 
         $ms = array();
         $fullCount = 0;
@@ -57,10 +70,10 @@ class view extends \misc\controller {
     function showMilestone()
     {
 		if (!ctype_alnum($this->get('SESSION.project')))
-			return $this->tpfail('Please select a project first.');
+			return $this->tpfail($this->get('lng.noProject'));
 
 		if (!\misc\helper::canRead($this->get('SESSION.project')))
-			return $this->tpfail('You don\'t have the permissions to do this');
+			return $this->tpfail($this->get('lng.insuffPermissions'));
 
         $hash = $this->get('PARAMS.hash');
 

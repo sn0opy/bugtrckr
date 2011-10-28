@@ -26,7 +26,7 @@ class view extends \misc\controller
 			return $this->tpfail($this->get('lng.noProject'));
 
 		if (!\misc\helper::canRead($this->get('SESSION.project')))
-			return $this->tpfail('You don\'t have the permissions to do this');
+			return $this->tpfail($this->get('lng.insuffPermissions'));
 
         $order = 'created';
 		$search = '';
@@ -78,10 +78,10 @@ class view extends \misc\controller
         $ticket->load(array("tickethash = :hash", array(':hash' => $hash)));
 
         if($ticket->dry())
-            return $this->tpfail("Ticket doesn't exist.");
+            return $this->tpfail($this->get('lng.noTicket'));
 
 		if (!\misc\helper::canRead($this->get('SESSION.project')))
-			return $this->tpfail('You don\'t have the permissions to do this');
+			return $this->tpfail($this->get('lng.insuffPermissions'));
 
         $milestone = new \milestone\model();
 
@@ -108,4 +108,3 @@ class view extends \misc\controller
     }
     
 }
-?>

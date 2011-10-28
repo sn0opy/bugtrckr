@@ -12,12 +12,12 @@
  * @license http://www.gnu.org/licenses/lgpl.txt
  *   
 */
-	namespace activity;
+namespace activity;
 
-	class displayable extends \Axon 
-	{
-		public function __construct()
-		{
-			$this->sync('displayableactivity');
-		}
-	}
+class displayable extends \Axon 
+{
+    public function __construct()
+    {
+        $this->sync('displayableactivity');
+    }
+}
