@@ -85,7 +85,7 @@ class controller extends \misc\Controller
     function logoutUser()
     {
         $this->set('SESSION.user', NULL);
-        session_destroy();
+        $this->clear('SESSION');
 
         $this->set('SESSION.SUCCESS', $this->get('lng.logoutSuccess'));
         $this->reroute('/');
