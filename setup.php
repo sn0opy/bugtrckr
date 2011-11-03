@@ -70,6 +70,8 @@ class main extends F3instance {
             
             file_put_contents('data/config.inc.php', "<?php F3::set('DB', new DB('mysql:host=".$host.";dbname=".$db."', '".$user."', '".$pass."')); ?>");
 
+            print_r($this->get('ERROR'));
+            
             $this->set('INSTALLED', true);            
             $this->tpserve();
             

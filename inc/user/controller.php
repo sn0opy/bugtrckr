@@ -36,15 +36,10 @@ class controller extends \misc\Controller
         $user->hash = \misc\helper::getFreeHash('User');
         $user->admin = $admin ? 1 : 0;
         $user->save();
-        
-        if (!$user->_id)
-            return $this->tpfail($this->get('lng.createUserFail'));
-        elseif(!$user->_id && $name != false)
-            return true;
 
         if(!$name) {
             $this->set('SESSION.SUCCESS', $this->get('lng.userRegSuccessfull'));
-            $this->reroute($this->get('BASE') . '/');
+            $this->reroute('/');
         } 
 
         return true;
@@ -65,7 +60,6 @@ class controller extends \misc\Controller
             array(':email' => $this->get('POST.email'),
                 ':password' => \misc\helper::salting($user->salt, $this->get('POST.password')))));
 
-        
         if ($user->dry())
             return $this->tpfail($this->get('lng.pwMailWrong'));
 
