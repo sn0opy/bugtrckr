@@ -91,9 +91,6 @@ class view extends \misc\controller
         foreach($activities as $key => $activity) {
             $activities[$key]->changedFields = json_decode($activity->changedFields);
         }
-        
-        if (!$ticket->hash)
-            return $this->tpfail($this->get('tpl.cannotOpenTicket'));
 
         $users = new \user\model();
         
