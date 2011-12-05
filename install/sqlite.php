@@ -18,7 +18,7 @@ DB::sql('CREATE VIEW user_ticket AS SELECT user.hash as userhash, ticket.hash as
 
 DB::sql('CREATE VIEW displayableticket AS 
     SELECT owner.hash as userhash, owner.name as username, ticket.hash as tickethash,
-            assigned.hash as assignedhash, assigned.name as assignedname, category.name as categoryname, * 
+            assigned.hash as assignedhash, assigned.name as assignedname, category.name as categoryname, Ticket.* 
     FROM ticket, user as owner, category LEFT OUTER JOIN user as assigned
         ON assigned.hash = ticket.assigned
     WHERE owner.hash = ticket.owner AND category.hash = ticket.category;');

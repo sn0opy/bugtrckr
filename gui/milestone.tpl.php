@@ -20,7 +20,7 @@
 </F3:check>
 
 <p class="rminfo">{{@stats.openTickets}} {{@lng.ticketsleft}}</p>
-<p>{{nl2br(@milestone->description)}}</p>
+<p>{{\misc\helper::translateBBCode(@milestone->description)}}</p>
 
 <div class="milestoneTickets">
     <h3>{{@lng.tickets}}:</h3>
