@@ -12,7 +12,7 @@
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package Template
-		@version 2.0.5
+		@version 2.0.7
 **/
 
 //! Template engine
@@ -60,7 +60,7 @@ class Template extends Base {
 			// Parse raw template
 			$doc=new F3markup($mime,$globals);
 			$text=$doc->load(self::getfile($view));
-			if (self::$vars['CACHE'] && $doc->cache)
+			if (self::$vars['CACHE'] && $doc::$cache)
 				// Save PHP-compiled template to cache
 				Cache::set($hash,$text);
 		}
@@ -79,8 +79,7 @@ class Template extends Base {
 				filemtime($temp)<Cache::cached($view)) {
 				// Create semaphore
 				$hash='sem.'.self::hash($view);
-				$cached=Cache::cached($hash);
-				while ($cached)
+				while ($cached=Cache::cached($hash))
 					// Locked by another process
 					usleep(mt_rand(0,100));
 				Cache::set($hash,TRUE);
@@ -111,7 +110,8 @@ class F3markup extends Base {
 		//! MIME type
 		$mime,
 		//! Enable/disable PHP globals
-		$globals=TRUE,
+		$globals=TRUE;
+	static
 		//! Enable/disable template caching
 		$cache=TRUE;
 
@@ -131,46 +131,58 @@ class F3markup extends Base {
 	function expr($str,$echo=FALSE) {
 		$self=$this;
 		$syms=&$this->syms;
+		$regex='/(?!\w)@(\w+(?:\[[^\]]+\]|\.\w+(?![\w\(]))*'.
+			'(?:\s*->\s*\w+)?)(\s*\([^\)]*\))?(?:\s*\\\(.+))?/';
 		return preg_replace_callback(
-				'/{{(.+?)}}/s',
-				function($expr) use(&$syms,$self,$echo) {
-					$out=preg_replace_callback('/(?!\w)'.
-						'@(\w+(?:\[[^@\]]+\]|\.\w+(?![\w\(]))*'.
-						'(?:\s*->\s*\w+)?)(\s*\([^\)]*\))?(?:\s*\\\(.+))?/',
-						function($var) use(&$syms,$self) {
-							//Return stringified framework variable
-							preg_match('/^(\w+)\b(.*)/',$var[1],$match);
-							if (!$self->globals &&
-								preg_match('/'.$self::PHP_Globals.'/',
+			'/{{(.+?)}}/s',
+			function($expr) use(&$syms,$self,$echo,$regex) {
+				$out=preg_replace_callback($regex,
+					function($var) use(&$syms,$self,$regex) {
+						//Return stringified framework variable
+						preg_match('/^(\w+)\b(.*)/',$var[1],$match);
+						if (!$self->globals &&
+							preg_match('/'.$self::PHP_Globals.'/',
+							$match[1])) {
+							trigger_error(
+								sprintf($self::TEXT_Global,$match[1])
+							);
+							return FALSE;
+						}
+						$isfunc=isset($var[2]) && $var[2];
+						if (in_array($match[1],$syms))
+							return '$_'.$self::remix($var[1]).
+								($isfunc?$var[2]:'');
+						$str='F3::get('.var_export($var[1],TRUE).')';
+						if ($isfunc) {
+							preg_match_all($regex,$var[2],$parts,
+								PREG_SET_ORDER);
+							$args='';
+							if ($parts) {
+								foreach ($parts as $part)
+									$args.=($args?',':'').
+										$self->expr('{{'.$part[0].'}}');
+								$args='('.$args.')';
+							}
+							else
+								$args=$var[2];
+							$str='call_user_func_array('.
+								$str.',array'.$args.')';
+						}
+						elseif (isset($var[3]))
+							$str=str_replace(')',
+								',array('.$var[3].'))',$str);
+						if (!$match[2] &&
+							!preg_match('/('.$self::PHP_Globals.')\b/',
 								$match[1])) {
-								trigger_error(
-									sprintf($self::TEXT_Global,$match[1])
-								);
-								return FALSE;
-							}
-							$isfunc=isset($var[2]) && $var[2];
-							if (in_array($match[1],$syms))
-								return '$_'.$self::remix($var[1]).
-									($isfunc?$var[2]:'');
-							$str='F3::get('.var_export($var[1],TRUE).')';
-							if ($isfunc)
-								$str='call_user_func_array('.$str.','.
-									'array'.$var[2].')';
-							elseif (isset($var[3]))
-								$str=str_replace(')',
-									',array('.$var[3].'))',$str);
-							if (!$match[2] &&
-								!preg_match('/('.$self::PHP_Globals.')\b/',
-									$match[1])) {
-								$syms[]=$match[1];
-								$str='($_'.$match[1].'='.$str.')';
-							}
-							return trim($str);
-						},
-						$expr[1]
-					);
-					return $echo?('<?php echo '.trim($out).'; ?>'):$out;
-				},
+							$syms[]=$match[1];
+							$str='($_'.$match[1].'='.$str.')';
+						}
+						return $str;
+					},
+					$expr[1]
+				);
+				return $echo?('<?php echo '.$out.'; ?>'):$out;
+			},
 			$str
 		);
 	}
@@ -236,16 +248,16 @@ class F3markup extends Base {
 							$doc=new F3markup($this->mime,$this->globals);
 							$file=self::resolve($hvar);
 							if ($hvar!=$file)
-								$this->cache=FALSE;
-							$file=self::$vars['GUI'].$file;
-							if (is_file($file)) {
-								$text=$doc->load(
-									self::getfile($file),$this->syms
-								);
-								$out.=isset($ival)?
-									('<?php if ('.trim($cond).'): ?>'.
-										$text.'<?php endif; ?>'):$text;
-							}
+								self::$cache=FALSE;
+							foreach (self::split(self::$vars['GUI']) as $gui)
+								if (is_file($view=$gui.$file)) {
+									$text=$doc->load(
+										self::getfile($view),$this->syms
+									);
+									$out.=isset($ival)?
+										('<?php if ('.trim($cond).'): ?>'.
+											$text.'<?php endif; ?>'):$text;
+								}
 							break;
 						case 'loop':
 							// <loop> directive
@@ -284,7 +296,7 @@ class F3markup extends Base {
 								!$this->isdef($nkey,$nval,array('value'))))
 								return;
 							$gval=$nval['@attrib']['group'];
-							$gstr=$this->expr($gval);
+							$gstr=trim($this->expr($gval));
 							// Syntax check
 							if ($gstr==$gval) {
 								trigger_error(sprintf(
@@ -316,12 +328,17 @@ class F3markup extends Base {
 								$this->syms[]=$cvar;
 							$out.='<?php '.
 								(isset($cvar)?('$_'.$cvar.'=0; '):'').
-								'foreach (('.trim($gstr).'?:array()) as '.
+								'if (is_array('.$gstr.')):'.
+								'foreach (('.$gstr.'?:array()) as '.
 								(isset($kvar)?('$_'.$kvar.'=>'):'').
-									'$_'.$vvar.'): '.
-								(isset($cvar)?('$_'.$cvar.'++; '):'').'?>'.
+									'$_'.$vvar.'):'.
+								(isset($cvar)?('$_'.$cvar.'++; '):'').
+								'?>'.
 								$this->build($nval).
-								'<?php endforeach; ?>';
+								'<?php '.
+									'endforeach;'.
+									'endif;'.
+								'?>';
 							break;
 						case 'check':
 							// <check> directive
@@ -384,7 +401,7 @@ class F3markup extends Base {
 			$this->syms=$syms;
 		// Remove PHP code and alternative exclude-tokens
 		$text=preg_replace(
-			'/<\?(?:php)?.+?\?>|{{\*.+?\*}}/is','',trim($text));
+			'/<\?(?:php)?.+?\?>|{{\*.+?\*}}/is','',$text);
 		// Define root node
 		$node=&$this->tree;
 		// Define stack and depth variables
@@ -432,7 +449,7 @@ class F3markup extends Base {
 						foreach ($attr as $kv)
 							$node['@attrib'][$kv[1]]=$kv[2]?:$kv[3];
 					}
-					if ($match[4])
+					if ($match[4] || $match[1]=='include')
 						// Empty tag
 						$node=&$stack[$depth];
 					else

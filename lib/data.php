@@ -12,7 +12,7 @@
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package Data
-		@version 2.0.5
+		@version 2.0.7
 **/
 
 //! Data validators
@@ -28,7 +28,11 @@ class Data extends Base {
 	**/
 	static function validEmail($text,$mx=FALSE) {
 		return is_string(filter_var($text,FILTER_VALIDATE_EMAIL)) &&
-			(!$mx || getmxrr(substr($text,strrpos($text,'@')+1),$hosts));
+			(!$mx ||
+				extension_loaded('sockets') &&
+				@fsockopen(substr($text,
+					strpos($text,'@')+1),25,$errno,$errstr,5) ||
+				getmxrr(substr($text,strrpos($text,'@')+1),$hosts));
 	}
 
 	/**

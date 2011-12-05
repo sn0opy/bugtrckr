@@ -12,7 +12,7 @@
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package DB
-		@version 2.0.5
+		@version 2.0.7
 **/
 
 //! SQL data access layer
@@ -113,7 +113,7 @@ class DB extends Base {
 			$args=array($args);
 		}
 		foreach (array_combine($cmds,$args) as $cmd=>$arg) {
-			$hash='sql.'.self::hash($cmd);
+			$hash='sql.'.self::hash($cmd.var_export($args,TRUE));
 			$cached=Cache::cached($hash);
 			if ($ttl && $cached && $_SERVER['REQUEST_TIME']-$cached<$ttl) {
 				// Gather cached queries for profiler
@@ -143,13 +143,13 @@ class DB extends Base {
 						if ($this->trans && $this->auto)
 							$this->rollback();
 						$error=$obj->errorinfo();
-						$this->error(500,$error[2]);
+						trigger_error($error[2]);
 						return FALSE;
 					}
 				$this->result=preg_match(
-					'/^\s*(?:INSERT|UPDATE|DELETE)\s/i',$cmd)?
-						$query->rowCount():
-						$query->fetchall(PDO::FETCH_ASSOC);
+					'/^\s*(?:SELECT|PRAGMA|SHOW|EXPLAIN)\s/i',$cmd)?
+					$query->fetchall(PDO::FETCH_ASSOC):
+					$query->rowCount();
 				if ($ttl)
 					Cache::set($hash,$this->result,$ttl);
 				// Gather real queries for profiler
@@ -212,8 +212,9 @@ class DB extends Base {
 			'mysql'=>array(
 				'SHOW columns FROM `'.$this->dbname.'`.'.$table.';',
 				'Field','Key','PRI','Type'),
-			'mssql|sybase|dblib|pgsql'=>array(
-				'SELECT c.column_name AS field,t.constraint_type AS pkey '.
+			'mssql|sybase|dblib|pgsql|ibm|odbc'=>array(
+				'SELECT c.column_name AS field,'.
+				'c.data_type AS type,t.constraint_type AS pkey '.
 				'FROM information_schema.columns AS c '.
 				'LEFT OUTER JOIN '.
 					'information_schema.key_column_usage AS k ON '.
@@ -241,7 +242,7 @@ class DB extends Base {
 							'c.table_catalog':'c.table_schema').
 							'=\''.$this->dbname.'\''):'').
 				';',
-				'field','pkey','PRIMARY KEY','data_type')
+				'field','pkey','PRIMARY KEY','type')
 		);
 		$match=FALSE;
 		foreach ($cmd as $backend=>$val)
@@ -498,7 +499,7 @@ class Axon extends Base {
 	function aselect(
 		$fields=NULL,
 		$cond=NULL,$group=NULL,$seq=NULL,$limit=0,$ofs=0) {
-		return $this->find($fields,$cond,$group,$seq,$limit,$ofs,FALSE);
+		return $this->select($fields,$cond,$group,$seq,$limit,$ofs,FALSE);
 	}
 
 	/**

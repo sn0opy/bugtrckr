@@ -12,7 +12,7 @@
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package AtomRSS
-		@version 2.0.5
+		@version 2.0.7
 **/
 
 //! Atom/RSS feed reader
@@ -58,7 +58,7 @@ class AtomRSS extends Base {
 		}
 		else
 			return FALSE;
-		return $result;
+		return array_slice($result,0,$count);
 	}
 
 }
