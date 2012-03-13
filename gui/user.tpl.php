@@ -27,8 +27,8 @@
             <td class="id">{{substr(@ticket->tickethash,0,5)}}</td>
             <td class="title"><a href="{{@BASE}}/ticket/{{@ticket->tickethash}}">{{@ticket->title}}</a></td>
 			<td class="type">{{\misc\Helper::getName('types', @ticket->type)}}</td>
-            <td class="state color{{@ticket->state}}">{{\misc\Helper::getName('states', @ticket->state)}}</td>
-            <td class="priority">{{\misc\Helper::getName('priorities', @ticket->priority)}}</td>
+            <td class="state"><span class="color{{@ticket->state}}">{{\misc\Helper::getName('states', @ticket->state)}}</span></td>
+            <td class="priority"><span style="display: none;">{{@ticket->priority}}</span><span class="color{{@ticket->priority}}">{{\misc\Helper::getName('priorities', @ticket->priority)}}</span></td>
             <td class="created">{{date('d.m.Y H:i', @ticket->created)}}</td>
             <td class="owner"><a href="{{@BASE}}/user/{{@ticket->username}}">{{@ticket->username}}</a></td>
             <td class="owner"><a href="{{@BASE}}/user/{{@ticket->assignedname}}">{{@ticket->assignedname}}</a></td>

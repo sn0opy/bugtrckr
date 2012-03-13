@@ -39,7 +39,7 @@
     <hr />
 
     <h3>{{@lng.description}}</h3>
-    <p>{{nl2br(@ticket->description)}}</p>
+    <p>{{\misc\helper::translateBBCode(@ticket->description)}}</p>
 
 </div>
 

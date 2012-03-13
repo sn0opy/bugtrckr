@@ -12,7 +12,7 @@
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package Expansion
-		@version 2.0.5
+		@version 2.0.7
 **/
 
 //! Web pack
@@ -20,8 +20,7 @@ class Web extends Base {
 
 	//@{ Locale-specific error/exception messages
 	const
-		TEXT_Minify='Unable to minify %s',
-		TEXT_Timeout='Connection timed out';
+		TEXT_Minify='Unable to minify %s';
 	//@}
 
 	const
@@ -51,19 +50,14 @@ class Web extends Base {
 			@public
 	**/
 	static function minify($base,array $files,$echo=TRUE) {
-		preg_match('/\.(js|css)$/',$files[0],$ext);
-		if (!$ext[1]) {
-			// Not a JavaSript/CSS file
-			error(404);
-			return $echo?NULL:FALSE;
-		}
 		$mime=array(
 			'js'=>'application/x-javascript',
 			'css'=>'text/css'
 		);
 		$path=self::fixslashes($base);
 		foreach ($files as $file)
-			if (!is_file($path.$file)) {
+			if (!is_file($path.$file) || is_int(strpos($file,'../')) ||
+				!preg_match('/\.(js|css)$/',$file,$ext) || !$ext[1]) {
 				trigger_error(sprintf(self::TEXT_Minify,$file));
 				return $echo?NULL:FALSE;
 			}
@@ -245,10 +239,9 @@ class Web extends Base {
 	**/
 	static function http(
 		$pattern,$query='',$reqhdrs=array(),$follow=TRUE,$forward=FALSE) {
+		self::$vars['HEADERS']=array();
 		// Check if valid route pattern
 		list($method,$route)=explode(' ',$pattern,2);
-		// Content divider
-		$div=chr(0);
 		$url=parse_url($route);
 		if (!isset($url['path']))
 			// Set to Web root
@@ -284,6 +277,9 @@ class Web extends Base {
 			trigger_error($text);
 			return FALSE;
 		}
+		if (isset($url['user']) && isset($url['pass']))
+			$reqhdrs[]='Authorization: Basic '.
+				base64_encode($url['user'].':'.$url['pass']);
 		// Set connection timeout parameters
 		stream_set_blocking($socket,TRUE);
 		stream_set_timeout($socket,ini_get('default_socket_timeout'));
@@ -307,7 +303,6 @@ class Web extends Base {
 			$query.self::EOL.self::EOL
 		);
 		$found=FALSE;
-		$expires=FALSE;
 		$gzip=FALSE;
 		$rcvhdrs='';
 		$info=stream_get_meta_data($socket);
@@ -325,6 +320,12 @@ class Web extends Base {
 					// Redirection
 					preg_match('/'.self::HTTP_Location.
 						':\s*(.+)/',$rcvhdrs,$loc);
+					foreach ($reqhdrs as $key=>$hdr)
+						if (preg_match('/Authorization:/',$hdr) &&
+							$loc[1][0]!='/') {
+							unset($reqhdrs[$key]);
+							break;
+						}
 					return self::http($method.' '.trim($loc[1]),
 						$query,$reqhdrs);
 				}
@@ -364,9 +365,13 @@ class Web extends Base {
 	static function sitemap($url=NULL) {
 		if (is_null($url))
 			$url=self::$vars['BASE'].'/';
-		if ($url=='#' || isset(self::$vars['SITEMAP'][$url]) &&
+		if ($url[0]=='#' || isset(self::$vars['SITEMAP'][$url]) &&
 			is_bool(self::$vars['SITEMAP'][$url]['status']))
 			// Skip
+			return;
+		$parse=parse_url($url);
+		if (isset($parse['scheme']) &&
+			!preg_match('/https?:/',$parse['scheme']))
 			return;
 		$response=self::http('GET '.self::$vars['PROTOCOL'].'://'.
 			$_SERVER['SERVER_NAME'].$url);
@@ -499,7 +504,7 @@ class Web extends Base {
 			'Ÿ'=>'Y','ý'=>'y','ý'=>'y','ÿ'=>'y','Ž'=>'Z','ž'=>'z'
 		);
 		self::$vars['DIACRITICS']=isset(self::$vars['DIACRITICS'])?
-			array_merge($diacritics,self::$vars['DIACRITICS']):$diacritics;
+			$diacritics+self::$vars['DIACRITICS']:$diacritics;
 		// Site structure
 		self::$vars['SITEMAP']=NULL;
 	}

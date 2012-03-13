@@ -12,22 +12,22 @@ DB::sql('CREATE TABLE Category (hash CHAR(12) PRIMARY KEY, project CHAR(12), nam
 DB::sql('CREATE TABLE WikiEntry (hash CHAR(32) PRIMARY KEY, title VARCHAR(30), content TEXT, project CHAR(32), created DATE, created_by CHAR(32), edited DATE, edited_by CHAR(32));');
 DB::sql('CREATE TABLE WikiDiscussion (hash CHAR(32) PRIMARY KEY, entry CHAR(32), content TEXT, created DATE, created_by CHAR(32));');
 
-DB::sql('CREATE VIEW user_perms as SELECT * FROM user, projectpermission WHERE user.hash = projectpermission.user;');
-DB::sql('CREATE VIEW user_ticket AS SELECT user.hash as userhash, ticket.hash as tickethash FROM user, ticket WHERE user.hash = ticket.owner;');
+DB::sql('CREATE VIEW user_perms as SELECT * FROM User, ProjectPermission WHERE User.hash = ProjectPermission.user;');
+DB::sql('CREATE VIEW user_ticket AS SELECT User.hash as userhash, Ticket.hash as tickethash FROM User, Ticket WHERE User.hash = Ticket.owner;');
 
 DB::sql('CREATE VIEW displayableticket AS 
-    SELECT owner.hash as userhash, owner.name as username, ticket.hash as tickethash,
-            assigned.hash as assignedhash, assigned.name as assignedname, category.name as categoryname 
-    FROM user as owner, category, ticket LEFT OUTER JOIN user as assigned
-        ON assigned.hash = ticket.assigned
-    WHERE owner.hash = ticket.owner AND category.hash = ticket.category;');
+    SELECT owner.hash as userhash, owner.name as username, Ticket.hash as tickethash, 
+            assigned.hash as assignedhash, assigned.name as assignedname, Category.name as categoryname, Ticket.*
+    FROM User as owner, Category, Ticket LEFT OUTER JOIN User as assigned
+        ON assigned.hash = Ticket.assigned
+    WHERE owner.hash = Ticket.owner AND Category.hash = Ticket.category;');
 
 
 DB::sql('CREATE VIEW displayableactivity AS
-    SELECT activity.hash, activity.description, activity.changed, activity.ticket, activity.project, activity.comment, activity.changedFields, 
-           user.name as username, user.hash as userhash
-    FROM activity, user 
-    WHERE activity.user = user.hash;');
+    SELECT Activity.hash, Activity.description, Activity.changed, Activity.ticket, Activity.project, Activity.comment, Activity.changedFields, 
+           User.name as username, User.hash as userhash
+    FROM Activity, User
+    WHERE Activity.user = User.hash;');
 
 
 ?>

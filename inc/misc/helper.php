@@ -159,4 +159,19 @@ class helper extends \F3instance
         $ms->load(array('hash = :hash', array(':hash' => $hash)));
         return $ms->name;
     }
+
+	public static function translateBBCode($string)
+    {
+        $string = preg_replace('/===(.+)===/', '<h3>${1}</h3>', $string);
+        $string = preg_replace('/==(.+)==/', '<h2>${1}</h2>', $string);
+        $string = preg_replace('/\'\'\'(.+)\'\'\'/', '<b>${1}</b>', $string);			
+		$string = preg_replace('/\'\'(.+)\'\'/', '<i>${1}</i>', $string);
+        $string = preg_replace('/----/', '<hr />', $string);
+		$string = preg_replace('/\[\[(.+) (.+)\]\]/', '<a href="${1}">${2}</a>', $string);
+        $string = preg_replace('/\[\[(.+)\]\]/', '<a href="' . \F3::get('BASE') . '/wiki/${1}">${1}</a>', $string);
+        $string = preg_replace('/\~\~(.+)\~\~/', '<pre>${1}</pre>', $string);
+        $string = preg_replace('/\n/', '<br />', $string);
+
+        return $string;
+    }
 }

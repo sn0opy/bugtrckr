@@ -377,8 +377,8 @@ th
     background: none;
     border: none;
     letter-spacing: 0px;
-    cursor: none;
     color: #333;
+    cursor: default;
     text-transform: none;    
 }
 
@@ -466,29 +466,44 @@ th.headerSortDown {
     background-color: #D2315D;
 }
 
-.color1
-{
+.state .color1 {
     color: #88C134;
 }
 
-.color2
-{
+.state .color2 {
     color: #81629F;
 }
 
-.color3
-{
+.state .color3 {
     color: #22B5BF;
 }
 
-.color4
-{
+.state .color4 {
     color: #E98813;
 }
 
-.color5
-{
+.state .color5 {
     color: #D2315D;
+}
+
+.priority .color1 {
+    color: #F00;
+}
+
+.priority .color2 {
+    color: #FF8000;
+}
+
+.priority .color3 {
+    color: #CC0;
+}
+
+.priority .color4 {
+    color: #88C134;
+}
+
+.priority .color5 {
+    color: #A0D256;
 }
 
 .percentBar .noTickets

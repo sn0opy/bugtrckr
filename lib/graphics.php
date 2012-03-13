@@ -12,7 +12,7 @@
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package Graphics
-		@version 2.0.5
+		@version 2.0.7
 **/
 
 //! Graphics plugin
@@ -82,7 +82,7 @@ class Graphics extends Base {
 		if (!isset($stats['FILES']))
 			$stats['FILES']=array('fonts'=>array());
 		$stats['FILES']['fonts'][basename($file)]=filesize($file);
-		$maxdeg=12;
+		$maxdeg=15;
 		// Create blank image
 		$captcha=imagecreatetruecolor($dimx,$dimy);
 		list($r,$g,$b)=$base;
@@ -92,7 +92,7 @@ class Graphics extends Base {
 		// Insert each Captcha character
 		for ($i=0;$i<$len;$i++) {
 			// Random angle
-			$angle=$maxdeg-mt_rand(0,$maxdeg*2);
+			$angle=mt_rand(-$maxdeg,$maxdeg);
 			// Get CAPTCHA character from session cookie
 			$char=$seed[$i];
 			$fg=imagecolorallocatealpha(
@@ -104,8 +104,8 @@ class Graphics extends Base {
 			);
 			// Compute bounding box metrics
 			$bbox=imagettfbbox($size,0,$file,$char);
-			$w=max($bbox[2],$bbox[4])-max($bbox[0],$bbox[6]);
-			$h=max($bbox[1],$bbox[3])-max($bbox[5],$bbox[7]);
+			$w=max($bbox[2],$bbox[4])-min($bbox[0],$bbox[6]);
+			$h=max($bbox[1],$bbox[3])-min($bbox[5],$bbox[7]);
 			$sin=sin(deg2rad($angle));
 			imagettftext(
 				$captcha,$size,$angle,
