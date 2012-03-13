@@ -12,7 +12,7 @@
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package DB
-		@version 2.0.5
+		@version 2.0.9
 **/
 
 //! SQL data access layer
@@ -34,7 +34,9 @@ class DB extends Base {
 		//! Transaction tracker
 		$trans=FALSE,
 		//! Auto-commit mode
-		$auto=TRUE;
+		$auto=TRUE,
+		//! Number of rows affected by query
+		$rows=0;
 
 	/**
 		Force PDO instantiation
@@ -112,8 +114,9 @@ class DB extends Base {
 			$cmds=array($cmds);
 			$args=array($args);
 		}
-		foreach (array_combine($cmds,$args) as $cmd=>$arg) {
-			$hash='sql.'.self::hash($cmd);
+		for ($i=0,$len=count($cmds);$i<$len;$i++) {
+			list($cmd,$arg)=array($cmds[$i],$args[$i]);
+			$hash='sql.'.self::hash($cmd.var_export($arg,TRUE));
 			$cached=Cache::cached($hash);
 			if ($ttl && $cached && $_SERVER['REQUEST_TIME']-$cached<$ttl) {
 				// Gather cached queries for profiler
@@ -143,13 +146,16 @@ class DB extends Base {
 						if ($this->trans && $this->auto)
 							$this->rollback();
 						$error=$obj->errorinfo();
-						$this->error(500,$error[2]);
+						trigger_error($error[2]);
 						return FALSE;
 					}
-				$this->result=preg_match(
-					'/^\s*(?:INSERT|UPDATE|DELETE)\s/i',$cmd)?
-						$query->rowCount():
-						$query->fetchall(PDO::FETCH_ASSOC);
+				if (preg_match(
+					'/^\s*(?:SELECT|PRAGMA|SHOW|EXPLAIN)\s/i',$cmd)) {
+					$this->result=$query->fetchall(PDO::FETCH_ASSOC);
+					$this->rows=$query->rowcount();
+				}
+				else
+					$this->rows=$this->result=$query->rowCount();
 				if ($ttl)
 					Cache::set($hash,$this->result,$ttl);
 				// Gather real queries for profiler
@@ -161,6 +167,14 @@ class DB extends Base {
 		if ($batch || $this->trans && $this->auto)
 			$this->commit();
 		return $this->result;
+	}
+
+	/**
+		Return number of rows affected by latest query
+			@return int
+	**/
+	function rows() {
+		return $this->rows;
 	}
 
 	/**
@@ -212,8 +226,9 @@ class DB extends Base {
 			'mysql'=>array(
 				'SHOW columns FROM `'.$this->dbname.'`.'.$table.';',
 				'Field','Key','PRI','Type'),
-			'mssql|sybase|dblib|pgsql'=>array(
-				'SELECT c.column_name AS field,t.constraint_type AS pkey '.
+			'mssql|sybase|dblib|pgsql|ibm|odbc'=>array(
+				'SELECT c.column_name AS field,'.
+				'c.data_type AS type,t.constraint_type AS pkey '.
 				'FROM information_schema.columns AS c '.
 				'LEFT OUTER JOIN '.
 					'information_schema.key_column_usage AS k ON '.
@@ -241,7 +256,7 @@ class DB extends Base {
 							'c.table_catalog':'c.table_schema').
 							'=\''.$this->dbname.'\''):'').
 				';',
-				'field','pkey','PRIMARY KEY','data_type')
+				'field','pkey','PRIMARY KEY','type')
 		);
 		$match=FALSE;
 		foreach ($cmd as $backend=>$val)
@@ -498,7 +513,7 @@ class Axon extends Base {
 	function aselect(
 		$fields=NULL,
 		$cond=NULL,$group=NULL,$seq=NULL,$limit=0,$ofs=0) {
-		return $this->find($fields,$cond,$group,$seq,$limit,$ofs,FALSE);
+		return $this->select($fields,$cond,$group,$seq,$limit,$ofs,FALSE);
 	}
 
 	/**
@@ -684,7 +699,9 @@ class Axon extends Base {
 			$bind=array();
 			foreach ($this->fields as $field=>$val)
 				if (isset($this->mod[$field])) {
-					$fields.=($fields?',':'').$field;
+					$fields.=($fields?',':'').
+						(preg_match('/^mysql$/',$this->backend)?
+							('`'.$field.'`'):$field);
 					$values.=($values?',':'').':'.$field;
 					$bind[':'.$field]=array($val,$this->types[$field]);
 				}
@@ -699,7 +716,9 @@ class Axon extends Base {
 			$set=$cond='';
 			foreach ($this->fields as $field=>$val)
 				if (isset($this->mod[$field])) {
-					$set.=($set?',':'').$field.'=:'.$field;
+					$set.=($set?',':'').
+						(preg_match('/^mysql$/',$this->backend)?
+							('`'.$field.'`'):$field).'=:'.$field;
 					$bind[':'.$field]=array($val,$this->types[$field]);
 				}
 			// Use primary keys to find record
@@ -725,7 +744,7 @@ class Axon extends Base {
 	/**
 		Delete record/s
 			@param $cond mixed
-			@param $force boolean
+			@param $force bool
 			@public
 	**/
 	function erase($cond=NULL,$force=FALSE) {
@@ -734,12 +753,13 @@ class Axon extends Base {
 			return;
 		if (!$cond)
 			$cond=$this->cond;
-		if (is_array($cond))
-			$this->db->exec('DELETE FROM '.$this->table.
-				($force?'':(' WHERE '.($cond[0]?:'FALSE'))),$cond[1]);
-		else
-			$this->db->exec('DELETE FROM '.$this->table.
-				($force?'':(' WHERE '.($cond?:'FALSE'))));
+		if ($cond) {
+			if (!is_array($cond))
+				$cond=array($cond,NULL);
+			$this->db->exec(
+				'DELETE FROM '.$this->table.' WHERE '.$cond[0],$cond[1]
+			);
+		}
 		$this->reset();
 		if (method_exists($this,'afterErase'))
 			$this->afterErase();
@@ -846,7 +866,7 @@ class Axon extends Base {
 			@public
 	**/
 	function def($field,$expr) {
-		if (isset($this->fields[$field])) {
+		if (array_key_exists($field,$this->fields)) {
 			trigger_error(self::TEXT_AxonConflict);
 			return;
 		}
@@ -859,7 +879,7 @@ class Axon extends Base {
 			@public
 	**/
 	function undef($field) {
-		if (isset($this->fields[$field]) || !self::isdef($field)) {
+		if (array_key_exists($field,$this->fields) || !self::isdef($field)) {
 			trigger_error(sprintf(self::TEXT_AxonCantUndef,$field));
 			return;
 		}
@@ -872,7 +892,7 @@ class Axon extends Base {
 			@public
 	**/
 	function isdef($field) {
-		return isset($this->adhoc[$field]);
+		return $this->adhoc && array_key_exists($field,$this->adhoc);
 	}
 
 	/**
@@ -882,7 +902,7 @@ class Axon extends Base {
 			@public
 	**/
 	function &__get($field) {
-	if (isset($this->fields[$field]))
+		if (array_key_exists($field,$this->fields))
 			return $this->fields[$field];
 		if (self::isdef($field))
 			return $this->adhoc[$field][1];
@@ -926,7 +946,8 @@ class Axon extends Base {
 			@public
 	**/
 	function __isset($field) {
-		return isset($this->fields[$field]);
+		return array_key_exists($field,$this->fields) ||
+			$this->adhoc && array_key_exists($field,$this->adhoc);
 	}
 
 	/**

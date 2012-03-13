@@ -12,7 +12,7 @@
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package Auth
-		@version 2.0.5
+		@version 2.0.9
 **/
 
 //! Plugin for various user authentication methods
@@ -227,7 +227,7 @@ class Auth extends Base {
 				$_SERVER['PHP_AUTH_USER'],$_SERVER['PHP_AUTH_PW']
 			);
 		if (PHP_SAPI!='cli')
-			header(HTTP_WebAuth.': Basic realm="'.$realm.'"',TRUE,401);
+			header(self::HTTP_WebAuth.': Basic realm="'.$realm.'"',TRUE,401);
 		return FALSE;
 	}
 

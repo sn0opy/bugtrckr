@@ -12,7 +12,7 @@
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package Base
-		@version 2.0.5
+		@version 2.0.9
 **/
 
 //! Base structure
@@ -21,7 +21,7 @@ class Base {
 	//@{ Framework details
 	const
 		TEXT_AppName='Fat-Free Framework',
-		TEXT_Version='2.0.4',
+		TEXT_Version='2.0.9',
 		TEXT_AppURL='http://fatfree.sourceforge.net';
 	//@}
 
@@ -39,8 +39,6 @@ class Base {
 		TEXT_Method='Undefined method %s',
 		TEXT_NotFound='The URL %s was not found',
 		TEXT_NotAllowed='%s request is not allowed for the URL %s',
-		TEXT_Callback='The callback function %s is invalid',
-		TEXT_Import='Import file %s not found',
 		TEXT_NoRoutes='No routes specified',
 		TEXT_HTTP='HTTP status code %s is invalid',
 		TEXT_Render='Unable to render %s - file does not exist',
@@ -150,18 +148,29 @@ class Base {
 	}
 
 	/**
-		Convert PHP expression/value to string
+		Convert PHP expression/value to compressed exportable string
 			@return string
-			@param $val mixed
+			@param $arg mixed
 			@public
 	**/
-	static function stringify($val) {
-		return preg_replace('/\s+=>\s+/','=>',
-			is_object($val) && !method_exists($val,'__set_state')?
-				(method_exists($val,'__toString')?
-					var_export((string)stripslashes($val),TRUE):
-					('object:'.get_class($val))):
-				var_export($val,TRUE));
+	static function stringify($arg) {
+		switch (gettype($arg)) {
+			case 'array':
+				$str='';
+				foreach ($arg as $key=>$val)
+					$str.=($str?',':'').
+						self::stringify($key).'=>'.self::stringify($val);
+				return 'array('.$str.')';
+			case 'object':
+				return '\'object:'.get_class($arg).'\'';
+			case 'string':
+				return '"'.addcslashes($arg,'"').'"';
+			case 'boolean':
+				return $arg?'TRUE':'FALSE';
+			case 'NULL':
+				return 'NULL';
+		}
+		return (string)$arg;
 	}
 
 	/**
@@ -171,17 +180,7 @@ class Base {
 			@public
 	**/
 	static function csv($args) {
-		if (!is_array($args))
-			$args=array($args);
-		$str='';
-		foreach ($args as $key=>$val) {
-			$str.=($str?',':'');
-			if (is_string($key))
-				$str.=var_export($key,TRUE).'=>';
-			$str.=is_array($val)?
-				('array('.self::csv($val).')'):self::stringify($val);
-		}
-		return $str;
+		return implode(',',array_map('self::stringify',$args));
 	}
 
 	/**
@@ -304,7 +303,10 @@ class Base {
 			'/\[\s*[\'"]?|[\'"]?\s*\]|\.|(->)/',self::remix($key),
 			NULL,PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
 		// Referencing a SESSION variable element auto-starts a session
-		if (count($matches)>1 && $matches[0]=='SESSION' && !session_id()) {
+		if ($matches[0]=='SESSION' && !session_id()) {
+			// Use cookie jar setup
+			call_user_func_array('session_set_cookie_params',
+				self::$vars['JAR']);
 			session_start();
 			// Sync framework and PHP global
 			self::$vars['SESSION']=&$_SESSION;
@@ -423,8 +425,7 @@ class Base {
 				trigger_error(sprintf(self::TEXT_NotArray,
 					self::stringify($arg)));
 		}
-		$ref=&self::ref($var);
-		$ref=call_user_func_array('array_merge',$args);
+		call_user_func_array('array_merge',$args);
 	}
 
 	/**
@@ -488,6 +489,36 @@ class Base {
 	}
 
 	/**
+		Execute callback as a mutex operation
+			@return mixed
+			@public
+	**/
+	static function mutex() {
+		$args=func_get_args();
+		$func=array_shift($args);
+		$handles=array();
+		foreach ($args as $file) {
+			$lock=$file.'.lock';
+			while (TRUE) {
+				usleep(mt_rand(0,100));
+				if (is_resource($handle=@fopen($lock,'x'))) {
+					$handles[$lock]=$handle;
+					break;
+				}
+				if (is_file($lock) &&
+					filemtime($lock)+self::$vars['MUTEX']<time())
+					unlink($lock);
+			}
+		}
+		$out=$func();
+		foreach ($handles as $lock=>$handle) {
+			fclose($handle);
+			unlink($lock);
+		}
+		return $out;
+	}
+
+	/**
 		Lock-aware file reader
 			@param $file string
 			@public
@@ -495,12 +526,16 @@ class Base {
 	static function getfile($file) {
 		$out=FALSE;
 		if (!function_exists('flock'))
-			$out=file_get_contents($file);
-		elseif (is_file($file) && $handle=@fopen($file,'r')) {
+			$out=self::mutex(
+				function() use($file) {
+					return file_get_contents($file);
+				},
+				$file
+			);
+		elseif ($handle=@fopen($file,'r')) {
 			flock($handle,LOCK_EX);
 			$size=filesize($file);
-			if ($size)
-				$out=fread($handle,$size);
+			$out=$size?fread($handle,$size):$out;
 			flock($handle,LOCK_UN);
 			fclose($handle);
 		}
@@ -514,7 +549,16 @@ class Base {
 			@public
 	**/
 	static function putfile($file,$data) {
-		return file_put_contents($file,$data,LOCK_EX);
+		if (!function_exists('flock'))
+			$out=self::mutex(
+				function() use($file,$data) {
+					return file_put_contents($file,$data,LOCK_EX);
+				},
+				$file
+			);
+		else
+			$out=file_put_contents($file,$data,LOCK_EX);
+		return $out;
 	}
 
 	/**
@@ -539,7 +583,8 @@ class Base {
 							// Variable holds an anonymous function
 							call_user_func_array($ref,str_getcsv($func[2])):
 							// Check if empty array
-							($func[1].$func[2]=='array'?'NULL':$func[0]);
+							($func[1].$func[2]=='array'?'NULL':
+								($func[1]=='array'?'\'Array\'':$func[0]));
 					},
 					preg_replace_callback(
 						// Framework variable
@@ -561,9 +606,9 @@ class Base {
 						$expr[1]
 					)
 				);
-				return !preg_match('/@|\bnew\s+/i',$out) &&
+				return (!preg_match('/@|\bnew\s+/i',$out) &&
 					($eval=eval('return (string)'.$out.';'))!==FALSE?
-						$eval:$out;
+						$eval:$out);
 			},
 			$val
 		);
@@ -624,16 +669,15 @@ class Base {
 			@param $perm int
 			@public
 	**/
-	static function mkdir($name,$perm=0755) {
-		if (!is_writable(dirname($name)) &&
-			function_exists('posix_getpwuid')) {
+	static function mkdir($name,$perm=0775) {
+		$parent=dirname($name);
+		if (!@is_writable($parent) && !chmod($parent,775)) {
 			$uid=posix_getpwuid(posix_geteuid());
 			trigger_error(sprintf(self::TEXT_Write,
 				$uid['name'],realpath(dirname($name))));
 			return FALSE;
 		}
 		// Create the folder
-		umask(0);
 		mkdir($name,$perm);
 	}
 
@@ -709,11 +753,11 @@ class F3 extends Base {
 						$var=$match;
 					else
 						$var.='[\''.$match.'\']';
-				$val=array($var,$val);
+				$val=array($var=>$val);
 			}
 			if (is_array($val))
 				foreach ($val as $var=>$sub) {
-					$func=self::$vars['COOKIES'];
+					$func=self::$vars['JAR'];
 					array_unshift($func,$var,$sub);
 					call_user_func_array('setcookie',$func);
 				}
@@ -798,8 +842,8 @@ class F3 extends Base {
 			}
 			if (is_array($val))
 				// Expire all cookies
-				foreach ($val as $var=>$sub) {
-					$func=self::$vars['COOKIES'];
+				foreach (array_keys($val) as $var) {
+					$func=self::$vars['JAR'];
 					$func['expire']=strtotime('-1 year');
 					array_unshift($func,$var,FALSE);
 					call_user_func_array('setcookie',$func);
@@ -808,8 +852,11 @@ class F3 extends Base {
 		}
 		// Clearing SESSION array ends the current session
 		if ($key=='SESSION') {
-			if (!session_id())
+			if (!session_id()) {
+				call_user_func_array('session_set_cookie_params',
+					self::$vars['JAR']);
 				session_start();
+			}
 			// End the session
 			session_unset();
 			session_destroy();
@@ -895,59 +942,43 @@ class F3 extends Base {
 				trigger_error(sprintf(self::TEXT_Config,$file));
 				return;
 			}
-			// Map sections to framework methods
-			$map=array('globals'=>'set','routes'=>'route','maps'=>'map');
-			// Read the .ini file
-			preg_match_all(
-				'/\s*(?:\[(.+?)\]|(?:;.+?)?|(?:([^=]+)=(.+?)))(?:\v|$)/s',
-					self::getfile($file),$matches,PREG_SET_ORDER);
+			// Load the .ini file
 			$cfg=array();
-			$ptr=&$cfg;
-			foreach ($matches as $match)
-				if (isset($match[1]) && !empty($match[1])) {
-					// Section header
-					if (!isset($map[$match[1]])) {
-						// Unknown section
-						trigger_error(sprintf(self::TEXT_Section,$section));
-						return;
-					}
-					$ptr=&$cfg[$match[1]];
-				}
-				elseif (isset($match[2]) && !empty($match[2])) {
-					$csv=array_map(
-						function($val) {
-							// Typecast if necessary
-							return is_numeric($val) ||
-								preg_match('/^(TRUE|FALSE)\b/i',$val)?
-									eval('return '.$val.';'):$val;
-						},
-						str_getcsv($match[3])
-					);
-					// Convert comma-separated values to array
-					$match[3]=count($csv)>1?$csv:$csv[0];
-					if (preg_match('/([^\[]+)\[([^\]]*)\]/',$match[2],$sub)) {
-						if ($sub[2])
-							// Associative array
-							$ptr[$sub[1]][$sub[2]]=$match[3];
-						else
-							// Numeric-indexed array
-							$ptr[$sub[1]][]=$match[3];
-					}
-					else
+			$sec='';
+			if ($ini=file($file))
+				foreach ($ini as $line) {
+					preg_match('/^\s*(?:(;)|\[(.+)\]|(.+?)\s*=\s*(.+))/',
+						$line,$parts);
+					if (isset($parts[1]) && $parts[1])
+						// Comment
+						continue;
+					elseif (isset($parts[2]) && $parts[2])
+						// Section
+						$sec=strtolower($parts[2]);
+					elseif (isset($parts[3]) && $parts[3]) {
 						// Key-value pair
-						$ptr[trim($match[2])]=$match[3];
+						$csv=array_map(
+							function($val) {
+								$val=trim($val);
+								return is_numeric($val) || defined($val)?
+									eval('return '.$val.';'):$val;
+							},
+							str_getcsv($parts[4])
+						);
+						$cfg[$sec=$sec?:'globals'][$parts[3]]=
+							count($csv)>1?$csv:$csv[0];
+					}
 				}
+			$plan=array('globals'=>'set','maps'=>'map','routes'=>'route');
 			ob_start();
-			foreach ($cfg as $section=>$pairs)
-				if (isset($map[$section]) && is_array($pairs)) {
-					$func=$map[$section];
+			foreach ($cfg as $sec=>$pairs)
+				if (isset($plan[$sec]))
 					foreach ($pairs as $key=>$val)
-						// Generate PHP snippet
-						echo 'self::'.$func.'('.var_export($key,TRUE).','.
-							($func=='set' || !is_array($val)?
-								var_export($val,TRUE):self::csv($val)).
-						');'."\n";
-				}
+						echo 'self::'.$plan[$sec].'('.
+							self::stringify($key).','.
+							(is_array($val) && $sec!='globals'?
+								self::csv($val):self::stringify($val)).');'.
+							"\n";
 			$save=ob_get_clean();
 			// Compress and save to cache
 			Cache::set($hash,$save);
@@ -1020,13 +1051,8 @@ class F3 extends Base {
 			$req=array();
 			foreach ($_SERVER as $key=>$val)
 				if (substr($key,0,5)=='HTTP_')
-					$req[preg_replace_callback(
-						'/\w+\b/',
-						function($word) {
-							return ucfirst(strtolower($word[0]));
-						},
-						strtr(substr($key,5),'_','-')
-					)]=$val;
+					$req[strtr(ucwords(strtolower(
+						strtr(substr($key,5),'_',' '))),' ','-')]=$val;
 			return $req;
 		}
 		return array();
@@ -1104,18 +1130,21 @@ class F3 extends Base {
 	/**
 		Provide REST interface by mapping URL to object/class
 			@param $url string
-			@param $obj mixed
+			@param $class mixed
 			@param $ttl int
 			@param $throttle int
 			@param $hotlink bool
 			@public
 	**/
-	static function map($url,$obj,$ttl=0,$throttle=0,$hotlink=TRUE) {
-		foreach (explode('|',self::HTTP_Methods) as $method) {
-			if (method_exists($obj,$method))
-				self::route($method.' '.$url,
-					array($obj,$method),$ttl,$throttle,$hotlink);
-		}
+	static function map($url,$class,$ttl=0,$throttle=0,$hotlink=TRUE) {
+		foreach (explode('|',self::HTTP_Methods) as $method)
+			if (method_exists($class,$method)) {
+				$ref=new ReflectionMethod($class,$method);
+				self::route($method.' '.$url,$ref->isStatic()?
+					array($class,$method):array(new $class,$method),$ttl,
+					$throttle,$hotlink);
+				unset($ref);
+			}
 	}
 
 	/**
@@ -1133,8 +1162,9 @@ class F3 extends Base {
 				$func=self::resolve($func);
 				if (preg_match('/(.+)\s*(->|::)\s*(.+)/s',$func,$match)) {
 					if (!class_exists($match[1]) ||
+						!method_exists($match[1],'__call') &&
 						!method_exists($match[1],$match[3])) {
-						trigger_error(sprintf(self::TEXT_Callback,$func));
+						self::error(404);
 						return FALSE;
 					}
 					$func=array($match[2]=='->'?
@@ -1148,18 +1178,13 @@ class F3 extends Base {
 								$instance=new F3instance;
 								return $instance->sandbox($file);
 							}
-						trigger_error(sprintf(self::TEXT_Import,$func));
 					}
-					else
-						trigger_error(sprintf(self::TEXT_Callback,$func));
+					self::error(404);
 					return FALSE;
 				}
 			}
 			if (!is_callable($func)) {
-				trigger_error(sprintf(self::TEXT_Callback,
-					is_array($func) && count($func)>1?
-						(get_class($func[0]).(is_object($func[0])?'->':'::').
-							$func[1]):$func));
+				self::error(404);
 				return FALSE;
 			}
 			$oop=is_array($func) &&
@@ -1177,7 +1202,8 @@ class F3 extends Base {
 				method_exists($func[0],$after='afterRoute') &&
 				!in_array($func[0],$classes)) {
 				// Execute afterRoute() once per class
-				call_user_func(array($func[0],$after));
+				if (call_user_func(array($func[0],$after))===FALSE)
+					return FALSE;
 				$classes[]=is_object($func[0])?get_class($func[0]):$func[0];
 			}
 		}
@@ -1217,24 +1243,24 @@ class F3 extends Base {
 		// Detailed routes get matched first
 		krsort(self::$vars['ROUTES']);
 		$time=time();
+		$req=preg_replace('/^'.preg_quote(self::$vars['BASE'],'/').
+			'\b(.+)/','\1',rawurldecode($_SERVER['REQUEST_URI']));
 		foreach (self::$vars['ROUTES'] as $uri=>$route) {
 			if (!preg_match('/^'.
 				preg_replace(
-					'/(?:{{)?@(\w+\b)(?:}})?/i',
+					'/(?:{{)?@(\w+\b)(?:}})?/',
 					// Valid URL characters (RFC 1738)
 					'(?P<\1>[\w\-\.!~\*\'"(),\s]+)',
 					// Wildcard character in URI
 					str_replace('\*','(.*)',preg_quote($uri,'/'))
-				).'\/?(?:\?.*)?$/i',
-				preg_replace('/^'.preg_quote(self::$vars['BASE'],'/').
-					'\b(.+)/','\1',rawurldecode($_SERVER['REQUEST_URI'])),
-				$args))
+				).'\/?(?:\?.*)?$/iu',$req,$args))
 				continue;
-			$found=TRUE;
+			$wild=is_int(strpos($uri,'/*'));
 			// Inspect each defined route
 			foreach ($route as $method=>$proc) {
 				if (!preg_match('/'.$method.'/',$_SERVER['REQUEST_METHOD']))
 					continue;
+				$found=TRUE;
 				list($funcs,$ttl,$throttle,$hotlink)=$proc;
 				if (!$hotlink && isset(self::$vars['HOTLINK']) &&
 					isset($_SERVER['HTTP_REFERER']) &&
@@ -1242,11 +1268,12 @@ class F3 extends Base {
 						$_SERVER['SERVER_NAME'])
 					// Hot link detected; Redirect page
 					self::reroute(self::$vars['HOTLINK']);
-				// Save named uri captures
-				foreach ($args as $key=>$arg)
-					// Remove non-zero indexed elements
-					if (is_numeric($key) && $key)
-						unset($args[$key]);
+				if (!$wild)
+					// Save named uri captures
+					foreach (array_keys($args) as $key)
+						// Remove non-zero indexed elements
+						if (is_numeric($key) && $key)
+							unset($args[$key]);
 				self::$vars['PARAMS']=$args;
 				// Default: Do not cache
 				self::expire(0);
@@ -1307,17 +1334,10 @@ class F3 extends Base {
 					}
 				}
 				else {
-					self::expire(0);
 					// Capture output
 					ob_start();
-					if ($_SERVER['REQUEST_METHOD']=='PUT') {
-						// Associate PUT with file handle of stdin stream
-						self::$vars['PUT']=fopen('php://input','rb');
-						self::call($funcs,TRUE);
-						fclose(self::$vars['PUT']);
-					}
-					else
-						self::call($funcs,TRUE);
+					self::$vars['REQBODY']=file_get_contents('php://input');
+					self::call($funcs,TRUE);
 					self::$vars['RESPONSE']=ob_get_clean();
 				}
 				$elapsed=time()-$time;
@@ -1325,12 +1345,13 @@ class F3 extends Base {
 				if ($throttle/1e3>$elapsed)
 					// Delay output
 					usleep(1e6*($throttle/1e3-$elapsed));
-				if (self::$vars['RESPONSE'] && !self::$vars['QUIET'])
+				if (strlen(self::$vars['RESPONSE']) && !self::$vars['QUIET'])
 					// Display response
 					echo self::$vars['RESPONSE'];
+			}
+			if ($found)
 				// Hail the conquering hero
 				return;
-			}
 			// Method not allowed
 			if (PHP_SAPI!='cli' && !headers_sent())
 				header(self::HTTP_Allow.': '.
@@ -1360,7 +1381,6 @@ class F3 extends Base {
 		}
 		if (PHP_SAPI!='cli' && !headers_sent()) {
 			header(self::HTTP_Content.': application/octet-stream');
-			header(self::HTTP_Disposition.': filename="'.basename($file).'"');
 			header(self::HTTP_Partial.': '.($partial?'bytes':'none'));
 			header(self::HTTP_Length.': '.filesize($file));
 		}
@@ -1371,14 +1391,14 @@ class F3 extends Base {
 			if ($kbps) {
 				// Throttle bandwidth
 				$ctr++;
-				if (($ctr/$kbps)>microtime(TRUE)-$time)
+				if (($ctr/$kbps)>$elapsed=microtime(TRUE)-$time)
 					usleep(1e6*($ctr/$kbps-$elapsed));
 			}
 			// Send 1KiB and reset timer
 			echo fread($handle,1024);
 		}
 		fclose($handle);
-		return TRUE;
+		die;
 	}
 
 	/**
@@ -1491,27 +1511,24 @@ class F3 extends Base {
 	/**
 		Mock environment for command-line use and/or unit testing
 			@param $pattern string
-			@param $params array
+			@param $args array
 			@public
 	**/
-	static function mock($pattern,array $params=NULL) {
-		// Override PHP globals
-		list($method,$uri)=preg_split('/\s+/',
-			$pattern,2,PREG_SPLIT_NO_EMPTY);
-		$query=explode('&',parse_url($uri,PHP_URL_QUERY));
-		foreach ($query as $pair)
-			if (strpos($pair,'=')) {
-				list($var,$val)=explode('=',$pair);
-				self::$vars[$method][$var]=$val;
-				self::$vars['REQUEST'][$var]=$val;
-			}
-		if (is_array($params))
-			foreach ($params as $var=>$val) {
-				self::$vars[$method][$var]=$val;
-				self::$vars['REQUEST'][$var]=$val;
-			}
+	static function mock($pattern,array $args=NULL) {
+		list($method,$uri)=explode(' ',$pattern,2);
+		$method=strtoupper($method);
+		$url=parse_url($uri);
+		$query='';
+		if ($args)
+			$query.=http_build_query($args);
+		$query.=isset($url['query'])?(($query?'&':'').$url['query']):'';
+		if ($query) {
+			parse_str($query,$GLOBALS['_'.$method]);
+			parse_str($query,$GLOBALS['_REQUEST']);
+		}
 		$_SERVER['REQUEST_METHOD']=$method;
-		$_SERVER['REQUEST_URI']=self::$vars['BASE'].$uri;
+		$_SERVER['REQUEST_URI']=self::$vars['BASE'].$url['path'].
+			($query?('?'.$query):'');
 	}
 
 	/**
@@ -1565,7 +1582,7 @@ class F3 extends Base {
 				if (is_array($trace)) {
 					$line=0;
 					$plugins=is_array(
-						$plugins=glob(self::$vars['PLUGINS'].'*'))?
+						$plugins=glob(self::$vars['PLUGINS'].'*.php'))?
 						array_map('self::fixslashes',$plugins):array();
 					// Stringify the stack trace
 					ob_start();
@@ -1636,6 +1653,8 @@ class F3 extends Base {
 					'<p>'.$error['trace'].'</p>'.
 				'</body>'.
 			'</html>';
+		if (self::$vars['STRICT'])
+			die;
 	}
 
 	/**
@@ -1690,12 +1709,11 @@ class F3 extends Base {
 			return;
 		}
 		// Fix Apache's VirtualDocumentRoot limitation
-		$_SERVER['DOCUMENT_ROOT']=str_replace($_SERVER['SCRIPT_NAME'],'',
-			$_SERVER['SCRIPT_FILENAME']);
+		$_SERVER['DOCUMENT_ROOT']=
+			dirname(self::fixslashes($_SERVER['SCRIPT_FILENAME']));
 		// Adjust HTTP request time precision
 		$_SERVER['REQUEST_TIME']=microtime(TRUE);
 		// Hydrate framework variables
-		$root=self::fixslashes(realpath('.')).'/';
 		$base=self::fixslashes(
 			preg_replace('/\/[^\/]+$/','',$_SERVER['SCRIPT_NAME']));
 		$scheme=PHP_SAPI=='cli'?
@@ -1703,21 +1721,20 @@ class F3 extends Base {
 			isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']!='off' ||
 			isset($_SERVER['HTTP_X_FORWARDED_PROTO']) &&
 			$_SERVER['HTTP_X_FORWARDED_PROTO']=='https'?'https':'http';
+		$jar=array(
+			'expire'=>0,
+			'path'=>$base?:'/',
+			'domain'=>'.'.$_SERVER['SERVER_NAME'],
+			'secure'=>($scheme=='https'),
+			'httponly'=>TRUE
+		);
 		self::$vars=array(
 			// Autoload folders
-			'AUTOLOAD'=>$root,
+			'AUTOLOAD'=>'./',
 			// Web root folder
 			'BASE'=>$base,
 			// Cache backend to use (autodetect if true; disable if false)
 			'CACHE'=>FALSE,
-			// Default cookie settings
-			'COOKIES'=>array(
-				'expire'=>0,
-				'path'=>$base?:'/',
-				'domain'=>'.'.$_SERVER['SERVER_NAME'],
-				'secure'=>($scheme=='https'),
-				'httponly'=>TRUE
-			),
 			// Stack trace verbosity:
 			// 0-no stack trace, 1-noise removed, 2-normal, 3-verbose
 			'DEBUG'=>1,
@@ -1732,19 +1749,23 @@ class F3 extends Base {
 			// IP addresses exempt from spam detection
 			'EXEMPT'=>NULL,
 			// User interface folders
-			'GUI'=>$root,
+			'GUI'=>'./',
 			// URL for hotlink redirection
 			'HOTLINK'=>NULL,
 			// Include path for procedural code
-			'IMPORTS'=>$root,
+			'IMPORTS'=>'./',
+			// Default cookie settings
+			'JAR'=>$jar,
 			// Default language (auto-detect if null)
 			'LANGUAGE'=>NULL,
 			// Autoloaded classes
 			'LOADED'=>NULL,
 			// Dictionary folder
-			'LOCALES'=>$root,
+			'LOCALES'=>'./',
 			// Maximum POST size
 			'MAXSIZE'=>self::bytes($ini['post_max_size']),
+			// Max mutex lock duration
+			'MUTEX'=>60,
 			// Custom error handler
 			'ONERROR'=>NULL,
 			// Plugins folder
@@ -1758,24 +1779,28 @@ class F3 extends Base {
 			// Output suppression switch
 			'QUIET'=>FALSE,
 			// Absolute path to document root folder
-			'ROOT'=>$root,
+			'ROOT'=>$_SERVER['DOCUMENT_ROOT'].'/',
 			// Framework routes
 			'ROUTES'=>NULL,
 			// URL for spam redirection
 			'SPAM'=>NULL,
+			// Stop script on error?
+			'STRICT'=>TRUE,
 			// Profiler statistics
 			'STATS'=>array(
 				'MEMORY'=>array('start'=>memory_get_usage()),
 				'TIME'=>array('start'=>microtime(TRUE))
 			),
 			// Temporary folder
-			'TEMP'=>$root.'temp/',
+			'TEMP'=>'temp/',
 			// Minimum script execution time
 			'THROTTLE'=>0,
 			// Tidy options
 			'TIDY'=>array(),
 			// Framework version
-			'VERSION'=>self::TEXT_AppName.' '.self::TEXT_Version
+			'VERSION'=>self::TEXT_AppName.' '.self::TEXT_Version,
+			// Default whois server
+			'WHOIS'=>'whois.internic.net'
 		);
 		// Alias the GUI variable (2.0+)
 		self::$vars['UI']=&self::$vars['GUI'];
@@ -1783,7 +1808,8 @@ class F3 extends Base {
 		foreach (explode('|',self::PHP_Globals) as $var) {
 			// Sync framework and PHP globals
 			self::$vars[$var]=&$GLOBALS['_'.$var];
-			if ($ini['magic_quotes_gpc'] && preg_match('/^[GPCR]/',$var))
+			if (isset($ini['magic_quotes_gpc']) &&
+				$ini['magic_quotes_gpc'] && preg_match('/^[GPCR]/',$var))
 				// Corrective action on PHP magic quotes
 				array_walk_recursive(
 					self::$vars[$var],
@@ -1796,12 +1822,6 @@ class F3 extends Base {
 			// Command line: Parse GET variables in URL, if any
 			if (isset($_SERVER['argc']) && $_SERVER['argc']<2)
 				array_push($_SERVER['argv'],'/');
-			preg_match_all('/[\?&]([^=]+)=([^&$]*)/',
-				$_SERVER['argv'][1],$matches,PREG_SET_ORDER);
-			foreach ($matches as $match) {
-				$_REQUEST[$match[1]]=$match[2];
-				$_GET[$match[1]]=$match[2];
-			}
 			// Detect host name from environment
 			$_SERVER['SERVER_NAME']=gethostname();
 			// Convert URI to human-readable string
@@ -1817,18 +1837,16 @@ class F3 extends Base {
 			@public
 	**/
 	static function stop() {
+		chdir(self::$vars['ROOT']);
 		$error=error_get_last();
 		if ($error && !self::$vars['QUIET'] && in_array($error['type'],
 			array(E_ERROR,E_PARSE,E_CORE_ERROR,E_COMPILE_ERROR)))
 			// Intercept fatal error
 			self::error(500,sprintf(self::TEXT_Fatal,$error['message']),
 				array($error),TRUE);
-		if (isset(self::$vars['UNLOAD'])) {
-			ob_end_flush();
-			if (PHP_SAPI!='cli' && !headers_sent())
-				header(self::HTTP_Connect.': close');
+		if (isset(self::$vars['UNLOAD']) &&
+			is_callable(self::$vars['UNLOAD']))
 			self::call(self::$vars['UNLOAD']);
-		}
 	}
 
 	/**
@@ -1859,51 +1877,43 @@ class F3 extends Base {
 			@public
 	**/
 	static function autoload($class) {
-		$list=array_map('self::fixslashes',get_included_files());
-		// Support NS_class.php and NS/class.php namespace-mapping styles
-		foreach (array(str_replace('\\','_',$class),$class) as $style)
-			// Prioritize plugins before app classes
-			foreach (self::split(self::$vars['PLUGINS'].';'.
-				self::$vars['AUTOLOAD']) as $auto) {
-				$abs=self::fixslashes(realpath($auto));
-				if (!$abs)
-					continue;
-				$file=self::fixslashes($style).'.php';
-				if (is_int(strpos($file,'/'))) {
-					$ok=FALSE;
-					// Case-insensitive check for folders
-					foreach (explode('/',
-						self::fixslashes(dirname($file))) as $dir)
-						foreach (glob($abs.'/*') as $found) {
-							$found=self::fixslashes($found);
-							if (strtolower($abs.'/'.$dir)==
-								strtolower($found)) {
-								$abs=$found;
-								$ok=TRUE;
-							}
-						}
-					if (!$ok)
-						continue;
-					$file=basename($file);
-				}
-				$glob=glob($abs.'/*.php',GLOB_NOSORT);
-				if ($glob) {
-					$glob=array_map('self::fixslashes',$glob);
-					// Case-insensitive check for file presence
-					$fkey=array_search(strtolower($abs.'/'.$file),
-						array_map('strtolower',$glob));
-					if (is_int($fkey) && !in_array($glob[$fkey],$list)) {
+		foreach (self::split(
+			self::$vars['PLUGINS'].';'.self::$vars['AUTOLOAD']) as $auto) {
+			$ns='';
+			$iter=ltrim($class,'\\');
+			for (;;) {
+				if ($glob=glob($auto.self::fixslashes($ns).'*')) {
+					if ($grep=preg_grep('/^'.preg_quote($auto,'/').
+						implode('[\/_]',explode('\\',$ns.$iter)).
+						'(?:\.class)?\.php/i',$glob)) {
 						$instance=new F3instance;
-						$instance->sandbox($glob[$fkey]);
+						$instance->sandbox(current($grep));
 						// Verify that the class was loaded
 						if (class_exists($class,FALSE)) {
 							// Run onLoad event handler if defined
 							self::loadstatic($class);
 							return;
 						}
+						elseif (interface_exists($class,FALSE))
+							return;
+					}
+					$parts=explode('\\',$iter,2);
+					if (count($parts)>1) {
+						$iter=$parts[1];
+						if ($grep=preg_grep('/^'.
+							preg_quote($auto.self::fixslashes($ns).
+							$parts[0],'/').'$/i',$glob)) {
+							$ns=str_replace('/','\\',preg_replace('/^'.
+								preg_quote($auto,'/').'/','',
+								current($grep))).'\\';
+							continue;
+						}
+						$ns.=$parts[0].'\\';
 					}
 				}
+				break;
 			}
+		}
 		if (count(spl_autoload_functions())==1)
 			// No other registered autoload functions exist
 			trigger_error(sprintf(self::TEXT_Class,$class));
@@ -1975,9 +1985,8 @@ class Cache extends Base {
 			@public
 	**/
 	static function detect() {
-		$exts=array_intersect(array('apc','xcache'),
-			array_map('strtolower',get_loaded_extensions()));
-		$ref=array_merge($exts,array());
+		$ref=array_merge(array_intersect(array('apc','xcache'),
+			array_map('strtolower',get_loaded_extensions())),array());
 		self::$vars['CACHE']=array_shift($ref)?:
 			('folder='.self::$vars['ROOT'].'cache/');
 	}
@@ -1994,7 +2003,7 @@ class Cache extends Base {
 			// Auto-detect backend
 			self::detect();
 		if (preg_match(
-			'/^(apc)|(memcache)=(.+)|(xcache)|(folder)\=(.+\/)/i',
+			'/^(apc)|(memcache)=(.+)|(xcache)|(folder)=(.+\/)/i',
 			self::$vars['CACHE'],$match)) {
 			if (isset($match[5]) && $match[5]) {
 				if (!is_dir($match[6]))
@@ -2010,10 +2019,8 @@ class Cache extends Base {
 				}
 				if (isset($match[2]) && $match[2]) {
 					// Open persistent MemCache connection(s)
-					// Multiple servers separated by semi-colon
-					$pool=explode(';',$match[3]);
 					$mcache=NULL;
-					foreach ($pool as $server) {
+					foreach (self::split($match[3]) as $server) {
 						// Hostname:port
 						list($host,$port)=explode(':',$server);
 						if (is_null($port))
@@ -2184,7 +2191,7 @@ class Cache extends Base {
 				$ok=!xcache_isset($key) || xcache_unset($key);
 				break;
 			case 'folder':
-				$ok=is_file(self::$backend['id'].$key) &&
+				$ok=!is_file(self::$backend['id'].$key) ||
 					@unlink(self::$backend['id'].$key);
 				break;
 		}
@@ -2247,7 +2254,6 @@ class F3instance {
 	**/
 	function grab($file) {
 		$file=F3::resolve($file);
-		ob_start();
 		if (!ini_get('short_open_tag')) {
 			$text=preg_replace_callback(
 				'/<\?(?:\s|\s*(=))(.+?)\?>/s',
@@ -2264,21 +2270,16 @@ class F3instance {
 				if (!is_dir($ref=F3::ref('TEMP')))
 					F3::mkdir($ref);
 				$temp=$ref.$_SERVER['SERVER_NAME'].'.tpl.'.F3::hash($file);
-				if (!is_file($temp)) {
-					// Create semaphore
-					$hash='sem.'.F3::hash($file);
-					$cached=Cache::cached($hash);
-					while ($cached)
-						// Locked by another process
-						usleep(mt_rand(0,1000));
-					Cache::set($hash,TRUE);
-					self::putfile($temp,$text);
-					// Remove semaphore
-					Cache::clear($hash);
-				}
+				if (!is_file($temp))
+					self::mutex(
+						function() use($temp,$text) {
+							file_put_contents($temp,$text);
+						}
+					);
 				$file=$temp;
 			}
 		}
+		ob_start();
 		// Render
 		$this->sandbox($file);
 		return ob_get_clean();

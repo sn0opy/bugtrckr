@@ -38,8 +38,7 @@ class main extends F3instance {
         
         $this->set('BERROR', $this->doChecks());        
         $this->tpserve();
-    }
-    
+    }    
     
     function install() {
         $admname = $this->get('POST.name');

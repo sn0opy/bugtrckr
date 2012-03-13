@@ -12,7 +12,7 @@
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package ICU
-		@version 2.0.5
+		@version 2.0.9
 **/
 
 //! Language support tools
@@ -257,7 +257,8 @@ class ICU extends Base {
 				// Combine dictionaries and assign key/value pairs
 				F3::mset($trans);
 		}
-		if (!extension_loaded('intl'))
+		if (!extension_loaded('intl') &&
+			!isset($_SERVER['HTTP_ACCEPT_LANGUAGE']))
 			setlocale(LC_ALL,NULL);
 	}
 
@@ -273,13 +274,17 @@ class ICU extends Base {
 		if (extension_loaded('intl'))
 			return msgfmt_format_message(Locale::getDefault(),$str,
 				is_array($args)?$args:array($args));
+		foreach ($args as &$arg)
+			if (preg_match('/@\w+\b/',$arg))
+				$arg=self::resolve('{{'.$arg.'}}');
 		self::$locale=setlocale(LC_ALL,NULL);
 		if (preg_match('/\w+\b/',self::$vars['LANGUAGE'],$match))
 			setlocale(LC_ALL,self::$languages[$match[0]]);
 		$info=localeconv();
-		return preg_replace_callback(
+		$out=preg_replace_callback(
 			'/{(\d+)(?:,(\w+)(?:,(\w+))?)?}/',
 			function($expr) use($args,$info) {
+				extract($info);
 				$arg=$args[$expr[1]];
 				if (!isset($expr[2]))
 					return $arg;
@@ -288,15 +293,13 @@ class ICU extends Base {
 						switch ($expr[3]) {
 							case 'integer':
 								return number_format($arg,0,
-									$info['decimal_point'],
-									$info['thousands_sep']);
+									$decimal_point,$thousands_sep);
 							case 'currency':
-								return $info['currency_symbol'].
-									($info['p_sep_by_space']?' ':'').
-									number_format($arg,
-										$info['frac_digits'],
-										$info['mon_decimal_point'],
-										$info['mon_thousands_sep']);
+								return $currency_symbol.
+									($p_sep_by_space?' ':'').
+									number_format($arg,$frac_digits,
+										$mon_decimal_point,
+										$mon_thousands_sep);
 						}
 					else
 						return sprintf('%f',$arg);
@@ -309,6 +312,7 @@ class ICU extends Base {
 			$str
 		);
 		setlocale(LC_ALL,NULL);
+		return $out;
 	}
 
 }
