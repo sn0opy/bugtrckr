@@ -17,16 +17,15 @@ $phpver = explode('.', phpversion());
 if($phpver[0] < 5 && $phpver[1] < 3)
     die('Minimum PHP Version: 5.3');
 
-$app = require_once(__DIR__.'/lib/base.php');
-$app->set('AUTOLOAD', __DIR__.'/inc/|'.__DIR__.'/inc/models/');
+$app = require_once('../../lib/base.php');
+$app->set('AUTOLOAD', '../../inc/|../../inc/models/');
 $app->set('GUI','install/');
 $app->set('DEBUG', 3);
-$app->set('RELEASE', false);
 $app->set('LOCALES','install/lang/');
 $app->set('LANGUAGE', 'de');
-$app->route('GET /setup.php', 'main->start');
-$app->route('POST /setup.php', 'main->install');
-
+$app->route('GET /setup/index.php', 'main->start');
+$app->route('POST /setup/index.php', 'main->install');
+include 'sqlite.php';
 class main extends F3instance {
     function start() {
         $this->set('NEEDED', array(

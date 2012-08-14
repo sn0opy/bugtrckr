@@ -8,11 +8,11 @@
 	compliance with the license. Any of the license terms and conditions
 	can be waived if you get permission from the copyright holder.
 
-	Copyright (c) 2009-2011 F3::Factory
+	Copyright (c) 2009-2012 F3::Factory
 	Bong Cosca <bong.cosca@yahoo.com>
 
 		@package Template
-		@version 2.0.9
+		@version 2.0.12
 **/
 
 //! Template engine
@@ -29,9 +29,11 @@ class Template extends Base {
 			@param $file string
 			@param $mime string
 			@param $globals boolean
+			@param $syms array
 			@public
 	**/
-	static function serve($file,$mime='text/html',$globals=TRUE) {
+	static function serve($file,
+		$mime='text/html',$globals=TRUE,$syms=array()) {
 		$file=self::resolve($file);
 		$found=FALSE;
 		foreach (preg_split('/[\|;,]/',self::$vars['GUI'],0,
@@ -59,7 +61,7 @@ class Template extends Base {
 		else {
 			// Parse raw template
 			$doc=new F3markup($mime,$globals);
-			$text=$doc->load(self::getfile($view));
+			$text=$doc->load(self::getfile($view),$syms);
 			if (self::$vars['CACHE'] && $doc::$cache)
 				// Save PHP-compiled template to cache
 				Cache::set($hash,$text);
@@ -69,7 +71,7 @@ class Template extends Base {
 		ob_start();
 		if (ini_get('allow_url_fopen') && ini_get('allow_url_include'))
 			// Stream wrap
-			$instance->sandbox('data:text/plain,'.urlencode($text));
+			$instance->sandbox('data:text/plain,'.urlencode($text),$syms);
 		else {
 			// Save PHP-equivalent file in temporary folder
 			if (!is_dir(self::$vars['TEMP']))
@@ -87,7 +89,7 @@ class Template extends Base {
 				// Remove semaphore
 				Cache::clear($hash);
 			}
-			$instance->sandbox($temp);
+			$instance->sandbox($temp,$syms);
 		}
 		$out=ob_get_clean();
 		unset($instance);
@@ -149,10 +151,10 @@ class F3markup extends Base {
 							return FALSE;
 						}
 						$isfunc=isset($var[2]) && $var[2];
-						if (in_array($match[1],$syms))
+						if (array_key_exists('_'.$match[1],$syms))
 							return '$_'.$self::remix($var[1]).
-								($isfunc?$var[2]:'');
-						$str='F3::get('.var_export($var[1],TRUE).')';
+								($isfunc?$self->expr('{{'.$var[2].'}}'):'');
+						$str='$this->get('.$self::stringify($var[1]).')';
 						if ($isfunc) {
 							preg_match_all($regex,$var[2],$parts,
 								PREG_SET_ORDER);
@@ -165,8 +167,14 @@ class F3markup extends Base {
 							}
 							else
 								$args=$var[2];
+							if (isset($match[2]) &&
+								method_exists(F3::get($match[1]),
+								$temp=str_replace('->','',$match[2])))
+								$str='array($this->get('.
+									self::stringify($match[1]).'),'.
+									self::stringify($temp).')';
 							$str='call_user_func_array('.
-								$str.',array'.$args.')';
+								'$_'.$match[1].'='.$str.',array'.$args.')';
 						}
 						elseif (isset($var[3]))
 							$str=str_replace(')',',array('.
@@ -174,8 +182,11 @@ class F3markup extends Base {
 						if (!$match[2] &&
 							!preg_match('/('.$self::PHP_Globals.')\b/',
 								$match[1])) {
-							$syms[]=$match[1];
-							$str='($_'.$match[1].'='.$str.')';
+							if (!$isfunc)
+								$str='($_'.$match[1].
+									(array_key_exists('_'.$match[1],$syms)?
+										'':('='.$str)).')';
+							$syms['_'.$match[1]]=NULL;
 						}
 						return $str;
 					},
@@ -249,16 +260,46 @@ class F3markup extends Base {
 							$file=self::resolve($hvar);
 							if ($hvar!=$file)
 								self::$cache=FALSE;
-							foreach (self::split(self::$vars['GUI']) as $gui)
-								if (is_file($view=$gui.$file)) {
-									$text=$doc->load(
-										self::getfile($view),$this->syms
-									);
-									$out.=isset($ival)?
-										('<?php if ('.trim($cond).'): ?>'.
-											$text.'<?php endif; ?>'):$text;
-									break;
-								}
+							$nested=FALSE;
+							foreach (array_keys($this->syms) as $pvar)
+								if (strstr($hvar,$pvar))
+									$nested=TRUE;
+							if ($nested) {
+								$inc_var=preg_split("/[\s]*[}}{{][\s]*/i",
+									$hvar,-1,PREG_SPLIT_NO_EMPTY);
+								foreach ($inc_var as &$pval)
+									if ($pval[0]=='@')
+										$pval=preg_replace(
+											array(
+												'/<\?php echo /',
+												'/; \?>/'
+											),'',
+											self::expr('{{'.$pval.'}}')
+										);
+									else
+										$pval=self::stringify($pval);
+								$text='<?php echo Template::serve('.
+									implode('.',$inc_var).',\'text/html\','.
+									'TRUE,'.self::stringify($this->syms).
+									'); ?>';
+								$out.= isset($ival)?
+									('<?php if ('.trim($cond).'): ?>'.$text.
+									'<?php endif; ?>'):$text;
+							}
+							else
+								foreach (self::split(self::$vars['GUI'])
+									as $gui)
+									if (is_file($view=$gui.$file)) {
+										$text=$doc->load(
+											self::getfile($view),
+											$this->syms
+										);
+										$out.=isset($ival)?
+											('<?php if ('.trim($cond).'): ?>'.
+												$text.'<?php endif; ?>'):
+											$text;
+										break;
+									}
 							break;
 						case 'loop':
 							// <loop> directive
@@ -280,7 +321,7 @@ class F3markup extends Base {
 								}
 							}
 							unset($nval['@attrib']);
-							$this->syms[]=$cvar;
+							$this->syms['_'.$cvar]=eval('return '.$fstr.';');
 							$out.='<?php for ('.
 								'$_'.$cvar.'='.$fstr.';'.
 								'$_'.$cvar.'<='.$tstr.';'.
@@ -320,13 +361,13 @@ class F3markup extends Base {
 							}
 							unset($nval['@attrib']);
 							if (isset($vvar))
-								$this->syms[]=$vvar;
+								$this->syms['_'.$vvar]=NULL;
 							else
 								$vvar=self::hash($gvar);
 							if (isset($kvar))
-								$this->syms[]=$kvar;
+								$this->syms['_'.$kvar]=NULL;
 							if (isset($cvar))
-								$this->syms[]=$cvar;
+								$this->syms['_'.$cvar]=NULL;
 							$out.='<?php '.
 								(isset($cvar)?('$_'.$cvar.'=0; '):'').
 								'if (is_array('.$gstr.')):'.
@@ -378,11 +419,15 @@ class F3markup extends Base {
 							break;
 						case 'false':
 							// <false> block of <check> directive
-							$out.='<?php else: ?>'.$this->build($nval);
+							$out.='<?php else: ?>'.
+								$this->build($nval);
 							break;
 					}
 					// Reset scope
-					$this->syms=array_slice($this->syms,0,$count);
+					while (count($this->syms)>$count) {
+						end($this->syms);
+						unset($this->syms[key($this->syms)]);
+					}
 				}
 		}
 		else
@@ -397,9 +442,8 @@ class F3markup extends Base {
 			@param $syms array
 			@public
 	**/
-	function load($text,array $syms=NULL) {
-		if ($syms)
-			$this->syms=$syms;
+	function load($text,array $syms=array()) {
+		$this->syms=$syms;
 		// Remove PHP code and alternative exclude-tokens
 		$text=preg_replace(
 			'/<\?(?:php)?.+?\?>|{{\*.+?\*}}/is','',$text);

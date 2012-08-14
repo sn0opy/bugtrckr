@@ -1,7 +1,3 @@
-**Information:** We stopped developing *this* version of Bugtrckr and moved it to a "company project" including a whole rewrite. 
-
-**[bucketday/bugtrckr](https://github.com/bucketday/bugtrckr)**
-
 This version is mostly full functional and we even used it as our productive bug tracking system.
 
 # bugtrckr
@@ -23,8 +19,8 @@ Features:
 * SQLite or MySQL
 
 ## Bugtrckr-Team
-* Sascha 'sn0opy' Ohms 
-* Phillipp 'hanspolo' Hirsch
+* Sascha Ohms 
+* Phillipp Hirsch
 
 ## License & Copyright
 Copyright 2012, Bugtrckr-Team

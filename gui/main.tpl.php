@@ -1,13 +1,13 @@
 <!doctype html>
 <html>
     <head>
-    <meta charset="UTF-8" />
-            <link href="{{@BASE}}/gui/css/style.css" rel="stylesheet" type="text/css" />
-            <title>{{@pageTitle}} - Bugtrckr</title>
+		<meta charset="UTF-8" />
+		<link href="{{@BASE}}/css/style.css" rel="stylesheet" type="text/css" />
+		<title>{{@pageTitle}} - Bugtrckr</title>
 
-    <script type="text/javascript" src="{{@BASE}}/gui/js/jquery.js"></script>
-    <script type="text/javascript" src="{{@BASE}}/gui/js/jquery.tablesorter.js"></script>
-    <script type="text/javascript" src="{{@BASE}}/gui/js/bugtrckr.js"></script>
+		<script type="text/javascript" src="{{@BASE}}/js/jquery.js"></script>
+		<script type="text/javascript" src="{{@BASE}}/js/jquery.tablesorter.js"></script>
+		<script type="text/javascript" src="{{@BASE}}/js/bugtrckr.js"></script>
     </head>
 
     <body>

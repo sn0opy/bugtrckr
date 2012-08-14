@@ -8,35 +8,34 @@
  * @package Index
  * @author Sascha Ohms
  * @author Philipp Hirsch
- * @copyright Copyright 2011, Bugtrckr-Team
+ * @copyright Copyright 2012, Bugtrckr-Team
  * @license http://www.gnu.org/licenses/lgpl.txt
  *   
 **/
 
-$app = require(__DIR__.'/lib/base.php');
+$app = require '../lib/base.php';
 
-if(!file_exists('data/config.inc.php')) {
-    echo '<a href="' . F3::get('BASE') . '/setup.php">Setup</a>';
+if(!file_exists('../data/config.inc.php')) {
+    echo '<a href="' . $app->get('BASE') . '/setup">Setup</a>';
     exit;
 }
 
-$app->set('RELEASE', false);
 $app->set('CACHE', false);
 $app->set('DEBUG', 3);
-$app->set('EXTEND', true);
-$app->set('GUI','gui/');
-$app->set('AUTOLOAD', 'inc/|inc/models/');
-$app->set('LOCALES','lang/');
-$app->set('PROXY', true);
+$app->set('GUI','../gui/');
+$app->set('AUTOLOAD', '../inc/|../inc/models/');
+$app->set('TEMP', '../temp/');
+$app->set('LOCALES','../lang/');
 $app->set('LANGUAGE', 'de'); // currently forcing to German
 
-require_once('data/config.inc.php');
+include '../data/config.inc.php';
 
 // Template functions
 $app->set('getPermission', function($permission) {
     $helper = new \misc\helper();
     return $helper->getPermission($permission);
 });
+
 
 $app->route('GET /', 'misc\main->start');
 $app->route('GET /roadmap', '\milestone\view->showRoadmap');
