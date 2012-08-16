@@ -1,23 +1,23 @@
 <?php
 
 /**
- * milestone.php
+ * user\model.php
  * 
  * wrapper class for Axon
  * 
- * @package Milestone
+ * @package User
  * @author Sascha Ohms
  * @author Philipp Hirsch
  * @copyright Copyright 2011, Bugtrckr-Team
  * @license http://www.gnu.org/licenses/lgpl.txt
  *   
 */
-namespace milestone;
+namespace models;
 
-class model extends \Axon 
+class User extends \Axon 
 {
     public function __construct()
     {
-        $this->sync('Milestone');		
+        $this->sync('User');
     }
 }

@@ -13,7 +13,9 @@
  *   
 */
 
-class Activity extends Axon
+namespace models;
+
+class Activity extends \Axon
 {
     public function __construct()
     {

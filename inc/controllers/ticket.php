@@ -1,20 +1,17 @@
 <?php
 
 /**
- * ticket\controller.php
- * 
  * Ticket controller
  * 
- * @package ticket
  * @author Sascha Ohms
  * @author Philipp Hirsch
  * @copyright Copyright 2011, Bugtrckr-Team
  * @license http://www.gnu.org/licenses/lgpl.txt
  *   
  */
-namespace ticket;
+namespace controllers;
 
-class controller extends \misc\controller
+class Ticket extends \controllers\Controller
 {
 
     /**
@@ -25,7 +22,7 @@ class controller extends \misc\controller
         if (!\misc\helper::getPermission('iss_addIssues'))
             return $this->tpfail($this->get('lng.insuffPermissions'));
 
-        $ticket = new \ticket\model();
+        $ticket = new \models\Ticket();
         $ticket->hash = \misc\helper::getFreeHash('Ticket');
         $ticket->title = $this->get('POST.title');
         $ticket->description = $this->get('POST.description');
@@ -60,7 +57,7 @@ class controller extends \misc\controller
 
         $hash = $this->get('PARAMS.hash');
 
-        $ticket = new \ticket\model();
+        $ticket = new \models\Ticket();
         $ticket->load(array('hash = :hash', array(':hash' => $hash)));
 
         $changed = '';
@@ -95,5 +92,92 @@ class controller extends \misc\controller
         \misc\helper::addActivity($this->get('lng.ticket') . " '" .$ticket->title. "' " .$this->get('lng.edited'), $ticket->hash, $this->get('POST.comment'), json_encode($changed));
         
        $this->reroute('/ticket/'.$hash);
+    }
+	
+	/**
+	 *	Show a list of tickets of the project
+	 */
+    function showTickets()
+    {
+		if (!ctype_alnum($this->get('SESSION.project')))
+			return $this->tpfail($this->get('lng.noProject'));
+
+		if (!\misc\helper::canRead($this->get('SESSION.project')))
+			return $this->tpfail($this->get('lng.insuffPermissions'));
+
+        $order = 'created';
+		$search = '';
+        
+		if ($this->exists('SESSION.ticketSearch'))
+			$search = $this->get('SESSION.ticketSearch');
+
+		if($this->exists('POST.search'))
+			$search = $this->get('POST.search');
+
+        $this->set('SESSION.ticketOrder', $order);
+		$this->set('SESSION.ticketSearch', $search);
+        
+        $project = $this->get('SESSION.project');
+
+        $milestones = new \models\Milestone();
+        $milestones = $milestones->find(array('project = :project', array(':project' => $project)));
+
+        $mshashs = array();
+        foreach ($milestones as $ms)
+            $mshashs[] = $ms->hash;
+        $string = implode($mshashs, '\',\'');
+
+        $tickets = new \models\Displayableticket();
+        $tickets = $tickets->find('milestone IN (\'' . $string . '\') AND ' .
+                    'title LIKE \'%'.$search.'%\'' .
+                    'ORDER BY ' . $order. ' DESC');
+
+        $categories = new \models\Category();
+        $categories = $categories->find();
+
+        $this->set('milestones', $milestones);
+        $this->set('tickets', $tickets);
+        $this->set('categories', $categories);
+        $this->set('pageTitle', '{{@lng.tickets}}');
+        $this->set('template', 'tickets.tpl.php');
+        $this->set('onpage', 'tickets');
+        $this->tpserve();
+    }
+
+    /**
+     *	Show the details of a ticket 
+     */
+    function showTicket()
+	{
+        $hash = $this->get('PARAMS.hash');
+
+        $ticket = new \models\Displayableticket();
+        $ticket->load(array("tickethash = :hash", array(':hash' => $hash)));
+
+        if($ticket->dry())
+            return $this->tpfail($this->get('lng.noTicket'));
+
+		if (!\misc\helper::canRead($this->get('SESSION.project')))
+			return $this->tpfail($this->get('lng.insuffPermissions'));
+
+        $milestone = new \models\Milestone();
+
+        $activities = new \models\DisplayableActivity();
+        $activities = $activities->find(array("ticket = :ticket", array(':ticket' => $ticket->hash)));
+
+        foreach($activities as $key => $activity) {
+            $activities[$key]->changedFields = json_decode($activity->changedFields);
+        }
+
+        $users = new \models\User();
+        
+        $this->set('ticket', $ticket);
+        $this->set('milestones', $milestone->find());
+        $this->set('activities', $activities);        
+        $this->set('users', $users = $users->find());
+        $this->set('pageTitle', '{{@lng.tickets}} › ' .$ticket->title);
+        $this->set('template', 'ticket.tpl.php');
+        $this->set('onpage', 'tickets');
+        $this->tpserve();
     }
 }

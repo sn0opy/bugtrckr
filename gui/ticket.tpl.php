@@ -1,4 +1,4 @@
-<h2>{{@lng.tickets}} › {{@ticket->title}} <span class="hash">#{{@ticket->tickethash}}</span></h2>
+<h2>{{@lng.tickets}} › {{@ticket->title}}</h2>
 
 <div class="ticket">
     <table class="ticket">

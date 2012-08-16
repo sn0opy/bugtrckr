@@ -22,7 +22,7 @@ if(!file_exists('../data/config.inc.php')) {
 
 $app->set('CACHE', false);
 $app->set('DEBUG', 3);
-$app->set('GUI','../gui/');
+$app->set('GUI','../gui/'); 
 $app->set('AUTOLOAD', '../inc/|../inc/models/');
 $app->set('TEMP', '../temp/');
 $app->set('LOCALES','../lang/');
@@ -30,7 +30,6 @@ $app->set('LANGUAGE', 'de'); // currently forcing to German
 
 include '../data/config.inc.php';
 
-// Template functions
 $app->set('getPermission', function($permission) {
     $helper = new \misc\helper();
     return $helper->getPermission($permission);
@@ -38,47 +37,47 @@ $app->set('getPermission', function($permission) {
 
 
 $app->route('GET /', 'misc\main->start');
-$app->route('GET /roadmap', '\milestone\view->showRoadmap');
-$app->route('GET /timeline', '\timeline\view->showTimeline');
-$app->route('GET /tickets', '\ticket\view->showTickets');
-$app->route('GET /ticket/@hash', '\ticket\view->showTicket');
-$app->route('GET /user/@name', '\user\view->showUser');
-$app->route('GET /user/new', '\user\view->showUserRegister');
-$app->route('GET /user/login', '\user\view->showUserLogin');
-$app->route('GET /milestone/@hash', '\milestone\view->showMilestone');
-$app->route('GET /project/add', 'project\view->showAddProject');
-$app->route('GET /project/settings', 'project\view->showProjectSettings');
-$app->route('GET /project/settings/role/@hash', 'project\view->showProjectSettingsRole');
-$app->route('GET /project/settings/role/add', 'project\view->showAddRole');
-$app->route('GET /project/settings/milestone/@hash', 'project\view->showProjectSettingsMilestone');
-$app->route('GET /project/settings/milestone/add', 'project\view->showAddMilestone');
-$app->route('GET /project/settings/category/add', 'project\view->showAddCategory');
-$app->route('GET /project/settings/category/edit/@hash', 'project\view->showEditCategory');
-$app->route('GET /project/settings/role/delete/@hash', 'project\view->deleteRole');
-$app->route('GET /project/settings/milestone/delete/@hash', 'milestone\controller->deleteMilestone');
-$app->route('GET /project/settings/category/delete/@hash', 'project\controller->deleteCategory');
-$app->route('GET /wiki/@title', '\wiki\view->showEntry');
-$app->route('GET /wiki', '\wiki\view->showEntry');
-$app->route('GET /wiki/discussion/@hash', '\wiki\view->showDiscussion');
+$app->route('GET /roadmap', '\controllers\milestone->showRoadmap');
+$app->route('GET /timeline', '\controllers\timeline->showTimeline');
+$app->route('GET /tickets', '\controllers\ticket->showTickets');
+$app->route('GET /ticket/@hash', '\controllers\ticket->showTicket');
+$app->route('GET /user/@name', '\controllers\user->showUser');
+$app->route('GET /user/new', '\controllers\user->showUserRegister');
+$app->route('GET /user/login', '\controllers\user->showUserLogin');
+$app->route('GET /milestone/@hash', '\controllers\milestone->showMilestone');
+$app->route('GET /project/add', '\controllers\project->showAddProject');
+$app->route('GET /project/settings', '\controllers\project->showProjectSettings');
+$app->route('GET /project/settings/role/@hash', '\controllers\project->showProjectSettingsRole');
+$app->route('GET /project/settings/role/add', '\controllers\project->showAddRole');
+$app->route('GET /project/settings/milestone/@hash', '\controllers\project->showProjectSettingsMilestone');
+$app->route('GET /project/settings/milestone/add', '\controllers\project->showAddMilestone');
+$app->route('GET /project/settings/category/add', '\controllers\project->showAddCategory');
+$app->route('GET /project/settings/category/edit/@hash', '\controllers\project->showEditCategory');
+$app->route('GET /project/settings/role/delete/@hash', '\controllers\project->deleteRole');
+$app->route('GET /project/settings/milestone/delete/@hash', '\controllers\milestone->deleteMilestone');
+$app->route('GET /project/settings/category/delete/@hash', '\controllers\project->deleteCategory');
+$app->route('GET /wiki/@title', '\controllers\wiki->showEntry');
+$app->route('GET /wiki', '\controllers\wiki->showEntry');
+$app->route('GET /wiki/discussion/@hash', '\controllers\wiki->showDiscussion');
 
-$app->route('GET /user/logout', '\user\controller->logoutUser');
-$app->route('POST /search', '\ticket\view->showTickets');
+$app->route('GET /user/logout', '\controllers\user->logoutUser');
+$app->route('POST /search', '\controllers\ticket->showTickets');
 $app->route('POST /project/select', 'misc\main->selectProject');
-$app->route('POST /user/login', '\user\controller->loginUser');
-$app->route('POST /user/new', '\user\controller->registerUser');
-$app->route('POST /ticket', '\ticket\controller->addTicket');
-$app->route('POST /ticket/@hash', '\ticket\controller->editTicket');
-$app->route('POST /project/add', '\project\controller->projectAdd');
-$app->route('POST /project/settings/member/setrole', '\project\controller->projectSetRole');
-$app->route('POST /project/settings/category/add', '\project\controller->addEditCategory');
-$app->route('POST /project/settings/category/edit', '\project\controller->addEditCategory');
-$app->route('POST /project/settings/role/edit', '\project\controller->addEditRole');
-$app->route('POST /project/settings/main/edit', '\project\controller->projectEditMain');
-$app->route('POST /project/settings/milestone/edit', '\milestone\controller->addEditMilestone');
-$app->route('POST /project/settings/member/add', '\project\controller->projectAddMember');
-$app->route('POST /project/setttings/member/delete', '\project\controller->projectDelMember');
-$app->route('POST /wiki', '\wiki\controller->editEntry');
-$app->route('POST /wikidiscussion', '\wiki\controller->addDiscussion');
+$app->route('POST /user/login', '\controllers\user->loginUser');
+$app->route('POST /user/new', '\controllers\user->registerUser');
+$app->route('POST /ticket', '\controllers\ticket->addTicket');
+$app->route('POST /ticket/@hash', '\controllers\ticket->editTicket');
+$app->route('POST /project/add', '\controllers\project->projectAdd');
+$app->route('POST /project/settings/member/setrole', '\controllers\project->projectSetRole');
+$app->route('POST /project/settings/category/add', '\controllers\project->addEditCategory');
+$app->route('POST /project/settings/category/edit', '\controllers\project->addEditCategory');
+$app->route('POST /project/settings/role/edit', '\controllers\project->addEditRole');
+$app->route('POST /project/settings/main/edit', '\controllers\project->projectEditMain');
+$app->route('POST /project/settings/milestone/edit', '\controllers\milestone->addEditMilestone');
+$app->route('POST /project/settings/member/add', '\controllers\project->projectAddMember');
+$app->route('POST /project/setttings/member/delete', '\controllers\project->projectDelMember');
+$app->route('POST /wiki', '\controllers\wiki->editEntry');
+$app->route('POST /wikidiscussion', '\controllers\wiki->addDiscussion');
 
 $app->run();
 

@@ -1,27 +1,24 @@
 <?php
 
 /**
- * controller.php
- * 
  * Main controller class
  * 
- * @package controller
  * @author Sascha Ohms
  * @author Philipp Hirsch
  * @copyright Copyright 2011, Bugtrckr-Team
  * @license http://www.gnu.org/licenses/lgpl.txt
  *   
  */
-namespace misc;
+namespace controllers;
 
-class controller extends \F3instance
+class Controller extends \F3instance
 {
     /**
      * 
      */
     protected function tpserve()
     {
-        $project = new \project\model;
+        $project = new \models\Project();
         $projects = $project->find();
         $this->set('projects', $projects);
         

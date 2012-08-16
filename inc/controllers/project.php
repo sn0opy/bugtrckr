@@ -1,24 +1,21 @@
 <?php
 
 /**
- * project\controller.php
- * 
  * Project controller for different settings
- * 
- * @package Main
+ *
  * @author Sascha Ohms
  * @author Philipp Hirsch
  * @copyright Copyright 2011, Bugtrckr-Team
  * @license http://www.gnu.org/licenses/lgpl.txt
  *   
  */
-namespace project;
+namespace controllers;
 
-class controller extends \misc\controller
+class Project extends \controllers\Controller
 {
     function projectAddMember()
     {
-        $helper = new \misc\helper;
+        $helper = new \misc\helper();
         
         if (!$helper->getPermission('proj_manageMembers'))
         {
@@ -30,7 +27,7 @@ class controller extends \misc\controller
         $userHash = $this->get('POST.member');
         $roleHash = $this->get('POST.role');
 
-        $role = new \role\model();
+        $role = new \models\Role();
         $role->load(array('hash = :hash', array(':hash' => $roleHash)));
 
         if ($role->dry())
@@ -39,7 +36,7 @@ class controller extends \misc\controller
             return;
         }
 
-        $user = new \user\model();
+        $user = new \models\User();
         $user->load(array('hash = :hash', array(':hash' => $userHash)));
 
         if ($user->dry())
@@ -48,9 +45,8 @@ class controller extends \misc\controller
             return;
         }
 
-        $projPerms = new \projPerms\model();
-        $projPerms->load(array('user = :user AND project = :project',
-            array(':user' => $user->hash, ':project' => $projectHash)));
+        $projPerms = new \models\projPerms();
+        $projPerms->load(array('user = :user AND project = :project', array(':user' => $user->hash, ':project' => $projectHash)));
 
         if (!$projPerms->dry())
         {
@@ -79,7 +75,7 @@ class controller extends \misc\controller
         $userHash = $this->get('POST.user');
         $projectHash = $this->get('SESSION.project');
 
-        $user = new \user\model();
+        $user = new \models\User();
         $user->load(array('hash = :hash', array(':hash' => $userHash)));
 
         if ($user->dry())
@@ -88,7 +84,7 @@ class controller extends \misc\controller
             return;
         }
 
-        $projPerms = new \projPerms\model();
+        $projPerms = new \models\projPerms();
         $projPerms->load(array('user = :user AND project = :project', array(':user' => $user->hash, ':project' => $projectHash)));
         $projPerms->erase();
 
@@ -109,13 +105,13 @@ class controller extends \misc\controller
 
         $projectHash = $this->get('SESSION.project');
 
-        $user = new \user\model();
+        $user = new \models\User();
         $user->load(array('hash = :hash', array(':hash' => $this->get('POST.user'))));
 
         if (!$user->hash)
             return $this->tpfail($this->get('lng.gettingUserFail'));
 
-        $role = new \role\model();
+        $role = new \models\Role();
         $role->load(array('hash = :hash', array(':hash' => $this->get('POST.role'))));
 
         if (!$role->hash)
@@ -124,7 +120,7 @@ class controller extends \misc\controller
         if ($role->project != $projectHash)
             return $this->tpfail($this->get('lng.roleDoesNotBelong'));
 
-        $perms = new \projPerms\model();
+        $perms = new \models\projPerms();
         $perms->load(array('project = :proj AND user = :user',
             array(':proj' => $projectHash, ':user' => $user->hash)));
         $perms->role = $role->hash;
@@ -144,13 +140,13 @@ class controller extends \misc\controller
 
         $msHash = $this->get('PARAMS.hash');
 
-        $milestone = new \milestone\model();
+        $milestone = new \models\Milestone();
         $milestone->load(array('hash = :hash', array(':hash' => $msHash)));
 
         if (!$milestone->hash)
             return $this->tpfail($this->get('lng.gettingMSFail'));
 
-        $tickets = new \ticket\model();
+        $tickets = new \models\Ticket();
         $count = $tickets->found(array('milestone = :ms', array(':ms' => $milestone->hash)));
 
         if ($count > 0)
@@ -167,7 +163,7 @@ class controller extends \misc\controller
     {
         $roleHash = $this->get('POST.hash') ? $this->get('POST.hash') : \misc\helper::getFreeHash('Role');
 
-        $role = new \role\model();
+        $role = new \models\Role();
         if ($this->exists('POST.hash'))
         {
             $role->load(array('hash = :hash', array(':hash' => $roleHash)));
@@ -230,7 +226,7 @@ class controller extends \misc\controller
 		if (!\misc\helper::getPermission('proj_editProject'))
 			return $this->tpfail($this->get('lng.insuffPermissions'));
 
-        $category = new \category\model();
+        $category = new \models\Category();
 
         if ($this->get('POST.hash') != "")
             $category->load(array('hash = :hash', array(':hash' => $this->get('POST.hash'))));
@@ -297,13 +293,13 @@ class controller extends \misc\controller
         $cmain = new \misc\main();
         $cmain->selectProject($hash, false);
         
-        $perms = new \projPerms\model();
+        $perms = new \models\projPerms();
         $perms->user = $this->get('SESSION.user.hash');
         $perms->project = $hash;
         $perms->role = $this->addEditRole($hash);
         $perms->save();
         
-        $milestone = new \milestone\controller;
+        $milestone = new \controller\Milestone();
         $milestone->addEditMilestone($hash);
         
         $this->addEditCategory($hash, $this->get('lng.uncategorized'));
@@ -321,7 +317,7 @@ class controller extends \misc\controller
 		if (!\misc\helper::getPermission('proj_editProject'))
 			return $this->tpfail($this->get('lng.insuffPermissions'));
 
-        $project = new \project\model();
+        $project = new \models\Project();
         $project->load(array('hash = :hash', array(':hash' => $this->get('SESSION.project'))));
         $project->name = $this->get('POST.name');
         $project->public = $this->get('POST.public')=='on';
@@ -335,5 +331,171 @@ class controller extends \misc\controller
         }
 
         $this->reroute('/project/settings');
+    }
+	
+    /**
+     * 
+     */
+    function showProjectSettings()
+    {
+        $projectHash = $this->get('SESSION.project');
+
+        if($projectHash != "") {      
+            $project = new \models\Project();
+            $project->load(array('hash = :hash', array(':hash' => $projectHash)));
+
+            $role = new \models\Role();
+            $roles = $role->find(array('project = :hash', array(':hash' => $projectHash)));
+
+            $projPerms = new \models\UserPerms();
+            $projPerms = $projPerms->find(array('project = :hash', array(':hash' => $projectHash)));
+
+
+            $milestone = new \models\Milestone();
+            $milestones = $milestone->find(array('project = :hash', array(':hash' => $projectHash)));
+
+            // TODO: this here is wrong!
+            $user = new \models\User();
+            $users = $user->find();
+
+            $categories = new \models\Category();
+            $categories = $categories->find();
+
+            if (!$project->hash)
+            {
+                $this->tpfail($this->get('lng.openProjectFail'));
+                return;
+            }
+
+            $this->set('users', $users);
+            $this->set('projMilestones', $milestones);
+            $this->set('projRoles', $roles);
+            $this->set('projMembers', $projPerms);
+            $this->set('projDetails', $project);
+            $this->set('projCategories', $categories);
+            $this->set('template', 'projectSettings.tpl.php');
+            $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}}');
+            $this->set('onpage', 'settings');
+            $this->tpserve();
+        } else {
+            $this->set('SESSION.FAILURE', $this->get('lng.noProject'));
+            $this->set('template', 'projectSettings.tpl.php');
+            $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}}');
+            $this->tpserve();
+        }
+    }
+    
+    /**
+     * 
+     */
+    function showProjectSettingsRole()
+    {
+        $roleHash = $this->get('PARAMS.hash');
+
+        $role = new \role\model();
+        $role->load(array('hash = :hash', array(':hash' => $roleHash)));
+
+        if (!$role->hash)
+        {
+            $this->tpfail("Failure while getting Role");
+            return;
+        }
+
+        $this->set('roleData', $role);
+        $this->set('template', 'projectSettingsRole.tpl.php');
+        $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.role}} › {{@roleData->name}}');
+        $this->set('onpage', 'settings');
+        $this->tpserve();
+    }
+
+    
+    /**
+     * 
+     */
+    function showProjectSettingsMilestone()
+    {
+        $msHash = $this->get('PARAMS.hash');
+
+        $milestone = new \models\Milestone();
+        $milestone->load(array('hash = :hash', array(':hash' => $msHash)));
+
+        if (!$milestone->hash)
+        {
+            $this->tpfail($this->get('lng.gettingMSFail'));
+            return;
+        }
+
+        $this->set('msData', $milestone);
+        $this->set('template', 'projectSettingsMilestone.tpl.php');
+        $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.milestone}} › {{@msData->name}}');
+        $this->set('onpage', 'settings');
+        $this->tpserve();
+    }
+    
+
+    /**
+     * 
+     */
+    function showAddRole()
+    {
+        $this->set('template', 'projectSettingsRoleAdd.tpl.php');
+        $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.addrole}}');
+        $this->set('onpage', 'settings');
+        $this->tpserve();
+    }
+
+    /**
+     * 
+     */
+    function showAddMilestone()
+    {
+        $this->set('today', date('Y-m-d', time()));
+        $this->set('template', 'projectSettingsMilestoneAdd.tpl.php');
+        $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.addmilestone}}');
+        $this->set('onpage', 'settings');
+        $this->tpserve();
+    }
+
+    /**
+     * 
+     */
+    function showAddCategory()
+    {
+        $this->set('template', 'projectSettingsCategoryAdd.tpl.php');
+        $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.addcategory}}');
+        $this->set('onpage', 'settings');
+        $this->tpserve();
+    }
+
+    /**
+     *
+     */
+    function showEditCategory()
+    {
+        $hash = $this->get('PARAMS.hash');
+
+        $category = new \models\Category();
+        $category->load(array('hash = :hash', array(':hash' => $hash)));
+
+        $this->set('category', $category);
+        $this->set('template', 'projectSettingsCategoryEdit.tpl.php');
+        $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.editcategory}}');
+        $this->set('onpage', 'settings');
+        $this->tpserve();
+
+    }
+    
+    /**
+     * 
+     */
+    function showAddProject()
+    {
+		if (!\misc\helper::getPermission('proj_editProject'))
+			return $this->tpfail($this->get('lng.insuffPermissions'));			
+
+        $this->set('template', 'projectAdd.tpl.php');
+        $this->set('pageTitle', '{{@lng.project}} › {{@lng.add}}');
+        $this->set('onpage', 'settings');
+        $this->tpserve();
     }
 }

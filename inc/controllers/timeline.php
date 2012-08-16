@@ -1,23 +1,20 @@
 <?php
 
 /**
- * timeline\view.php
+ * Timeline Controller
  * 
- * timeline controller
- * 
- * @package timeline
  * @author Sascha Ohms
  * @author Philipp Hirsch
  * @copyright Copyright 2011, Bugtrckr-Team
  * @license http://www.gnu.org/licenses/lgpl.txt
  *   
  */
-namespace timeline;
+namespace controllers;
 
-class view extends \misc\controller
+class Timeline extends \controllers\Controller
 {
 
-    /**
+	/**
      *	Show all activities of a project
      */
     function showTimeline()
@@ -32,7 +29,7 @@ class view extends \misc\controller
 
         $project = $this->get('SESSION.project');
 
-        $activities = new \activity\displayable();
+        $activities = new \models\DisplayableActivity();
         $activities = $activities->find(array("project = :proj", array(':proj' => $project)));
 
         $this->set('activities', $activities);
@@ -41,5 +38,5 @@ class view extends \misc\controller
         $this->set('onpage', 'timeline');
         $this->tpserve();
     }
-
+	
 }

@@ -1,23 +1,24 @@
 <?php
 
 /**
- * activity.php
+ * projPerms\projectpermission.php
  * 
  * wrapper class for Axon
  * 
- * @package Acivity
+ * @package ProjectPermission
  * @author Sascha Ohms
  * @author Philipp Hirsch
  * @copyright Copyright 2011, Bugtrckr-Team
  * @license http://www.gnu.org/licenses/lgpl.txt
  *   
 */
-namespace activity;
 
-class model extends \Axon
+namespace models;
+
+class projPerms extends \Axon
 {
     public function __construct()
     {
-        $this->sync('Activity');
+        $this->sync('ProjectPermission');
     }
 }

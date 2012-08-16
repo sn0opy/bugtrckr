@@ -1,22 +1,25 @@
 <?php
 
+
 /**
- * wiki\wikidiscussion.php
+ * user_perms\model.php
  * 
- * @package Wiki
+ * wrapper class for Axon (table is a VIEW)
+ * 
+ * @package User_Perms
  * @author Sascha Ohms
  * @author Philipp Hirsch
  * @copyright Copyright 2011, Bugtrckr-Team
  * @license http://www.gnu.org/licenses/lgpl.txt
  *   
- */
+*/
 
-namespace wiki;
+namespace models;
 
-class WikiDiscussion extends \Axon
+class UserPerms extends \Axon 
 {
     public function __construct()
     {
-        $this->sync('WikiDiscussion');
+        $this->sync('user_perms');
     }
 }

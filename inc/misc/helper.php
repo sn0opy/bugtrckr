@@ -68,19 +68,19 @@ class helper extends \F3instance
         
         if ($userHash)
         {
-            $user = new \user\model();
+            $user = new \models\User();
             $user->load(array('hash = :hash', array(':hash' => $userHash)));
 
             if($user->admin) // admin has access to everything
                 return true;
             
-            $projPerm = new \userPerms\model();
+            $projPerm = new \models\UserPerms();
             $permissions = $projPerm->findone(array('user = :user AND project = :project', array(':user' => $userHash, ':project' => $projectHash)));
             
 			if($permissions == null)
 				return false;
 
-            $role = new \role\model();
+            $role = new \models\Role();
             $role->load(array('hash = :hash', array(':hash' => $permissions->role)));
             
             if($role->dry())
@@ -98,13 +98,13 @@ class helper extends \F3instance
 	 */
 	public static function canRead($hash)
 	{
-		$project = new \project\model;
+		$project = new \models\Project();
 		$project->load(array('hash = :hash', array(':hash' => $hash)));
 
 		if ($project->public)
 			return true;
 
-		$perm = new \projPerms\model;
+		$perm = new \models\projPerms();
 		return $perm->found(array('user = :user AND project = :project', array(':user' => \F3::get('SESSION.user.hash'), ':project' => \F3::get('SESSION.project'))));
 	}
 
@@ -116,9 +116,12 @@ class helper extends \F3instance
         return \F3::get('DB')->sql('SELECT state, COUNT(*) AS `count` FROM `Ticket` WHERE milestone = \'' . $milestone . '\' GROUP BY state');
     }
 
+	/**
+	 *
+	 */
     public static function addActivity($description, $ticket = 0, $comment = '', $fields = '', $projHash = false)
     {
-        $activity = new \activity\model();
+        $activity = new \models\Activity();
         
         $activity->hash = \misc\helper::getFreeHash('Activity');
         $activity->description = $description;
@@ -132,9 +135,12 @@ class helper extends \F3instance
         $activity->save();
     }
 
+	/**
+	 *
+	 */
 	public static function getUsername($hash)
 	{
-		$user = new \user\model;
+		$user = new \models\User();
 		$user->load(array('hash = :hash', array(':hash' => $hash)));
 
         if($user->dry())
@@ -155,7 +161,7 @@ class helper extends \F3instance
 	}
     
     public static function getMsName($hash) {
-        $ms = new \milestone\model();
+        $ms = new \models\Milestone();
         $ms->load(array('hash = :hash', array(':hash' => $hash)));
         return $ms->name;
     }

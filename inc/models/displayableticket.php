@@ -12,8 +12,9 @@
  * @license http://www.gnu.org/licenses/lgpl.txt
  *   
 */
+namespace models;
 
-class DisplayableTicket extends Axon 
+class Displayableticket extends \Axon 
 {
     public function __construct()
     {

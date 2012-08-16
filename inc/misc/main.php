@@ -15,9 +15,11 @@
 
 namespace misc;
 
-class main extends \misc\controller
+class main extends \controllers\Controller
 {
-
+	/**
+	 * 
+	 */
     function start()
     {
         $this->set('pageTitle', '{{@lng.home}}');
@@ -37,7 +39,7 @@ class main extends \misc\controller
         if($projHash == 'new') 
             $this->reroute('/project/add');
 
-        $project = new \project\model();
+        $project = new \models\Project();
         $project->load(array("hash = :hash", array(':hash' =>$projHash)));
 
         if (!$project->hash)
@@ -48,7 +50,7 @@ class main extends \misc\controller
 
         if ($this->get('SESSION.user.hash'))
         {
-            $user = new \user\model();
+            $user = new \models\User();
             $user->load(array('hash = :hash', array(':hash' => $this->get('SESSION.user.hash'))));
 			
             if (!$user->dry())

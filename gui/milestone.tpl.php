@@ -1,4 +1,4 @@
-<h2>{{@lng.milestone}} › {{@milestone->name}} <span class="hash">#{{@milestone->hash}}</span></h2>
+<h2>{{@lng.milestone}} › {{@milestone->name}}</h2>
 
 <F3:check if="{{@stats.fullTicketCount}}">
     <F3:true>
@@ -29,7 +29,6 @@
             <table class="sortable zebra">
                 <thead>
                     <tr>
-                        <th>#</a></th>
                         <th>{{@lng.title}}</th>
                         <th>{{@lng.type}}</th>
                         <th>{{@lng.status}}</th>
@@ -42,7 +41,6 @@
                 <tbody>
                 <F3:repeat group="{{@tickets}}" value="{{@ticket}}">
                     <tr>
-                        <td class="id">{{substr(@ticket->tickethash,0,5)}}</td>
                         <td class="title">
                                 <a href="{{@BASE}}/ticket/{{@ticket->tickethash}}">{{@ticket->title}}</a>
                         </td>

@@ -1,11 +1,11 @@
 <?php
 
 /**
- * project.php
+ * ticket.php
  * 
  * wrapper class for Axon
  * 
- * @package Project
+ * @package Ticket
  * @author Sascha Ohms
  * @author Philipp Hirsch
  * @copyright Copyright 2011, Bugtrckr-Team
@@ -13,12 +13,12 @@
  *   
 */
 
-namespace project;
+namespace models;
 
-class Model extends \Axon 
+class Ticket extends \Axon 
 {
     public function __construct()
     {
-        $this->sync('Project');			
+        $this->sync('Ticket');
     }
 }

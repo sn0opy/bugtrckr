@@ -1,12 +1,11 @@
 <?php
 
-
 /**
- * user_perms\model.php
+ * role.php
  * 
- * wrapper class for Axon (table is a VIEW)
+ * wrapper class for Axon
  * 
- * @package User_Perms
+ * @package Role
  * @author Sascha Ohms
  * @author Philipp Hirsch
  * @copyright Copyright 2011, Bugtrckr-Team
@@ -14,12 +13,12 @@
  *   
 */
 
-namespace userPerms;
+namespace models;
 
-class model extends \Axon 
+class Role extends \Axon 
 {
     public function __construct()
     {
-        $this->sync('user_perms');
+        $this->sync('Role');
     }
 }

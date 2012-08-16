@@ -1,11 +1,8 @@
 <?php
 
 /**
- * wiki\controller.php
- * 
  * Wiki controller
  * 
- * @package Wiki
  * @author Sascha Ohms
  * @author Philipp Hirsch
  * @copyright Copyright 2011, Bugtrckr-Team
@@ -13,9 +10,9 @@
  *   
  */
 
-namespace wiki;
+namespace controllers;
 
-class controller extends \misc\controller
+class Wiki extends \controllers\Controller
 {
 
     public function editEntry()
@@ -28,7 +25,7 @@ class controller extends \misc\controller
         $title = $this->get('POST.title');
         $project = $this->get('SESSION.projectHash');
 
-        $entry = new \wiki\wikiEntry();
+        $entry = new \models\WikiEntry();
         $entry->load(array('hash = :hash AND project = :project', array(':hash' => $hash, ':project' => $project)));
 
         if ($entry->dry())
@@ -57,7 +54,7 @@ class controller extends \misc\controller
 		if (!\misc\helper::getPermission('wiki_editWiki'))
 			return $this->tpfail($this->get('lng.insuffPermissions'));
 
-		$disc = new \wiki\WikiDiscussion;
+		$disc = new \models\WikiDiscussion();
 
 		$entry = $this->get('POST.entry');
 		$content = $this->get('POST.content');
@@ -87,4 +84,77 @@ class controller extends \misc\controller
 
         return $string;
     }
+	
+    
+    public function showEntry()
+    {
+		if (!\misc\helper::canRead($this->get('SESSION.project')))
+			return $this->tpfail($this->get('lng.insuffPermissions'));
+
+        $title = $this->get('PARAMS.title');
+        $project = $this->get('SESSION.projectHash');
+
+        if (!($project > 0))
+            ; //Fail
+
+        if ($title == null)
+            $title = '{{main}}';
+
+        // Load Entry
+        $entry = new \models\WikiEntry();
+        $entry->load(array("title = :title AND project = :project ORDER BY created", array(":title" => $title, ":project" => $project)));
+
+        // Entry does not exist
+        if ($entry->dry())
+        {
+            $entry->title = $title;
+            $entry->content = $this->get('lng.insertContent');
+        }
+
+        if ($entry->title == '{{main}}')
+            $pagetitle = $this->get('lng.mainpage');
+		else
+			$pagetitle = $entry->title;
+
+        $this->set('entry', $entry);
+        $controller = new \controllers\Wiki();
+        $this->set('displayablecontent', $controller->translateHTML($entry->content));
+
+        $this->set('pageTitle', $this->get('lng.wiki') . ' › ' . $pagetitle);
+		$this->set('title', $pagetitle);
+        $this->set('template', 'wiki.tpl.php');
+        $this->set('onpage', 'wiki');
+        $this->tpserve();
+    }
+
+	public function showDiscussion()
+	{
+		if (!\misc\helper::canRead($this->get('SESSION.project')))
+			return $this->tpfail($this->get('lng.insuffPermissions'));
+
+		$hash = $this->get('PARAMS.hash');
+
+		$d = new \models\WikiDiscussion();
+		$discussions = $d->find(array('entry = :hash', array(':hash' => $hash)));
+
+		$entry = new \models\WikiEntry();
+		$entry->load(array('hash = :hash', array(':hash' => $hash)));
+
+		$controller = new \controllers\Wiki();
+		foreach ($discussions as $discussion)
+			$discussion->content = $controller->translateHTML($discussion->content);
+
+        if ($entry->title == '{{main}}')
+            $pagetitle = $this->get('lng.mainpage');
+		else
+			$pagetitle = $entry->title;
+
+		$this->set('entry', $entry);
+		$this->set('discussions', $discussions);
+        $this->set('pageTitle', $this->get('lng.wiki') . ' › ' . $pagetitle);
+		$this->set('title', $pagetitle);
+        $this->set('template', 'wikidiscussion.tpl.php');
+        $this->set('onpage', 'wiki');
+        $this->tpserve();
+	}
 }

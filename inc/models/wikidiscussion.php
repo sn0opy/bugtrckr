@@ -1,24 +1,22 @@
 <?php
 
 /**
- * ticket.php
+ * wiki\wikidiscussion.php
  * 
- * wrapper class for Axon
- * 
- * @package Ticket
+ * @package Wiki
  * @author Sascha Ohms
  * @author Philipp Hirsch
  * @copyright Copyright 2011, Bugtrckr-Team
  * @license http://www.gnu.org/licenses/lgpl.txt
  *   
-*/
+ */
 
-namespace ticket;
+namespace models;
 
-class Model extends \Axon 
+class WikiDiscussion extends \Axon
 {
     public function __construct()
     {
-        $this->sync('Ticket');
+        $this->sync('WikiDiscussion');
     }
 }

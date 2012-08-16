@@ -1,23 +1,24 @@
 <?php
 
 /**
- * user\model.php
+ * project.php
  * 
  * wrapper class for Axon
  * 
- * @package User
+ * @package Project
  * @author Sascha Ohms
  * @author Philipp Hirsch
  * @copyright Copyright 2011, Bugtrckr-Team
  * @license http://www.gnu.org/licenses/lgpl.txt
  *   
 */
-namespace user;
 
-class model extends \Axon 
+namespace models;
+
+class Project extends \Axon 
 {
     public function __construct()
     {
-        $this->sync('User');
+        $this->sync('Project');			
     }
 }

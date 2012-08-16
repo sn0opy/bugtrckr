@@ -1,21 +1,77 @@
 <?php
 
 /**
- * milestone\view.php
+ * Milestone controller
  * 
- * milestone view
- * 
- * @package Milestone
  * @author Sascha Ohms
  * @author Philipp Hirsch
  * @copyright Copyright 2011, Bugtrckr-Team
  * @license http://www.gnu.org/licenses/lgpl.txt
  *   
-*/
+ */
+namespace controllers;
 
-namespace milestone;
+class Milestone extends \controllers\Controller
+{
 
-class view extends \misc\controller {
+    /**
+     *	Save a milestone to the database
+     */
+    function addEditMilestone($projHash = false)
+    {
+        if (!\misc\helper::getPermission('proj_manageMilestones'))
+            return $this->tpfail($this->get('lng.insuffPermissions'));
+
+        $name = ($projHash) ? $this->get('lng.firstMilestone') : $this->get('POST.name');
+        
+        if(!isset($projHash)) {
+            // This params have to be set
+            if ($this->get('POST.name') == "" || $this->get('SESSION.project') <= 0)
+                return $this->tpfail($this->get('lng.failMilestoneSave'));
+        }
+
+        $msHash = $this->get('POST.hash') ? $this->get('POST.hash') : \misc\helper::getFreeHash('Milestone');
+
+        $milestone = new \models\Milestone();
+        if ($this->exists('POST.hash'))
+        {
+            $milestone->load(array('hash = :hash', array(':hash' => $msHash)));
+            if ($milestone->dry())
+                return $this->tpfail($this->get('lng.failMilestoneSave'));
+        }
+
+        $milestone->name = $name;
+        $milestone->hash = $msHash;
+        $milestone->description = ($projHash) ? $this->get('lng.firstMilestone') : $this->get('POST.description');
+        $milestone->project = ($projHash) ? $projHash : $this->get('SESSION.project');
+        $milestone->finished = ($projHash) ? time()+2629743 : $this->get('POST.finished');
+        $milestone->save();
+
+        if(!$projHash)
+            $this->reroute('/project/settings#milestones');
+    }
+    
+    function deleteMilestone() 
+    {
+        if (!\misc\helper::getPermission('proj_manageMilestones'))
+            return $this->tpfail($this->get('lng.insuffPermissions'));
+        
+        $msHash = $this->get('PARAMS.hash');
+        
+        $tickets = new \models\Ticket();
+        $milestones = new \models\Milestone();
+        
+        if($tickets->found(array('milestone = :ms', array(':ms' => $msHash))) < 1 && $milestones->found() > 1) {            
+            $milestones->load(array('hash = :hash', array(':hash' => $msHash)));
+            $milestones->erase();
+            
+            $this->set('SESSION.SUCCESS', $this->set('lng.milestonedDeleted'));
+            $this->reroute('/project/settings#milestones');
+        } else {
+            $this->tpfail($this->get('lng.cannotDeleteMilestone'));
+        }
+    }
+	
 
     /**
      *	Display a roadmap that contains the milestones of a project
@@ -34,7 +90,7 @@ class view extends \misc\controller {
         $project = $this->get('SESSION.project');		// Actual project
 
 		// Get the milestones
-        $milestones = new \milestone\model();
+        $milestones = new \models\Milestone();
         $milestones = $milestones->find(array('project = :project', array(':project' => $project)));
 
 		// Calculate the details of each milestone 
@@ -77,13 +133,13 @@ class view extends \misc\controller {
 
         $hash = $this->get('PARAMS.hash');
 
-        $milestone = new \milestone\model();
+        $milestone = new \models\Milestone();
         $milestone->load(array('hash = :hash', array(':hash' => $hash)));
 
         if($milestone->dry())
             return $this->tpfail('The milestone doesn\'t exist.');
 
-        $ticket = new \ticket\displayable();
+        $ticket = new \models\Displayableticket();
         $tickets = $ticket->find(array('milestone = :hash', array(':hash' => $milestone->hash)));
 
         if($milestone->dry())
@@ -113,4 +169,3 @@ class view extends \misc\controller {
         $this->tpserve();
     }
 }
-?>

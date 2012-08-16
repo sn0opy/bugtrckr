@@ -12,8 +12,9 @@
  * @license http://www.gnu.org/licenses/lgpl.txt
  *   
 */
+namespace models;
 
-class DisplayableActivity extends Axon 
+class DisplayableActivity extends \Axon 
 {
     public function __construct()
     {
