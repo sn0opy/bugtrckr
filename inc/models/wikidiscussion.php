@@ -1,9 +1,8 @@
 <?php
 
 /**
- * wiki\wikidiscussion.php
+ *  wrapper class for Axon
  * 
- * @package Wiki
  * @author Sascha Ohms
  * @author Philipp Hirsch
  * @copyright Copyright 2011, Bugtrckr-Team

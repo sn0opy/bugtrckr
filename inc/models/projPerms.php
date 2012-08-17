@@ -1,11 +1,8 @@
 <?php
 
 /**
- * projPerms\projectpermission.php
- * 
  * wrapper class for Axon
  * 
- * @package ProjectPermission
  * @author Sascha Ohms
  * @author Philipp Hirsch
  * @copyright Copyright 2011, Bugtrckr-Team

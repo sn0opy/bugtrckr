@@ -1,11 +1,8 @@
 <?php
 
 /**
- * models\state.php
- * 
  * wrapper class for Axon
  * 
- * @package Acivity
  * @author Sascha Ohms
  * @author Philipp Hirsch
  * @copyright Copyright 2011, Bugtrckr-Team

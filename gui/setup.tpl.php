@@ -3,8 +3,11 @@
     <head>
         <meta charset="UTF-8" />
         <title>Bugtrckr Setup</title>
-        <link href="{{@BASE}}/install/style.css" rel="stylesheet" type="text/css" />
-        <script type="text/javascript" src="{{@BASE}}/gui/js/jquery.js"></script>
+		
+		<link href="{{@BASE}}/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="{{@BASE}}/css/setup.css" rel="stylesheet" type="text/css" />
+        
+		<script type="text/javascript" src="{{@BASE}}/js/jquery.js"></script>
         <script type="text/javascript">
         $(document).ready(function(){
             $('.dbtype').click(function() {
@@ -48,26 +51,26 @@
     <body>
         <div class="container">
             <div class="head">
-                <h1><a href="{{@BASE}}/setup.php">Bugtrckr Setup</a></h1>
+                <h1><a href="{{@BASE}}/setup">Bugtrckr Setup</a></h1>
             </div>
             <div id="content">
                 <F3:check if="{{@dbexists}}">
-                    <p class="failure message">{{@lng.dbexists}}</p>
+                    <p class="alert alert-error">{{@lng.dbexists}}</p>
                 </F3:check>
                 
                 <F3:check if="{{@mysqldata}}">
-                    <p class="failure message">{{@lng.mysqlfailed}}</p>
+                    <p class="alert alert-error">{{@lng.mysqlfailed}}</p>
                 </F3:check>
                 
                 
                 <F3:check if="{{@usererror}}">
-                    <p class="failure message">{{@lng.usererror}}</p>
+                    <p class="alert alert-error">{{@lng.usererror}}</p>
                 </F3:check>
                 
                 <F3:check if="{{@INSTALLED}}">
                     <F3:true>
                         <div class="content">
-                            <p class="success message">
+                            <p class="alert alert-success">
                             {{@lng.done}}
                             <a href="{{@BASE}}/"> <br/>&raquo; {{@lng.toApp}}</a></p>
                         </div>
@@ -105,7 +108,7 @@
                             <div class="formValue">
                                 <F3:check if="{{@NEEDED.writepermission}}">
                                     <true><span class="true">✔</span></true>
-                                    <false><span class="false">✖ {{@lng.permsOn}} <em>data/</em></span></false>
+                                    <false><span class="false">✖ {{@lng.permsOn}} <em>../data/</em></span></false>
                                 </F3:check>
                             </div>
                         </div>
@@ -128,16 +131,17 @@
                                 <p class="false">{{@lng.fixErrors}}</p>
                             </true>
                             <false>
-                                <form action="{{@BASE}}/setup.php" method="post" id="theform">
+                                <form action="{{@BASE}}/setup" method="post" id="theform">
                                     <br class="clearfix" />
                                     <h2>{{@lng.step2}}</h2>
 
-                                    <p class="dbtype" style="text-align: center; margin-bottom: 20px;">
-                                        <input type="radio" name="dbtype" class="dbtype" value="sqlitedb" id="sqlitedb" {{@mysqldata?@'':'checked="checked"'}} />
-                                        <label for="sqlitedb">SQLite</label>
-
-                                        <input type="radio" name="dbtype" class="dbtype" value="mysqldb" id="mysqldb" {{@mysqldata?'checked="checked"':''}}/>
-                                        <label for="mysqldb">MySQL</label>
+                                    <p class="dbtype" style="text-align: center; margin-bottom: 20px;">                                        
+                                        <label for="sqlitedb" class="checkbox inline">
+												<input type="radio" name="dbtype" class="dbtype" value="sqlitedb" id="sqlitedb" {{@mysqldata?@'':'checked="checked"'}} /> SQLite
+										</label>                                        
+                                        <label for="mysqldb" class="checkbox inline">
+												<input type="radio" name="dbtype" class="dbtype" value="mysqldb" id="mysqldb" {{@mysqldata?'checked="checked"':''}}/> MySQL
+										</label>
                                     </p>
 
                                     <div id="sqliteChosen">
@@ -188,7 +192,7 @@
                                         </div>
                                     </div>
 
-                                    <input type="submit" value="{{@lng.letsGo}}" />
+                                    <input type="submit" value="{{@lng.letsGo}}" class="btn btn-primary" />
                                 </form>
                             </false>
                         <br class="clearfix" />

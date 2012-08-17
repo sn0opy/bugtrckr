@@ -1,11 +1,8 @@
 <?php
 
 /**
- * milestone.php
- * 
  * wrapper class for Axon
  * 
- * @package Milestone
  * @author Sascha Ohms
  * @author Philipp Hirsch
  * @copyright Copyright 2011, Bugtrckr-Team

@@ -1,11 +1,8 @@
 <?php
 
 /**
- * index.php
- * 
  * Routes, settings anonymous functions
  * 
- * @package Index
  * @author Sascha Ohms
  * @author Philipp Hirsch
  * @copyright Copyright 2012, Bugtrckr-Team
@@ -15,10 +12,10 @@
 
 $app = require '../lib/base.php';
 
-if(!file_exists('../data/config.inc.php')) {
-    echo '<a href="' . $app->get('BASE') . '/setup">Setup</a>';
-    exit;
-}
+if(file_exists('../data/config.inc.php'))
+    include '../data/config.inc.php';
+else 
+	$app->mock('GET /setup'); // this is so dirty, but the great thing: it works!
 
 $app->set('CACHE', false);
 $app->set('DEBUG', 3);
@@ -28,13 +25,10 @@ $app->set('TEMP', '../temp/');
 $app->set('LOCALES','../lang/');
 $app->set('LANGUAGE', 'de'); // currently forcing to German
 
-include '../data/config.inc.php';
-
 $app->set('getPermission', function($permission) {
     $helper = new \misc\helper();
     return $helper->getPermission($permission);
 });
-
 
 $app->route('GET /', 'misc\main->start');
 $app->route('GET /roadmap', '\controllers\milestone->showRoadmap');
@@ -78,6 +72,9 @@ $app->route('POST /project/settings/member/add', '\controllers\project->projectA
 $app->route('POST /project/setttings/member/delete', '\controllers\project->projectDelMember');
 $app->route('POST /wiki', '\controllers\wiki->editEntry');
 $app->route('POST /wikidiscussion', '\controllers\wiki->addDiscussion');
+
+$app->route('GET /setup', '\misc\setup->start');
+$app->route('POST /setup', '\misc\setup->install');
 
 $app->run();
 

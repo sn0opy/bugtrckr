@@ -1,11 +1,8 @@
 <?php
 
 /**
- * helper.php
- * 
  * helper functions
  * 
- * @package Helper
  * @author Sascha Ohms
  * @author Philipp Hirsch
  * @copyright Copyright 2011, Bugtrckr-Team

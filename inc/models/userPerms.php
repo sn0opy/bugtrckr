@@ -2,11 +2,8 @@
 
 
 /**
- * user_perms\model.php
- * 
  * wrapper class for Axon (table is a VIEW)
  * 
- * @package User_Perms
  * @author Sascha Ohms
  * @author Philipp Hirsch
  * @copyright Copyright 2011, Bugtrckr-Team

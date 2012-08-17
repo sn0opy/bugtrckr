@@ -1,11 +1,8 @@
 <?php
 
 /**
- * models\displayableticket.php
- * 
  * wrapper class for Axon (table is a VIEW)
  * 
- * @package User_Ticket
  * @author Sascha Ohms
  * @author Philipp Hirsch
  * @copyright Copyright 2011, Bugtrckr-Team
