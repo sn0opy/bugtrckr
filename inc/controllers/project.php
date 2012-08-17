@@ -392,7 +392,7 @@ class Project extends \controllers\Controller
     {
         $roleHash = $this->get('PARAMS.hash');
 
-        $role = new \role\model();
+        $role = new \models\Role();
         $role->load(array('hash = :hash', array(':hash' => $roleHash)));
 
         if (!$role->hash)

@@ -52,7 +52,7 @@ return array('lng' => array(
     'home' => 'Home',
     'tickets' => 'Tickets',
     'roadmap' => 'Roadmap',
-    'footer' => '© 2011 Bugtrckr-Team',
+    'footer' => '© 2012 Bugtrckr-Team',
     'error' => 'Error',
     'password' => 'Password',
     'email' => 'E-Mail',
@@ -133,5 +133,6 @@ return array('lng' => array(
                     array('id' => 5, 'name' => 'Very low'),
                 ),
 	'wiki' => 'Wiki',
-	'mainpage' => 'Mainpage'
+	'mainpage' => 'Mainpage',
+	'editTicket' => 'Edit ticket'
 ));

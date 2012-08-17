@@ -26,7 +26,7 @@
     <h3>{{@lng.tickets}}:</h3>
     <F3:check if="{{count(@tickets)}}">
         <F3:true>
-            <table class="sortable zebra">
+            <table class="table table-striped sortable table-bordered">
                 <thead>
                     <tr>
                         <th>{{@lng.title}}</th>

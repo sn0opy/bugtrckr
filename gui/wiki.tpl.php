@@ -24,7 +24,7 @@
 </script>
 
 
-<h1>{{@title}}</h1>
+<h2>{{@title}}</h2>
 
 <F3:check if="{{@entry->hash}}">
 	<a href="/{{@BASE}}wiki/discussion/{{@entry->hash}}">Diskussion betrachten</a>
@@ -41,7 +41,7 @@
 		<input type="hidden" name="title" value="{{@entry->title}}" />
 	</form>
 
-	<a href="#" id="editbutton" onclick="edit()">Edit</a>
-	<a href="#" id="submitbutton" onclick="submit()">Submit</a>
-	<a href="#" id="cancelbutton" onclick="cancel()">Cancel</a>
+	<a href="#" id="editbutton" onclick="edit()" class="btn">Edit</a>
+	<a href="#" id="submitbutton" onclick="submit()" class="btn btn-primary">Submit</a>
+	<a href="#" id="cancelbutton" onclick="cancel()" class="btn">Cancel</a>
 </div>

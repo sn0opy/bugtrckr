@@ -12,6 +12,6 @@
         </div>
         
 		<input type="hidden" name="hash" value="{{@category->hash}}" />
-        <input type="submit" value="{{@lng.save}}" />
+        <input type="submit" value="{{@lng.save}}" class="btn" />
     </form>
 </div>

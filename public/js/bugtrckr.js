@@ -1,9 +1,6 @@
 /**
- * bugtrckr.js
- * 
  * Main JS code for Bugtrckr
  * 
- * @package js
  * @author Sascha Ohms
  * @author Philipp Hirsch
  * @copyright Copyright 2011, Bugtrckr-Team
@@ -22,8 +19,8 @@ $(document).ready(function() {
         var content_show = $(anchor).attr("title");  
         $("#"+content_show).show();
    }
-    
-    $("a.tab").click(function() {
+	
+    $(".settingsMenu ul li a").click(function() {
         $(".active").removeClass("active");  
         $(this).parent().addClass("active");  
         $(".tabContent").hide();  
@@ -45,17 +42,7 @@ $(document).ready(function() {
         sortList: [[3,1]] 
     });
 
-    $('.showLayer').click(function() {
-       $('#darkBg').show();
-       $('.layer').fadeIn();
-       return false;
-    });
 
-    $('.closeButton').click(function() {
-        $('.layer').fadeOut();
-        $('#darkBg').hide();
-        return false;
-    });
 
     $('.succes').live(function() {
         $(this).fadeOut();

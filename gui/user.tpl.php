@@ -1,16 +1,9 @@
 <h2>{{@lng.user}} › {{@user->name}}</h2>
 
-<h3>{{@lng.informations}}</h3>
-<div class="formRow">
-    <div class="formLabel">{{@lng.name}}: </div>
-    <div class="formValue">{{@user->name}}</div>
-</div>
-
 <h3>{{@lng.tickets}}:</h3>
-<table class="zebra sortable">
+<table class="table table-striped sortable table-bordered">
     <thead>
         <tr>
-            <th>#</th>
 			<th>{{@lng.title}}</th>
 			<th>{{@lng.type}}</th>
 			<th>{{@lng.status}}</th>
@@ -24,7 +17,6 @@
     <tbody>
         <F3:repeat group="{{@tickets}}" value="{{@ticket}}">
         <tr>
-            <td class="id">{{substr(@ticket->tickethash,0,5)}}</td>
             <td class="title"><a href="{{@BASE}}/ticket/{{@ticket->tickethash}}">{{@ticket->title}}</a></td>
 			<td class="type">{{\misc\Helper::getName('types', @ticket->type)}}</td>
             <td class="state"><span class="color{{@ticket->state}}">{{\misc\Helper::getName('states', @ticket->state)}}</span></td>

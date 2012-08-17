@@ -23,7 +23,7 @@ if(!file_exists('../data/config.inc.php')) {
 $app->set('CACHE', false);
 $app->set('DEBUG', 3);
 $app->set('GUI','../gui/'); 
-$app->set('AUTOLOAD', '../inc/|../inc/models/');
+$app->set('AUTOLOAD', '../inc/');
 $app->set('TEMP', '../temp/');
 $app->set('LOCALES','../lang/');
 $app->set('LANGUAGE', 'de'); // currently forcing to German

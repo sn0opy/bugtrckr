@@ -10,15 +10,6 @@
                 <input type="text" name="name" />
             </div>
         </div>
-
-        <div class="formRow">
-            <div class="formLabel">
-                {{@lng.description}}
-            </div>
-            <div class="formValue">
-                <textarea name="description"></textarea>
-            </div>
-        </div>
         
         <div class="formRow">
             <div class="formLabel">
@@ -28,7 +19,16 @@
                 <input type="date" name="finished" value="{{@today}}" />
             </div>
         </div>
+		
+		<div class="formRow">
+            <div class="formLabel">
+                {{@lng.description}}
+            </div>
+            <div class="formValue">
+                <textarea name="description" class="ticketComment"></textarea>
+            </div>
+        </div>
 
-        <input type="submit" value="{{@lng.save}}" />
+        <input type="submit" value="{{@lng.save}}" class="btn" />
     </form>
 </div>

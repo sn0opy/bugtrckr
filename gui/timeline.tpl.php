@@ -1,6 +1,6 @@
 <h2>{{@lng.timeline}}</h2>
 
-<table class="sortable zebra">
+<table class="table-striped table table-bordered">
     <thead>
         <tr>
             <th>{{@lng.description}}</th>

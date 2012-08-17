@@ -119,6 +119,6 @@
         </div>
     </div>
     
-    <input type="submit" value="{{@lng.save}}" />
+    <input type="submit" value="{{@lng.save}}" class="btn" />
 </form>
 </div>

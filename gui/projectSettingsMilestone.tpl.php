@@ -1,4 +1,4 @@
-<h2>{{@lng.milestone}} › {{@msData->name}} <span class="hash">#{{@msData->hash}}</span></h2>
+<h2>{{@lng.milestone}} › {{@msData->name}}</h2>
 
 <div class="msSettings">
     <form action="{{@BASE}}/project/settings/milestone/edit" method="post">
@@ -12,15 +12,6 @@
                 <input type="text" name="name" value="{{@msData->name}}" />
             </div>
         </div>
-
-        <div class="formRow">
-            <div class="formLabel">
-                {{@lng.description}}
-            </div>
-            <div class="formValue">
-                <textarea name="description">{{@msData->description}}</textarea>
-            </div>
-        </div>
         
         <div class="formRow">
             <div class="formLabel">
@@ -30,7 +21,16 @@
                 <input type="date" name="finished" value="{{@msData->finished}}" />
             </div>
         </div>
+		
+        <div class="formRow">
+            <div class="formLabel">
+                {{@lng.description}}
+            </div>
+            <div class="formValue">
+                <textarea name="description" class="ticketComment">{{@msData->description}}</textarea>
+            </div>
+        </div>
 
-        <input type="submit" value="{{@lng.save}}" />
+        <input type="submit" value="{{@lng.save}}" class="btn" />
     </form>
 </div>

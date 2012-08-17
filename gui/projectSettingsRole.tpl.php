@@ -1,4 +1,4 @@
-<h2>{{@lng.role}} › {{@roleData->name}} <span class="hash">#{{@roleData->hash}}</span></h2>
+<h2>{{@lng.role}} › {{@roleData->name}}</h2>
 
 <div class="roleSettings">
 <form action="{{@BASE}}/project/settings/role/edit" method="post">

@@ -1,15 +1,6 @@
-*
+body 
 {
-    margin: 0px;
-    padding: 0px;
-}
-
-body
-{
-    color: #333;
-    font-size: 9pt;
-    font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
-    min-width: 900px;
+	margin-top: 50px;
 }
 
 a:hover
@@ -17,198 +8,91 @@ a:hover
     text-decoration: underline;
 }
 
+h2 {
+	margin-bottom: 20px;
+}
+
 h1 a, h2 a, h3 a, #menu a
 {
     text-decoration: none !important;
 }
 
-/* 
- *	
- */
-#head
+.navbar-inner
 {
-    background: #068 url(../img/headBgN.png);
-    height: 50px;
-    line-height: 50px;
-    padding-left: 20px;
-    box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.4);
+    background-image: url(../img/headBgN.png);
 }
 
-#head h1 {
-    font-size: 18pt;
+.navbar ul.nav li a 
+{
+	color: #FFF !important;
+}
+
+.navbar ul.nav li a:hover 
+{
+	color: #CCC !important;
+}
+
+.navbar .brand
+{
     font-family: Georgia;
+	text-shadow: 1px 1px 1px #000;
+	font-style: italic;
+	color: #FFF !important;
+	font-weight: bold !important;
 }
 
-.llfix {
-    padding-right: 10px;
-}
-
-#menu
+.navbar li.active a
 {
-    padding: 10px;
-    line-height: 30px;
-    color: #FFF;
-    text-shadow: 1px 1px 1px #000;
-    font-size: 10pt;
+	background-color: rgba(0, 0, 0, 0.3) !important;
 }
 
-#menu ul
+.tabContent 
 {
-    list-style-type: none;
+	float: left;
 }
 
-#menu li
+div.ticket_timeline
 {
-    float: left;
-    margin-right: 5px;
-    margin-left: 5px;
-    border-bottom: 3px solid transparent;
-}
-
-#menu li.project_selector
-{
-	border-bottom: 0px;
-    background: none !important;
-}
-
-#menu a
-{
-    border: none;
-    color: #FFF;
-    padding: 6px;
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
-
-#menu li:hover a, .menuActive
-{
-    background: rgba(0,0,0,0.2);
+    border: 1px solid #CCC;
     border-radius: 3px;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
-    box-shadow: inset 1px 1px 3px rgba(0,0,0,0.4);
+	padding: 10px;
 }
 
-#menu li a.normLink
+.hero-ticket
 {
-    border-bottom: none;
-    padding: 0px;
-    background: none;
-    box-shadow: none;
+	padding: 10px;
 }
 
-#menu select
+.hero-unit p
 {
-    border: 0px;
-    margin-top: -3px;
-    background: #068;
-    color: #FFF;
+	font-size: 100% !important;
 }
 
-#content
-{
-    float: left;
-    font-size: 12px;
-    width: 100%;
-}
+
+
+
+
 
 #innerContentLOL
 {
-    padding: 10px;
+    padding-left: 10px;
+	padding-right: 10px;
 }
 
 #footer
 {
-    clear: both;
     text-align: center;
     padding-top: 10px;
     color: #CCC;
     font-size: 8pt;
 }
 
-.message {
-    background-repeat: repeat-x;
-    border: rgba(0, 0, 0, 0.102);
-    border-bottom-color: rgba(0, 0, 0, 0.251);
-    text-shadow: 0px -1px 0px rgba(0, 0, 0, 0.251);
-    color: #FFF;
-    margin: 0 auto;
-    padding: 5px;
-    border-radius: 3px;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    margin-top: 5px;
-    margin-bottom: 5px;
-    width: 90%;
-}
-
-.failure
-{
-    background-color: #c43c35;
-    background-image: -o-linear-gradient(top, #ee5f5b, #c43c35);
-    background-image: -webkit-linear-gradient(top, #ee5f5b, #c43c35); 
-    background-image: -moz-linear-gradient(top, #ee5f5b, #c43c35);
-}
-
-.success
-{
-    background-color: #57a957;
-    background-image: -o-linear-gradient(top, #62c462, #57a957);
-    background-image: -webkit-linear-gradient(top, #62c462, #57a957); 
-    background-image: -moz-linear-gradient(top, #62c462, #57a957);
-}
-
-.info {
-    background-color: #339bb9; 
-    background-image: -o-linear-gradient(top, #5bc0de, #339bb9);
-    background-image: -webkit-linear-gradient(top, #5bc0de, #339bb9); 
-    background-image: -moz-linear-gradient(top, #5bc0de, #339bb9);
-}
-
-.warning 
-{
-    background-color: #eedc94; 
-    background-image: -o-linear-gradient(top, #fceec1, #eedc94);
-    background-image: -webkit-linear-gradient(top, #fceec1, #eedc94); 
-    background-image: -moz-linear-gradient(top, #fceec1, #eedc94);
-    color: #404040;
-    text-shadow: 0px -1px 0px rgba(255, 255, 255, 0.251);
-}
-
 .projectText
 {
     width: 400px;
     height: 150px;
-}
-
-.tabbed 
-{
-    margin-top: 20px;
-}
-
-.tab 
-{
-    padding-top: 2px;
-    padding-bottom: 5px;
-}
-
-.tabs
-{
-    padding-bottom: 5px;
-    border-bottom: 1px solid #CCC;
-}
-
-.tabs a
-{
-    border: none;
-    margin-right: 5px;
-    border-top: 1px solid #CCC;
-    border-left: 1px solid #CCC;
-    border-right: 1px solid #CCC;
-    padding-left: 10px;
-    padding-right: 10px;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
 }
 
 td.manageMember input, td.manageMember select
@@ -240,11 +124,6 @@ td.manageMember input, td.manageMember select
 .tabs .active a
 {
     border-bottom: 1px solid #FFF;
-}
-
-.tabContent
-{
-    padding: 40px; 
 }
 
 #tabContent_2, #tabContent_3, #tabContent_4, #tabContent_5
@@ -287,14 +166,6 @@ input, textarea, select
     box-shadow: inset 1px 1px 3px #DDD;
 }
 
-input[type=submit] {
-    box-shadow: inset -1px -1px 2px #DDD;
-}
-
-input[type=submit]:active {
-    box-shadow: inset 1px 1px 2px #DDD;
-}
-
 .normalText
 {
     text-transform: none !important;
@@ -321,80 +192,7 @@ input[type=submit]:active {
     float: left;
 }
 
-/* 
- *	
-*/
-h1 a
-{
-    margin-right: 40px;
-    color: #FFF;
-    font-style: italic;
-    text-shadow: 1px 1px 3px rgba(0,0,0,1);
-    float: left;
-}
 
-h2
-{
-    font-size: 16pt;
-    margin-bottom: 20px;
-}
-
-h3
-{
-    margin-bottom: 5px;
-}
-
-/* 
- *	
-*/
-a
-{
-    color: #000;
-    text-decoration: none;
-}
-
-/* 
- *	
-*/
-
-table {
-    width: 100%;
-}
-
-th
-{
-    text-transform: lowercase;
-    font-weight: normal;
-    color: #FFF;
-    border-bottom: 3px solid #068;
-    letter-spacing: 1px;
-    text-align: left;
-    background: #333 url(../img/bg.gif) center right no-repeat;
-    cursor: pointer; 
-}
-
-.ticket th {
-    background: none;
-    border: none;
-    letter-spacing: 0px;
-    color: #333;
-    cursor: default;
-    text-transform: none;    
-}
-
-th.headerSortUp { 
-    background-image: url(../img/asc.gif); 
-    background-color: #068; 
-} 
-
-th.headerSortDown { 
-    background-image: url(../img/desc.gif); 
-    background-color: #068; 
-} 
-
-.zebra tbody tr:nth-child(2n+1) td {
-    background:	#EEE;
-}
 
 /*
  *
@@ -530,18 +328,6 @@ div.ticket
     padding: 10px;
     width: 80%;
 }
-
-div.ticket_timeline
-{
-    border: 1px solid #8BC;
-    border-radius: 3px;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    margin-top: 5px;
-    padding: 10px;
-    width: 80%;
-}
-
 .editTicket
 {
     margin-top: 10px;
@@ -580,70 +366,6 @@ table th, table td
 table.ticket th
 {
     text-align: left;
-}
-
-#darkBg {
-	display: none;
-	position: absolute;
-	top: 0px;
-	left: 0px;
-	width: 100%;
-	height: 100%;
-	background: rgba(0,0,0,0.6);
-	z-index: 4;
-}
-
-.layer
-{
-    background: #FFF;
-    border: 1px solid rgba(0,0,0,0.3);
-    border-radius: 5px;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    box-shadow: 0px 3px 7px rgba(0, 0, 0, 0.3);
-    display: none;
-    position: absolute;
-    width: 400px; 
-    z-index: 5;
-    left: 50%;
-    margin-left: -210px;
-    padding: 20px;
-    color: #333;
-    text-shadow: none;
-    top: 100px;
-    font-size: 9pt;
-}
-
-.layer h3 {
-    margin-bottom: 30px;
-}
-
-.layer a
-{
-    color: #333 !important;
-    text-transform: none;
-}
-
-.layer a:hover {
-    text-decoration: underline;
-}
-
-.layer input, .layer textarea
-{
-    width: 400px;
-}
-
-.layer textarea
-{
-    height: 120px;
-}
-
-.closeButton
-{
-    float: right;
-    text-decoration: none !important;
-    border: none;
-    font-size: 13pt;
 }
 
 #add .formRow
@@ -738,13 +460,7 @@ td.action a {
 }
 
 #wikicontent {
-	border: solid 1px;
-	border-radius: 5px;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	margin: 5px;
 	min-height: 400px;
-	padding: 5px;
 	width: 600px;
 }
 

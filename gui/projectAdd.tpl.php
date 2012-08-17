@@ -28,7 +28,7 @@
                     <input type="checkbox" name="public" checked="checked" />                          
                 </div>
             </div>
-            <input type="submit" value="{{@lng.add}}" />
+            <input type="submit" value="{{@lng.add}}" class="btn btn-primary" />
         </form>
     </F3:true>
     <F3:false>
