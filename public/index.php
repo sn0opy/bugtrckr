@@ -12,10 +12,14 @@
 
 $app = require '../lib/base.php';
 
+// really dirty, but works great
 if(file_exists('../data/config.inc.php'))
     include '../data/config.inc.php';
-else 
-	$app->mock('GET /setup'); // this is so dirty, but the great thing: it works!
+elseif($app->exists('POST.email'))
+	$app->mock('POST /setup');
+else
+	$app->mock('GET /setup');
+	
 
 $app->set('CACHE', false);
 $app->set('DEBUG', 3);

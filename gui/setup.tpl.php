@@ -51,7 +51,7 @@
     <body>
         <div class="container">
             <div class="head">
-                <h1><a href="{{@BASE}}/setup">Bugtrckr Setup</a></h1>
+                <h1>Bugtrckr Setup</h1>
             </div>
             <div id="content">
                 <F3:check if="{{@dbexists}}">
@@ -69,10 +69,11 @@
                 
                 <F3:check if="{{@INSTALLED}}">
                     <F3:true>
-                        <div class="content">
+                        <div class="content" style="text-align: center;">
                             <p class="alert alert-success">
                             {{@lng.done}}
-                            <a href="{{@BASE}}/"> <br/>&raquo; {{@lng.toApp}}</a></p>
+                            </p>
+							<a href="{{@BASE}}/" class="btn btn-large btn-primary">{{@lng.toApp}}</a>
                         </div>
                     </F3:true>
                     <F3:false>

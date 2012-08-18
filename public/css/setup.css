@@ -12,11 +12,7 @@ h1 {
     font-style: italic;
     text-shadow: 1px 1px 3px #000;
     font-weight: bold;
-}
-
-h1 a {
-    color: #FFF;
-    text-decoration: none;
+	color: #FFF;
 }
 
 ul {

@@ -40,15 +40,6 @@ class Setup extends \F3instance
             $pass = $this->get('POST.sqlpw');
             $db = $this->get('POST.sqldb');
 
-            function errhandler() 
-			{
-                F3::set('mysqldata', array('host' => F3::get('POST.sqlhost'), 'user' => F3::get('POST.sqluser'), 'db' => F3::get('POST.sqldb')));
-                $main = new main();
-                $main->start();
-                return;
-            }
-            
-            $this->set('ONERROR', 'errhandler');
             $this->set('DB', new \DB('mysql:host=' .$host. ';dbname=' .$db, $user, $pass));
             $this->get('DB')->sql('SET NAMES utf8'); // just to check whether connection works
             
