@@ -20,7 +20,7 @@
             </div>
             <div class="formRow">
                 <div class="formLabel"> </div>
-                <div class="formValue"><input type="submit" value="{{@lng.submit}}" /></div>
+                <div class="formValue"><input type="submit" value="{{@lng.register}}" /></div>
             </div>
         </form>
     </F3:false>

@@ -77,7 +77,7 @@
 								</td>
 								<td class="type manageMember">
 									<p>
-									<form action="{{@BASE}}/project/settings/member/setrole" method="post" class="floatleft">
+									<form action="{{@BASE}}/project/settings/member/setrole" method="post" class="pull-left">
 										<input type="hidden" name="user" value="{{@member->hash}}" />
 										<select name="role" class="floatleft">
 											<F3:repeat group="{{@projRoles}}" value="{{@role}}">
@@ -140,7 +140,7 @@
 								<td class="title">
 									<a href="{{@BASE}}/project/settings/milestone/{{@milestone->hash}}">{{@milestone->name}}</a>
 								</td>
-								<td class="action">
+								<td>
 									<a class="btn" href="{{@BASE}}/project/settings/milestone/delete/{{@milestone->hash}}" onclick="return confirm('{{@lng.sure}}');">{{@lng.delete}}</a>
 									<a class="btn" href="{{@BASE}}/project/settings/milestone/{{@milestone->hash}}">{{@lng.edit}}</a>
 								</td>
@@ -176,7 +176,7 @@
 								<td class="title">
 									<a href="{{@BASE}}/project/settings/role/{{@role->hash}}">{{@role->name}}</a>
 								</td>
-								<td class="action">
+								<td>
 									<a class="btn" href="{{@BASE}}/project/settings/role/delete/{{@role->hash}}">{{@lng.delete}}</a>
 									<a class="btn" href="{{@BASE}}/project/settings/role/{{@role->hash}}">{{@lng.edit}}</a>
 								</td>

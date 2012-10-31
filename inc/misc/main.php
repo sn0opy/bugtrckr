@@ -31,16 +31,12 @@ class main extends \controllers\Controller
     function selectProject($hash = false, $routeBack = true)
     {
         $url = $this->get('SERVER.HTTP_REFERER');
-        $projHash = ($hash) ? $hash : $this->get('REQUEST.project');
-
-        if($projHash == 'new') 
-            $this->reroute('/project/add');
-
+        $projHash = ($hash) ? $hash : $this->get('PARAMS.project');
+		
         $project = new \models\Project();
-        $project->load(array("hash = :hash", array(':hash' =>$projHash)));
+        $project->load(array("hash = :hash", array(':hash' => $projHash)));
 
-        if (!$project->hash)
-        {
+        if($project->dry()) {
             $this->tpfail($this->get('lng.changeProjectFail'));
             return;
         }

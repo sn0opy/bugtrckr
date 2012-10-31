@@ -3,11 +3,6 @@ body
 	margin-top: 50px;
 }
 
-a:hover
-{
-    text-decoration: underline;
-}
-
 h2 {
 	margin-bottom: 20px;
 }
@@ -15,6 +10,10 @@ h2 {
 h1 a, h2 a, h3 a, #menu a
 {
     text-decoration: none !important;
+}
+
+form {
+	margin-bottom: 0px !important;
 }
 
 .navbar-inner
@@ -482,4 +481,14 @@ td.action a {
 
 .pinOnTop tbody td {
     vertical-align: top;
+}
+
+.textDropdown .caret {
+	vertical-align: middle;
+	opacity: 1;
+	border-top-color: #FFF;
+}
+
+.navbar ul.nav li.projectChooser .dropdown-menu a {
+	color: #333 !important;
 }

@@ -188,6 +188,7 @@ class Project extends \controllers\Controller
         $role->iss_editWatchers = ($projHash) ? 1 : $this->get('POST.iss_editWatchers') == "on";
         $role->iss_addWatchers = ($projHash) ? 1 : $this->get('POST.iss_addWatchers') == "on";
         $role->iss_viewWatchers = ($projHash) ? 1 : $this->get('POST.iss_viewWatchers') == "on";
+		$role->proj_manageCategories = ($projHash) ? 1 : $this->get('POST.proj_manageCategories') == "on";
         $role->save();
 
         if($projHash)
@@ -278,9 +279,11 @@ class Project extends \controllers\Controller
      */
     function projectAdd() 
     {
+		/* TODO: Fehlgedanke
 		if (!$this->get('SESSION.user.admin'))
 			return $this->tpfail($this->get('lng.insuffPermissions'));			
-
+		*/
+		
         $hash = \misc\helper::getFreeHash('Project');
         
         $ax = new \Axon('Project');
@@ -299,7 +302,7 @@ class Project extends \controllers\Controller
         $perms->role = $this->addEditRole($hash);
         $perms->save();
         
-        $milestone = new \controller\Milestone();
+        $milestone = new \controllers\Milestone();
         $milestone->addEditMilestone($hash);
         
         $this->addEditCategory($hash, $this->get('lng.uncategorized'));
@@ -490,9 +493,10 @@ class Project extends \controllers\Controller
      */
     function showAddProject()
     {
+		/* TODO: falscher Gedanke? Prüft nur auf Permissions eines bereits gewählten Projekts
 		if (!\misc\helper::getPermission('proj_editProject'))
 			return $this->tpfail($this->get('lng.insuffPermissions'));			
-
+		*/
         $this->set('template', 'projectAdd.tpl.php');
         $this->set('pageTitle', '{{@lng.project}} › {{@lng.add}}');
         $this->set('onpage', 'settings');

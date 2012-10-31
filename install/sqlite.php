@@ -14,7 +14,7 @@ $this->get('DB')->sql('CREATE TABLE User (name VARCHAR(40), hash CHAR(12) PRIMAR
 $this->get('DB')->sql('CREATE TABLE Project (hash CHAR(12) PRIMARY KEY, name VARCHAR(40), description TEXT, public TINYINT(1));');
 $this->get('DB')->sql('CREATE TABLE Milestone (hash CHAR(12) PRIMARY KEY, name VARCHAR(40), description text, finished date, project CHAR(12));');
 $this->get('DB')->sql('CREATE TABLE Activity (hash CHAR(12) PRIMARY KEY, description text, user CHAR(12), changed date, project CHAR(12), ticket CHAR(12), comment TEXT, changedFields TEXT);');
-$this->get('DB')->sql('CREATE TABLE Role (project CHAR(12), hash CHAR(12), name VARCHAR(40), issuesAssigneable BOOL, proj_editProject BOOL, proj_manageMembers BOOL, proj_manageMilestones BOOL, proj_manageRoles BOOL, iss_editIssues BOOL, iss_addIssues BOOL, iss_deleteIssues BOOL, iss_moveIssue BOOL, iss_editWatchers BOOL, iss_addWatchers BOOL, iss_viewWatchers BOOL, wiki_editWiki BOOL);');
+$this->get('DB')->sql('CREATE TABLE Role (project CHAR(12), hash CHAR(12), name VARCHAR(40), issuesAssigneable BOOL, proj_editProject BOOL, proj_manageMembers BOOL, proj_manageMilestones BOOL, proj_manageRoles BOOL, iss_editIssues BOOL, iss_addIssues BOOL, iss_deleteIssues BOOL, iss_moveIssue BOOL, iss_editWatchers BOOL, iss_addWatchers BOOL, iss_viewWatchers BOOL, wiki_editWiki BOOL, proj_manageCategories BOOL);');
 $this->get('DB')->sql('CREATE TABLE ProjectPermission (user CHAR(12), project CHAR(12), role CHAR(12), PRIMARY KEY (user, project));');
 $this->get('DB')->sql('CREATE TABLE ProjectAdmins (hash CHAR(12) PRIMARY KEY, user CHAR(12), project CHAR(12));');
 $this->get('DB')->sql('CREATE TABLE Category (hash CHAR(12) PRIMARY KEY, project CHAR(12), name VARCHAR(40));');

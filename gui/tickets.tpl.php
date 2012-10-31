@@ -1,6 +1,6 @@
-<h2 class="floatleft">{{@lng.tickets}}</h2>
+<h2 class="pull-left">{{@lng.tickets}}</h2>
 
-<div class="floatright">
+<div class="pull-right">
 	<form action="{{@BASE}}/search" method="post" id="searchForm" class="form-search">
 		<input type="input" name="search" value="{{@SESSION.ticketSearch}}" id="searchInput" class="search-query input-medium" /> <input type="submit" value="{{@lng.search}}" class="btn" /> <F3:check if="{{@getPermission('iss_addIssues')}}"><button class="btn btn-primary" data-toggle="modal" href="#addIssue">{{@lng.addticket}}</button></F3:check>
 	</form>
@@ -36,7 +36,7 @@
         </table>
     </F3:true>
     <F3:false>
-        <div class="info message clearfix">{{@lng.noTickets}}</div>
+        <div class="alert alert-info clearfix">{{@lng.noTickets}}</div>
     </F3:false>
 </F3:check>
 

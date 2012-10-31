@@ -10,6 +10,7 @@
 		<script type="text/javascript" src="{{@BASE}}/js/jquery.js"></script>
 		<script type="text/javascript" src="{{@BASE}}/js/jquery.tablesorter.js"></script>
 		<script type="text/javascript" src="{{@BASE}}/js/bootstrap.modals.js"></script>
+		<script type="text/javascript" src="{{@BASE}}/js/bootstrap.dropdown.js"></script>
 		<script type="text/javascript" src="{{@BASE}}/js/bugtrckr.js"></script>
     </head>
 
@@ -39,21 +40,17 @@
 						</F3:false>
 					</F3:check>  
 					<F3:check if="{{count(@projects) > 0 || @SESSION.user.hash}}">
-						{{*<li>
-							<form method="post" action="{{@BASE}}/project/select">
-								<select name="project" size="1" id="projectChooser">
-									<option value=""></option>
-									<F3:check if="{{@SESSION.user.hash}}">
-										<option value="new">{{@lng.newProject}}</option>
+						<li class="projectChooser">	
+							<a class="dropdown-toggle textDropdown" data-toggle="dropdown">Project <span class="caret"></span></a>
+							<ul class="dropdown-menu">
+								<F3:repeat group="{{@projects}}" value="{{@project}}">
+									<F3:check if="{{\misc\helper::canRead(@project->hash)}}">
+										<li><a href="{{@BASE}}/project/select/{{@project->hash}}">{{@project->name}} {{(@project->hash == @SESSION.project)?'<span class="label label-success">'.strtolower(@lng.active).'</span>':''}}</a></li>
 									</F3:check>
-									<F3:repeat group="{{@projects}}" value="{{@project}}">
-										<F3:check if="{{\misc\helper::canRead(@project->hash)}}">
-										<option value="{{@project->hash}}" {{(@project->hash == @SESSION.project)?'selected="selected"':''}}>{{@project->name}}</option>
-										</F3:check>
-									</F3:repeat>
-								</select>
-							</form>
-						</li>*}}
+								</F3:repeat>
+								<li><a href="{{@BASE}}/project/add"><em>{{@lng.newProject}}</em></a>
+							</ul>
+						</li>
 					</F3:check>
 				</ul>
 				<ul class="nav pull-right">
@@ -78,7 +75,7 @@
 
     <F3:check if="{{!@SESSION.user}}">
         <div id="login" class="modal hide">
-			<form action="{{@BASE}}/user/login" method="post" class="clearfix">
+			<form action="{{@BASE}}/user/login" method="post">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal">×</button>
 					<h3>{{@lng.login}}</h3>

@@ -10,6 +10,8 @@
  *   
 **/
 
+$start = microtime();
+
 $app = require '../lib/base.php';
 
 // really dirty, but works great
@@ -27,7 +29,7 @@ $app->set('GUI','../gui/');
 $app->set('AUTOLOAD', '../inc/');
 $app->set('TEMP', '../temp/');
 $app->set('LOCALES','../lang/');
-$app->set('LANGUAGE', 'de'); // currently forcing to German
+$app->set('LANGUAGE', 'en'); // currently forcing to German
 
 $app->set('getPermission', function($permission) {
     $helper = new \misc\helper();
@@ -58,9 +60,9 @@ $app->route('GET /wiki/@title', '\controllers\wiki->showEntry');
 $app->route('GET /wiki', '\controllers\wiki->showEntry');
 $app->route('GET /wiki/discussion/@hash', '\controllers\wiki->showDiscussion');
 
+$app->route('GET /project/select/@project', 'misc\main->selectProject');
 $app->route('GET /user/logout', '\controllers\user->logoutUser');
 $app->route('POST /search', '\controllers\ticket->showTickets');
-$app->route('POST /project/select', 'misc\main->selectProject');
 $app->route('POST /user/login', '\controllers\user->loginUser');
 $app->route('POST /user/new', '\controllers\user->registerUser');
 $app->route('POST /ticket', '\controllers\ticket->addTicket');
@@ -84,3 +86,7 @@ $app->run();
 
 $app->clear('SESSION.SUCCESS');
 $app->clear('SESSION.FAILURE');
+
+$end = microtime();
+
+echo "Render time: ".($end - $start);

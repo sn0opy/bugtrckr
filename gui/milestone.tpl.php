@@ -56,7 +56,7 @@
             </table>
         </F3:true>
         <F3:false>
-            <div class="message info">{{@lng.noTickets}}</div>
+            <div class="alert alert-info">{{@lng.noTickets}}</div>
         </F3:false>
 	</F3:check>
 </div>

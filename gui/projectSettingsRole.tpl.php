@@ -30,6 +30,15 @@
             <input type="checkbox" name="proj_editProject" {{(@roleData->proj_editProject)?'checked="checked"':''}} />
         </div>
     </div>
+	
+	<div class="formRow">
+        <div class="formLabel">
+            {{@lng.proj_manageCategories}}
+        </div>
+        <div class="formValue">
+            <input type="checkbox" name="proj_manageCategories" {{(@roleData->proj_manageCategories)?'checked="checked"':''}} />
+        </div>
+    </div>
 
     <div class="formRow">
         <div class="formLabel">
@@ -119,8 +128,7 @@
         <div class="formValue">
             <input type="checkbox" name="iss_viewWatchers" {{(@roleData->iss_viewWatchers)?'checked="checked"':''}} />
         </div>
-    </div>
-    
-    <input type="submit" value="{{@lng.save}}" />
+    </div>    
+    <input type="submit" value="{{@lng.save}}" class="btn btn-primary" />
 </form>
 </div>

@@ -1,0 +1,1 @@
+<?php F3::set('DB', new \DB('mysql:host=localhost;dbname=bugtrckr', 'root', 'hehejo')); ?>
