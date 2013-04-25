@@ -40,7 +40,7 @@
 						</F3:false>
 					</F3:check>  
 					<F3:check if="{{count(@projects) > 0 || @SESSION.user.hash}}">
-						<li class="projectChooser">	
+						<li class="projectChooser dropdown">	
 							<a class="dropdown-toggle textDropdown" data-toggle="dropdown">Project <span class="caret"></span></a>
 							<ul class="dropdown-menu">
 								<F3:repeat group="{{@projects}}" value="{{@project}}">

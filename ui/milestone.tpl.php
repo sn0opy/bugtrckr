@@ -2,20 +2,16 @@
 
 <F3:check if="{{@stats.fullTicketCount}}">
     <F3:true>
-        <table class="percentBar">
-            <tr>
+        <div class="progress">
             <F3:repeat group="{{@stats.ticketCount}}" value="{{@tickCnt}}">
-                <td width="{{@tickCnt.percent}}%" class="background-color{{@tickCnt.state}}">{{@tickCnt.count}}</td>
+                <div width="{{@tickCnt.percent}}%" class="bar background-color{{@tickCnt.state}}">{{@tickCnt.count}}</div>
             </F3:repeat>
-            </tr>
-        </table>
+		</div>
     </F3:true>
     <F3:false>
-        <table class="percentBar">
-            <tr>
-                <td width="100%" class="noTickets">0</td>
-            </tr>
-        </table>
+        <div class="progress">
+			<div class="bar" style="width: 100%;">0</div>
+        </div>
     </F3:false>
 </F3:check>
 

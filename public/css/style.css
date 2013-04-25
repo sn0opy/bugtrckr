@@ -223,21 +223,6 @@ input, textarea, select
     margin-top: 20px;
 }
 
-.percentBar
-{
-    width: 300px;
-    text-align: center;
-    border: 1px solid #999;
-    margin-bottom: 10px;
-}
-
-.percentBar td
-{
-    padding-top: 5px;
-    padding-bottom: 5px;
-    line-height: 10px;
-}
-
 .percentBar .background-color1
 {
     background-color: #88C134;
@@ -491,4 +476,8 @@ td.action a {
 
 .navbar ul.nav li.projectChooser .dropdown-menu a {
 	color: #333 !important;
+}
+
+.progress {
+	width: 300px;
 }

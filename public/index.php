@@ -10,11 +10,8 @@
  *   
 **/
 
-$start = microtime();
-
 $app = require '../lib/base.php';
 
-// really dirty, but works great
 if(file_exists('../data/config.inc.php'))
     include '../data/config.inc.php';
 elseif($app->exists('POST.email'))
@@ -24,12 +21,10 @@ else
 	
 
 $app->set('CACHE', false);
-$app->set('DEBUG', 3);
-$app->set('GUI','../gui/'); 
+$app->set('DEBUG', 2);
+$app->set('GUI','../ui/'); 
 $app->set('AUTOLOAD', '../inc/');
 $app->set('TEMP', '../temp/');
-$app->set('LOCALES','../lang/');
-$app->set('LANGUAGE', 'en'); // currently forcing to German
 
 $app->set('getPermission', function($permission) {
     $helper = new \misc\helper();
@@ -86,7 +81,3 @@ $app->run();
 
 $app->clear('SESSION.SUCCESS');
 $app->clear('SESSION.FAILURE');
-
-$end = microtime();
-
-echo "Render time: ".($end - $start);
