@@ -10,9 +10,7 @@
  *   
  */
 
-namespace controllers;
-
-class Wiki extends \controllers\Controller
+class Wiki extends Controller
 {
 
     public function editEntry()

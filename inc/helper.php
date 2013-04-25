@@ -5,45 +5,59 @@
  * 
  * @author Sascha Ohms
  * @author Philipp Hirsch
- * @copyright Copyright 2011, Bugtrckr-Team
+ * @copyright Copyright 2013, Bugtrckr-Team
  * @license http://www.gnu.org/licenses/lgpl.txt
  *   
  */
-namespace misc;
 
-class helper extends \F3instance
-{
+// TODO: shouldn't extend controller
+class Helper extends Controller {
 
-    public static function randStr($length = 5)
-    {
+	/**
+	 * 
+	 * @param type $length
+	 * @return type
+	 */
+    public static function randStr($length = 5) {
         return substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, $length);
     }
 
-    public static function salting($salt, $pass)
-    {
+	/**
+	 * 
+	 * @param type $salt
+	 * @param type $pass
+	 * @return type
+	 */
+    public static function salting($salt, $pass) {
         $salt = md5($salt);
         $pw = md5($pass);
         return sha1(md5($salt . $pw) . $salt);
     }
 
-    public static function getFreeHash($table, $length = 12)
-    {
+	/**
+	 * 
+	 * @param type $table
+	 * @param type $length
+	 * @return type
+	 */
+    public static function getFreeHash($table, $length = 12) {
         $ax = new \Axon($table);
-        do
-        {
+        do {
             $hash = self::randStr($length);
             $ax->find('hash = "' . $hash . '"');
         } while (!$ax->dry());
         return $hash;
     }
 
-    public static function setTitle($subTitles)
-    {
+	/**
+	 * 
+	 * @param type $subTitles
+	 */
+    public static function setTitle($subTitles) {
         $title = '';
         $subTitles = (array) $subTitles;
 
-        foreach ($subTitles as $sub)
-        {
+        foreach ($subTitles as $sub) {
             $seperator = !empty($title) ? ' › ' : '';
             $title .= $seperator . $sub;
         }
@@ -58,13 +72,11 @@ class helper extends \F3instance
      * @return bool
      * @static
      */
-    public static function getPermission($permission)
-    {
+    public static function getPermission($permission) {
         $userHash = \F3::get('SESSION.user.hash');
         $projectHash = \F3::get('SESSION.project');
         
-        if ($userHash)
-        {
+        if ($userHash) {
             $user = new \models\User();
             $user->load(array('hash = :hash', array(':hash' => $userHash)));
 
@@ -91,33 +103,41 @@ class helper extends \F3instance
     }
 
 	/**
-	 *	
+	 * 
+	 * @param type $hash
+	 * @return boolean
 	 */
-	public static function canRead($hash)
-	{
-		$project = new \models\Project();
+	public static function canRead($hash){
+		$f3 = Base::instance();
+		
+		$project = new DB\SQL\Mapper(parent::$db, 'project');
 		$project->load(array('hash = :hash', array(':hash' => $hash)));
 
 		if ($project->public)
 			return true;
 
-		$perm = new \models\projPerms();
-		return $perm->found(array('user = :user AND project = :project', array(':user' => \F3::get('SESSION.user.hash'), ':project' => \F3::get('SESSION.project'))));
+		$perm = new DB\SQL\Mapper(parent::$db, 'ProjectPermission');
+		return $perm->found(array('user = :user AND project = :project', array(':user' => $f3->get('SESSION.user.hash'), ':project' => $f3->get('SESSION.project'))));
 	}
 
 	/**
-	 *
+	 * 
+	 * @param type $milestone
+	 * @return type
 	 */
-    public static function getTicketCount($milestone)
-    {
+    public static function getTicketCount($milestone) {
         return \F3::get('DB')->sql('SELECT state, COUNT(*) AS `count` FROM `Ticket` WHERE milestone = \'' . $milestone . '\' GROUP BY state');
     }
 
 	/**
-	 *
+	 * 
+	 * @param type $description
+	 * @param type $ticket
+	 * @param type $comment
+	 * @param type $fields
+	 * @param type $projHash
 	 */
-    public static function addActivity($description, $ticket = 0, $comment = '', $fields = '', $projHash = false)
-    {
+    public static function addActivity($description, $ticket = 0, $comment = '', $fields = '', $projHash = false) {
         $activity = new \models\Activity();
         
         $activity->hash = \misc\helper::getFreeHash('Activity');
@@ -133,10 +153,11 @@ class helper extends \F3instance
     }
 
 	/**
-	 *
+	 * 
+	 * @param type $hash
+	 * @return type
 	 */
-	public static function getUsername($hash)
-	{
+	public static function getUsername($hash) {
 		$user = new \models\User();
 		$user->load(array('hash = :hash', array(':hash' => $hash)));
 
@@ -146,8 +167,13 @@ class helper extends \F3instance
 		return $user->name;
 	}
 
-	public static function getName($type, $id)
-	{
+	/**
+	 * 
+	 * @param type $type
+	 * @param type $id
+	 * @return string
+	 */
+	public static function getName($type, $id) {
         $arr = \F3::get('lng.' . $type);
         
         foreach($arr as $elem)
@@ -157,14 +183,23 @@ class helper extends \F3instance
         return '';
 	}
     
+	/**
+	 * 
+	 * @param type $hash
+	 * @return type
+	 */
     public static function getMsName($hash) {
         $ms = new \models\Milestone();
         $ms->load(array('hash = :hash', array(':hash' => $hash)));
         return $ms->name;
     }
 
-	public static function translateBBCode($string)
-    {
+	/**
+	 * 
+	 * @param type $string
+	 * @return type
+	 */
+	public static function translateBBCode($string) {
         $string = preg_replace('/===(.+)===/', '<h3>${1}</h3>', $string);
         $string = preg_replace('/==(.+)==/', '<h2>${1}</h2>', $string);
         $string = preg_replace('/\'\'\'(.+)\'\'\'/', '<b>${1}</b>', $string);			

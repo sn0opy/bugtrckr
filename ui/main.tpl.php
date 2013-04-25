@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
     <head>
-		<meta charset="UTF-8" />
+		<meta charset="utf-8" />
 		<link href="{{@BASE}}/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 		<link href="{{@BASE}}/css/bootstrap-responsive.min.css" rel="stylesheet" type="text/css" />
 		<link href="{{@BASE}}/css/style.css" rel="stylesheet" type="text/css" />
@@ -21,59 +21,63 @@
 				<a class="brand" href="{{@BASE}}/">Bugtrckr</a>
 				<ul class="nav">
 					<li{{@onpage=='start'?' class="active"':''}}><a href="{{@BASE}}/">{{@lng.home}}</a></li>
-					<F3:check if="{{@SESSION.project}}">
-						<F3:true>
+					<check if="{{isset(@SESSION.project)}}">
+						<true>
 							<li{{@onpage=='tickets'?' class="active"':''}}><a href="{{@BASE}}/tickets">{{@lng.tickets}}</a></li>
 							<li{{@onpage=='roadmap'?' class="active"':''}}><a href="{{@BASE}}/roadmap">{{@lng.roadmap}}</a></li>
 							<li{{@onpage=='timeline'?' class="active"':''}}><a href="{{@BASE}}/timeline">{{@lng.timeline}}</a></li>
 							<li{{@onpage=='wiki'?' class="active"':''}}><a href="{{@BASE}}/wiki">{{@lng.wiki}}</a></li>
-							<F3:check if="{{@SESSION.user}}">
-								<F3:true>
+							<check if="{{@SESSION.user}}">
+								<true>
 									<li{{@onpage=='settings'?' class="active"':''}}><a href="{{@BASE}}/project/settings">{{@lng.settings}}</a></li>
-								</F3:true>
-							</F3:check>
-						</F3:true>
-					</F3:check>
-					<F3:check if="{{@SESSION.user}}">
-						<F3:false>
+								</true>
+							</check>
+						</true>
+					</check>
+					<check if="{{isset(@SESSION.user)}}">
+						<false>
 							<li{{@onpage=='registration'?' class="active"':''}}><a href="{{@BASE}}/user/new">{{@lng.registration}}</a></li>
-						</F3:false>
-					</F3:check>  
-					<F3:check if="{{count(@projects) > 0 || @SESSION.user.hash}}">
+						</false>
+					</check>  
+					<check if="{{count(@projects) > 0 || @SESSION.user.hash}}">
 						<li class="projectChooser dropdown">	
 							<a class="dropdown-toggle textDropdown" data-toggle="dropdown">Project <span class="caret"></span></a>
 							<ul class="dropdown-menu">
-								<F3:repeat group="{{@projects}}" value="{{@project}}">
-									<F3:check if="{{\misc\helper::canRead(@project->hash)}}">
-										<li><a href="{{@BASE}}/project/select/{{@project->hash}}">{{@project->name}} {{(@project->hash == @SESSION.project)?'<span class="label label-success">'.strtolower(@lng.active).'</span>':''}}</a></li>
-									</F3:check>
-								</F3:repeat>
+								<repeat group="{{@projects}}" value="{{@project}}">
+									{*
+									TODO: static call is broken
+									helper::canRead(@project->hash)
+									<check if="{{1==1}}">
+										<li><a href="{{@BASE}}/project/select/{{@project->hash}}">{{@project->name}} {{(isset(@SESSION.project) && @project->hash == @SESSION.project)?'<span class="label label-success">'.strtolower(@lng.active).'</span>':''}}</a></li>
+									</check>
+									*}
+								</repeat>
 								<li><a href="{{@BASE}}/project/add"><em>{{@lng.newProject}}</em></a>
 							</ul>
 						</li>
-					</F3:check>
+					</check>
 				</ul>
 				<ul class="nav pull-right">
-					<F3:check if="{{@SESSION.user}}">
-						<F3:true>
+					<check if="{{isset(@SESSION.user)}}">
+						<true>
 							<li><a href="{{@BASE}}/user/{{@SESSION.user->name}}">{{@SESSION.user->name}}</a></li>
 							<li><a href="{{@BASE}}/user/logout">{{@lng.logout}}</a></li>
-						</F3:true>
-						<F3:false>
+						</true>
+						<false>
 							<li><a href="#login" data-toggle="modal">{{@lng.login}}</a></li>
-						</F3:false>
-					</F3:check>
+						</false>
+					</check>
 				</ul>
 			</div>
 		</div>
 	</div>
 
 
-    <F3:check if="{{@installWarning && @RELEASE}}">
+    <check if="{{isset(@installWarning) && isset(@RELEASE)}}">
         <div class="message warning">{{@lng.warningInstallFiles}}</div>
-    </F3:check>
+    </check>
 
-    <F3:check if="{{!@SESSION.user}}">
+    <check if="{{!isset(@SESSION.user)}}">
         <div id="login" class="modal hide">
 			<form action="{{@BASE}}/user/login" method="post">
 				<div class="modal-header">
@@ -95,17 +99,17 @@
 				</div>
 			</form>
         </div>
-    </F3:check>
+    </check>
 
     <div id="content">
 		<div id="innerContentLOL">
-            <F3:check if="{{@SESSION.FAILURE}}">
+            <check if="{{isset(@SESSION.FAILURE)}}">
                 <div class="alert alert-error">{{@SESSION.FAILURE}}</div>
-            </F3:check>
-            <F3:check if="{{@SESSION.SUCCESS}}">
+            </check>
+            <check if="{{isset(@SESSION.SUCCESS)}}">
                 <div class="alert alert-success">{{@SESSION.SUCCESS}}</div>
-            </F3:check>
-            <F3:include href="{{@template}}" />
+            </check>
+            <include href="{{@template}}" />
         </div>
     </div>
 

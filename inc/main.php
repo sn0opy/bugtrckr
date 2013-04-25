@@ -5,24 +5,19 @@
  * 
  * @author Sascha Ohms
  * @author Philipp Hirsch
- * @copyright Copyright 2011, Bugtrckr-Team
+ * @copyright Copyright 2013, Bugtrckr-Team
  * @license http://www.gnu.org/licenses/lgpl.txt
  *   
  */
 
-namespace misc;
-
-class main extends \controllers\Controller
-{
+class Main extends Controller {
 	/**
 	 * 
 	 */
-    function start()
-    {
-        $this->set('pageTitle', '{{@lng.home}}');
-        $this->set('template', 'home.tpl.php');
-        $this->set('onpage', 'start');
-        $this->tpserve();
+    function start($f3) {
+        $f3->set('pageTitle', '{{@lng.home}}');
+        $f3->set('template', 'home.tpl.php');
+        $f3->set('onpage', 'start');
     }
  
     /**

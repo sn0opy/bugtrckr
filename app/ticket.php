@@ -9,39 +9,37 @@
  * @license http://www.gnu.org/licenses/lgpl.txt
  *   
  */
-namespace controllers;
 
-class Ticket extends \controllers\Controller
-{
+class Ticket extends Controller {
 
-    /**
-     *	Add Ticket into the database
-     */
-    function addTicket()
-    {
-        if (!\misc\helper::getPermission('iss_addIssues'))
-            return $this->tpfail($this->get('lng.insuffPermissions'));
+	/**
+	 * 
+	 * @return type
+	 */
+    function addTicket($f3) {
+        if (!helper::getPermission('iss_addIssues'))
+            return $this->tpfail($f3->get('lng.insuffPermissions'));
 
-        $ticket = new \models\Ticket();
-        $ticket->hash = \misc\helper::getFreeHash('Ticket');
-        $ticket->title = $this->get('POST.title');
-        $ticket->description = $this->get('POST.description');
-        $ticket->owner = $this->get('SESSION.user.hash');
+        $ticket = new \DB\SQL\Mapper($f3->db, 'Ticket');
+        $ticket->hash = helper::getFreeHash('Ticket');
+        $ticket->title = $f3->get('POST.title');
+        $ticket->description = $f3->get('POST.description');
+        $ticket->owner = $f3->get('SESSION.user.hash');
         $ticket->assigned = 0; // do not assign to anyone
-        $ticket->type = $this->get('POST.type');
+        $ticket->type = $f3->get('POST.type');
         $ticket->state = 1;
         $ticket->created = time();
-        $ticket->priority = $this->get('POST.priority');
-        $ticket->category = $this->get('POST.category');
-        $ticket->milestone = $this->get('POST.milestone');
+        $ticket->priority = $f3->get('POST.priority');
+        $ticket->category = $f3->get('POST.category');
+        $ticket->milestone = $f3->get('POST.milestone');
         $ticket->save();
 
         if (!$ticket->_id)
-            return $this->tpfail($this->get('lng.saveTicketFail'));
+            return $this->tpfail($f3->get('lng.saveTicketFail'));
 
-        \misc\helper::addActivity($this->get('lng.ticket') . " '$ticket->title' " . $this->get('lng.added') . ".", $ticket->hash);
+        helper::addActivity($f3->get('lng.ticket') . " '$f3->title' " . $f3->get('lng.added') . ".", $ticket->hash);
 
-        $this->reroute('/ticket/' . $ticket->hash);
+        $f3->reroute('/ticket/' . $ticket->hash);
     }
 
     /**

@@ -163,5 +163,6 @@ return array('lng' => array(
 	'active' => 'Active',
 	'insuffPermissions' => 'You have insufficient permissions do to this.',
 	'pwMailWrong' => 'Password or mail is wrong, please try again.',
-	'firstMilestone' => 'First milestone'
+	'firstMilestone' => 'First milestone',
+	'register' => 'Register'
 ));

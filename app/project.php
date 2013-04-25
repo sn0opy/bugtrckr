@@ -9,9 +9,8 @@
  * @license http://www.gnu.org/licenses/lgpl.txt
  *   
  */
-namespace controllers;
 
-class Project extends \controllers\Controller
+class Project extends Controller
 {
     function projectAddMember()
     {

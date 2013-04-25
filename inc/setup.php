@@ -5,43 +5,43 @@
  * 
  * @author Sascha Ohms
  * @author Philipp Hirsch
- * @copyright Copyright 2011, Bugtrckr-Team
+ * @copyright Copyright 2013, Bugtrckr-Team
  * @license http://www.gnu.org/licenses/lgpl.txt
  *   
  */
 
-namespace misc;
-
-class Setup extends \F3instance 
-{
+class Setup {
     public function start() 
 	{
-        $this->set('NEEDED', array(
+		$f3 = Base::instance();
+		
+        $f3->set('NEEDED', array(
             'sqlite' => extension_loaded('pdo_sqlite'),
             'mysql' => extension_loaded('pdo_mysql'),
             'writepermission' => is_writable('../data/'),
             'configexists' => file_exists('../data/config.inc.php')
             ));                
         
-        $this->set('BERROR', $this->doChecks());        
+        $f3->set('BERROR', $this->doChecks());        
         $this->tpserve();
     }    
     
     public function install() 
 	{
-        $admname = $this->get('POST.name');
-        $admpw = $this->get('POST.pw');
-        $admemail = $this->get('POST.email');
+		$f3 = Base::instance();
+		
+        $admname = $f3->get('POST.name');
+        $admpw = $f3->get('POST.pw');
+        $admemail = $f3->get('POST.email');
         
-        if($this->get('POST.dbtype') == 'mysqldb') 
+        if($f3->get('POST.dbtype') == 'mysqldb') 
 		{
-            $host = $this->get('POST.sqlhost');
-            $user = $this->get('POST.sqluser');
-            $pass = $this->get('POST.sqlpw');
-            $db = $this->get('POST.sqldb');
+            $host = $f3->get('POST.sqlhost');
+            $user = $f3->get('POST.sqluser');
+            $pass = $f3->get('POST.sqlpw');
+            $db = $f3->get('POST.sqldb');
 
-            $this->set('DB', new \DB('mysql:host=' .$host. ';dbname=' .$db, $user, $pass));
-            $this->get('DB')->sql('SET NAMES utf8'); // just to check whether connection works
+            $f3->set('DB', new \DB\SQL('mysql:host=' .$host. ';dbname=' .$db, $user, $pass));
             
             require_once '../install/mysql.php';
             
@@ -84,22 +84,29 @@ class Setup extends \F3instance
         }
     }           
     
+	/**
+	 * 
+	 */
     private function doChecks() {
+		$f3 = Base::instance();
         $error = false;
         
-        if($this->get('NEEDED.sqlite') != true && $this->get('NEEDED.mysql') != true)
+        if($f3->get('NEEDED.sqlite') != true && $f3->get('NEEDED.mysql') != true)
             $error = true;
         
-        if($this->get('NEEDED.writepermission') != true)
+        if($f3->get('NEEDED.writepermission') != true)
             $error = true;
         
-        if($this->get('NEEDED.configexists') == true)
+        if($f3->get('NEEDED.configexists') == true)
             $error = true;
         
         return $error;
     }
-    
+	
+    /**
+	 * 
+	 */
     private function tpserve() {
-        echo \Template::serve('setup.tpl.php');
+        echo Template::instance()->serve('setup.tpl.php');
     }
 }
