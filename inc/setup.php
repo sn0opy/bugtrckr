@@ -46,7 +46,7 @@ class Setup {
             require_once '../install/mysql.php';
             
             $usr = new \controllers\User();
-            $usr->registerUser($admname, $admpw, $admemail, true);
+            $usr->registerUser(false, false, $admname, $admpw, $admemail, true);
             
             file_put_contents('../data/config.inc.php', "<?php F3::set('DB', new \DB('mysql:host=".$host.";dbname=".$db."', '".$user."', '".$pass."')); ?>");
             
@@ -69,7 +69,7 @@ class Setup {
             require_once '../install/sqlite.php';
             
             $user = new \controllers\User();
-            if(!$user->registerUser($admname, $admpw, $admemail, true)) 
+            if(!$user->registerUser(false, false, $admname, $admpw, $admemail, true)) 
 			{
                 $this->set('usererror', true);
                 $this->tpserve();

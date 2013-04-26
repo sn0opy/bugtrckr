@@ -41,7 +41,7 @@ class Helper extends Controller {
 	 * @return type
 	 */
     public static function getFreeHash($table, $length = 12) {
-        $ax = new \Axon($table);
+        $ax = new DB\SQL\Mapper(self::$db, $table);
         do {
             $hash = self::randStr($length);
             $ax->find('hash = "' . $hash . '"');

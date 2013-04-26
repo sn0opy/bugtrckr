@@ -16,8 +16,9 @@ class User extends Controller
     /**
      *	Adds a new user to the database
      */
-    function registerUser($name = false, $password = false, $email = false, $admin = false) {
-		$f3 = Base::instance();
+    function registerUser($f3 = false, $params = false, $name = false, $password = false, $email = false, $admin = false) {
+		if(!$f3)
+			$f3 = Base::instance();
 		
         if (($f3->get('POST.name') == "" && $name == "") || ($f3->get('POST.email') == "" && $email == ""))
 			return $this->tpfail($f3->get('lng.noCorretdata'));
