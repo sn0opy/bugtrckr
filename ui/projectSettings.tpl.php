@@ -17,8 +17,8 @@
 
 		*}}    
 		<div class="tabContent span10" id="tabContent_1">
-			<F3:check if="{{@getPermission('proj_editProject')}}">
-				<F3:true>
+			<check if="{{@getPermission('proj_editProject')}}">
+				<true>
 					<form action="{{@BASE}}/project/settings/main/edit" method="post">
 						<div class="formRow">
 							<div class="formLabel">
@@ -48,11 +48,11 @@
 						</div>
 						<input type="submit" value="{{@lng.save}}" class="btn btn-primary" />
 					</form>
-				</F3:true>
-				<F3:false>
+				</true>
+				<false>
 					<div class="alert alert-error">{{@lng.noAccess}}</div>
-				</F3:false>
-			</F3:check>
+				</false>
+			</check>
 		</div>
 		{{* 
 
@@ -60,8 +60,8 @@
 
 		*}}
 		<div class="tabContent span10" id="tabContent_2">
-			<F3:check if="{{@getPermission('proj_manageMembers')}}">
-				<F3:true>
+			<check if="{{@getPermission('proj_manageMembers')}}">
+				<true>
 					<table class="sortable table table-striped table-bordered">
 						<thead>
 							<tr>
@@ -70,7 +70,7 @@
 							</tr>
 						</thead>
 						<tbody>
-						<F3:repeat group="{{@projMembers}}" value="{{@member}}">
+						<repeat group="{{@projMembers}}" value="{{@member}}">
 							<tr>
 								<td class="title">
 									<a href="{{@BASE}}/user/{{@member->name}}">{{@member->name}}</a>
@@ -80,9 +80,9 @@
 									<form action="{{@BASE}}/project/settings/member/setrole" method="post" class="pull-left">
 										<input type="hidden" name="user" value="{{@member->hash}}" />
 										<select name="role" class="floatleft">
-											<F3:repeat group="{{@projRoles}}" value="{{@role}}">
+											<repeat group="{{@projRoles}}" value="{{@role}}">
 												<option value="{{@role->hash}}" {{(@member->roleId == @role->id)?'selected="selected"':''}}>{{@role->name}}</option>
-											</F3:repeat>
+											</repeat>
 										</select>
 										<input type="submit" value="Ändern" class="btn" />
 									</form>
@@ -93,31 +93,31 @@
 									</p>
 								</td>
 							</tr>
-						</F3:repeat>
+						</repeat>
 						</tbody>
 					</table>
 
 					<form action="{{@BASE}}/project/settings/member/add" method="post" class="form-inline">
 						<p class="addUser">
 							<select name="member">
-								<F3:repeat group="{{@users}}" value="{{@user}}">
+								<repeat group="{{@users}}" value="{{@user}}">
 									<option value="{{@user->hash}}">{{@user->name}}</option>
-								</F3:repeat>
+								</repeat>
 							</select>
 							{{@lng.asRole}}
 							<select name="role">
-								<F3:repeat group="{{@projRoles}}" value="{{@role}}">
+								<repeat group="{{@projRoles}}" value="{{@role}}">
 									<option value="{{@role->hash}}">{{@role->name}}</option>
-								</F3:repeat>
+								</repeat>
 							</select>
 							<input type="submit" value="{{@lng.add}}" class="btn btn-primary" />
 						</p>
 					</form>
-				</F3:true>
-				<F3:false>
+				</true>
+				<false>
 					<div class="alert alert-error">{{@lng.noAccess}}</div>
-				</F3:false>
-			</F3:check>
+				</false>
+			</check>
 		</div>
 		{{* 
 
@@ -125,8 +125,8 @@
 
 		*}}
 		<div class="tabContent span10" id="tabContent_3">
-			<F3:check if="{{@getPermission('proj_manageMilestones')}}">
-				<F3:true>
+			<check if="{{@getPermission('proj_manageMilestones')}}">
+				<true>
 					<table class="sortable table table-striped table-bordered">
 						<thead>
 							<tr>
@@ -135,7 +135,7 @@
 							</tr>
 						</thead>
 						<tbody>
-						<F3:repeat group="{{@projMilestones}}" value="{{@milestone}}">
+						<repeat group="{{@projMilestones}}" value="{{@milestone}}">
 							<tr>
 								<td class="title">
 									<a href="{{@BASE}}/project/settings/milestone/{{@milestone->hash}}">{{@milestone->name}}</a>
@@ -145,15 +145,15 @@
 									<a class="btn" href="{{@BASE}}/project/settings/milestone/{{@milestone->hash}}">{{@lng.edit}}</a>
 								</td>
 							</tr>
-						</F3:repeat>
+						</repeat>
 						</tbody>
 					</table>
 					<a href="{{@BASE}}/project/settings/milestone/add" class="btn btn-primary">{{@lng.addmilestone}}</a>
-				</F3:true>
-				<F3:false>
+				</true>
+				<false>
 					<div class="alert alert-error">{{@lng.noAccess}}</div>
-				</F3:false>
-			</F3:check>
+				</false>
+			</check>
 		</div>
 		{{* 
 
@@ -161,8 +161,8 @@
 
 		*}}
 		<div class="tabContent span10" id="tabContent_4">
-			<F3:check if="{{@getPermission('proj_manageRoles')}}">
-				<F3:true>
+			<check if="{{@getPermission('proj_manageRoles')}}">
+				<true>
 					<table class="table-striped table sortable table-bordered">
 						<thead>
 							<tr>
@@ -171,7 +171,7 @@
 							</tr>
 						</thead>
 						<tbody>
-						<F3:repeat group="{{@projRoles}}" value="{{@role}}">
+						<repeat group="{{@projRoles}}" value="{{@role}}">
 							<tr>
 								<td class="title">
 									<a href="{{@BASE}}/project/settings/role/{{@role->hash}}">{{@role->name}}</a>
@@ -181,15 +181,15 @@
 									<a class="btn" href="{{@BASE}}/project/settings/role/{{@role->hash}}">{{@lng.edit}}</a>
 								</td>
 							</tr>
-						</F3:repeat>
+						</repeat>
 						</tbody>
 					</table>
 					<a href="{{@BASE}}/project/settings/role/add" class="btn btn-primary">{{@lng.addrole}}</a>
-				</F3:true>
-				<F3:false>
+				</true>
+				<false>
 					<div class="alert alert-error">{{@lng.noAccess}}</div>
-				</F3:false>
-			</F3:check>
+				</false>
+			</check>
 		</div>
 		{{* 
 
@@ -197,8 +197,8 @@
 
 		*}}
 		<div class="tabContent span10" id="tabContent_5">
-			<F3:check if="{{@getPermission('proj_manageCategories')}}">
-				<F3:true>
+			<check if="{{@getPermission('proj_manageCategories')}}">
+				<true>
 					<table class="table table-striped sortable table-bordered">
 						<thead>
 							<tr>
@@ -207,7 +207,7 @@
 							</tr>
 						</thead>
 						<tbody>
-						<F3:repeat group="{{@projCategories}}" value="{{@category}}">
+						<repeat group="{{@projCategories}}" value="{{@category}}">
 							<tr>
 								<td class="title">
 									{{@category->name}}
@@ -217,15 +217,15 @@
 									<a class="btn" href="{{@BASE}}/project/settings/category/edit/{{@category->hash}}">{{@lng.edit}}</a>
 								</td>
 							</tr>
-						</F3:repeat>
+						</repeat>
 						</tbody>
 					</table>
 					<a href="{{@BASE}}/project/settings/category/add" class="btn btn-primary">{{@lng.addcategory}}</a>
-				</F3:true>
-				<F3:false>
+				</true>
+				<false>
 					<div class="alert alert-error">{{@lng.noAccess}}</div>
-				</F3:false>
-			</F3:check>
+				</false>
+			</check>
 		</div>
 	</div>
 		

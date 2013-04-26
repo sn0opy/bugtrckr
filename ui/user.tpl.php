@@ -1,8 +1,8 @@
 <h2>{{@lng.user}} › {{@user->name}}</h2>
 
 <h3>{{@lng.tickets}}:</h3>
-<F3:check if="{{@tickets}}">
-	<F3:true>
+<check if="{{@tickets}}">
+	<true>
 		<table class="table table-striped sortable table-bordered">
 			<thead>
 				<tr>
@@ -17,21 +17,21 @@
 			</thead>
 
 			<tbody>
-				<F3:repeat group="{{@tickets}}" value="{{@ticket}}">
+				<repeat group="{{@tickets}}" value="{{@ticket}}">
 				<tr>
 					<td class="title"><a href="{{@BASE}}/ticket/{{@ticket->tickethash}}">{{@ticket->title}}</a></td>
-					<td class="type">{{\misc\Helper::getName('types', @ticket->type)}}</td>
-					<td class="state"><span class="color{{@ticket->state}}">{{\misc\Helper::getName('states', @ticket->state)}}</span></td>
-					<td class="priority"><span style="display: none;">{{@ticket->priority}}</span><span class="color{{@ticket->priority}}">{{\misc\Helper::getName('priorities', @ticket->priority)}}</span></td>
+					<td class="type">{{Helper::getName('types', @ticket->type)}}</td>
+					<td class="state"><span class="color{{@ticket->state}}">{{Helper::getName('states', @ticket->state)}}</span></td>
+					<td class="priority"><span style="display: none;">{{@ticket->priority}}</span><span class="color{{@ticket->priority}}">{{Helper::getName('priorities', @ticket->priority)}}</span></td>
 					<td class="created">{{date('d.m.Y H:i', @ticket->created)}}</td>
 					<td class="owner"><a href="{{@BASE}}/user/{{@ticket->username}}">{{@ticket->username}}</a></td>
 					<td class="owner"><a href="{{@BASE}}/user/{{@ticket->assignedname}}">{{@ticket->assignedname}}</a></td>
 				</tr>
-				</F3:repeat>
+				</repeat>
 			</tbody>
 		</table>
-	</F3:true>
-	<F3:false>
+	</true>
+	<false>
 		<p class="alert alert-info">{{@lng.noTickets}}</p>
-	</F3:false>
-</F3:check>
+	</false>
+</check>

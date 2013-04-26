@@ -1,8 +1,8 @@
 <div class="home">
     <h2>Bugtrckr</h2>
 
-    <p>Bugtrckr is a minimal but feature rich web application to manage projects. It's written in pure PHP and uses <a href="http://fatfree.sf.net">Fat-Free Framework</a> to make <strike>our life</strike> coding this project easier.</p>
-    <p>Bugtrckr is open source and is released under the terms of <a href="http://www.gnu.org/licenses/lgpl.txt">LGPL</a></p>
+    <p>Bugtrckr is a minimal but feature rich web application to manage projects. It's written in pure PHP and uses <a href="http://fatfreeframework.com">Fat-Free Framework</a> to make <strike>our life</strike> coding this project easier.</p>
+    <p>Bugtrckr is open source and is released under the terms of <a href="http://www.gnu.org/licenses/gpl.txt">GPL</a></p>
 
     <h3>Features</h3>
     <ul>

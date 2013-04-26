@@ -5,15 +5,15 @@
  * 
  * @author Sascha Ohms
  * @author Philipp Hirsch
- * @copyright Copyright 2013, Bugtrckr-Team
+ * @copyright 2013 Bugtrckr-Team
  * @license http://www.gnu.org/licenses/gpl.txt
  *   
  */
 
 class Ticket extends Controller {
-
 	/**
 	 * 
+	 * @param type $f3
 	 * @return type
 	 */
     function addTicket($f3) {
@@ -42,61 +42,64 @@ class Ticket extends Controller {
         $f3->reroute('/ticket/' . $ticket->hash);
     }
 
-    /**
-     *	Updates a Ticket in the database
-     */
-    function editTicket()
-    {
-        if (!is_numeric($this->get('POST.state')) || $this->get('POST.state') <= 0 || $this->get('POST.state') > 5)
-            return $this->tpfail($this->get('lng.saveTicketFail'));
+	/**
+	 * 
+	 * @param type $f3
+	 * @return type
+	 */
+    function editTicket($f3) {
+        if (!is_numeric($f3->get('POST.state')) || $f3->get('POST.state') <= 0 || $f3->get('POST.state') > 5)
+            return $this->tpfail($f3->get('lng.saveTicketFail'));
 
-		if (!\misc\helper::getPermission('iss_editIssues'))
-			return $this->tpfail($this->get('lng.insuffPermissions'));	
+		if (!helper::getPermission('iss_editIssues'))
+			return $this->tpfail($f3->get('lng.insuffPermissions'));	
 
-        $hash = $this->get('PARAMS.hash');
+        $hash = $f3->get('PARAMS.hash');
 
-        $ticket = new \models\Ticket();
+        $ticket = new DB\SQL\Mapper($this->db, 'Ticket');
         $ticket->load(array('hash = :hash', array(':hash' => $hash)));
 
         $changed = '';
                 
         // get the diff stuff
-        if($ticket->state != $this->get('POST.state'))
-            $changed[] = array('field' => 'state', 'from' => $ticket->state, 'to' => $this->get('POST.state'));
+        if($ticket->state != $f3->get('POST.state'))
+            $changed[] = array('field' => 'state', 'from' => $ticket->state, 'to' => $f3->get('POST.state'));
         
-        if($ticket->assigned != $this->get('POST.assigned'))
-            $changed[] = array('field' => 'assigned', 'from' => $ticket->assigned, 'to' => $this->get('POST.assigned'));
+        if($ticket->assigned != $f3->get('POST.assigned'))
+            $changed[] = array('field' => 'assigned', 'from' => $ticket->assigned, 'to' => $f3->get('POST.assigned'));
         
-        if($ticket->milestone != $this->get('POST.milestone'))
-            $changed[] = array('field' => 'milestone', 'from' => $ticket->milestone, 'to' => $this->get('POST.milestone'));
+        if($ticket->milestone != $f3->get('POST.milestone'))
+            $changed[] = array('field' => 'milestone', 'from' => $ticket->milestone, 'to' => $f3->get('POST.milestone'));
         
-        if($ticket->priority != $this->get('POST.priority'))
-            $changed[] = array('field' => 'priority', 'from' => $ticket->priority, 'to' => $this->get('POST.priority'));
+        if($ticket->priority != $f3->get('POST.priority'))
+            $changed[] = array('field' => 'priority', 'from' => $ticket->priority, 'to' => $f3->get('POST.priority'));
         
-        $ticket->state = $this->get('POST.state');
-        $ticket->priority = $this->get('POST.priority');
+        $ticket->state = $f3->get('POST.state');
+        $ticket->priority = $f3->get('POST.priority');
         
-        if (ctype_alnum($this->get('POST.assigned')))
-            $ticket->assigned = $this->get('POST.assigned');
+        if (ctype_alnum($f3->get('POST.assigned')))
+            $ticket->assigned = $f3->get('POST.assigned');
 
-        if (ctype_alnum($this->get('POST.milestone')))
-            $ticket->milestone = $this->get('POST.milestone');
+        if (ctype_alnum($f3->get('POST.milestone')))
+            $ticket->milestone = $f3->get('POST.milestone');
 
         $ticket->save();
 
         if (!$ticket->hash)
-            return $this->tpfail($this->get('lng.saveTicketFail'));
+            return $this->tpfail($f3->get('lng.saveTicketFail'));
 
-        \misc\helper::addActivity($this->get('lng.ticket') . " '" .$ticket->title. "' " .$this->get('lng.edited'), $ticket->hash, $this->get('POST.comment'), json_encode($changed));
+        helper::addActivity($f3->get('lng.ticket') . " '" .$ticket->title. "' " .$f3->get('lng.edited'), $ticket->hash, $this->get('POST.comment'), json_encode($changed));
         
-       $this->reroute('/ticket/'.$hash);
+       $f3->reroute('/ticket/'.$hash);
     }
 	
+	
 	/**
-	 *	Show a list of tickets of the project
+	 * 
+	 * @param type $f3
+	 * @return type
 	 */
-    function showTickets($f3)
-    {
+    function showTickets($f3) {
 		if (!ctype_alnum($f3->get('SESSION.project')))
 			return $this->tpfail($f3->get('lng.noProject'));
 
@@ -125,7 +128,7 @@ class Ticket extends Controller {
             $mshashs[] = $ms->hash;
         $string = implode($mshashs, '\',\'');
 
-        $tickets = new \models\Displayableticket();
+        $tickets = new DB\SQL\Mapper($this->db, 'displayableticket');
         $tickets = $tickets->find('milestone IN (\'' . $string . '\') AND ' .
                     'title LIKE \'%'.$search.'%\'' .
                     'ORDER BY ' . $order. ' DESC');
@@ -133,49 +136,48 @@ class Ticket extends Controller {
         $categories = new DB\SQL\Mapper($this->db, 'Category');
         $categories = $categories->find();
 
-        $this->set('milestones', $milestones);
-        $this->set('tickets', $tickets);
-        $this->set('categories', $categories);
-        $this->set('pageTitle', $f3->get('lng.tickets'));
-        $this->set('template', 'tickets.tpl.php');
-        $this->set('onpage', 'tickets');
-        $this->tpserve();
+        $f3->set('milestones', $milestones);
+        $f3->set('tickets', $tickets);
+        $f3->set('categories', $categories);
+        $f3->set('pageTitle', $f3->get('lng.tickets'));
+        $f3->set('template', 'tickets.tpl.php');
+        $f3->set('onpage', 'tickets');
     }
 
-    /**
-     *	Show the details of a ticket 
-     */
-    function showTicket($f3)
-	{
+	
+	/**
+	 * 
+	 * @param type $f3
+	 * @return type
+	 */
+    function showTicket($f3) {
         $hash = $f3->get('PARAMS.hash');
 
-        $ticket = new \models\Displayableticket();
+        $ticket = new DB\SQL\Mapper($this->db, 'displayableticket');
         $ticket->load(array("tickethash = :hash", array(':hash' => $hash)));
 
         if($ticket->dry())
             return $this->tpfail($f3->get('lng.noTicket'));
 
-		if (!\misc\helper::canRead($f3->get('SESSION.project')))
+		if (!helper::canRead($f3->get('SESSION.project')))
 			return $this->tpfail($f3->get('lng.insuffPermissions'));
 
         $milestone = new DB\SQL\Mapper($this->db, 'Milestone');
 
-        $activities = new \models\DisplayableActivity();
+        $activities = new DB\SQL\Mapper($this->db, 'displayableactivity');
         $activities = $activities->find(array("ticket = :ticket", array(':ticket' => $ticket->hash)));
 
         foreach($activities as $key => $activity) {
             $activities[$key]->changedFields = json_decode($activity->changedFields);
         }
 
-        $users = new \models\User();
-        
-        $this->set('ticket', $ticket);
-        $this->set('milestones', $milestone->find());
-        $this->set('activities', $activities);        
-        $this->set('users', $users = $users->find());
-        $this->set('pageTitle', $f3->get('lng.tickets') . ' › ' .$ticket->title);
-        $this->set('template', 'ticket.tpl.php');
-        $this->set('onpage', 'tickets');
-        $this->tpserve();
+        $users = new DB\SQL\Mapper($this->db, 'User');        
+        $f3->set('ticket', $ticket);
+        $f3->set('milestones', $milestone->find());
+        $f3->set('activities', $activities);        
+        $f3->set('users', $users = $users->find());
+        $f3->set('pageTitle', $f3->get('lng.tickets') . ' › ' .$ticket->title);
+        $f3->set('template', 'ticket.tpl.php');
+        $f3->set('onpage', 'tickets');
     }
 }

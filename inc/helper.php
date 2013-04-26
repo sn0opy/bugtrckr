@@ -5,8 +5,8 @@
  * 
  * @author Sascha Ohms
  * @author Philipp Hirsch
- * @copyright Copyright 2013, Bugtrckr-Team
- * @license http://www.gnu.org/licenses/lgpl.txt
+ * @copyright 2013 Bugtrckr-Team
+ * @license http://www.gnu.org/licenses/gpl.txt
  *   
  */
 

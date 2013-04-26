@@ -5,16 +5,18 @@
  * 
  * @author Sascha Ohms
  * @author Philipp Hirsch
- * @copyright Copyright 2013, Bugtrckr-Team
- * @license http://www.gnu.org/licenses/lgpl.txt
+ * @copyright 2013 Bugtrckr-Team
+ * @license http://www.gnu.org/licenses/gpl.txt
  *   
  */
 
-class Setup {
-    public function start() 
-	{
-		$f3 = Base::instance();
-		
+class Setup extends Controller {
+	/**
+	 * 
+	 * @param type $f3
+	 */
+	public function start($f3) {
+	
         $f3->set('NEEDED', array(
             'sqlite' => extension_loaded('pdo_sqlite'),
             'mysql' => extension_loaded('pdo_mysql'),
@@ -22,20 +24,21 @@ class Setup {
             'configexists' => file_exists('../data/config.inc.php')
             ));                
         
-        $f3->set('BERROR', $this->doChecks());        
-        $this->tpserve();
+        $f3->set('BERROR', self::_doChecks());        
+        self::tpserve();
     }    
     
-    public function install() 
-	{
-		$f3 = Base::instance();
-		
+	/**
+	 * 
+	 * @param type $f3
+	 * @return type
+	 */
+    public function install($f3) {
         $admname = $f3->get('POST.name');
         $admpw = $f3->get('POST.pw');
         $admemail = $f3->get('POST.email');
         
-        if($f3->get('POST.dbtype') == 'mysqldb') 
-		{
+        if($f3->get('POST.dbtype') == 'mysqldb') {
             $host = $f3->get('POST.sqlhost');
             $user = $f3->get('POST.sqluser');
             $pass = $f3->get('POST.sqlpw');
@@ -50,46 +53,43 @@ class Setup {
             
             file_put_contents('../data/config.inc.php', "<?php F3::set('DB', new \DB('mysql:host=".$host.";dbname=".$db."', '".$user."', '".$pass."')); ?>");
             
-            $this->set('INSTALLED', true);            
-            $this->tpserve();
+            $f3->set('INSTALLED', true);            
+            self::tpserve();            
+        } else {
+            $db = $f3->get('POST.dbname');
             
-        } 
-		else 
-		{
-            $db = $this->get('POST.dbname');
-            
-            if(file_exists('../data/'.$db)) 
-			{
-                $this->set('dbexists', true);
-                $this->tpserve();
+            if(file_exists('../data/'.$db)) {
+                $f3->set('dbexists', true);
+                self::tpserve();
                 return;
             }
 
-            $this->set('DB', new \DB('sqlite:../data/'.$db));
+            $f3->set('DB', new \DB('sqlite:../data/'.$db));
             require_once '../install/sqlite.php';
             
-            $user = new \controllers\User();
-            if(!$user->registerUser(false, false, $admname, $admpw, $admemail, true)) 
-			{
-                $this->set('usererror', true);
-                $this->tpserve();
+            $user = new User;
+            if(!$user->registerUser(false, false, $admname, $admpw, $admemail, true)) {
+                $f3->set('usererror', true);
+                self::tpserve();
                 return;
             }
             
-            
+            // TODO: file has changed
             file_put_contents('../data/config.inc.php', "<?php F3::set('DB', new \DB('sqlite:../data/".$db."')); ?>");
             
-            $this->set('INSTALLED', true);            
-            $this->tpserve();
+            $f3->set('INSTALLED', true);            
+            self::pserve();
         }
     }           
     
+
 	/**
 	 * 
+	 * @param type $f3
+	 * @return boolean
 	 */
-    private function doChecks() {
-		$f3 = Base::instance();
-        $error = false;
+    private static function _doChecks($f3) {
+		$error = false;
         
         if($f3->get('NEEDED.sqlite') != true && $f3->get('NEEDED.mysql') != true)
             $error = true;
@@ -103,10 +103,11 @@ class Setup {
         return $error;
     }
 	
-    /**
+	
+	/**
 	 * 
 	 */
-    private function tpserve() {
+    private static function tpserve() {
         echo Template::instance()->serve('setup.tpl.php');
     }
 }

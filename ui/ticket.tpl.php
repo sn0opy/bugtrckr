@@ -8,13 +8,13 @@
     <table class="ticket">
         <tr>
             <th>{{@lng.status}}</th>
-            <td>{{\misc\Helper::getName('states', @ticket->state)}}</td>
+            <td>{{Helper::getName('states', @ticket->state)}}</td>
             <th>{{@lng.created}}</th>
             <td>{{date('d.m.Y H:i', @ticket->created)}}</td>
         </tr>
         <tr>
             <th>{{@lng.priority}}</th>
-            <td>{{\misc\Helper::getName('priorities', @ticket->priority)}}</td>
+            <td>{{Helper::getName('priorities', @ticket->priority)}}</td>
             <th>{{@lng.assignedTo}}</th>
             <td><a href="{{@BASE}}/user/{{@ticket->assignedname}}">{{@ticket->assignedname}}</a></td>
         </tr>
@@ -33,7 +33,7 @@
         <tr>
             <th>{{@lng.milestone}}</th>
             <td>
-                {{\misc\Helper::getMsName(@ticket->milestone)}}
+                {{Helper::getMsName(@ticket->milestone)}}
             </td>
             <th></th>
             <td></td>
@@ -43,7 +43,7 @@
     <hr />
 
     <h3>{{@lng.description}}</h3>
-    <p>{{\misc\helper::translateBBCode(@ticket->description)}}</p>
+    <p>{{helper::translateBBCode(@ticket->description)}}</p>
 
 </div>
 
@@ -67,16 +67,16 @@
                         <ul class="changedFields">
                             <F3:repeat group="{{@activity->changedFields}}" value="{{@changedField}}">
                                 <F3:check if="{{@changedField->field=='state'}}">
-                                    <li>{{@lng.status}} {{@lng.changedfrom}} <strong>{{\misc\Helper::getName('states', @changedField->from)}}</strong> {{@lng.to}} <strong>{{\misc\Helper::getName('states', @changedField->to)}}</strong></li>
+                                    <li>{{@lng.status}} {{@lng.changedfrom}} <strong>{{Helper::getName('states', @changedField->from)}}</strong> {{@lng.to}} <strong>{{Helper::getName('states', @changedField->to)}}</strong></li>
                                 </F3:check>
                                 <F3:check if="{{@changedField->field=='priority'}}">
-                                    <li>{{@lng.theprioritychanged}} <strong>{{\misc\Helper::getName('priorities', @changedField->from)}}</strong> {{@lng.to}} <strong>{{\misc\Helper::getName('priorities', @changedField->to)}}</strong></li>
+                                    <li>{{@lng.theprioritychanged}} <strong>{{Helper::getName('priorities', @changedField->from)}}</strong> {{@lng.to}} <strong>{{Helper::getName('priorities', @changedField->to)}}</strong></li>
                                 </F3:check>
                                 <F3:check if="{{@changedField->field=='milestone'}}">
-                                    <li>{{@lng.milestone}} {{@lng.changedfrom}} <strong>{{\misc\Helper::getMsName(@changedField->from)}}</strong> {{@lng.to}} <strong>{{\misc\Helper::getMsName(@changedField->to)}}</strong></li>
+                                    <li>{{@lng.milestone}} {{@lng.changedfrom}} <strong>{{Helper::getMsName(@changedField->from)}}</strong> {{@lng.to}} <strong>{{Helper::getMsName(@changedField->to)}}</strong></li>
                                 </F3:check>
                                 <F3:check if="{{@changedField->field=='assigned'}}">
-                                    <li>Ticket von <strong>{{\misc\Helper::getUserName(@changedField->from)}}</strong> an <strong>{{\misc\Helper::getUserName(@changedField->to)}}</strong> {{strtolower(@lng.assigned)}}</li>
+                                    <li>Ticket von <strong>{{Helper::getUserName(@changedField->from)}}</strong> an <strong>{{Helper::getUserName(@changedField->to)}}</strong> {{strtolower(@lng.assigned)}}</li>
                                 </F3:check>
                             </F3:repeat>
                         </ul>

@@ -5,7 +5,7 @@
  *
  * @author Sascha Ohms
  * @author Philipp Hirsch
- * @copyright Copyright 2013, Bugtrckr-Team
+ * @copyright 2013 Bugtrckr-Team
  * @license http://www.gnu.org/licenses/gpl.txt
  *   
  */
@@ -71,7 +71,7 @@ class Project extends Controller {
             return;
         }
 
-        $projPerms = new \models\projPerms();
+        $projPerms = new DB\SQL\Mapper($this->db, 'ProjectPermission');
         $projPerms->load(array('user = :user AND project = :project', array(':user' => $user->hash, ':project' => $projectHash)));
         $projPerms->erase();
 
@@ -228,7 +228,7 @@ class Project extends Controller {
 		if(!$f3)
 			$f3 = Base::instance();
 		
-		if(!\misc\helper::getPermission('proj_editProject'))
+		if(!helper::getPermission('proj_editProject'))
 			return $this->tpfail($f3->get('lng.insuffPermissions'));
 
         $category = new DB\SQL\Mapper($this->db, 'Category');
@@ -309,7 +309,7 @@ class Project extends Controller {
         $perms->save();
         
         $milestone = new Milestone;
-        $milestone->addEditMilestone($hash);
+        $milestone->addEditMilestone(false, $hash);
         
         $this->addEditCategory(false, false, $hash, $f3->get('lng.uncategorized'));
         

@@ -6,8 +6,8 @@
  * @package i18n
  * @author Sascha Ohms
  * @author Phillipp Hirsch
- * @copyright Copyright 2011, Bugtrckr-Team
- * @license http://www.gnu.org/licenses/lgpl.txt
+ * @copyright 2013 Bugtrckr-Team
+ * @license http://www.gnu.org/licenses/gpl.txt
  *   
 **/
 

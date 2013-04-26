@@ -1,10 +1,10 @@
 <h2>{{@lng.login}}</h2>
 
-<F3:check if="{{isset(@SESSION.user.hash)}}">
-    <F3:true>
+<check if="{{isset(@SESSION.user.hash)}}">
+    <true>
         <p>{{@lng.alreadyLoggedIn}}</p>
-    </F3:true>
-    <F3:false>
+    </true>
+    <false>
         <form action="user/login" method="post">
             <div class="formRow">
                 <div class="formLabel">{{@lng.email}}: </div>
@@ -16,8 +16,8 @@
             </div>
             <div class="formRow">
                 <div class="formLabel"> </div>
-                <div class="formValue"><input type="submit" value="{{@lng.login}}" /></div>
+                <div class="formValue"><input type="submit" clas="btn" value="{{@lng.login}}" /></div>
             </div>
         </form>
-    </F3:false>
-</F3:check>
+    </false>
+</check>

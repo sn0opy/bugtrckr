@@ -22,9 +22,14 @@ class Main extends Controller {
     }
  
 	
-    /**
-     *
-     */
+	/**
+	 * 
+	 * @param type $f3
+	 * @param type $params
+	 * @param type $hash
+	 * @param type $routeBack
+	 * @return type
+	 */
     function selectProject($f3 = false, $params = false, $hash = false, $routeBack = true) {
 		if(!$f3)
 			$f3 = Base::instance();

@@ -2,12 +2,12 @@
 
 <div class="pull-right">
 	<form action="{{@BASE}}/search" method="post" id="searchForm" class="form-search">
-		<input type="input" name="search" value="{{@SESSION.ticketSearch}}" id="searchInput" class="search-query input-medium" /> <input type="submit" value="{{@lng.search}}" class="btn" /> <F3:check if="{{@getPermission('iss_addIssues')}}"><button class="btn btn-primary" data-toggle="modal" href="#addIssue">{{@lng.addticket}}</button></F3:check>
+		<input type="input" name="search" value="{{@SESSION.ticketSearch}}" id="searchInput" class="search-query input-medium" /> <input type="submit" value="{{@lng.search}}" class="btn" /> <check if="{{@getPermission('iss_addIssues')}}"><button class="btn btn-primary" data-toggle="modal" href="#addIssue">{{@lng.addticket}}</button></check>
 	</form>
 </div>
 
-<F3:check if="{{count(@tickets)}}">
-    <F3:true>
+<check if="{{count(@tickets)}}">
+    <true>
         <table class="sortable table-striped table table-bordered">
             <thead>
                 <tr>
@@ -21,24 +21,24 @@
                 </tr>
             </thead>
             <tbody>
-                <F3:repeat group="{{@tickets}}" value="{{@ticket}}">
+                <repeat group="{{@tickets}}" value="{{@ticket}}">
                 <tr>
                     <td class="title"><a href="{{@BASE}}/ticket/{{@ticket->tickethash}}">{{@ticket->title}}</a></td>
-                    <td class="type">{{\misc\Helper::getName('types', @ticket->type)}}</td>
-                    <td class="state"><span class="color{{@ticket->state}}">{{\misc\Helper::getName('states', @ticket->state)}}</span></td>
-                    <td class="priority"><span style="display: none;">{{@ticket->priority}}</span><span class="color{{@ticket->priority}}">{{\misc\Helper::getName('priorities', @ticket->priority)}}</span></td>
+                    <td class="type">{{Helper::getName('types', @ticket->type)}}</td>
+                    <td class="state"><span class="color{{@ticket->state}}">{{Helper::getName('states', @ticket->state)}}</span></td>
+                    <td class="priority"><span style="display: none;">{{@ticket->priority}}</span><span class="color{{@ticket->priority}}">{{Helper::getName('priorities', @ticket->priority)}}</span></td>
                     <td class="created">{{date('d.m.Y H:i', @ticket->created)}}</td>
                     <td class="owner"><a href="{{@BASE}}/user/{{@ticket->username}}">{{@ticket->username}}</a></td>
                     <td class="owner"><a href="{{@BASE}}/user/{{@ticket->assignedname}}">{{@ticket->assignedname}}</a></td>
                 </tr>
-                </F3:repeat>
+                </repeat>
             </tbody>
         </table>
-    </F3:true>
-    <F3:false>
+    </true>
+    <false>
         <div class="alert alert-info clearfix">{{@lng.noTickets}}</div>
-    </F3:false>
-</F3:check>
+    </false>
+</check>
 
 
 <div class="modal hide" id="addIssue">
@@ -57,9 +57,9 @@
 				<div class="formLabel">{{@lng.category}}</div>
 				<div class="formValue">
 					<select name="category" size="1">
-						<F3:repeat group="{{@categories}}" value="{{@category}}">
+						<repeat group="{{@categories}}" value="{{@category}}">
 							<option value="{{@category->hash}}">{{@category->name}}</option>
-						</F3:repeat>
+						</repeat>
 					</select>
 				</div>
 			</div>
@@ -68,9 +68,9 @@
 				<div class="formLabel">{{@lng.type}}</div>
 				<div class="formValue">
 					<select name="type" size="1">
-						<F3:repeat group="{{@lng.types}}" value="{{@type}}">
+						<repeat group="{{@lng.types}}" value="{{@type}}">
 							<option value="{{@type.id}}">{{@type.name}}</option>
-						</F3:repeat>
+						</repeat>
 					</select>
 				</div>
 			</div>
@@ -79,9 +79,9 @@
 				<div class="formLabel">{{@lng.priority}}</div>
 				<div class="formValue">
 					<select name="priority" size="1">
-						<F3:repeat group="{{@lng.priorities}}" value="{{@priority}}">
+						<repeat group="{{@lng.priorities}}" value="{{@priority}}">
 							<option value="{{@priority.id}}" {{(@priority.id==3)?'selected="selected"':''}}>{{@priority.id}} - {{@priority.name}}</option>
-						</F3:repeat>
+						</repeat>
 					</select>
 				</div>
 			</div>
@@ -90,9 +90,9 @@
 				<div class="formLabel">{{@lng.milestone}}</div>
 				<div class="formValue">
 					<select name="milestone" size="1">
-					<F3:repeat group="{{@milestones}}" value="{{@milestone}}">
+					<repeat group="{{@milestones}}" value="{{@milestone}}">
 						<option value="{{@milestone->hash}}">{{@milestone->name}}</option>
-					</F3:repeat>
+					</repeat>
 					</select>
 				</div>
 			</div>

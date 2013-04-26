@@ -1,6 +1,6 @@
 <h2>{{@lng.project}} › {{@lng.add}}</h2>
-<F3:check if="{{@SESSION.user.hash}}">
-    <F3:true>
+<check if="{{@SESSION.user.hash}}">
+    <true>
         <form action="{{@BASE}}/project/add" method="post">
             <div class="formRow">
                 <div class="formLabel">
@@ -30,8 +30,8 @@
             </div>
             <input type="submit" value="{{@lng.add}}" class="btn btn-primary" />
         </form>
-    </F3:true>
-    <F3:false>
+    </true>
+    <false>
         <div class="info message">{{@lng.noAccess}}</div>
-    </F3:false>
-</F3:check>
+    </false>
+</check>

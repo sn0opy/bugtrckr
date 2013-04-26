@@ -5,7 +5,7 @@
  * 
  * @author Sascha Ohms
  * @author Philipp Hirsch
- * @copyright Copyright 2013, Bugtrckr-Team
+ * @copyright 2013 Bugtrckr-Team
  * @license http://www.gnu.org/licenses/gpl.txt
  *   
  */
@@ -15,7 +15,7 @@ class Wiki extends Controller
 
     public function editEntry()
     {
-		if (!\misc\helper::getPermission('wiki_editWiki'))
+		if (!helper::getPermission('wiki_editWiki'))
 			return $this->tpfail($this->get('lng.insuffPermissions'));
 
         $hash = $this->get('POST.hash');
@@ -28,7 +28,7 @@ class Wiki extends Controller
 
         if ($entry->dry())
         {
-            $entry->hash = \misc\helper::getFreeHash('WikiEntry');
+            $entry->hash = helper::getFreeHash('WikiEntry');
             $entry->title = $title;
             $entry->created = date("Y-m-d H:i:s");
             $entry->created_by = $this->get('SESSION.user.hash');
@@ -49,7 +49,7 @@ class Wiki extends Controller
 
 	public function addDiscussion()
 	{
-		if (!\misc\helper::getPermission('wiki_editWiki'))
+		if (!helper::getPermission('wiki_editWiki'))
 			return $this->tpfail($this->get('lng.insuffPermissions'));
 
 		$disc = new \models\WikiDiscussion();
@@ -57,7 +57,7 @@ class Wiki extends Controller
 		$entry = $this->get('POST.entry');
 		$content = $this->get('POST.content');
 
-		$disc->hash = \misc\helper::getFreeHash('WikiDiscussion');
+		$disc->hash = helper::getFreeHash('WikiDiscussion');
 		$disc->entry = $entry;
 		$disc->content = $content;
 		$disc->created = date("Y-m-d H:i:s");
@@ -86,7 +86,7 @@ class Wiki extends Controller
     
     public function showEntry()
     {
-		if (!\misc\helper::canRead($this->get('SESSION.project')))
+		if (!helper::canRead($this->get('SESSION.project')))
 			return $this->tpfail($this->get('lng.insuffPermissions'));
 
         $title = $this->get('PARAMS.title');
@@ -127,7 +127,7 @@ class Wiki extends Controller
 
 	public function showDiscussion()
 	{
-		if (!\misc\helper::canRead($this->get('SESSION.project')))
+		if (!helper::canRead($this->get('SESSION.project')))
 			return $this->tpfail($this->get('lng.insuffPermissions'));
 
 		$hash = $this->get('PARAMS.hash');

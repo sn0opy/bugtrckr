@@ -9,12 +9,12 @@
         </tr>
     </thead>
     <tbody>
-    <F3:repeat group="{{@activities}}" value="{{@activity}}">
+    <repeat group="{{@activities}}" value="{{@activity}}">
         <tr>
             <td>{{@activity->description}}</td>
             <td>{{date('d.m.Y H:i', @activity->changed)}}</td>
             <td><a href="{{@BASE}}/user/{{@activity->username}}">{{@activity->username}}</a></td>
         </tr>
-    </F3:repeat>
+    </repeat>
     </tbody>
 </table>

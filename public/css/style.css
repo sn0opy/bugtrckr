@@ -153,19 +153,6 @@ td.manageMember input, td.manageMember select
     float: left;
 }
 
-input, textarea, select
-{
-    color: #555;
-    background: #FFF;
-    border: 1px solid #CCC;
-    font: 10pt Helvetica;
-    padding: 4px;
-    border-radius: 3px;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    box-shadow: inset 1px 1px 3px #DDD;
-}
-
 .normalText
 {
     text-transform: none !important;
@@ -374,25 +361,6 @@ ul.sublist
     color:	green;
     font-weight: bold;
 }
-
-button, .button
-{
-    color: #555;
-    background: #FFF;
-    border: 1px solid #CCC;
-    font: 10pt Helvetica;
-    padding: 4px;
-    border-radius: 3px;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    box-shadow: inset -1px -1px 2px #DDD;
-    text-decoration: none !important;
-}
-
-button:active, .button:active {
-    box-shadow: inset 1px 1px 2px #DDD;
-}
-
 .ticketComment 
 {
     width: 300px;
