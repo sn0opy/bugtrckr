@@ -16,6 +16,11 @@ $app->config('../app/config.ini');
 $app->config('../app/sql.ini');
 $app->config('../app/routes.ini');
 
+$app->set('DB', new DB\SQL('mysql:host=localhost;dbname=' . 
+		$app->get('DB_DBNAME'), 
+		$app->get('DB_USER'), 
+		$app->get('DB_PASSWORD')));
+
 $app->set('getPermission', function($permission) {
     $helper = new Helper;
     return $helper->getPermission($permission);

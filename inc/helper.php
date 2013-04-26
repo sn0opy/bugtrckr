@@ -12,28 +12,31 @@
 
 // TODO: shouldn't extend controller
 class Helper extends Controller {
-
 	/**
 	 * 
 	 * @param type $length
 	 * @return type
 	 */
+	// TODO: user another method to create random strings
     public static function randStr($length = 5) {
         return substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, $length);
     }
 
+	
 	/**
 	 * 
 	 * @param type $salt
 	 * @param type $pass
 	 * @return type
 	 */
+	// TODO: deprecated, we use php_compat instead
     public static function salting($salt, $pass) {
         $salt = md5($salt);
         $pw = md5($pass);
         return sha1(md5($salt . $pw) . $salt);
     }
 
+	
 	/**
 	 * 
 	 * @param type $table
@@ -41,7 +44,9 @@ class Helper extends Controller {
 	 * @return type
 	 */
     public static function getFreeHash($table, $length = 12) {
-        $ax = new DB\SQL\Mapper(self::$db, $table);
+		$db = Base::instance()->get('DB');
+		
+        $ax = new DB\SQL\Mapper($db, $table);
         do {
             $hash = self::randStr($length);
             $ax->find('hash = "' . $hash . '"');
@@ -49,11 +54,14 @@ class Helper extends Controller {
         return $hash;
     }
 
+	
 	/**
 	 * 
 	 * @param type $subTitles
 	 */
     public static function setTitle($subTitles) {
+		$f3 = Base::instance();
+		
         $title = '';
         $subTitles = (array) $subTitles;
 
@@ -62,34 +70,36 @@ class Helper extends Controller {
             $title .= $seperator . $sub;
         }
 
-        F3::set('title', $title . ' - ' . \F3::get('title'));
+        $f3->set('title', $title . ' - ' . $f3->get('title'));
     }
 
-    /**
-     * Checks whether the user has access to $permission
-     * 
-     * @param string $permission Permission is a predefined string stored in the db
-     * @return bool
-     * @static
-     */
+	
+	/**
+	 * 
+	 * @param type $permission
+	 * @return boolean
+	 */
     public static function getPermission($permission) {
-        $userHash = \F3::get('SESSION.user.hash');
-        $projectHash = \F3::get('SESSION.project');
+		$f3 = Base::instance();
+		$db = $f3->get('DB');
+		
+        $userHash = $f3->get('SESSION.user.hash');
+        $projectHash = $f3->get('SESSION.project');
         
         if ($userHash) {
-            $user = new \models\User();
+            $user = new DB\SQL\Mapper($db, 'User');
             $user->load(array('hash = :hash', array(':hash' => $userHash)));
 
             if($user->admin) // admin has access to everything
                 return true;
             
-            $projPerm = new \models\UserPerms();
+            $projPerm = new DB\SQL\Mapper($db, 'ProjectPermission');
             $permissions = $projPerm->findone(array('user = :user AND project = :project', array(':user' => $userHash, ':project' => $projectHash)));
             
 			if($permissions == null)
 				return false;
 
-            $role = new \models\Role();
+            $role = new DB\SQL\Mapper($db, 'Role');
             $role->load(array('hash = :hash', array(':hash' => $permissions->role)));
             
             if($role->dry())
@@ -102,6 +112,7 @@ class Helper extends Controller {
         return false;
     }
 
+	
 	/**
 	 * 
 	 * @param type $hash
@@ -109,26 +120,30 @@ class Helper extends Controller {
 	 */
 	public static function canRead($hash){
 		$f3 = Base::instance();
-		
-		$project = new DB\SQL\Mapper(parent::$db, 'project');
+		$db = $f3->get('DB');
+	
+		$project = new DB\SQL\Mapper($db, 'project');
 		$project->load(array('hash = :hash', array(':hash' => $hash)));
 
 		if ($project->public)
 			return true;
 
-		$perm = new DB\SQL\Mapper(parent::$db, 'ProjectPermission');
+		$perm = new DB\SQL\Mapper(self::$db, 'ProjectPermission');
 		return $perm->found(array('user = :user AND project = :project', array(':user' => $f3->get('SESSION.user.hash'), ':project' => $f3->get('SESSION.project'))));
 	}
 
+	
 	/**
 	 * 
 	 * @param type $milestone
 	 * @return type
 	 */
     public static function getTicketCount($milestone) {
-        return \F3::get('DB')->sql('SELECT state, COUNT(*) AS `count` FROM `Ticket` WHERE milestone = \'' . $milestone . '\' GROUP BY state');
+		// TODO: dirty? dirty!
+        return Base::instance()->get('DB')->exec('SELECT state, COUNT(*) AS `count` FROM `Ticket` WHERE milestone = \'' . $milestone . '\' GROUP BY state');
     }
 
+	
 	/**
 	 * 
 	 * @param type $description
@@ -138,35 +153,41 @@ class Helper extends Controller {
 	 * @param type $projHash
 	 */
     public static function addActivity($description, $ticket = 0, $comment = '', $fields = '', $projHash = false) {
-        $activity = new \models\Activity();
+		$f3 = Base::instance();
+		$db = $f3->get('DB');
+        $activity = new DB\SQL\Mapper($db, 'Activity');
         
-        $activity->hash = \misc\helper::getFreeHash('Activity');
+        $activity->hash = self::getFreeHash('Activity');
         $activity->description = $description;
         $activity->comment = $comment;
-        $activity->user = \F3::get('SESSION.user.hash');
+        $activity->user = $f3->get('SESSION.user.hash');
         $activity->changed = time();
-        $activity->project = ($projHash) ? $projHash : \F3::get('SESSION.project');
+        $activity->project = ($projHash) ? $projHash : $f3->get('SESSION.project');
         $activity->ticket = $ticket;
         $activity->changedFields = $fields;
-
         $activity->save();
     }
 
+	
 	/**
 	 * 
 	 * @param type $hash
 	 * @return type
 	 */
 	public static function getUsername($hash) {
-		$user = new \models\User();
+		$f3 = Base::instance();
+		$db = $f3->get('DB');
+		
+		$user = new DB\SQL\Mapper($db, 'User');
 		$user->load(array('hash = :hash', array(':hash' => $hash)));
 
         if($user->dry())
-            return \F3::get('lng.nobody');
+            return $f3->get('lng.nobody');
             
 		return $user->name;
 	}
 
+	
 	/**
 	 * 
 	 * @param type $type
@@ -174,7 +195,7 @@ class Helper extends Controller {
 	 * @return string
 	 */
 	public static function getName($type, $id) {
-        $arr = \F3::get('lng.' . $type);
+		$arr = Base::instance()->get('lng.' . $type);
         
         foreach($arr as $elem)
             if($elem['id'] == $id)
@@ -183,16 +204,21 @@ class Helper extends Controller {
         return '';
 	}
     
+	
 	/**
 	 * 
 	 * @param type $hash
 	 * @return type
 	 */
     public static function getMsName($hash) {
-        $ms = new \models\Milestone();
+		$f3 = Base::instance();
+		$db = $f3->get('DB');
+		
+        $ms = new DB\SQL\Mapper($db, 'Model');
         $ms->load(array('hash = :hash', array(':hash' => $hash)));
         return $ms->name;
     }
+	
 
 	/**
 	 * 

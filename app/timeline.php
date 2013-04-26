@@ -6,7 +6,7 @@
  * @author Sascha Ohms
  * @author Philipp Hirsch
  * @copyright Copyright 2013, Bugtrckr-Team
- * @license http://www.gnu.org/licenses/lgpl.txt
+ * @license http://www.gnu.org/licenses/gpl.txt
  *   
  */
 
@@ -31,7 +31,7 @@ class Timeline extends Controller {
         $activities = $activities->find(array("project = :proj", array(':proj' => $project)));
 
         $f3->set('activities', $activities);
-        $f3->set('pageTitle', '{{@lng.timeline}}');
+        $f3->set('pageTitle', $f3->get('lng.timeline'));
         $f3->set('template', 'timeline.tpl.php');
         $f3->set('onpage', 'timeline');
     }

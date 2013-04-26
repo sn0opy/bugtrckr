@@ -6,16 +6,22 @@
  * @author Sascha Ohms
  * @author Philipp Hirsch
  * @copyright Copyright 2013, Bugtrckr-Team
- * @license http://www.gnu.org/licenses/lgpl.txt
+ * @license http://www.gnu.org/licenses/gpl.txt
  *   
  */
 
-class User extends Controller
-{
+class User extends Controller {
 
-    /**
-     *	Adds a new user to the database
-     */
+	/**
+	 * 
+	 * @param type $f3
+	 * @param type $params
+	 * @param type $name
+	 * @param type $password
+	 * @param type $email
+	 * @param type $admin
+	 * @return boolean
+	 */
     function registerUser($f3 = false, $params = false, $name = false, $password = false, $email = false, $admin = false) {
 		if(!$f3)
 			$f3 = Base::instance();
@@ -43,9 +49,11 @@ class User extends Controller
     }
 
 
-    /**
-     *	Checks user to log in
-     */
+	/**
+	 * 
+	 * @param type $f3
+	 * @return type
+	 */
     function loginUser($f3) {
         $email = $f3->get('POST.email');
         
@@ -57,7 +65,7 @@ class User extends Controller
             array(':email' => $f3->get('POST.email'),
                 ':password' => helper::salting($user->salt, $f3->get('POST.password')))));
 
-        if ($user->dry())
+        if($user->dry())
             return $this->tpfail($f3->get('lng.pwMailWrong'));
 
 
@@ -71,9 +79,10 @@ class User extends Controller
     }
 	
 
-    /**
-     *	Destroy users session 
-     */
+	/**
+	 * 
+	 * @param type $f3
+	 */
     function logoutUser($f3) {
         $f3->set('SESSION.user', NULL);
         $f3->clear('SESSION');
@@ -83,45 +92,49 @@ class User extends Controller
     }
 	
 	
-    /**
-     *	Displays users infopage
-     */
+	/**
+	 * 
+	 * @param type $f3
+	 * @return type
+	 */
     function showUser($f3) {
         $name = $f3->get('PARAMS.name');
 
-        $user = DB\SQL\Mapper($this->db, 'User');
+        $user = new DB\SQL\Mapper($this->db, 'User');
         $user->load(array('name = :name', array(':name' => $name)));
 
         if (!$user->hash)
             return $this->tpfail($f3->get('lng.userNotFound'));
 
-        $ticket = DB\SQL\Mapper($this->db, 'displayableticket');
+        $ticket = new DB\SQL\Mapper($this->db, 'displayableticket');
         $tickets = $ticket->find(array('owner = :owner', array(':owner' => $user->hash)));
 
         $f3->set('user', $user);
         $f3->set('tickets', $tickets);
         $f3->set('template', 'user.tpl.php');
-        $f3->set('pageTitle', '{{@lng.user}}' . $name);
+        $f3->set('pageTitle', $f3->get('lng.user') . ' ' . $name);
         $f3->set('onpage', 'user');
     }
 	
     
-    /**
-     *	Displays a form for registration
-     */
+	/**
+	 * 
+	 * @param type $f3
+	 */
     function showUserRegister($f3) {
         $f3->set('template', 'userRegister.tpl.php');
-        $f3->set('pageTitle', '{{@lng.user}} > {{@lng.registration}}');
+		$f3->set('pageTitle', $f3->get('lng.user') . ' › ' . $f3->get('lng.registration'));
         $f3->set('onpage', 'registration');
     }
 	
     
-    /**
-     *	Show loginform
-     */
+	/**
+	 * 
+	 * @param type $f3
+	 */
     function showUserLogin($f3) {
         $f3->set('template', 'userLogin.tpl.php');
-        $f3->set('pageTitle', '{{@lng.user}} > {{@lng.login}}');
+        $f3->set('pageTitle', $f3->get('lng.user') . ' › ' . $f3->get('lng.login'));
         $f3->set('onpage', 'login');
     }
 }

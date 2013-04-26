@@ -16,7 +16,7 @@
 </F3:check>
 
 <p class="rminfo">{{@stats.openTickets}} {{@lng.ticketsleft}}</p>
-<p>{{\misc\helper::translateBBCode(@milestone->description)}}</p>
+<p>{{helper::translateBBCode(@milestone->description)}}</p>
 
 <div class="milestoneTickets">
     <h3>{{@lng.tickets}}:</h3>
@@ -40,9 +40,9 @@
                         <td class="title">
                                 <a href="{{@BASE}}/ticket/{{@ticket->tickethash}}">{{@ticket->title}}</a>
                         </td>
-                        <td class="type">{{\misc\Helper::getName('types', @ticket->type)}}</td>
-                        <td class="state"><span class="color{{@ticket->state}}">{{\misc\Helper::getName('states', @ticket->state)}}</span></td>
-                        <td class="priority"><span style="display: none;">{{@ticket->priority}}</span><span class="color{{@ticket->priority}}">{{\misc\Helper::getName('priorities', @ticket->priority)}}</span></td>
+                        <td class="type">{{Helper::getName('types', @ticket->type)}}</td>
+                        <td class="state"><span class="color{{@ticket->state}}">{{Helper::getName('states', @ticket->state)}}</span></td>
+                        <td class="priority"><span style="display: none;">{{@ticket->priority}}</span><span class="color{{@ticket->priority}}">{{Helper::getName('priorities', @ticket->priority)}}</span></td>
                         <td class="created">{{date('d.m.Y H:i', @ticket->created)}}</td>
                         <td class="owner"><a href="{{@BASE}}/user/{{@ticket->username}}">{{@ticket->username}}</a></td>
                         <td class="owner"><a href="{{@BASE}}/user/{{@ticket->assignedname}}">{{@ticket->assignedname}}</a></td>

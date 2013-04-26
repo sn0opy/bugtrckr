@@ -50,7 +50,6 @@ return array('lng' => array(
     'home' => 'Home',
     'tickets' => 'Tickets',
     'roadmap' => 'Roadmap',
-    'footer' => '© 2012 Bugtrckr-Team',
     'error' => 'Error',
     'password' => 'Password',
     'email' => 'E-Mail',

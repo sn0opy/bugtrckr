@@ -5,8 +5,8 @@
  * 
  * @author Sascha Ohms
  * @author Philipp Hirsch
- * @copyright Copyright 2011, Bugtrckr-Team
- * @license http://www.gnu.org/licenses/lgpl.txt
+ * @copyright Copyright 2013, Bugtrckr-Team
+ * @license http://www.gnu.org/licenses/gpl.txt
  *   
  */
 
@@ -95,29 +95,29 @@ class Ticket extends Controller {
 	/**
 	 *	Show a list of tickets of the project
 	 */
-    function showTickets()
+    function showTickets($f3)
     {
-		if (!ctype_alnum($this->get('SESSION.project')))
-			return $this->tpfail($this->get('lng.noProject'));
+		if (!ctype_alnum($f3->get('SESSION.project')))
+			return $this->tpfail($f3->get('lng.noProject'));
 
-		if (!\misc\helper::canRead($this->get('SESSION.project')))
-			return $this->tpfail($this->get('lng.insuffPermissions'));
+		if (!helper::canRead($f3->get('SESSION.project')))
+			return $this->tpfail($f3->get('lng.insuffPermissions'));
 
         $order = 'created';
 		$search = '';
         
-		if ($this->exists('SESSION.ticketSearch'))
-			$search = $this->get('SESSION.ticketSearch');
+		if ($f3->exists('SESSION.ticketSearch'))
+			$search = $f3->get('SESSION.ticketSearch');
 
-		if($this->exists('POST.search'))
-			$search = $this->get('POST.search');
+		if($f3->exists('POST.search'))
+			$search = $f3->get('POST.search');
 
-        $this->set('SESSION.ticketOrder', $order);
-		$this->set('SESSION.ticketSearch', $search);
+        $f3->set('SESSION.ticketOrder', $order);
+		$f3->set('SESSION.ticketSearch', $search);
         
-        $project = $this->get('SESSION.project');
+        $project = $f3->get('SESSION.project');
 
-        $milestones = new \models\Milestone();
+        $milestones = new DB\SQL\Mapper($this->db, 'Milestone');
         $milestones = $milestones->find(array('project = :project', array(':project' => $project)));
 
         $mshashs = array();
@@ -130,13 +130,13 @@ class Ticket extends Controller {
                     'title LIKE \'%'.$search.'%\'' .
                     'ORDER BY ' . $order. ' DESC');
 
-        $categories = new \models\Category();
+        $categories = new DB\SQL\Mapper($this->db, 'Category');
         $categories = $categories->find();
 
         $this->set('milestones', $milestones);
         $this->set('tickets', $tickets);
         $this->set('categories', $categories);
-        $this->set('pageTitle', '{{@lng.tickets}}');
+        $this->set('pageTitle', $f3->get('lng.tickets'));
         $this->set('template', 'tickets.tpl.php');
         $this->set('onpage', 'tickets');
         $this->tpserve();
@@ -145,20 +145,20 @@ class Ticket extends Controller {
     /**
      *	Show the details of a ticket 
      */
-    function showTicket()
+    function showTicket($f3)
 	{
-        $hash = $this->get('PARAMS.hash');
+        $hash = $f3->get('PARAMS.hash');
 
         $ticket = new \models\Displayableticket();
         $ticket->load(array("tickethash = :hash", array(':hash' => $hash)));
 
         if($ticket->dry())
-            return $this->tpfail($this->get('lng.noTicket'));
+            return $this->tpfail($f3->get('lng.noTicket'));
 
-		if (!\misc\helper::canRead($this->get('SESSION.project')))
-			return $this->tpfail($this->get('lng.insuffPermissions'));
+		if (!\misc\helper::canRead($f3->get('SESSION.project')))
+			return $this->tpfail($f3->get('lng.insuffPermissions'));
 
-        $milestone = new \models\Milestone();
+        $milestone = new DB\SQL\Mapper($this->db, 'Milestone');
 
         $activities = new \models\DisplayableActivity();
         $activities = $activities->find(array("ticket = :ticket", array(':ticket' => $ticket->hash)));
@@ -173,7 +173,7 @@ class Ticket extends Controller {
         $this->set('milestones', $milestone->find());
         $this->set('activities', $activities);        
         $this->set('users', $users = $users->find());
-        $this->set('pageTitle', '{{@lng.tickets}} › ' .$ticket->title);
+        $this->set('pageTitle', $f3->get('lng.tickets') . ' › ' .$ticket->title);
         $this->set('template', 'ticket.tpl.php');
         $this->set('onpage', 'tickets');
         $this->tpserve();

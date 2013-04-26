@@ -5,51 +5,43 @@
  *
  * @author Sascha Ohms
  * @author Philipp Hirsch
- * @copyright Copyright 2011, Bugtrckr-Team
- * @license http://www.gnu.org/licenses/lgpl.txt
+ * @copyright Copyright 2013, Bugtrckr-Team
+ * @license http://www.gnu.org/licenses/gpl.txt
  *   
  */
 
-class Project extends Controller
-{
-    function projectAddMember()
-    {
-        $helper = new \misc\helper();
-        
-        if (!$helper->getPermission('proj_manageMembers'))
-        {
-            $this->tpfail($this->get('lng.insuffPermissions'));
+class Project extends Controller {
+    public function projectAddMember() {
+        if(!$helper::getPermission('proj_manageMembers')) {
+            $this->tpfail($f3->get('lng.insuffPermissions'));
             return;
         }
 
-        $projectHash = $this->get('SESSION.project');
-        $userHash = $this->get('POST.member');
-        $roleHash = $this->get('POST.role');
+        $projectHash = $f3->get('SESSION.project');
+        $userHash = $f3->get('POST.member');
+        $roleHash = $f3->get('POST.role');
 
-        $role = new \models\Role();
+        $role = new DB\SQL\Mapper($this->db, 'Role');
         $role->load(array('hash = :hash', array(':hash' => $roleHash)));
 
-        if ($role->dry())
-        {
+        if($role->dry()) {
             $this->tpfail('Failure while getting role.');
             return;
         }
 
-        $user = new \models\User();
+        $user = new DB\SQL\Mapper($this->db, 'User');
         $user->load(array('hash = :hash', array(':hash' => $userHash)));
 
-        if ($user->dry())
-        {
+        if($user->dry()) {
             $this->tpfail('Failure while getting user.');
             return;
         }
 
-        $projPerms = new \models\projPerms();
+        $projPerms = new DB\SQL\Mapper($this->db, 'ProjectPermission');
         $projPerms->load(array('user = :user AND project = :project', array(':user' => $user->hash, ':project' => $projectHash)));
 
-        if (!$projPerms->dry())
-        {
-            $this->tpfail($this->get('lng.userExistsInProj'));
+        if (!$projPerms->dry()) {
+            $this->tpfail($f3->get('lng.userExistsInProj'));
             return;
         }
 
@@ -58,27 +50,23 @@ class Project extends Controller
         $projPerms->project = $projectHash;
         $projPerms->save();
 
-        $this->reroute('/project/settings#members');
+        $f3->reroute('/project/settings#members');
     }
 
-    function projectDelMember()
-    {
-        $helper = new \misc\helper;
-        
-        if (!$helper->getPermission('proj_manageMembers'))
-        {
-            $this->tpfail($this->get('lng.addMemberNotAllowed'));
+    public function projectDelMember($f3) {
+    
+        if(!helper::getPermission('proj_manageMembers')) {
+            $this->tpfail($f3->get('lng.addMemberNotAllowed'));
             return;
         }
 
-        $userHash = $this->get('POST.user');
-        $projectHash = $this->get('SESSION.project');
+        $userHash = $f3->get('POST.user');
+        $projectHash = $f3->get('SESSION.project');
 
-        $user = new \models\User();
+        $user = new DB\SQL\Mapper($this->db, 'User');
         $user->load(array('hash = :hash', array(':hash' => $userHash)));
 
-        if ($user->dry())
-        {
+        if($user->dry()) {
             $this->tpfail('Failure while getting user.');
             return;
         }
@@ -91,35 +79,37 @@ class Project extends Controller
         $this->reroute('/project/settings#members');
     }
 
-    /**
-     * 
-     */
-    function projectSetRole()
-    {
-        if (!\misc\helper::getPermission('proj_manageMembers'))
-        {
-            $this->tpfail($this->get('lng.insuffPermissions'));
+	
+	/**
+	 * 
+	 * @param type $f3
+	 * @return type
+	 */
+    public function projectSetRole($f3) {
+        if(!helper::getPermission('proj_manageMembers')) {
+            $this->tpfail($f3->get('lng.insuffPermissions'));
             return;
         }
 
-        $projectHash = $this->get('SESSION.project');
+        $projectHash = $f3->get('SESSION.project');
 
-        $user = new \models\User();
-        $user->load(array('hash = :hash', array(':hash' => $this->get('POST.user'))));
+        $user = new DB\SQL\Mapper($this->db, 'User');
+        $user->load(array('hash = :hash', array(':hash' => $f3->get('POST.user'))));
 
-        if (!$user->hash)
-            return $this->tpfail($this->get('lng.gettingUserFail'));
+        if(!$user->hash)
+            return $this->tpfail($f3->get('lng.gettingUserFail'));
 
-        $role = new \models\Role();
-        $role->load(array('hash = :hash', array(':hash' => $this->get('POST.role'))));
+        $role = new DB\SQL\Mapper($this->db, 'Role');
+        $role->load(array('hash = :hash', 
+			array(':hash' => $f3->get('POST.role'))));
 
-        if (!$role->hash)
-            return $this->tpfail($this->get('lng.gettingRoleFail'));
+        if(!$role->hash)
+            return $this->tpfail($f3->get('lng.gettingRoleFail'));
 
-        if ($role->project != $projectHash)
-            return $this->tpfail($this->get('lng.roleDoesNotBelong'));
+        if($role->project != $projectHash)
+            return $this->tpfail($f3->get('lng.roleDoesNotBelong'));
 
-        $perms = new \models\projPerms();
+        $perms = new DB\SQL\Mapper($this->db, 'ProjectPermission');
         $perms->load(array('project = :proj AND user = :user',
             array(':proj' => $projectHash, ':user' => $user->hash)));
         $perms->role = $role->hash;
@@ -129,376 +119,384 @@ class Project extends Controller
     }
 
 
-    /**
-     * 
-     */
-    function deleteProjectSettingsMilestone()
-    {
-        if (!\misc\helper::getPermission('proj_manageMilestones'))
-            return $this->tpfail($this->get('lng.insuffPermissions'));
+	/**
+	 * 
+	 * @param type $f3
+	 * @return type
+	 */
+    public function deleteProjectSettingsMilestone($f3) {
+        if(!helper::getPermission('proj_manageMilestones'))
+            return $this->tpfail($f3->get('lng.insuffPermissions'));
 
-        $msHash = $this->get('PARAMS.hash');
+        $msHash = $f3->get('PARAMS.hash');
 
-        $milestone = new \models\Milestone();
+        $milestone = new DB\SQL\Mapper($this->db, 'Milestone');
         $milestone->load(array('hash = :hash', array(':hash' => $msHash)));
 
-        if (!$milestone->hash)
-            return $this->tpfail($this->get('lng.gettingMSFail'));
+        if(!$milestone->hash)
+            return $this->tpfail($f3->get('lng.gettingMSFail'));
 
-        $tickets = new \models\Ticket();
+        $tickets = new DB\SQL\Mapper($this->db, 'Ticket');
         $count = $tickets->found(array('milestone = :ms', array(':ms' => $milestone->hash)));
 
         if ($count > 0)
-            return $this->tpfail($this->get('lng.removeMSFail'));
+            return $this->tpfail($f3->get('lng.removeMSFail'));
 
         $milestone->erase();
-        $this->reroute('/project/settings#milestones');
+        $f3->reroute('/project/settings#milestones');
     }
 
-    /**
-     * 
-     */
-    function addEditRole($projHash = false)
-    {
-        $roleHash = $this->get('POST.hash') ? $this->get('POST.hash') : \misc\helper::getFreeHash('Role');
+	
+	/**
+	 * 
+	 * @param type $f3
+	 * @param type $projHash
+	 * @return type
+	 */
+	public function addEditRole($f3 = false, $projHash = false) {
+		if(!$f3)
+			$f3 = Base::instance();
+		
+        $roleHash = $f3->get('POST.hash') ? $f3->get('POST.hash') : helper::getFreeHash('Role');
 
-        $role = new \models\Role();
-        if ($this->exists('POST.hash'))
-        {
+        $role = new DB\SQL\Mapper($this->db, 'Role');
+        if($f3->exists('POST.hash')) {
             $role->load(array('hash = :hash', array(':hash' => $roleHash)));
 
             if ($role->dry())
-                return $this->tpfail($this->get('lng.editRoleFail'));
+                return $this->tpfail($f3->get('lng.editRoleFail'));
         }
 
-        $role->name = ($projHash) ? 'Admin' : $this->get('POST.name');
+        $role->name = ($projHash) ? 'Admin' : $f3->get('POST.name');
         $role->hash = $roleHash;
-        $role->issuesAssigneable = ($projHash) ? 1 : $this->get('POST.issuesAssigneable') == "on";
-        $role->project = ($projHash) ? $projHash : $this->get('SESSION.project');
-        $role->iss_addIssues = ($projHash) ? 1 : $this->get('POST.iss_addIssues') == "on";
-        $role->proj_editProject = ($projHash) ? 1 : $this->get('POST.proj_editProject') == "on";
-        $role->proj_manageMembers = ($projHash) ? 1 : $this->get('POST.proj_manageMembers') == "on";
-        $role->proj_manageMilestones = ($projHash) ? 1 : $this->get('POST.proj_manageMilestones') == "on";
-        $role->proj_manageRoles = ($projHash) ? 1 : $this->get('POST.proj_manageRoles') == "on";
-        $role->iss_editIssues = ($projHash) ? 1 : $this->get('POST.iss_editIssues') == "on";
-        $role->iss_addIssues = ($projHash) ? 1 : $this->get('POST.iss_addIssues') == "on";
-        $role->iss_deleteIssues = ($projHash) ? 1 : $this->get('POST.iss_deleteIssues') == "on";
-        $role->iss_moveIssue = ($projHash) ? 1 : $this->get('POST.iss_moveIssue') == "on";
-        $role->iss_editWatchers = ($projHash) ? 1 : $this->get('POST.iss_editWatchers') == "on";
-        $role->iss_addWatchers = ($projHash) ? 1 : $this->get('POST.iss_addWatchers') == "on";
-        $role->iss_viewWatchers = ($projHash) ? 1 : $this->get('POST.iss_viewWatchers') == "on";
-		$role->proj_manageCategories = ($projHash) ? 1 : $this->get('POST.proj_manageCategories') == "on";
+        $role->issuesAssigneable = ($projHash) ? 1 : $f3->get('POST.issuesAssigneable') == "on";
+        $role->project = ($projHash) ? $projHash : $f3->get('SESSION.project');
+        $role->iss_addIssues = ($projHash) ? 1 : $f3->get('POST.iss_addIssues') == "on";
+        $role->proj_editProject = ($projHash) ? 1 : $f3->get('POST.proj_editProject') == "on";
+        $role->proj_manageMembers = ($projHash) ? 1 : $f3->get('POST.proj_manageMembers') == "on";
+        $role->proj_manageMilestones = ($projHash) ? 1 : $f3->get('POST.proj_manageMilestones') == "on";
+        $role->proj_manageRoles = ($projHash) ? 1 : $f3->get('POST.proj_manageRoles') == "on";
+        $role->iss_editIssues = ($projHash) ? 1 : $f3->get('POST.iss_editIssues') == "on";
+        $role->iss_addIssues = ($projHash) ? 1 : $f3->get('POST.iss_addIssues') == "on";
+        $role->iss_deleteIssues = ($projHash) ? 1 : $f3->get('POST.iss_deleteIssues') == "on";
+        $role->iss_moveIssue = ($projHash) ? 1 : $f3->get('POST.iss_moveIssue') == "on";
+        $role->iss_editWatchers = ($projHash) ? 1 : $f3->get('POST.iss_editWatchers') == "on";
+        $role->iss_addWatchers = ($projHash) ? 1 : $f3->get('POST.iss_addWatchers') == "on";
+        $role->iss_viewWatchers = ($projHash) ? 1 : $f3->get('POST.iss_viewWatchers') == "on";
+		$role->proj_manageCategories = ($projHash) ? 1 : $f3->get('POST.proj_manageCategories') == "on";
         $role->save();
 
         if($projHash)
             return $roleHash;
         else
-            $this->reroute('/project/settings#roles');
+            $f3->reroute('/project/settings#roles');
     }
     
     
-    function deleteRole()
-    {
-        $hash = $this->get('PARAMS.hash');
+    public function deleteRole($f3) {
+        $hash = $f3->get('PARAMS.hash');
         
-        if(\misc\helper::getPermission('proj_manageRoles')) {
-            $ax = new Axon('Role');
+        if(helper::getPermission('proj_manageRoles')) {
+            $ax = new DB\SQL\Mapper($this->db, 'Role');
             $ax->load(array('hash = :hash', array(':hash' => $hash)));
 
-            $ax2 = new \Axon('ProjectPermission');
+            $ax2 = new DB\SQL\Mapper($this->db, 'ProjectPermission');
 
-            if($ax2->found('role = '.$ax->hash))
-	            return $this->tpfail($this->get('lng.deleteRoleFail'));
+			// TODO: may break later. Switched to array-syntax even if 
+			//		 injection is not possible here
+            if($ax2->found('role = :role', array(':role' => $ax->hash)))
+	            return $this->tpfail($f3->get('lng.deleteRoleFail'));
 
             $ax->erase();
-            $this->set('SESSION.SUCCESS', $this->get('lng.roleDeleted'));
-            $this->reroute('/project/settings#roles');     
+            $f3->set('SESSION.SUCCESS', $f3->get('lng.roleDeleted'));
+            $f3->reroute('/project/settings#roles');     
         } else {
-            $this->tpfail($this->get('lng.insuffPermissions'));
+            $this->tpfail($f3->get('lng.insuffPermissions'));
         }
     }
 
-    /**
-     * 
-     */
-    function addEditCategory($projHash = false, $name = false)
-    {     
-		if (!\misc\helper::getPermission('proj_editProject'))
-			return $this->tpfail($this->get('lng.insuffPermissions'));
+	
+	/**
+	 * 
+	 * @param type $f3
+	 * @param type $params
+	 * @param type $projHash
+	 * @param type $name
+	 * @return type
+	 */
+    public function addEditCategory($f3 = false, $params = false, $projHash = false, $name = false) {#
+		if(!$f3)
+			$f3 = Base::instance();
+		
+		if(!\misc\helper::getPermission('proj_editProject'))
+			return $this->tpfail($f3->get('lng.insuffPermissions'));
 
-        $category = new \models\Category();
+        $category = new DB\SQL\Mapper($this->db, 'Category');
 
-        if ($this->get('POST.hash') != "")
-            $category->load(array('hash = :hash', array(':hash' => $this->get('POST.hash'))));
-        else
-        {
-            $category->project = ($projHash) ? $projHash : $this->get('SESSION.projectHash');
-            $category->hash = \misc\helper::getFreeHash('Category');
+        if($f3->get('POST.hash') != "") {
+            $category->load(array('hash = :hash', array(':hash' => $f3->get('POST.hash'))));
+		} else {
+            $category->project = ($projHash) ? $projHash : $f3->get('SESSION.projectHash');
+            $category->hash = helper::getFreeHash('Category');
         }
 
-        $category->name = ($name) ? $name : $this->get('POST.name');
+        $category->name = ($name) ? $name : $f3->get('POST.name');
         $category->save();
 
-        if ($this->get('POST.hash') != "")
-            $this->set('SESSION.SUCCESS', $this->get('lng.categoryEdited'));
+        if($f3->get('POST.hash') != "")
+            $this->set('SESSION.SUCCESS', $f3->get('lng.categoryEdited'));
         else
             if(!$projHash)
-                $this->set('SESSION.SUCCESS', $this->get('lng.categoryAdded'));
+                $f3->set('SESSION.SUCCESS', $f3->get('lng.categoryAdded'));
 
         if(!$projHash)
-            $this->reroute('/project/settings#categories');
+            $f3->reroute('/project/settings#categories');
 
     }
 
+	
 	/**
-	 *
+	 * 
+	 * @param type $f3
+	 * @return type
 	 */
-	function deleteCategory()
-	{
-		if (!\misc\helper::getPermission('proj_editProject'))
-			return $this->tpfail($this->get('lng.insuffPermissions'));			
+	public function deleteCategory($f3) {
+		if(!helper::getPermission('proj_editProject'))
+			return $this->tpfail($f3->get('lng.insuffPermissions'));			
 
-            $hash = $this->get('PARAMS.hash');
+            $hash = $f3->get('PARAMS.hash');
 
-            if (\misc\helper::getPermission('proj_editProject'))
-            {
-                $category = new \category\model();
+            if(helper::getPermission('proj_editProject')) {
+                $category = new DB\SQL\Mapper($this->db, 'Category');
                 $category->load(array('hash = :hash', array(':hash' => $hash)));
 
                 $category->erase();
-                $this->set('SESSION.SUCCESS', $this->get('lng.categoryDeleted'));
+                $this->set('SESSION.SUCCESS', $f3->get('lng.categoryDeleted'));
                 $this->reroute('/project/settings#categories');
-            }
-            else
-                $this->tpfail($this->get('lng.insuffPermissions'));
+            } else {
+                $this->tpfail($f3->get('lng.insuffPermissions'));
+			}
 	}
     
-    /**
-     * 
-     */
-    function projectAdd() 
-    {
+	
+	/**
+	 * 
+	 * @param type $f3
+	 */
+    public function projectAdd($f3) {
 		/* TODO: Fehlgedanke
 		if (!$this->get('SESSION.user.admin'))
 			return $this->tpfail($this->get('lng.insuffPermissions'));			
 		*/
 		
-        $hash = \misc\helper::getFreeHash('Project');
+        $hash = helper::getFreeHash('Project');
         
-        $ax = new \Axon('Project');
-        $ax->name = $this->get('POST.name');
-        $ax->description = $this->get('POST.description');
-        $ax->public = ($this->get('POST.public') == 'on') ? 1 : 0;
+        $ax = new DB\SQL\Mapper($this->db, 'Project');
+        $ax->name = $f3->get('POST.name');
+        $ax->description = $f3->get('POST.description');
+        $ax->public = ($f3->get('POST.public') == 'on') ? 1 : 0;
         $ax->hash = $hash;
         $ax->save();
 
-        $cmain = new \misc\main();
-        $cmain->selectProject($hash, false);
+		// TODO: fix this!
+        $cmain = new main;
+        $cmain->selectProject(false, false, $hash, false);
         
-        $perms = new \models\projPerms();
+        $perms = new DB\SQL\Mapper($this->db, 'ProjectPermission');
         $perms->user = $this->get('SESSION.user.hash');
         $perms->project = $hash;
-        $perms->role = $this->addEditRole($hash);
+        $perms->role = $this->addEditRole(false, $hash);
         $perms->save();
         
-        $milestone = new \controllers\Milestone();
+        $milestone = new Milestone;
         $milestone->addEditMilestone($hash);
         
-        $this->addEditCategory($hash, $this->get('lng.uncategorized'));
+        $this->addEditCategory(false, false, $hash, $f3->get('lng.uncategorized'));
         
-        \misc\helper::addActivity($this->get('lng.projCreated'), 0, '', '', $hash);
+        helper::addActivity($f3->get('lng.projCreated'), 0, '', '', $hash);
         
         $this->reroute('/');        
     }
 
-    /**
-     * 
-     */
-    function projectEditMain()
-    {
-		if (!\misc\helper::getPermission('proj_editProject'))
-			return $this->tpfail($this->get('lng.insuffPermissions'));
+	
+	/**
+	 * 
+	 * @param type $f3
+	 * @return type
+	 */
+    public function projectEditMain($f3) {
+		if (!helper::getPermission('proj_editProject'))
+			return $this->tpfail($f3->get('lng.insuffPermissions'));
 
-        $project = new \models\Project();
-        $project->load(array('hash = :hash', array(':hash' => $this->get('SESSION.project'))));
-        $project->name = $this->get('POST.name');
-        $project->public = $this->get('POST.public')=='on';
-        $project->description = $this->get('POST.description');
+        $project = new DB\SQL\Mapper($this->db, 'Project');
+        $project->load(array('hash = :hash', array(':hash' => $f3->get('SESSION.project'))));
+        $project->name = $f3->get('POST.name');
+        $project->public = $f3->get('POST.public')=='on';
+        $project->description = $f3->get('POST.description');
         $project->save();
 
-        if (!$project->hash)
-        {
+        if (!$project->hash) {
             $this->tpfail($this->get('lng.saveProjectFail'));
             return;
         }
 
-        $this->reroute('/project/settings');
+        $f3->reroute('/project/settings');
     }
+	
 	
     /**
      * 
      */
-    function showProjectSettings()
-    {
-        $projectHash = $this->get('SESSION.project');
+    public function showProjectSettings($f3) {
+        $projectHash = $f3->get('SESSION.project');
 
-        if($projectHash != "") {      
-            $project = new \models\Project();
+        if($projectHash != "") {
+            $project = new DB\SQL\Mapper($this->db, 'Project');
             $project->load(array('hash = :hash', array(':hash' => $projectHash)));
 
-            $role = new \models\Role();
+            $role = new DB\SQL\Mapper($this->db, 'Role');
             $roles = $role->find(array('project = :hash', array(':hash' => $projectHash)));
 
-            $projPerms = new \models\UserPerms();
+            $projPerms = new DB\SQL\Mapper($this->db, 'user_perms');
             $projPerms = $projPerms->find(array('project = :hash', array(':hash' => $projectHash)));
 
-
-            $milestone = new \models\Milestone();
+            $milestone = new DB\SQL\Mapper($this->db, 'Milestone');
             $milestones = $milestone->find(array('project = :hash', array(':hash' => $projectHash)));
 
-            // TODO: this here is wrong!
-            $user = new \models\User();
+			// TODO: don't load EVERY user
+			// - Idea: Ajax'd input field to auto-complete user names
+            $user = new DB\SQL\Mapper($this->db, 'User');
             $users = $user->find();
 
-            $categories = new \models\Category();
+            $categories = new DB\SQL\Mapper($this->db, 'Category');
             $categories = $categories->find();
 
-            if (!$project->hash)
-            {
-                $this->tpfail($this->get('lng.openProjectFail'));
+            if (!$project->hash) {
+                $this->tpfail($f3->get('lng.openProjectFail'));
                 return;
             }
 
-            $this->set('users', $users);
-            $this->set('projMilestones', $milestones);
-            $this->set('projRoles', $roles);
-            $this->set('projMembers', $projPerms);
-            $this->set('projDetails', $project);
-            $this->set('projCategories', $categories);
-            $this->set('template', 'projectSettings.tpl.php');
-            $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}}');
-            $this->set('onpage', 'settings');
-            $this->tpserve();
+            $f3->set('users', $users);
+            $f3->set('projMilestones', $milestones);
+            $f3->set('projRoles', $roles);
+            $f3->set('projMembers', $projPerms);
+            $f3->set('projDetails', $project);
+            $f3->set('projCategories', $categories);
+            $f3->set('template', 'projectSettings.tpl.php');
+            $f3->set('pageTitle', $f3->get('lng.project') . ' › ' . $f3->get('lng.settings'));
+            $f3->set('onpage', 'settings');
         } else {
-            $this->set('SESSION.FAILURE', $this->get('lng.noProject'));
-            $this->set('template', 'projectSettings.tpl.php');
-            $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}}');
-            $this->tpserve();
+            $f3->set('SESSION.FAILURE', $f3->get('lng.noProject'));
+            $f3->set('template', 'projectSettings.tpl.php');
+            $f3->set('pageTitle', $f3->get('lng.project') . ' › ' . $f3->get('lng.settings'));
         }
     }
     
-    /**
-     * 
-     */
-    function showProjectSettingsRole()
-    {
-        $roleHash = $this->get('PARAMS.hash');
+	
+	/**
+	 * 
+	 * @param type $f3
+	 * @return type
+	 */
+    public function showProjectSettingsRole($f3) {
+        $roleHash = $f3->get('PARAMS.hash');
 
-        $role = new \models\Role();
+        $role = new DB\SQL\Mapper($this->db, 'Role');
         $role->load(array('hash = :hash', array(':hash' => $roleHash)));
 
-        if (!$role->hash)
-        {
+        if (!$role->hash) {
             $this->tpfail("Failure while getting Role");
             return;
         }
 
         $this->set('roleData', $role);
         $this->set('template', 'projectSettingsRole.tpl.php');
-        $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.role}} › {{@roleData->name}}');
+        $this->set('pageTitle', $f3->get('lng.project') . ' › ' . $f3->get('lng.settings') . ' › ' . $f3->get('lng.role') . ' › ' . $f3->get('roleData')->name);
         $this->set('onpage', 'settings');
-        $this->tpserve();
     }
 
-    
-    /**
-     * 
-     */
-    function showProjectSettingsMilestone()
-    {
+	
+	/**
+	 * 
+	 * @param type $f3
+	 * @return type
+	 */
+    public function showProjectSettingsMilestone($f3) {
         $msHash = $this->get('PARAMS.hash');
 
-        $milestone = new \models\Milestone();
+        $milestone = new DB\SQL\Mapper($this->db, 'Milestone');
         $milestone->load(array('hash = :hash', array(':hash' => $msHash)));
 
-        if (!$milestone->hash)
-        {
-            $this->tpfail($this->get('lng.gettingMSFail'));
+        if(!$milestone->hash) {
+            $this->tpfail($f3->get('lng.gettingMSFail'));
             return;
         }
 
-        $this->set('msData', $milestone);
-        $this->set('template', 'projectSettingsMilestone.tpl.php');
-        $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.milestone}} › {{@msData->name}}');
-        $this->set('onpage', 'settings');
-        $this->tpserve();
+        $f3->set('msData', $milestone);
+        $f3->set('template', 'projectSettingsMilestone.tpl.php');
+        $f3->set('pageTitle', $f3->get('lng.project') . ' › ' . $f3->get('lng.settings') . ' › ' . $f3->get('lng.milestone') . ' › ' . $f3->get('msData')->name);
+        $f3->set('onpage', 'settings');
     }
     
-
-    /**
-     * 
-     */
-    function showAddRole()
-    {
-        $this->set('template', 'projectSettingsRoleAdd.tpl.php');
-        $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.addrole}}');
-        $this->set('onpage', 'settings');
-        $this->tpserve();
+	
+	/**
+	 * 
+	 * @param type $f3
+	 */
+    public function showAddRole($f3) {
+        $f3->set('template', 'projectSettingsRoleAdd.tpl.php');
+        $f3->set('pageTitle', $f3->get('lng.project') . ' › ' . $f3->get('lng.settings') . ' › ' . $f3->get('lng.addrole'));
+        $f3->set('onpage', 'settings');
     }
 
-    /**
-     * 
-     */
-    function showAddMilestone()
-    {
-        $this->set('today', date('Y-m-d', time()));
-        $this->set('template', 'projectSettingsMilestoneAdd.tpl.php');
-        $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.addmilestone}}');
-        $this->set('onpage', 'settings');
-        $this->tpserve();
+	
+	/**
+	 * 
+	 * @param type $f3
+	 */
+    public function showAddMilestone($f3) {
+        $f3->set('today', date('Y-m-d', time()));
+        $f3->set('template', 'projectSettingsMilestoneAdd.tpl.php');
+        $f3->set('pageTitle', $f3->get('lng.project') . ' › ' . $f3->get('lng.settings') . ' › ' . $f3->get('lng.addmilestone'));
+        $f3->set('onpage', 'settings');
     }
 
-    /**
-     * 
-     */
-    function showAddCategory()
-    {
-        $this->set('template', 'projectSettingsCategoryAdd.tpl.php');
-        $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.addcategory}}');
-        $this->set('onpage', 'settings');
-        $this->tpserve();
+	
+	/**
+	 * 
+	 * @param type $f3
+	 */
+    public function showAddCategory($f3) {
+        $f3->set('template', 'projectSettingsCategoryAdd.tpl.php');
+        $f3->set('pageTitle', $f3->get('lng.project') . ' › ' . $f3->get('lng.settings') . ' › ' . $f3->get('lng.addcategory'));
+        $f3->set('onpage', 'settings');
     }
 
-    /**
-     *
-     */
-    function showEditCategory()
-    {
-        $hash = $this->get('PARAMS.hash');
+	
+	/**
+	 * 
+	 * @param type $f3
+	 */
+    public function showEditCategory($f3) {
+        $hash = $f3->get('PARAMS.hash');
 
-        $category = new \models\Category();
+        $category = new DB\SQL\Mapper($this->db, 'Category');
         $category->load(array('hash = :hash', array(':hash' => $hash)));
 
-        $this->set('category', $category);
-        $this->set('template', 'projectSettingsCategoryEdit.tpl.php');
-        $this->set('pageTitle', '{{@lng.project}} › {{@lng.settings}} › {{@lng.editcategory}}');
-        $this->set('onpage', 'settings');
-        $this->tpserve();
-
+        $f3->set('category', $category);
+        $f3->set('template', 'projectSettingsCategoryEdit.tpl.php');
+        $f3->set('pageTitle', $f3->get('lng.project') . ' › ' . $f3->get('lng.settings') . ' › ' . $f3->get('lng.editcategory'));
+        $f3->set('onpage', 'settings');
     }
     
-    /**
-     * 
-     */
-    function showAddProject()
-    {
-		/* TODO: falscher Gedanke? Prüft nur auf Permissions eines bereits gewählten Projekts
-		if (!\misc\helper::getPermission('proj_editProject'))
-			return $this->tpfail($this->get('lng.insuffPermissions'));			
-		*/
-        $this->set('template', 'projectAdd.tpl.php');
-        $this->set('pageTitle', '{{@lng.project}} › {{@lng.add}}');
-        $this->set('onpage', 'settings');
-        $this->tpserve();
+	
+	/**
+	 * 
+	 * @param type $f3
+	 */
+    public function showAddProject($f3) {
+        $f3->set('template', 'projectAdd.tpl.php');
+        $f3->set('pageTitle', $f3->get('lng.project') . ' › ' . $f3->get('lng.add'));
+        $f3->set('onpage', 'settings');
     }
 }

@@ -49,7 +49,6 @@ return array('lng' => array(
     'home' => 'Start',
     'tickets' => 'Tickets',
     'roadmap' => 'Roadmap',
-    'footer' => '© 2012 Bugtrckr-Team',
     'error' => 'Fehler',
     'password' => 'Passwort',
     'email' => 'E-Mail',

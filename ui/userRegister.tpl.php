@@ -5,7 +5,7 @@
         <p>{{@lng.alreadyLoggedIn}}</p>
     </F3:true>
     <F3:false>
-        <form action="{{@BASE}}/user/new" method="post">
+        <form action="user/new" method="post">
             <div class="formRow">
                 <div class="formLabel">{{@lng.name}}: </div>
                 <div class="formValue"><input type="text" name="name" /></div>

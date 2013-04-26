@@ -24,6 +24,7 @@ form {
 .navbar ul.nav li a 
 {
 	color: #FFF !important;
+	text-shadow: none;
 }
 
 .navbar ul.nav li a:hover 
@@ -74,7 +75,7 @@ div.ticket_timeline
 
 
 
-#innerContentLOL
+#content-inner
 {
     padding-left: 10px;
 	padding-right: 10px;

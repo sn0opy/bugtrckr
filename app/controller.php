@@ -6,7 +6,7 @@
  * @author Sascha Ohms
  * @author Philipp Hirsch
  * @copyright Copyright 2013, Bugtrckr-Team
- * @license http://www.gnu.org/licenses/lgpl.txt
+ * @license http://www.gnu.org/licenses/gpl.txt
  *   
  */
 
@@ -23,7 +23,9 @@ class Controller {
 	public function __construct() {
 		$f3 = Base::instance();
 		
-		$this->db = new DB\SQL('mysql:host=localhost;dbname=' . $f3->get('DB_DBNAME'), $f3->get('DB_USER'), $f3->get('DB_PASSWORD'));
+		$this->db = $f3->get('DB');
+		// TODO: just a workaround, remove this asap
+		$f3->set('onpage', '');
 	}
 	
 	/**
@@ -32,13 +34,13 @@ class Controller {
     public function afterRoute() {
 		$f3 = Base::instance();
 		
-        $project = new \DB\SQL\Mapper($this->db, 'project');
+        $project = new \DB\SQL\Mapper($this->db, 'Project');
         $projects = $project->find();
         $f3->set('projects', $projects);
         
         if(file_exists('setup.php') || file_exists('install/sqlite.php') || file_exists('install/mysql.php'))
 			$f3->set('installWarning', true);
-        
+		       		
         echo Template::instance()->render('main.tpl.php');
     }
 
@@ -53,9 +55,11 @@ class Controller {
      *
      */
     protected function tpfail($msg) {
-        $this->set('pageTitle', $this->get('lng.error'));
-        $this->set('SESSION.FAILURE', $msg);
-        $this->tpserve();
+		$f3 = Base::instance();
+		
+		$f3->set('template', 'error.tpl.php');
+        $f3->set('pageTitle', $f3->get('lng.error'));
+        $f3->set('SESSION.FAILURE', $msg);
     }
 
 }
