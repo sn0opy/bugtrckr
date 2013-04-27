@@ -1,6 +1,6 @@
 <h2 class="floatleft">{{@lng.ticket}} › {{@ticket->title}}</h2>
 
-<a href="#editIssue" data-toggle="modal" class="btn floatright">Ticket editieren</a>
+<a href="/#editIssue" data-toggle="modal" class="btn floatright">Ticket editieren</a>
 
 <br class="clearfix" />
 
@@ -16,11 +16,11 @@
             <th>{{@lng.priority}}</th>
             <td>{{Helper::getName('priorities', @ticket->priority)}}</td>
             <th>{{@lng.assignedTo}}</th>
-            <td><a href="{{@BASE}}/user/{{@ticket->assignedname}}">{{@ticket->assignedname}}</a></td>
+            <td><a href="/user/{{@ticket->assignedname}}">{{@ticket->assignedname}}</a></td>
         </tr>
         <tr>
             <th>{{@lng.owner}}</th>
-            <td><a href="{{@BASE}}/user/{{@ticket->username}}">{{@ticket->username}}</a></td>
+            <td><a href="/user/{{@ticket->username}}">{{@ticket->username}}</a></td>
             <th></th>
             <td></td>
         </tr>
@@ -86,7 +86,7 @@
                     </F3:check>
                 </td>
                 <td>{{date('d.m.Y H:i', @activity->changed)}}</td>
-                <td><a href="{{@BASE}}/user/{{@activity->username}}">{{@activity->username}}</a></td>
+                <td><a href="/user/{{@activity->username}}">{{@activity->username}}</a></td>
             </tr>
         </F3:repeat>
         </tbody>
@@ -96,7 +96,7 @@
 <F3:check if="{{@SESSION.user}}">
     <F3:true>
 	<div class="modal hide" id="editIssue">
-		<form method="post" action="{{@BASE}}/ticket/{{@ticket->tickethash}}">
+		<form method="post" action="/ticket/{{@ticket->tickethash}}">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal">×</button>
 				<h3>{{@lng.editTicket}}</h3>

@@ -11,11 +11,11 @@
  */
 
 class Setup extends Controller {
-	/**
-	 * 
-	 * @param type $f3
-	 */
-	public function start($f3) {
+    /**
+     * 
+     * @param type $f3
+     */
+    public function start($f3) {
 	
         $f3->set('NEEDED', array(
             'sqlite' => extension_loaded('pdo_sqlite'),
@@ -24,15 +24,15 @@ class Setup extends Controller {
             'configexists' => file_exists('../data/config.inc.php')
             ));                
         
-        $f3->set('BERROR', self::_doChecks());        
-        self::tpserve();
+        $f3->set('BERROR', $this->_doChecks());        
+        $this->tpserve();
     }    
     
-	/**
-	 * 
-	 * @param type $f3
-	 * @return type
-	 */
+    /**
+     * 
+     * @param type $f3
+     * @return type
+     */
     public function install($f3) {
         $admname = $f3->get('POST.name');
         $admpw = $f3->get('POST.pw');
@@ -48,7 +48,7 @@ class Setup extends Controller {
             
             require_once '../install/mysql.php';
             
-            $usr = new \controllers\User();
+            $usr = new User;
             $usr->registerUser(false, false, $admname, $admpw, $admemail, true);
             
             file_put_contents('../data/config.inc.php', "<?php F3::set('DB', new \DB('mysql:host=".$host.";dbname=".$db."', '".$user."', '".$pass."')); ?>");
@@ -60,11 +60,11 @@ class Setup extends Controller {
             
             if(file_exists('../data/'.$db)) {
                 $f3->set('dbexists', true);
-                self::tpserve();
+                $this->tpserve();
                 return;
             }
 
-            $f3->set('DB', new \DB('sqlite:../data/'.$db));
+            $f3->set('DB', new \DB\SQL('sqlite:../data/'.$db));
             require_once '../install/sqlite.php';
             
             $user = new User;
@@ -78,18 +78,18 @@ class Setup extends Controller {
             file_put_contents('../data/config.inc.php', "<?php F3::set('DB', new \DB('sqlite:../data/".$db."')); ?>");
             
             $f3->set('INSTALLED', true);            
-            self::pserve();
+            self::tpserve();
         }
     }           
     
 
-	/**
-	 * 
-	 * @param type $f3
-	 * @return boolean
-	 */
-    private static function _doChecks($f3) {
-		$error = false;
+    /**
+     * 
+     * @param type $f3
+     * @return boolean
+     */
+    private static function _doChecks() {
+        $error = false;
         
         if($f3->get('NEEDED.sqlite') != true && $f3->get('NEEDED.mysql') != true)
             $error = true;
@@ -104,9 +104,9 @@ class Setup extends Controller {
     }
 	
 	
-	/**
-	 * 
-	 */
+    /**
+     * 
+     */
     private static function tpserve() {
         echo Template::instance()->serve('setup.tpl.php');
     }

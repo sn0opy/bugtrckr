@@ -1,7 +1,7 @@
 <h2>{{@lng.category}} › {{@lng.editcategory}}</h2>
 
 <div class="msSettings">
-    <form action="{{@BASE}}/project/settings/category/edit" method="post">
+    <form action="/project/settings/category/edit" method="post">
         <div class="formRow">
             <div class="formLabel">
                 {{@lng.name}}

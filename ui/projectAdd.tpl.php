@@ -1,7 +1,7 @@
 <h2>{{@lng.project}} › {{@lng.add}}</h2>
 <check if="{{@SESSION.user.hash}}">
     <true>
-        <form action="{{@BASE}}/project/add" method="post">
+        <form action="/project/add" method="post">
             <div class="formRow">
                 <div class="formLabel">
                     {{@lng.projectname}}

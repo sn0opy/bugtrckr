@@ -4,7 +4,7 @@
         <meta charset="UTF-8" />
         <title>Bugtrckr Setup</title>
 		
-		<link href="{{@BASE}}/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="{{@BASE}}/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
         <link href="{{@BASE}}/css/setup.css" rel="stylesheet" type="text/css" />
         
 		<script type="text/javascript" src="{{@BASE}}/js/jquery.js"></script>

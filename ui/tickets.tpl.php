@@ -1,7 +1,7 @@
 <h2 class="pull-left">{{@lng.tickets}}</h2>
 
 <div class="pull-right">
-	<form action="{{@BASE}}/search" method="post" id="searchForm" class="form-search">
+	<form action="/search" method="post" id="searchForm" class="form-search">
 		<input type="input" name="search" value="{{@SESSION.ticketSearch}}" id="searchInput" class="search-query input-medium" /> <input type="submit" value="{{@lng.search}}" class="btn" /> <check if="{{@getPermission('iss_addIssues')}}"><button class="btn btn-primary" data-toggle="modal" href="#addIssue">{{@lng.addticket}}</button></check>
 	</form>
 </div>
@@ -23,13 +23,13 @@
             <tbody>
                 <repeat group="{{@tickets}}" value="{{@ticket}}">
                 <tr>
-                    <td class="title"><a href="{{@BASE}}/ticket/{{@ticket->tickethash}}">{{@ticket->title}}</a></td>
+                    <td class="title"><a href="/ticket/{{@ticket->tickethash}}">{{@ticket->title}}</a></td>
                     <td class="type">{{Helper::getName('types', @ticket->type)}}</td>
                     <td class="state"><span class="color{{@ticket->state}}">{{Helper::getName('states', @ticket->state)}}</span></td>
                     <td class="priority"><span style="display: none;">{{@ticket->priority}}</span><span class="color{{@ticket->priority}}">{{Helper::getName('priorities', @ticket->priority)}}</span></td>
                     <td class="created">{{date('d.m.Y H:i', @ticket->created)}}</td>
-                    <td class="owner"><a href="{{@BASE}}/user/{{@ticket->username}}">{{@ticket->username}}</a></td>
-                    <td class="owner"><a href="{{@BASE}}/user/{{@ticket->assignedname}}">{{@ticket->assignedname}}</a></td>
+                    <td class="owner"><a href="/user/{{@ticket->username}}">{{@ticket->username}}</a></td>
+                    <td class="owner"><a href="/user/{{@ticket->assignedname}}">{{@ticket->assignedname}}</a></td>
                 </tr>
                 </repeat>
             </tbody>
@@ -42,7 +42,7 @@
 
 
 <div class="modal hide" id="addIssue">
-	<form method="post" action="{{@BASE}}/ticket/">
+	<form method="post" action="/ticket/">
 		<div class="modal-header">
 			<button type="button" class="close" data-dismiss="modal">×</button>
 			<h3>{{@lng.addticket}}</h3>

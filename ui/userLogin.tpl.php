@@ -5,7 +5,7 @@
         <p>{{@lng.alreadyLoggedIn}}</p>
     </true>
     <false>
-        <form action="user/login" method="post">
+        <form action="/user/login" method="post">
             <div class="formRow">
                 <div class="formLabel">{{@lng.email}}: </div>
                 <div class="formValue"><input type="text" name="email" /></div>

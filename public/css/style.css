@@ -1,5 +1,4 @@
-body 
-{
+body {
 	margin-top: 50px;
 }
 
@@ -7,8 +6,7 @@ h2 {
 	margin-bottom: 20px;
 }
 
-h1 a, h2 a, h3 a, #menu a
-{
+h1 a, h2 a, h3 a, #menu a {
     text-decoration: none !important;
 }
 
@@ -16,57 +14,23 @@ form {
 	margin-bottom: 0px !important;
 }
 
-.navbar-inner
-{
-    background-image: url(../img/headBgN.png);
-}
-
-.navbar ul.nav li a 
-{
-	color: #FFF !important;
-	text-shadow: none;
-}
-
-.navbar ul.nav li a:hover 
-{
-	color: #CCC !important;
-}
-
-.navbar .brand
-{
-    font-family: Georgia;
-	text-shadow: 1px 1px 1px #000;
-	font-style: italic;
-	color: #FFF !important;
-	font-weight: bold !important;
-}
-
-.navbar li.active a
-{
-	background-color: rgba(0, 0, 0, 0.3) !important;
-}
-
-.tabContent 
-{
+.tabContent  {
 	float: left;
 }
 
-div.ticket_timeline
-{
+div.ticket_timeline {
     border: 1px solid #CCC;
     border-radius: 3px;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
+    padding: 10px;
+}
+
+.hero-ticket {
 	padding: 10px;
 }
 
-.hero-ticket
-{
-	padding: 10px;
-}
-
-.hero-unit p
-{
+.hero-unit p {
 	font-size: 100% !important;
 }
 
@@ -78,7 +42,7 @@ div.ticket_timeline
 #content-inner
 {
     padding-left: 10px;
-	padding-right: 10px;
+    padding-right: 10px;
 }
 
 #footer

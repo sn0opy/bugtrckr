@@ -19,7 +19,7 @@
 		<div class="tabContent span10" id="tabContent_1">
 			<check if="{{@getPermission('proj_editProject')}}">
 				<true>
-					<form action="{{@BASE}}/project/settings/main/edit" method="post">
+					<form action="/project/settings/main/edit" method="post">
 						<div class="formRow">
 							<div class="formLabel">
 								{{@lng.projectname}}
@@ -73,11 +73,11 @@
 						<repeat group="{{@projMembers}}" value="{{@member}}">
 							<tr>
 								<td class="title">
-									<a href="{{@BASE}}/user/{{@member->name}}">{{@member->name}}</a>
+									<a href="/user/{{@member->name}}">{{@member->name}}</a>
 								</td>
 								<td class="type manageMember">
 									<p>
-									<form action="{{@BASE}}/project/settings/member/setrole" method="post" class="pull-left">
+									<form action="/project/settings/member/setrole" method="post" class="pull-left">
 										<input type="hidden" name="user" value="{{@member->hash}}" />
 										<select name="role" class="floatleft">
 											<repeat group="{{@projRoles}}" value="{{@role}}">
@@ -86,7 +86,7 @@
 										</select>
 										<input type="submit" value="Ändern" class="btn" />
 									</form>
-									<form action="{{@BASE}}/project/setttings/member/delete" method="post" class="inline-form">
+									<form action="/project/setttings/member/delete" method="post" class="inline-form">
 										<input type="hidden" name="user" value="{{@member->hash}}" />
 										<input type="submit" value="{{@lng.delete}}" class="btn" />
 									</form>
@@ -97,7 +97,7 @@
 						</tbody>
 					</table>
 
-					<form action="{{@BASE}}/project/settings/member/add" method="post" class="form-inline">
+					<form action="/project/settings/member/add" method="post" class="form-inline">
 						<p class="addUser">
 							<select name="member">
 								<repeat group="{{@users}}" value="{{@user}}">
@@ -138,17 +138,17 @@
 						<repeat group="{{@projMilestones}}" value="{{@milestone}}">
 							<tr>
 								<td class="title">
-									<a href="{{@BASE}}/project/settings/milestone/{{@milestone->hash}}">{{@milestone->name}}</a>
+									<a href="/project/settings/milestone/{{@milestone->hash}}">{{@milestone->name}}</a>
 								</td>
 								<td>
-									<a class="btn" href="{{@BASE}}/project/settings/milestone/delete/{{@milestone->hash}}" onclick="return confirm('{{@lng.sure}}');">{{@lng.delete}}</a>
-									<a class="btn" href="{{@BASE}}/project/settings/milestone/{{@milestone->hash}}">{{@lng.edit}}</a>
+									<a class="btn" href="/project/settings/milestone/delete/{{@milestone->hash}}" onclick="return confirm('{{@lng.sure}}');">{{@lng.delete}}</a>
+									<a class="btn" href="/project/settings/milestone/{{@milestone->hash}}">{{@lng.edit}}</a>
 								</td>
 							</tr>
 						</repeat>
 						</tbody>
 					</table>
-					<a href="{{@BASE}}/project/settings/milestone/add" class="btn btn-primary">{{@lng.addmilestone}}</a>
+					<a href="/project/settings/milestone/add" class="btn btn-primary">{{@lng.addmilestone}}</a>
 				</true>
 				<false>
 					<div class="alert alert-error">{{@lng.noAccess}}</div>
@@ -174,17 +174,17 @@
 						<repeat group="{{@projRoles}}" value="{{@role}}">
 							<tr>
 								<td class="title">
-									<a href="{{@BASE}}/project/settings/role/{{@role->hash}}">{{@role->name}}</a>
+									<a href="/project/settings/role/{{@role->hash}}">{{@role->name}}</a>
 								</td>
 								<td>
-									<a class="btn" href="{{@BASE}}/project/settings/role/delete/{{@role->hash}}">{{@lng.delete}}</a>
-									<a class="btn" href="{{@BASE}}/project/settings/role/{{@role->hash}}">{{@lng.edit}}</a>
+									<a class="btn" href="/project/settings/role/delete/{{@role->hash}}">{{@lng.delete}}</a>
+									<a class="btn" href="/project/settings/role/{{@role->hash}}">{{@lng.edit}}</a>
 								</td>
 							</tr>
 						</repeat>
 						</tbody>
 					</table>
-					<a href="{{@BASE}}/project/settings/role/add" class="btn btn-primary">{{@lng.addrole}}</a>
+					<a href="/project/settings/role/add" class="btn btn-primary">{{@lng.addrole}}</a>
 				</true>
 				<false>
 					<div class="alert alert-error">{{@lng.noAccess}}</div>
@@ -213,14 +213,14 @@
 									{{@category->name}}
 								</td>
 								<td>
-									<a class="btn" href="{{@BASE}}/project/settings/category/delete/{{@category->hash}}">{{@lng.delete}}</a>
-									<a class="btn" href="{{@BASE}}/project/settings/category/edit/{{@category->hash}}">{{@lng.edit}}</a>
+									<a class="btn" href="/project/settings/category/delete/{{@category->hash}}">{{@lng.delete}}</a>
+									<a class="btn" href="/project/settings/category/edit/{{@category->hash}}">{{@lng.edit}}</a>
 								</td>
 							</tr>
 						</repeat>
 						</tbody>
 					</table>
-					<a href="{{@BASE}}/project/settings/category/add" class="btn btn-primary">{{@lng.addcategory}}</a>
+					<a href="/project/settings/category/add" class="btn btn-primary">{{@lng.addcategory}}</a>
 				</true>
 				<false>
 					<div class="alert alert-error">{{@lng.noAccess}}</div>
