@@ -1,84 +1,15 @@
-body 
-{
-	padding-top: 20px;
-	padding-bottom: 20px;
-}
-
 h1 {
-    font: 18pt Georgia;
-    line-height: 50px;
-    text-align: right;
-    margin-right: 20px;
-    font-style: italic;
-    text-shadow: 1px 1px 3px #000;
-    font-weight: bold;
-	color: #FFF;
+	margin-bottom: 50px;
 }
 
-ul {
-    list-style-type: none;
+.container {
+	margin-top: 100px;
 }
 
-#content, .head, .footer {
-    border-left: 1px solid #DDD;
-    border-right: 1px solid #DDD;
-    margin: 0 auto;
+.label {
+	font-weight: normal;
 }
 
-.head {
-    width: 540px;
-    background: #068 url(../img/headBgN.png);
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-    height: 50px;
-}
-
-#content {
-    width: 538px;
-}
-
-.content {
-    padding: 10px;
-}
-
-.footer {
-    height: 10px;
-    width: 538px;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
-    border-bottom: 1px solid #DDD;
-}
-
-.false {
-    color: #F00;
-}
-
-.true {
-    color: #2DB300;
-}
-
-.formRow
-{
-    float: left;
-    width: 100%;
-    margin-bottom: 2px;
-}
-
-.formLabel
-{
-    float: left;
-    width: 160px;
-}
-
-.formValue
-{
-    float: left;
-}
-
-.clearfix {
-    clear: both;
-}
-
-#mysqlChosen {
-    display: none;
+#requirements td:first-child {
+	width: 50%;
 }

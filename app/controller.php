@@ -22,17 +22,17 @@ class Controller {
 	public function __construct() {
 		$f3 = Base::instance();		
 		
-		$app->config('../app/sql.ini');
+		$f3->config('../app/sql.ini');
 
-		$app->set('DB', new DB\SQL('mysql:host=localhost;dbname=' . 
-					$app->get('DB_DBNAME'), 
-					$app->get('DB_USER'), 
-					$app->get('DB_PASSWORD'))
+		$f3->set('DB', new DB\SQL('mysql:host=localhost;dbname=' . 
+					$f3->get('DB_DBNAME'), 
+					$f3->get('DB_USER'), 
+					$f3->get('DB_PASSWORD'))
 				);
 
 		$this->db = $f3->get('DB');
 
-		$app->set('getPermission', function($permission) {
+		$f3->set('getPermission', function($permission) {
 			return Helper::getPermission($permission);
 		});
 
@@ -56,8 +56,8 @@ class Controller {
 		       		
         echo Template::instance()->render('main.tpl.php');
 		
-		$app->clear('SESSION.SUCCESS');
-		$app->clear('SESSION.FAILURE');
+		$f3->clear('SESSION.SUCCESS');
+		$f3->clear('SESSION.FAILURE');
     }
 
     /**

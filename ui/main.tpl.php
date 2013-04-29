@@ -65,7 +65,7 @@
 
 <check if="{{!isset(@SESSION.user)}}">
 	<div id="login" class="modal hide">
-		<form action="user/login" method="post">
+		<form action="/user/login" method="post">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal">×</button>
 				<h3>{{@lng.login}}</h3>

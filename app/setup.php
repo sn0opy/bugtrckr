@@ -16,15 +16,8 @@ class Setup {
      */
     public function start() {
 		$f3 = Base::instance();
-	
-        $f3->set('NEEDED', array(
-            'sqlite' => extension_loaded('pdo_sqlite'),
-            'mysql' => extension_loaded('pdo_mysql'),
-            'writepermission' => is_writable('../data/'),
-            'configexists' => file_exists('../data/config.inc.php')
-            ));                
         
-        $f3->set('BERROR', $this->_doChecks());        
+		$f3->set('reqs', $this->_doChecks());        
         $this->tpserve();
     }    
     
@@ -33,7 +26,9 @@ class Setup {
      * @param type $f3
      * @return type
      */
-    public function install($f3) {
+	public function install() {
+		$f3 = Base::instance();
+
         $admname = $f3->get('POST.name');
         $admpw = $f3->get('POST.pw');
         $admemail = $f3->get('POST.email');
@@ -89,18 +84,31 @@ class Setup {
      * @return boolean
      */
     private static function _doChecks() {
-        $error = false;
-        
-        if($f3->get('NEEDED.sqlite') != true && $f3->get('NEEDED.mysql') != true)
-            $error = true;
-        
-        if($f3->get('NEEDED.writepermission') != true)
-            $error = true;
-        
-        if($f3->get('NEEDED.configexists') == true)
-            $error = true;
-        
-        return $error;
+		$f3 = Base::instance();	
+		$error = false;
+		$check = null;
+		
+		$check['sqlite'] = !extension_loaded('pdo_sqlite') ? false : true;
+		$check['mysql'] = !extension_loaded('pdo_mysql') ? false: true;
+
+		if(!$check['sqlite'] && !$check['mysql'])
+			$error = true;
+
+		if(is_writeable('../app/')) {
+			$check['config1'] = true;
+		} else {
+			$check['config1'] = false;
+			$error = true;
+		}
+
+		if(!file_exists('../app/config.ini.php')) {
+			$check['config2'] = true;
+		} else {
+			$error = true;
+			$check['config2'] = false;
+		}
+
+        return array('error' => $error, 'checks' => $check);
     }
 	
 	
@@ -108,6 +116,6 @@ class Setup {
      * 
      */
     private static function tpserve() {
-        echo Template::instance()->serve('setup.tpl.php');
+        echo Template::instance()->render('setup.tpl.php');
     }
 }

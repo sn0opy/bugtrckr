@@ -16,24 +16,20 @@ class Helper extends Controller {
 	 * @param type $length
 	 * @return type
 	 */
-	// TODO: user another method to create random strings
-    public static function randStr($length = 5) {
-        return substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, $length);
-    }
-
-	
-	/**
-	 * 
-	 * @param type $salt
-	 * @param type $pass
-	 * @return type
-	 */
-	// TODO: deprecated, we use php_compat instead
-    public static function salting($salt, $pass) {
-        $salt = md5($salt);
-        $pw = md5($pass);
-        return sha1(md5($salt . $pw) . $salt);
-    }
+	public function randStr($len = 10) { 
+		$pw = '';
+		for($i = 0; $i < $len; $i++) {
+			switch(mt_rand(1,6)) { 
+				case 1: $pw.=chr(rand(48,54)); break;
+				case 2: $pw.=chr(rand(55,69)); break;
+				case 3: $pw.=chr(rand(70,80)); break;
+				case 4: $pw.=chr(rand(81,96)); break; 
+				case 5: $pw.=chr(rand(97,104)); break; 
+				case 6: $pw.=chr(rand(105,122)); break;
+			} 
+		} 
+		return $pw; 
+	}
 
 	
 	/**
