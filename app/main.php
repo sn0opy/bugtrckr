@@ -1,7 +1,6 @@
 <?php
 
 /**
- * Everything comes together in here
  * 
  * @author Sascha Ohms
  * @author Philipp Hirsch

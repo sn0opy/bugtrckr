@@ -1,7 +1,6 @@
 <?php
 
 /**
- * Setup
  * 
  * @author Sascha Ohms
  * @author Philipp Hirsch
@@ -10,12 +9,13 @@
  *   
  */
 
-class Setup extends Controller {
+class Setup {
     /**
      * 
      * @param type $f3
      */
-    public function start($f3) {
+    public function start() {
+		$f3 = Base::instance();
 	
         $f3->set('NEEDED', array(
             'sqlite' => extension_loaded('pdo_sqlite'),

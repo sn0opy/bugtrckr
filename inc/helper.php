@@ -1,7 +1,6 @@
 <?php
 
 /**
- * helper functions
  * 
  * @author Sascha Ohms
  * @author Philipp Hirsch

@@ -1,7 +1,6 @@
 <?php
 
 /**
- * Wiki controller
  * 
  * @author Sascha Ohms
  * @author Philipp Hirsch

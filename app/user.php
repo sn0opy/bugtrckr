@@ -1,7 +1,6 @@
 <?php
 
 /**
- * User controller
  * 
  * @author Sascha Ohms
  * @author Philipp Hirsch

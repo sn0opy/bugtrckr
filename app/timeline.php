@@ -1,7 +1,6 @@
 <?php
 
 /**
- * Timeline Controller
  * 
  * @author Sascha Ohms
  * @author Philipp Hirsch

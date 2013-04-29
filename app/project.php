@@ -1,7 +1,6 @@
 <?php
 
 /**
- * Project controller for different settings
  *
  * @author Sascha Ohms
  * @author Philipp Hirsch

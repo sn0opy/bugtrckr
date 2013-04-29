@@ -1,7 +1,6 @@
 <?php
 
 /**
- * Ticket controller
  * 
  * @author Sascha Ohms
  * @author Philipp Hirsch

@@ -1,7 +1,6 @@
 <?php
 
 /**
- * Main controller class
  * 
  * @author Sascha Ohms
  * @author Philipp Hirsch
@@ -21,11 +20,25 @@ class Controller {
 	 * 
 	 */
 	public function __construct() {
-		$f3 = Base::instance();
+		$f3 = Base::instance();		
 		
+		$app->config('../app/sql.ini');
+
+		$app->set('DB', new DB\SQL('mysql:host=localhost;dbname=' . 
+					$app->get('DB_DBNAME'), 
+					$app->get('DB_USER'), 
+					$app->get('DB_PASSWORD'))
+				);
+
 		$this->db = $f3->get('DB');
+
+		$app->set('getPermission', function($permission) {
+			return Helper::getPermission($permission);
+		});
+
 		// TODO: just a workaround, remove this asap
-		$f3->set('onpage', '');
+		$f3->set('onpage', '');			
+
 	}
 	
 	/**
@@ -42,6 +55,9 @@ class Controller {
 			$f3->set('installWarning', true);
 		       		
         echo Template::instance()->render('main.tpl.php');
+		
+		$app->clear('SESSION.SUCCESS');
+		$app->clear('SESSION.FAILURE');
     }
 
     /**
