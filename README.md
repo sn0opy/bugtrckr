@@ -1,5 +1,3 @@
-This version is mostly full functional and we even used it as our productive bug tracking system.
-
 # bugtrckr
 
 This will be a simple bug tracking system. When it's done ...
@@ -11,7 +9,6 @@ Features:
 * Projects
 * Timeline
 * Users
-* Localization
 
 ## Requirements
 * PHP 5.3
@@ -23,7 +20,7 @@ Features:
 * Phillipp Hirsch
 
 ## License & Copyright
-Copyright 2012, Bugtrckr-Team
+Copyright 2013 Bugtrckr-Team
 
-This project is licensed under the LGPL
-http://www.gnu.org/licenses/lgpl.txt
+This project is licensed under the GPL
+http://www.gnu.org/licenses/gpl.txt
