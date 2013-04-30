@@ -77,20 +77,20 @@
 		    </div>
 		    <div class="tab-pane" id="database">
 			<div class="row">
-			    <div class="span3 well">
 				<check if="{{@reqs.checks.mysql}}">
 				    <true>
-					<input type="text" name="sqlusername" placeholder="User name" /><br/>
-					<input type="password" name="sqlpassword" placeholder="Password" /><br/>
-					<input type="password" name="sqlpasswordrep" placeholder="Repeat password" /><br/>
-					<input type="text" name="sqlserver" placeholder="Server" /><br/>
-					<a href="#" class="btn pull-right"><i class="icon-ok"></i> Validate</a>
+						<div class="span3 well">				
+							<input type="text" name="sqlusername" placeholder="User name" /><br/>
+							<input type="password" name="sqlpassword" placeholder="Password" /><br/>
+							<input type="text" name="sqldb" placeholder="Database name" /><br/>
+							<input type="text" name="sqlserver" placeholder="Server" /><br/>
+							<a href="#" class="btn pull-right"><i class="icon-ok"></i> Validate</a>
+						</div>
 				    </true>
 				    <false>
-					<p>MySQL is not available</p>
+					<p class="alert alert-danger span3">MySQL is not available</p>
 				    </false>
 				</check>
-			    </div>
 			    <div class="span8">
 				<check if="{{@reqs.checks.sqlite}}">
 				    <true>
@@ -106,7 +106,7 @@
 						consider MySQL!</p>
 					    </true>
 					    <false>
-						<p>Please enable MySQL and reload the page, or just continue to use SQLite instead.</p>
+						<p>Please enable MySQL and reload the page, <strong>or</strong> just continue to the next step, to use SQLite instead.</p>
 						<p>The setup will create a random-named SQLite 
 						    database. You can migrate this database to MySQL later.</p>
 					    </false>
@@ -126,36 +126,7 @@
 		    </div>
 		    <div class="tab-pane" id="admin">
 			<div class="row">
-			    <div class="span5">
-				<div class="form-horizontal">
-				    <div class="control-group">
-					<label class="control-label">User name</label>
-					<div class="controls">
-					    <input type="text" name="username" placeholder="User name" />
-					</div>
-				    </div>
-				    <div class="control-group">
-					<label class="control-label">Email</label>
-					<div class="controls">
-					    <input type="text" name="email" placeholder="Email" />
-					</div>
-				    </div>
-				    <div class="control-group">
-					<label class="control-label">Password</label>
-					<div class="controls">
-					    <input type="password" name="password" placeholder="Password" />
-					</div>
-				    </div>	
-				    <div class="control-group">
-					<label class="control-label">Repeat password</label>
-					<div class="controls">
-					    <input type="password" name="passwordrepeat" placeholder="Repeat password" />
-					</div>
-				    </div>	
-				</div>
-			    </div>
-			    <div class="span1"></div>
-			    <div class="span5">
+			    <div class="span8">
 				<p class="alert alert-info">Almost done!</p>
 
 				<p>Create your own account.</p>
@@ -163,6 +134,12 @@
 				<p>This account will have admin rights, which means 
 				    you have access to all projects without any restrictions.</p>
 			    </div>
+				<div class="span3 well">
+					<input type="text" name="username" placeholder="User name" />
+					<input type="text" name="email" placeholder="Email" />
+					<input type="password" name="password" placeholder="Password" />
+					<input type="password" name="passwordrepeat" placeholder="Repeat password" />
+				</div>
 			</div>
 			<hr/>
 			<input type="submit" value="Installieren" class="btn btn-primary" />

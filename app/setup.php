@@ -15,10 +15,10 @@ class Setup {
      * @param type $f3
      */
     public function start() {
-	$f3 = Base::instance();
-        
-	$f3->set('reqs', $this->_doChecks());        
-        $this->tpserve();
+		$f3 = Base::instance();
+			
+		$f3->set('reqs', $this->_doChecks());        
+			$this->tpserve();
     }    
     
     /**
@@ -26,22 +26,37 @@ class Setup {
      * @return type
      */
     public function install() {
-	$f3 = Base::instance();
-
-	foreach($f3->get('POST') as $elem => $val) {
-	    $f3->set('SESSION.'.$elem, $val);
-	}
-	
-	if($f3->get('username') && $f3->get('email') &&
-	    $f3->get('password') && $f3->get('passwordrepeat')) {
-	    if($f3->get('password') == $f3->get('passwordrepeat')) {
+		$f3 = Base::instance();
+		$err = '';
+		$success = false;
 		
-	    } else {
+		foreach($f3->get('POST') as $elem => $val)
+			$f3->set('SESSION.'.$elem, $val);
 		
-	    }
-	} else {
-	    
-	}
+		if($f3->get('POST.username') && $f3->get('POST.email') && $f3->get('POST.password') && $f3->get('POST.passwordrepeat')) {
+			if($f3->get('POST.password') == $f3->get('POST.passwordrepeat')) {
+				if(!$f3->get('POST.sqlusername') && !$f3->get('POST.sqlpassword') && !$f3->get('POST.sqlserver') && !$f3->get('POST.sqldb')) {
+					// SQLite installation					
+					
+				} elseif(!$f3->get('POST.sqlusername') || !$f3->get('POST.sqlpassword') || !$f3->get('POST.sqlserver') || !$f3->get('POST.sqldb')) {
+					$err['sqlmissingfields'] = true;
+				} else {
+					try {
+						$db = new DB\SQL('mysql:host=' . $f3->get('POST.sqlserver') . ';dbname=' . $f3->get('POST.sqldb'), $f3->get('POST.sqlusername'), $f3->get('POST.sqlpassword'), array(\PDO::ATTR_ERRMODE=>\PDO::ERRMODE_EXCEPTION));
+					} catch(PDOException $e) {
+						$err['mysqlconnfail'] = true;
+					}
+				}
+			} else {
+				$err['pwmatch'] = true;
+			}
+		} else {
+			$err['missingfields'] = true;
+		}
+		print_r($err);
+		$f3->set('err', $err);
+		$f3->set('success', $success);
+		//$f3->reroute('/setup');
     }           
     
 
@@ -51,29 +66,29 @@ class Setup {
      * @return boolean
      */
     private static function _doChecks() {
-	$f3 = Base::instance();	
-	$error = false;
-	$check = null;
+		$f3 = Base::instance();	
+		$error = false;
+		$check = null;
 
-	$check['sqlite'] = !extension_loaded('pdo_sqlite') ? false : true;
-	$check['mysql'] = !extension_loaded('pdo_mysql') ? false: true;
+		$check['sqlite'] = !extension_loaded('pdo_sqlite') ? false : true;
+		$check['mysql'] = !extension_loaded('pdo_mysql') ? false: true;
 
-	if(!$check['sqlite'] && !$check['mysql'])
-		$error = true;
+		if(!$check['sqlite'] && !$check['mysql'])
+			$error = true;
 
-	if(is_writeable('../app/')) {
-		$check['config1'] = true;
-	} else {
-		$check['config1'] = false;
-		$error = true;
-	}
+		if(is_writeable('../app/')) {
+			$check['config1'] = true;
+		} else {
+			$check['config1'] = false;
+			$error = true;
+		}
 
-	if(!file_exists('../app/config.ini.php')) {
-		$check['config2'] = true;
-	} else {
-		$error = true;
-		$check['config2'] = false;
-	}
+		if(!file_exists('../app/config.ini.php')) {
+			$check['config2'] = true;
+		} else {
+			$error = true;
+			$check['config2'] = false;
+		}
 
         return array('error' => $error, 'checks' => $check);
     }
