@@ -36,7 +36,11 @@ class Setup {
 		if($f3->get('POST.username') && $f3->get('POST.email') && $f3->get('POST.password') && $f3->get('POST.passwordrepeat')) {
 			if($f3->get('POST.password') == $f3->get('POST.passwordrepeat')) {
 				if(!$f3->get('POST.sqlusername') && !$f3->get('POST.sqlpassword') && !$f3->get('POST.sqlserver') && !$f3->get('POST.sqldb')) {
-					// SQLite installation					
+					// SQLite installation
+					
+					$rnd = Helper::randStr();
+					$db = new DB\SQL('sqlite:../app/' . $rnd . '.db');
+					$db->exec(explode(';', $f3->read('../app/setup/sqlite.sql')));
 					
 				} elseif(!$f3->get('POST.sqlusername') || !$f3->get('POST.sqlpassword') || !$f3->get('POST.sqlserver') || !$f3->get('POST.sqldb')) {
 					$err['sqlmissingfields'] = true;
@@ -45,6 +49,12 @@ class Setup {
 						$db = new DB\SQL('mysql:host=' . $f3->get('POST.sqlserver') . ';dbname=' . $f3->get('POST.sqldb'), $f3->get('POST.sqlusername'), $f3->get('POST.sqlpassword'), array(\PDO::ATTR_ERRMODE=>\PDO::ERRMODE_EXCEPTION));
 					} catch(PDOException $e) {
 						$err['mysqlconnfail'] = true;
+					}
+					
+					if(!$err['mysqlconnfail']) {
+						// MySQL installation
+					} else {
+						
 					}
 				}
 			} else {

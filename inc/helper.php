@@ -16,16 +16,17 @@ class Helper extends Controller {
 	 * @param type $length
 	 * @return type
 	 */
-	public function randStr($len = 10) { 
+	public static function randStr($len = 10) { 
 		$pw = '';
 		for($i = 0; $i < $len; $i++) {
-			switch(mt_rand(1,6)) { 
-				case 1: $pw.=chr(rand(48,54)); break;
-				case 2: $pw.=chr(rand(55,69)); break;
-				case 3: $pw.=chr(rand(70,80)); break;
-				case 4: $pw.=chr(rand(81,96)); break; 
-				case 5: $pw.=chr(rand(97,104)); break; 
-				case 6: $pw.=chr(rand(105,122)); break;
+			switch(mt_rand(1, 7)) { 
+				case 1: $pw .= chr(rand(48, 57)); break;
+				case 2: $pw .= chr(rand(65, 72)); break;
+				case 3: $pw .= chr(rand(73, 81)); break;
+				case 4: $pw .= chr(rand(82, 90)); break; 
+				case 5: $pw .= chr(rand(97, 104)); break; 
+				case 6: $pw .= chr(rand(105, 113)); break;
+				case 7: $pw .= chr(rand(114, 122)); break;
 			} 
 		} 
 		return $pw; 
