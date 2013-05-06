@@ -10,7 +10,10 @@
  */
 
 class User extends Controller {
-
+	function __construct() {
+		require_once '../inc/password.php';
+	}
+	
 	/**
 	 * 
 	 * @param type $f3
@@ -21,26 +24,33 @@ class User extends Controller {
 	 * @param type $admin
 	 * @return boolean
 	 */
-    function registerUser($f3 = false, $params = false, $name = false, $password = false, $email = false, $admin = false) {
+    function registerUser($db = false, $f3 = false, $params = false, $name = false, $password = false, $email = false, $admin = false) {
 		if(!$f3)
 			$f3 = Base::instance();
+		
+		if(!$db) {
+			helper::dbconnection ();
+			$db = $f3->get('DB');
+		} else {
+			$db = $this->db;
+		}
 		
         if (($f3->get('POST.name') == "" && $name == "") || ($f3->get('POST.email') == "" && $email == ""))
 			return $this->tpfail($f3->get('lng.noCorretdata'));
 
-        $salt = helper::randStr();
+        $salt = helper::randStr(32);
 
-        $user = new DB\SQL\Mapper($this->db, 'User');
+        $user = new DB\SQL\Mapper($db, 'User');
         $user->name = $name ? $name : $f3->get('POST.name');
         $user->email = $email ? $email : $f3->get('POST.email');
-        $user->password = $password ? helper::salting($salt, $password) : helper::salting($salt, $f3->get('POST.password'));
+        $user->password = $password ? password_hash($password, PASSWORD_BCRYPT, array('salt' => $salt)) : password_hash($f3->get('POST.password'), PASSWORD_BCRYPT, array('salt' => $salt));
         $user->salt = $salt;
         $user->hash = helper::getFreeHash('User');
         $user->admin = $admin ? 1 : 0;
         $user->save();
 
         if(!$name) {
-            $f3->set('SESSION.SUCCESS', $f3->get('lng.userRegSuccessfull'));
+            $f3->set('SESSION.SUCCESS', 'Registration successfull');
             $f3->reroute('/');
         } 
 
@@ -62,7 +72,7 @@ class User extends Controller {
 		// TODO: use password_* function
         $user->load(array('email = :email AND password = :password',
             array(':email' => $f3->get('POST.email'),
-                ':password' => helper::salting($user->salt, $f3->get('POST.password')))));
+                ':password' => password_hash($f3->get('POST.password', PASSWORD_BCRYPT, array('salt' => $user->salt))))));
 
         if($user->dry())
             return $this->tpfail($f3->get('lng.pwMailWrong'));

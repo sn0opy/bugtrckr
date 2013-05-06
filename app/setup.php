@@ -36,11 +36,19 @@ class Setup {
 		if($f3->get('POST.username') && $f3->get('POST.email') && $f3->get('POST.password') && $f3->get('POST.passwordrepeat')) {
 			if($f3->get('POST.password') == $f3->get('POST.passwordrepeat')) {
 				if(!$f3->get('POST.sqlusername') && !$f3->get('POST.sqlpassword') && !$f3->get('POST.sqlserver') && !$f3->get('POST.sqldb')) {
-					// SQLite installation
-					
+					// SQLite installation					
 					$rnd = Helper::randStr();
 					$db = new DB\SQL('sqlite:../app/' . $rnd . '.db');
 					$db->exec(explode(';', $f3->read('../app/setup/sqlite.sql')));
+					
+					$f3->write('../app/sql.ini', "[global]\nDB_DBNAME=../app/".$rnd.'.db');
+					
+					// create new user
+					$u = new User;
+					$u->registerUser(false, false, $f3->get('POST.username'), $f3->get('POST.password'), $f3->get('POST.email'), true);
+					
+					$f3->set('success', 'Installation complete');
+					
 					
 				} elseif(!$f3->get('POST.sqlusername') || !$f3->get('POST.sqlpassword') || !$f3->get('POST.sqlserver') || !$f3->get('POST.sqldb')) {
 					$err['sqlmissingfields'] = true;
@@ -51,10 +59,8 @@ class Setup {
 						$err['mysqlconnfail'] = true;
 					}
 					
-					if(!$err['mysqlconnfail']) {
+					if(!isset($err['mysqlconnfail'])) {
 						// MySQL installation
-					} else {
-						
 					}
 				}
 			} else {
@@ -63,10 +69,13 @@ class Setup {
 		} else {
 			$err['missingfields'] = true;
 		}
-		print_r($err);
+		
 		$f3->set('err', $err);
-		$f3->set('success', $success);
-		//$f3->reroute('/setup');
+		
+		if($err != '') 
+			$f3->reroute('/setup');
+		else
+			$f3->reroute('/');
     }           
     
 
@@ -93,7 +102,7 @@ class Setup {
 			$error = true;
 		}
 
-		if(!file_exists('../app/config.ini.php')) {
+		if(!file_exists('../app/sql.ini')) {
 			$check['config2'] = true;
 		} else {
 			$error = true;

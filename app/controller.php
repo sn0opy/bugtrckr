@@ -22,23 +22,22 @@ class Controller {
 	public function __construct() {
 		$f3 = Base::instance();		
 		
-		$f3->config('../app/sql.ini');
+		if(file_exists('../app/sql.ini')) {
+			$f3->config('../app/sql.ini');
 
-		$f3->set('DB', new DB\SQL('mysql:host=localhost;dbname=' . 
-					$f3->get('DB_DBNAME'), 
-					$f3->get('DB_USER'), 
-					$f3->get('DB_PASSWORD'))
-				);
+			helper::dbconnection();
 
-		$this->db = $f3->get('DB');
+			$this->db = $f3->get('DB');			
+			
+			$f3->set('getPermission', function($permission) {
+				return Helper::getPermission($permission);
+			});
 
-		$f3->set('getPermission', function($permission) {
-			return Helper::getPermission($permission);
-		});
-
-		// TODO: just a workaround, remove this asap
-		$f3->set('onpage', '');			
-
+			$f3->set('onpage', '');	
+			
+		} else {
+			$f3->reroute('/setup');
+		}
 	}
 	
 	/**

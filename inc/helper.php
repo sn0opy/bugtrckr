@@ -31,6 +31,18 @@ class Helper extends Controller {
 		} 
 		return $pw; 
 	}
+	
+	public static function dbconnection() {
+		$f3 = Base::instance();
+		
+		if($f3->exists('DB_USER')) 
+			$f3->set('DB', new DB\SQL('mysql:host=localhost;dbname=' . 
+						$f3->get('DB_DBNAME'), 
+						$f3->get('DB_USER'), 
+						$f3->get('DB_PASSWORD')));
+		else
+			$f3->set('DB', new DB\SQL('sqlite:'.$f3->get('DB_DBNAME')));
+	}
 
 	
 	/**

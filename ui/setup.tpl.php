@@ -24,44 +24,44 @@
 		    <div class="tab-pane active" id="requirements">
 			<table class="table table-bordered">
 			    <tr>
-				<th>Requirement</th>
-				<th>Result</th>
-			    </tr>
-			    <tr>
-				<td>MySQL</td>
-				<td>
-				    <check if="{{@reqs.checks.mysql}}">
-					<true><span class="label label-success">avilable</span></true>
-					<false><span class="label label-important">unavailable</false>
-				    </check>
-				</td>
-			    </tr>
-			    <tr>
-				<td>SQLite</td>
-				<td>
-				    <check if="{{@reqs.checks.sqlite}}">
-					<true><span class="label label-success">avilable</span></true>
-					<false><span class="label label-important">unavailable</false>
-				    </check>
-				</td>
-			    </tr>
-			    <tr>
-				<td><em>app</em> folder writeable</td>
-				<td>
-				    <check if="{{@reqs.checks.config1}}">
-					<true><span class="label label-success">yes</span></true>
-					<false><span class="label label-important">no</false>
-				    </check>
-				</td>
-			    </tr>
-			    <tr>
-				<td><em>config.ini.php</em> existing</td>
-				<td>
-				    <check if="{{@reqs.checks.config1}}">
-					<true><span class="label label-success">no</span></true>
-					<false><span class="label label-important">yes</false>
-				    </check>
-				</td>
+					<th>Requirement</th>
+					<th>Result</th>
+				</tr>
+				<tr>
+					<td>MySQL</td>
+					<td>
+						<check if="{{@reqs.checks.mysql}}">
+						<true><span class="label label-success">avilable</span></true>
+						<false><span class="label label-important">unavailable</false>
+						</check>
+					</td>
+				</tr>
+				<tr>
+					<td>SQLite</td>
+					<td>
+						<check if="{{@reqs.checks.sqlite}}">
+						<true><span class="label label-success">avilable</span></true>
+						<false><span class="label label-important">unavailable</false>
+						</check>
+					</td>
+				</tr>
+				<tr>
+					<td><em>app</em> folder writeable</td>
+					<td>
+						<check if="{{@reqs.checks.config1}}">
+						<true><span class="label label-success">yes</span></true>
+						<false><span class="label label-important">no</false>
+						</check>
+					</td>
+				</tr>
+				<tr>
+					<td><em>sql.ini.php</em> existing</td>
+					<td>
+						<check if="{{@reqs.checks.config2}}">
+						<true><span class="label label-success">no</span></true>
+						<false><span class="label label-important">yes</false>
+						</check>
+					</td>
 			    </tr>
 			</table>
 			<check if="{{@reqs.error}}">
