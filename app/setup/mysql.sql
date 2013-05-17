@@ -8,8 +8,8 @@ CREATE TABLE Ticket
 ;
 
 CREATE TABLE User 
-	(name VARCHAR(40), hash CHAR(12) PRIMARY KEY, password CHAR(40), 
-	salt CHAR(32), email VARCHAR(40), admin bool, lastProject CHAR(12))
+	(name VARCHAR(40), hash CHAR(12) PRIMARY KEY, password CHAR(60), 
+	salt CHAR(22), email VARCHAR(40), admin bool, lastProject CHAR(12))
 ;
 
 CREATE TABLE Project 

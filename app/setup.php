@@ -40,9 +40,9 @@ class Setup {
 					$rnd = Helper::randStr();
 					$db = new DB\SQL('sqlite:../app/' . $rnd . '.db');
 					$db->exec(explode(';', $f3->read('../app/setup/sqlite.sql')));
-					
+					unset($db);					
 					$f3->write('../app/sql.ini', "[global]\nDB_DBNAME=../app/".$rnd.'.db');
-					
+
 					// create new user
 					$u = new User;
 					$u->registerUser(false, false, $f3->get('POST.username'), $f3->get('POST.password'), $f3->get('POST.email'), true);
@@ -76,6 +76,7 @@ class Setup {
 			$f3->reroute('/setup');
 		else
 			$f3->reroute('/');
+
     }           
     
 

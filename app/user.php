@@ -10,10 +10,12 @@
  */
 
 class User extends Controller {
+	private $len;
+
 	function __construct() {
-		require_once '../inc/password.php';
+		$this->len = 14;
 	}
-	
+
 	/**
 	 * 
 	 * @param type $f3
@@ -38,22 +40,24 @@ class User extends Controller {
         if (($f3->get('POST.name') == "" && $name == "") || ($f3->get('POST.email') == "" && $email == ""))
 			return $this->tpfail($f3->get('lng.noCorretdata'));
 
-        $salt = helper::randStr(32);
+        $salt = helper::randStr(22);
 
+		var_dump($db);
+/*
         $user = new DB\SQL\Mapper($db, 'User');
         $user->name = $name ? $name : $f3->get('POST.name');
         $user->email = $email ? $email : $f3->get('POST.email');
-        $user->password = $password ? password_hash($password, PASSWORD_BCRYPT, array('salt' => $salt)) : password_hash($f3->get('POST.password'), PASSWORD_BCRYPT, array('salt' => $salt));
+        $user->password = $password ? Bcrypt::instance()->hash($password, $salt, $this->len) : Bcrypt::instance()->hash($f3->get('POST.password'), $salt, $this->len);
         $user->salt = $salt;
         $user->hash = helper::getFreeHash('User');
         $user->admin = $admin ? 1 : 0;
         $user->save();
-
+ 
         if(!$name) {
             $f3->set('SESSION.SUCCESS', 'Registration successfull');
             $f3->reroute('/');
         } 
-
+ */
         return true;
     }
 
@@ -69,10 +73,9 @@ class User extends Controller {
         $user = new DB\SQL\Mapper($this->db, 'User');
         $user->load(array('email = :email', array(':email' => $email)));
 
-		// TODO: use password_* function
         $user->load(array('email = :email AND password = :password',
             array(':email' => $f3->get('POST.email'),
-                ':password' => password_hash($f3->get('POST.password', PASSWORD_BCRYPT, array('salt' => $user->salt))))));
+                ':password' => Bcrypt::instance()->hash($f3->get('POST.password', $user->salt, $this->len)))));
 
         if($user->dry())
             return $this->tpfail($f3->get('lng.pwMailWrong'));
