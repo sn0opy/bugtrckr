@@ -27,22 +27,14 @@ class User extends Controller {
 	 * @param type $admin
 	 * @return boolean
 	 */
-    function registerUser($db = false, $f3 = false, $params = false, $name = false, $password = false, $email = false, $admin = false) {
-		if(!$f3)
-			$f3 = Base::instance();
+    function registerUser($base = false, $params = false, $name = false, $password = false, $email = false, $admin = false) {
+		$f3 = Base::instance();		
+		$db = $this->db;
 		
-		if(!$db) {
-			helper::dbconnection ();
-			$db = $f3->get('DB');
-		} else {
-			$db = $this->db;
-		}
-		
-        if (($f3->get('POST.name') == "" && $name == "") || ($f3->get('POST.email') == "" && $email == ""))
-			return $this->tpfail($f3->get('lng.noCorretdata'));
+        if(($f3->get('POST.name') == "" && $name == "") || ($f3->get('POST.email') == "" && $email == ""))
+			return $this->tpfail('Nope');
 
         $salt = helper::randStr(22);
-
 
         $user = new DB\SQL\Mapper($db, 'User');
         $user->name = $name ? $name : $f3->get('POST.name');
@@ -54,8 +46,8 @@ class User extends Controller {
         $user->save();
  
         if(!$name) {
-            $f3->set('SESSION.SUCCESS', 'Registration successfull');
-            $f3->reroute('/');
+          $f3->set('SESSION.SUCCESS', 'Registration successfull');
+          $f3->reroute('/');
         } 
         return true;
     }
@@ -71,16 +63,11 @@ class User extends Controller {
         
         $user = new DB\SQL\Mapper($this->db, 'User');
         $user->load(array('email = :email', array(':email' => $email)));
+		$salt = $user->salt;
 
-        $user->load(array('email = :email AND password = :password',
-            array(':email' => $f3->get('POST.email'),
-                ':password' => Bcrypt::instance()->hash($f3->get('POST.password', $user->salt, 14)))));
-
-        if($user->dry())
-            return $this->tpfail($f3->get('lng.pwMailWrong'). ' - '.Bcrypt::instance()->hash($f3->get('POST.password', $user->salt, 14)));
-
-
-        // enable user's last used project if he hasn't already chosen one
+		if(!Bcrypt::instance()->verify($f3->get('POST.password'), $user->password))
+			return $this->tpfail($f3->get('lng.pwMailWrong'));
+		
         if($user->lastProject && !$f3->get('SESSION.project'))
             $f3->set('SESSION.project', $user->lastProject);
 

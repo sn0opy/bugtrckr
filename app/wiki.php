@@ -69,13 +69,15 @@ class Wiki extends Controller
 
     public function translateHTML($string)
     {
+		$f3 = Base::instance();
+		
         $string = preg_replace('/===(.+)===/', '<h3>${1}</h3>', $string);
         $string = preg_replace('/==(.+)==/', '<h2>${1}</h2>', $string);
         $string = preg_replace('/\'\'\'(.+)\'\'\'/', '<b>${1}</b>', $string);			
 		$string = preg_replace('/\'\'(.+)\'\'/', '<i>${1}</i>', $string);
         $string = preg_replace('/----/', '<hr />', $string);
 		$string = preg_replace('/\[\[(.+) (.+)\]\]/', '<a href="${1}">${2}</a>', $string);
-        $string = preg_replace('/\[\[(.+)\]\]/', '<a href="' . $this->get('BASE') . '/wiki/${1}">${1}</a>', $string);
+        $string = preg_replace('/\[\[(.+)\]\]/', '<a href="' . $f3->get('BASE') . '/wiki/${1}">${1}</a>', $string);
         $string = preg_replace('/\~\~(.+)\~\~/', '<pre>${1}</pre>', $string);
         $string = preg_replace('/\n/', '<br />', $string);
 
@@ -85,11 +87,14 @@ class Wiki extends Controller
     
     public function showEntry()
     {
-		if (!helper::canRead($this->get('SESSION.project')))
-			return $this->tpfail($this->get('lng.insuffPermissions'));
+		$f3 = Base::instance();
+		$db = $f3->get('DB');
+		
+		if (!helper::canRead($f3->get('SESSION.project')))
+			return $this->tpfail($f3->get('lng.insuffPermissions'));
 
-        $title = $this->get('PARAMS.title');
-        $project = $this->get('SESSION.projectHash');
+        $title = $f3->get('PARAMS.title');
+        $project = $f3->get('SESSION.projectHash');
 
         if (!($project > 0))
             ; //Fail
@@ -98,30 +103,28 @@ class Wiki extends Controller
             $title = '{{main}}';
 
         // Load Entry
-        $entry = new \models\WikiEntry();
+        $entry = new DB\SQL\Mapper($db, 'WikiEntry');
         $entry->load(array("title = :title AND project = :project ORDER BY created", array(":title" => $title, ":project" => $project)));
 
         // Entry does not exist
         if ($entry->dry())
         {
             $entry->title = $title;
-            $entry->content = $this->get('lng.insertContent');
+            $entry->content = $f3->get('lng.insertContent');
         }
 
-        if ($entry->title == '{{main}}')
-            $pagetitle = $this->get('lng.mainpage');
+        if($entry->title == '{{main}}')
+            $pagetitle = $f3->get('lng.mainpage');
 		else
 			$pagetitle = $entry->title;
 
-        $this->set('entry', $entry);
-        $controller = new \controllers\Wiki();
-        $this->set('displayablecontent', $controller->translateHTML($entry->content));
+        $f3->set('entry', $entry);
+        $f3->set('displayablecontent', $this->translateHTML($entry->content));
 
-        $this->set('pageTitle', $this->get('lng.wiki') . ' › ' . $pagetitle);
-		$this->set('title', $pagetitle);
-        $this->set('template', 'wiki.tpl.php');
-        $this->set('onpage', 'wiki');
-        $this->tpserve();
+        $f3->set('pageTitle', $f3->get('lng.wiki') . ' › ' . $pagetitle);
+		$f3->set('title', $pagetitle);
+        $f3->set('template', 'wiki.tpl.php');
+        $f3->set('onpage', 'wiki');
     }
 
 	public function showDiscussion()

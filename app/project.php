@@ -157,35 +157,37 @@ class Project extends Controller {
 			$f3 = Base::instance();
 		
         $roleHash = $f3->get('POST.hash') ? $f3->get('POST.hash') : helper::getFreeHash('Role');
-
         $role = new DB\SQL\Mapper($this->db, 'Role');
+		
         if($f3->exists('POST.hash')) {
             $role->load(array('hash = :hash', array(':hash' => $roleHash)));
 
             if ($role->dry())
                 return $this->tpfail($f3->get('lng.editRoleFail'));
         }
-
-        $role->name = ($projHash) ? 'Admin' : $f3->get('POST.name');
-        $role->hash = $roleHash;
-        $role->issuesAssigneable = ($projHash) ? 1 : $f3->get('POST.issuesAssigneable') == "on";
-        $role->project = ($projHash) ? $projHash : $f3->get('SESSION.project');
-        $role->iss_addIssues = ($projHash) ? 1 : $f3->get('POST.iss_addIssues') == "on";
-        $role->proj_editProject = ($projHash) ? 1 : $f3->get('POST.proj_editProject') == "on";
-        $role->proj_manageMembers = ($projHash) ? 1 : $f3->get('POST.proj_manageMembers') == "on";
-        $role->proj_manageMilestones = ($projHash) ? 1 : $f3->get('POST.proj_manageMilestones') == "on";
-        $role->proj_manageRoles = ($projHash) ? 1 : $f3->get('POST.proj_manageRoles') == "on";
-        $role->iss_editIssues = ($projHash) ? 1 : $f3->get('POST.iss_editIssues') == "on";
-        $role->iss_addIssues = ($projHash) ? 1 : $f3->get('POST.iss_addIssues') == "on";
-        $role->iss_deleteIssues = ($projHash) ? 1 : $f3->get('POST.iss_deleteIssues') == "on";
-        $role->iss_moveIssue = ($projHash) ? 1 : $f3->get('POST.iss_moveIssue') == "on";
-        $role->iss_editWatchers = ($projHash) ? 1 : $f3->get('POST.iss_editWatchers') == "on";
-        $role->iss_addWatchers = ($projHash) ? 1 : $f3->get('POST.iss_addWatchers') == "on";
-        $role->iss_viewWatchers = ($projHash) ? 1 : $f3->get('POST.iss_viewWatchers') == "on";
-		$role->proj_manageCategories = ($projHash) ? 1 : $f3->get('POST.proj_manageCategories') == "on";
+		
+        $role->name = $projHash ? 'Admin' : $f3->get('POST.name');
+		/*$role->hash = $roleHash;
+        $role->issuesAssigneable = $projHash ? 1 : $f3->get('POST.issuesAssigneable') == "on";
+        $role->project = $projHash ? $projHash : $f3->get('SESSION.project');
+        $role->iss_addIssues = $projHash ? 1 : $f3->get('POST.iss_addIssues') == "on";
+        $role->proj_editProject = $projHash ? 1 : $f3->get('POST.proj_editProject') == "on";
+        $role->proj_manageMembers = $projHash ? 1 : $f3->get('POST.proj_manageMembers') == "on";
+        $role->proj_manageMilestones = $projHash ? 1 : $f3->get('POST.proj_manageMilestones') == "on";
+        $role->proj_manageRoles = $projHash ? 1 : $f3->get('POST.proj_manageRoles') == "on";
+        $role->iss_editIssues = $projHash ? 1 : $f3->get('POST.iss_editIssues') == "on";
+        $role->iss_addIssues = $projHash ? 1 : $f3->get('POST.iss_addIssues') == "on";
+        $role->iss_deleteIssues = $projHash ? 1 : $f3->get('POST.iss_deleteIssues') == "on";
+        $role->iss_moveIssue = $projHash ? 1 : $f3->get('POST.iss_moveIssue') == "on";
+        $role->iss_editWatchers = $projHash ? 1 : $f3->get('POST.iss_editWatchers') == "on";
+        $role->iss_addWatchers = $projHash ? 1 : $f3->get('POST.iss_addWatchers') == "on";
+        $role->iss_viewWatchers = $projHash ? 1 : $f3->get('POST.iss_viewWatchers') == "on";
+		$role->proj_manageCategories = $projHash ? 1 : $f3->get('POST.proj_manageCategories') == "on";
+		$role->wiki_editWiki = $projHash ? 1 : $f3->get('POST.wiki_editWiki') == "on";
+		*/
         $role->save();
 
-        if($projHash)
+		if($projHash)
             return $roleHash;
         else
             $f3->reroute('/project/settings#roles');
@@ -297,24 +299,24 @@ class Project extends Controller {
         $ax->hash = $hash;
         $ax->save();
 
-		// TODO: fix this!
         $cmain = new main;
         $cmain->selectProject(false, false, $hash, false);
-        
+     
         $perms = new DB\SQL\Mapper($this->db, 'ProjectPermission');
-        $perms->user = $this->get('SESSION.user.hash');
+        $perms->user = $f3->get('SESSION.user.hash');
         $perms->project = $hash;
         $perms->role = $this->addEditRole(false, $hash);
         $perms->save();
-        
+ /*          
         $milestone = new Milestone;
         $milestone->addEditMilestone(false, $hash);
         
         $this->addEditCategory(false, false, $hash, $f3->get('lng.uncategorized'));
         
         helper::addActivity($f3->get('lng.projCreated'), 0, '', '', $hash);
-        
-        $this->reroute('/');        
+ */       
+        $f3->reroute('/'); 
+       
     }
 
 	

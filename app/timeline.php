@@ -10,11 +10,6 @@
  */
 
 class Timeline extends Controller {
-
-	/**
-	 * 
-	 * @return type
-	 */
     function showTimeline($f3) {
 		if (!ctype_alnum($f3->get('SESSION.project')))
 			return $this->tpfail($f3->get('lng.noProject'));
@@ -26,7 +21,7 @@ class Timeline extends Controller {
 
         $project = $f3->get('SESSION.project');
 
-        $activities = new \DB\SQL\Mapper($f3->db, 'Activity');
+        $activities = new \DB\SQL\Mapper($f3->get('DB'), 'Activity');
         $activities = $activities->find(array("project = :proj", array(':proj' => $project)));
 
         $f3->set('activities', $activities);
