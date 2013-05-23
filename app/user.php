@@ -13,6 +13,7 @@ class User extends Controller {
 	private $len;
 
 	function __construct() {
+		parent::__construct();
 		$this->len = 14;
 	}
 
@@ -42,8 +43,7 @@ class User extends Controller {
 
         $salt = helper::randStr(22);
 
-		var_dump($db);
-/*
+
         $user = new DB\SQL\Mapper($db, 'User');
         $user->name = $name ? $name : $f3->get('POST.name');
         $user->email = $email ? $email : $f3->get('POST.email');
@@ -57,7 +57,6 @@ class User extends Controller {
             $f3->set('SESSION.SUCCESS', 'Registration successfull');
             $f3->reroute('/');
         } 
- */
         return true;
     }
 
@@ -75,10 +74,10 @@ class User extends Controller {
 
         $user->load(array('email = :email AND password = :password',
             array(':email' => $f3->get('POST.email'),
-                ':password' => Bcrypt::instance()->hash($f3->get('POST.password', $user->salt, $this->len)))));
+                ':password' => Bcrypt::instance()->hash($f3->get('POST.password', $user->salt, 14)))));
 
         if($user->dry())
-            return $this->tpfail($f3->get('lng.pwMailWrong'));
+            return $this->tpfail($f3->get('lng.pwMailWrong'). ' - '.Bcrypt::instance()->hash($f3->get('POST.password', $user->salt, 14)));
 
 
         // enable user's last used project if he hasn't already chosen one
