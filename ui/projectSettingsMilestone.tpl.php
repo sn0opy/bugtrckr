@@ -31,6 +31,7 @@
             </div>
         </div>
 
-        <input type="submit" value="{{@lng.save}}" class="btn" />
+        <input type="submit" value="{{@lng.save}}" class="btn btn-primary" />
+		<a href="/project/settings#milestones" class="btn btn-default">{{@lng.cancel}}</a>
     </form>
 </div>

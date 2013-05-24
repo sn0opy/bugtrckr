@@ -21,7 +21,7 @@ class Timeline extends Controller {
 
         $project = $f3->get('SESSION.project');
 
-        $activities = new \DB\SQL\Mapper($f3->get('DB'), 'Activity');
+        $activities = new \DB\SQL\Mapper($f3->get('DB'), 'displayableactivity');
         $activities = $activities->find(array("project = :proj", array(':proj' => $project)));
 
         $f3->set('activities', $activities);

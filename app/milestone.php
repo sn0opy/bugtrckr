@@ -16,39 +16,43 @@ class Milestone extends Controller {
 	 * @param type $projHash
 	 * @return type
 	 */
-    function addEditMilestone($f3 = false, $projHash = false) {
+    function addEditMilestone($f3 = false, $url = false, $projHash = false) {
 		if(!$f3)
 			$f3 = Base::instance();
 		
-        if (!helper::getPermission('proj_manageMilestones'))
+        if(!helper::getPermission('proj_manageMilestones'))
             return $this->tpfail($f3->get('lng.insuffPermissions'));
 
-        $name = ($projHash) ? $f3->get('lng.firstMilestone') : $f3->get('POST.name');
+        $name = $projHash ? $f3->get('lng.firstMilestone') : $f3->get('POST.name');
         
         if(!isset($projHash)) {
-            // This params have to be set
-            if ($f3->get('POST.name') == "" || $f3->get('SESSION.project') <= 0)
+            if($f3->get('POST.name') == "" || $f3->get('SESSION.project') <= 0)
                 return $this->tpfail($f3->get('lng.failMilestoneSave'));
         }
 
         $msHash = $f3->get('POST.hash') ? $f3->get('POST.hash') : helper::getFreeHash('Milestone');
 
         $milestone = new DB\SQL\Mapper($this->db, 'Milestone');
-        if ($f3->exists('POST.hash')) {
+        if($f3->exists('POST.hash')) {
             $milestone->load(array('hash = :hash', array(':hash' => $msHash)));
-            if ($milestone->dry())
+            if($milestone->dry())
                 return $this->tpfail($f3->get('lng.failMilestoneSave'));
         }
 
-        $milestone->name = $name;
+		$milestone->name = $name;
         $milestone->hash = $msHash;
-        $milestone->description = ($projHash) ? $f3->get('lng.firstMilestone') : $f3->get('POST.description');
-        $milestone->project = ($projHash) ? $projHash : $f3->get('SESSION.project');
-        $milestone->finished = ($projHash) ? time()+2629743 : $f3->get('POST.finished');
+        $milestone->description = $projHash ? $f3->get('lng.firstMilestone') : $f3->get('POST.description');
+        $milestone->project = $projHash ? $projHash : $f3->get('SESSION.project');
+        $milestone->finished = $projHash ? time()+2629743 : $f3->get('POST.finished');
         $milestone->save();
 
+		if($f3->exists('POST.hash'))
+			$f3->set('SESSION.SUCCESS', $f3->get('lng.milestoneEdited'));
+		else
+			$f3->set('SESSION.SUCCESS', $f3->get('lng.milestoneAdded'));
+		
         if(!$projHash)
-            $this->reroute('/project/settings#milestones');
+			$f3->reroute('/project/settings#milestones');
     }
     
 	
@@ -66,11 +70,11 @@ class Milestone extends Controller {
         $tickets = new DB\SQL\Mapper($this->db, 'Ticket');
         $milestones = new DB\SQL\Mapper($this->db, 'Milestone');
         
-        if($tickets->found(array('milestone = :ms', array(':ms' => $msHash))) < 1 && $milestones->found() > 1) {            
+        if($tickets->count(array('milestone = :ms', array(':ms' => $msHash))) < 1 && $milestones->count() > 1) {            
             $milestones->load(array('hash = :hash', array(':hash' => $msHash)));
             $milestones->erase();
             
-            $f3->set('SESSION.SUCCESS', $f3->set('lng.milestonedDeleted'));
+            $f3->set('SESSION.SUCCESS', $f3->get('lng.milestonedDeleted'));
             $f3->reroute('/project/settings#milestones');
         } else {
             $this->tpfail($f3->get('lng.cannotDeleteMilestone'));

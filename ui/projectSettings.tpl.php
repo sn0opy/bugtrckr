@@ -1,8 +1,8 @@
 <h2>{{@lng.settings}}</h2>
 <div class="tabbed">
 	<div class="row">
-		<div class="settingsMenu span2">
-			<ul class="nav nav-tabs nav-stacked">
+		<div class="settingsMenu col col-lg-2">
+			<ul class="nav nav-pills nav-stacked">
 				<li class="active"><a href="#" title="tabContent_1">{{@lng.settings}}</a></li>
 				<li><a href="#members" id="members" title="tabContent_2">{{@lng.members}}</a></li>
 				<li><a href="#milestones" id="milestones" title="tabContent_3">{{@lng.milestones}}</a></li>
@@ -13,10 +13,10 @@
 
 		{{* 
 
-			Settings 
+			settings 
 
 		*}}    
-		<div class="tabContent span10" id="tabContent_1">
+		<div class="tabContent col col-lg-10" id="tabContent_1">
 			<check if="{{@getPermission('proj_editProject')}}">
 				<true>
 					<form action="/project/settings/main/edit" method="post">
@@ -59,10 +59,10 @@
 			members 
 
 		*}}
-		<div class="tabContent span10" id="tabContent_2">
+		<div class="tabContent col col-lg-10" id="tabContent_2">
 			<check if="{{@getPermission('proj_manageMembers')}}">
 				<true>
-					<table class="sortable table table-striped table-bordered">
+					<table class="sortable table">
 						<thead>
 							<tr>
 								<th>Name</th>
@@ -76,21 +76,19 @@
 									<a href="/user/{{@member->name}}">{{@member->name}}</a>
 								</td>
 								<td class="type manageMember">
-									<p>
 									<form action="/project/settings/member/setrole" method="post" class="pull-left">
 										<input type="hidden" name="user" value="{{@member->hash}}" />
-										<select name="role" class="floatleft">
+										<select name="role" class="floatleft" class="input-small">
 											<repeat group="{{@projRoles}}" value="{{@role}}">
-												<option value="{{@role->hash}}" {{(@member->roleId == @role->id)?'selected="selected"':''}}>{{@role->name}}</option>
+												<option value="{{@role->hash}}" {{(@member->role == @role->hash)?'selected="selected"':''}}>{{@role->name}}</option>
 											</repeat>
 										</select>
-										<input type="submit" value="Ändern" class="btn" />
+										<input type="submit" value="{{@lng.edit}}" class="btn btn-default btn-small" />
 									</form>
 									<form action="/project/setttings/member/delete" method="post" class="inline-form">
 										<input type="hidden" name="user" value="{{@member->hash}}" />
-										<input type="submit" value="{{@lng.delete}}" class="btn" />
-									</form>
-									</p>
+										<input type="submit" value="{{@lng.delete}}" class="btn btn-danger btn-small" />
+									</form>									
 								</td>
 							</tr>
 						</repeat>
@@ -110,7 +108,7 @@
 									<option value="{{@role->hash}}">{{@role->name}}</option>
 								</repeat>
 							</select>
-							<input type="submit" value="{{@lng.add}}" class="btn btn-primary" />
+							<input type="submit" value="{{@lng.addmember}}" class="btn btn-primary" />
 						</p>
 					</form>
 				</true>
@@ -124,10 +122,10 @@
 			milestones 
 
 		*}}
-		<div class="tabContent span10" id="tabContent_3">
+		<div class="tabContent col col-lg-10" id="tabContent_3">
 			<check if="{{@getPermission('proj_manageMilestones')}}">
 				<true>
-					<table class="sortable table table-striped table-bordered">
+					<table class="sortable table">
 						<thead>
 							<tr>
 								<th>{{@lng.milestone}}</th>
@@ -138,11 +136,11 @@
 						<repeat group="{{@projMilestones}}" value="{{@milestone}}">
 							<tr>
 								<td class="title">
-									<a href="/project/settings/milestone/{{@milestone->hash}}">{{@milestone->name}}</a>
+									<a href="/milestone/{{@milestone->hash}}">{{@milestone->name}}</a>
 								</td>
 								<td>
-									<a class="btn" href="/project/settings/milestone/delete/{{@milestone->hash}}" onclick="return confirm('{{@lng.sure}}');">{{@lng.delete}}</a>
-									<a class="btn" href="/project/settings/milestone/{{@milestone->hash}}">{{@lng.edit}}</a>
+									<a class="btn btn-default btn-small" href="/project/settings/milestone/{{@milestone->hash}}">{{@lng.edit}}</a>
+									<a class="btn btn-danger btn-small" href="/project/settings/milestone/delete/{{@milestone->hash}}" onclick="return confirm('{{@lng.sure}}');">{{@lng.delete}}</a>
 								</td>
 							</tr>
 						</repeat>
@@ -160,10 +158,10 @@
 			roles 
 
 		*}}
-		<div class="tabContent span10" id="tabContent_4">
+		<div class="tabContent col col-lg-10" id="tabContent_4">
 			<check if="{{@getPermission('proj_manageRoles')}}">
 				<true>
-					<table class="table-striped table sortable table-bordered">
+					<table class="table sortable">
 						<thead>
 							<tr>
 								<th>{{@lng.role}}</th>
@@ -174,11 +172,11 @@
 						<repeat group="{{@projRoles}}" value="{{@role}}">
 							<tr>
 								<td class="title">
-									<a href="/project/settings/role/{{@role->hash}}">{{@role->name}}</a>
+									{{@role->name}}
 								</td>
 								<td>
-									<a class="btn" href="/project/settings/role/delete/{{@role->hash}}">{{@lng.delete}}</a>
-									<a class="btn" href="/project/settings/role/{{@role->hash}}">{{@lng.edit}}</a>
+									<a class="btn btn-default btn-small" href="/project/settings/role/{{@role->hash}}">{{@lng.edit}}</a>
+									<a class="btn btn-danger btn-small" href="/project/settings/role/delete/{{@role->hash}}" onclick="return confirm('{{@lng.sure}}');">{{@lng.delete}}</a>
 								</td>
 							</tr>
 						</repeat>
@@ -196,10 +194,10 @@
 			categories 
 
 		*}}
-		<div class="tabContent span10" id="tabContent_5">
+		<div class="tabContent col col-lg-10" id="tabContent_5">
 			<check if="{{@getPermission('proj_manageCategories')}}">
 				<true>
-					<table class="table table-striped sortable table-bordered">
+					<table class="table sortable">
 						<thead>
 							<tr>
 								<th>{{@lng.category}}</th>
@@ -213,8 +211,8 @@
 									{{@category->name}}
 								</td>
 								<td>
-									<a class="btn" href="/project/settings/category/delete/{{@category->hash}}">{{@lng.delete}}</a>
-									<a class="btn" href="/project/settings/category/edit/{{@category->hash}}">{{@lng.edit}}</a>
+									<a class="btn btn-default btn-small" href="/project/settings/category/edit/{{@category->hash}}">{{@lng.edit}}</a>
+									<a class="btn btn-danger btn-small" href="/project/settings/category/delete/{{@category->hash}}" onclick="return confirm('{{@lng.sure}}');">{{@lng.delete}}</a>
 								</td>
 							</tr>
 						</repeat>

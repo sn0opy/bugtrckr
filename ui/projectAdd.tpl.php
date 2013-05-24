@@ -28,7 +28,7 @@
                     <input type="checkbox" name="public" checked="checked" />                          
                 </div>
             </div>
-            <input type="submit" value="{{@lng.add}}" class="btn btn-primary" />
+            <input type="submit" value="{{@lng.addProject}}" class="btn btn-primary" />
         </form>
     </true>
     <false>

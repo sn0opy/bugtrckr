@@ -29,7 +29,7 @@ CREATE TABLE Activity
 ;
 
 CREATE TABLE Role 
-	(project CHAR(12), hash CHAR(12), name VARCHAR(40), issuesAssigneable BOOL, 
+	(project CHAR(12), hash CHAR(12) PRIMARY KEY, name VARCHAR(40), issuesAssigneable BOOL, 
 	proj_editProject BOOL, proj_manageMembers BOOL, proj_manageMilestones BOOL, 
 	proj_manageRoles BOOL, iss_editIssues BOOL, iss_addIssues BOOL, 
 	iss_deleteIssues BOOL, iss_moveIssue BOOL, iss_editWatchers BOOL, 

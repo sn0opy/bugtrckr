@@ -138,7 +138,7 @@ class Project extends Controller {
         $tickets = new DB\SQL\Mapper($this->db, 'Ticket');
         $count = $tickets->found(array('milestone = :ms', array(':ms' => $milestone->hash)));
 
-        if ($count > 0)
+        if($count > 0)
             return $this->tpfail($f3->get('lng.removeMSFail'));
 
         $milestone->erase();
@@ -152,7 +152,7 @@ class Project extends Controller {
 	 * @param type $projHash
 	 * @return type
 	 */
-	public function addEditRole($f3 = false, $projHash = false) {
+	public function addEditRole($f3 = false, $url = false, $projHash = false) {
 		if(!$f3)
 			$f3 = Base::instance();
 		
@@ -166,10 +166,10 @@ class Project extends Controller {
                 return $this->tpfail($f3->get('lng.editRoleFail'));
         }
 		
+		$role->project = $projHash ? $projHash : $f3->get('SESSION.project');
+		$role->hash = $roleHash;
         $role->name = $projHash ? 'Admin' : $f3->get('POST.name');
-		/*$role->hash = $roleHash;
-        $role->issuesAssigneable = $projHash ? 1 : $f3->get('POST.issuesAssigneable') == "on";
-        $role->project = $projHash ? $projHash : $f3->get('SESSION.project');
+        $role->issuesAssigneable = $projHash ? 1 : $f3->get('POST.issuesAssigneable') == "on";        
         $role->iss_addIssues = $projHash ? 1 : $f3->get('POST.iss_addIssues') == "on";
         $role->proj_editProject = $projHash ? 1 : $f3->get('POST.proj_editProject') == "on";
         $role->proj_manageMembers = $projHash ? 1 : $f3->get('POST.proj_manageMembers') == "on";
@@ -182,11 +182,15 @@ class Project extends Controller {
         $role->iss_editWatchers = $projHash ? 1 : $f3->get('POST.iss_editWatchers') == "on";
         $role->iss_addWatchers = $projHash ? 1 : $f3->get('POST.iss_addWatchers') == "on";
         $role->iss_viewWatchers = $projHash ? 1 : $f3->get('POST.iss_viewWatchers') == "on";
-		$role->proj_manageCategories = $projHash ? 1 : $f3->get('POST.proj_manageCategories') == "on";
 		$role->wiki_editWiki = $projHash ? 1 : $f3->get('POST.wiki_editWiki') == "on";
-		*/
+		$role->proj_manageCategories = $projHash ? 1 : $f3->get('POST.proj_manageCategories') == "on";
         $role->save();
 
+		if($f3->exists('POST.hash'))
+            $f3->set('SESSION.SUCCESS', $f3->get('lng.roleEdited'));
+        else
+			$f3->set('SESSION.SUCCESS', $f3->get('lng.roleAdded'));
+		
 		if($projHash)
             return $roleHash;
         else
@@ -203,9 +207,7 @@ class Project extends Controller {
 
             $ax2 = new DB\SQL\Mapper($this->db, 'ProjectPermission');
 
-			// TODO: may break later. Switched to array-syntax even if 
-			//		 injection is not possible here
-            if($ax2->found('role = :role', array(':role' => $ax->hash)))
+            if($ax2->count('role = :role', array(':role' => $ax->hash)))
 	            return $this->tpfail($f3->get('lng.deleteRoleFail'));
 
             $ax->erase();
@@ -245,7 +247,7 @@ class Project extends Controller {
         $category->save();
 
         if($f3->get('POST.hash') != "")
-            $this->set('SESSION.SUCCESS', $f3->get('lng.categoryEdited'));
+            $f3->set('SESSION.SUCCESS', $f3->get('lng.categoryEdited'));
         else
             if(!$projHash)
                 $f3->set('SESSION.SUCCESS', $f3->get('lng.categoryAdded'));
@@ -305,16 +307,16 @@ class Project extends Controller {
         $perms = new DB\SQL\Mapper($this->db, 'ProjectPermission');
         $perms->user = $f3->get('SESSION.user.hash');
         $perms->project = $hash;
-        $perms->role = $this->addEditRole(false, $hash);
+        $perms->role = $this->addEditRole(false, false, $hash);
         $perms->save();
- /*          
+         
         $milestone = new Milestone;
-        $milestone->addEditMilestone(false, $hash);
+        $milestone->addEditMilestone(false, false, $hash);
         
         $this->addEditCategory(false, false, $hash, $f3->get('lng.uncategorized'));
         
         helper::addActivity($f3->get('lng.projCreated'), 0, '', '', $hash);
- */       
+      
         $f3->reroute('/'); 
        
     }
@@ -340,6 +342,8 @@ class Project extends Controller {
             $this->tpfail($this->get('lng.saveProjectFail'));
             return;
         }
+		
+		$f3->set('SESSION.SUCCESS', $f3->get('lng.projectEdited'));
 
         $f3->reroute('/project/settings');
     }
@@ -410,10 +414,10 @@ class Project extends Controller {
             return;
         }
 
-        $this->set('roleData', $role);
-        $this->set('template', 'projectSettingsRole.tpl.php');
-        $this->set('pageTitle', $f3->get('lng.project') . ' › ' . $f3->get('lng.settings') . ' › ' . $f3->get('lng.role') . ' › ' . $f3->get('roleData')->name);
-        $this->set('onpage', 'settings');
+        $f3->set('roleData', $role);
+        $f3->set('template', 'projectSettingsRole.tpl.php');
+        $f3->set('pageTitle', $f3->get('lng.project') . ' › ' . $f3->get('lng.settings') . ' › ' . $f3->get('lng.role') . ' › ' . $f3->get('roleData')->name);
+        $f3->set('onpage', 'settings');
     }
 
 	
@@ -423,7 +427,7 @@ class Project extends Controller {
 	 * @return type
 	 */
     public function showProjectSettingsMilestone($f3) {
-        $msHash = $this->get('PARAMS.hash');
+        $msHash = $f3->get('PARAMS.hash');
 
         $milestone = new DB\SQL\Mapper($this->db, 'Milestone');
         $milestone->load(array('hash = :hash', array(':hash' => $msHash)));

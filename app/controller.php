@@ -45,7 +45,7 @@ class Controller {
 	 */
     public function afterRoute() {
 		$f3 = Base::instance();
-		
+	
         $project = new \DB\SQL\Mapper($this->db, 'Project');
         $projects = $project->find();
         $f3->set('projects', $projects);

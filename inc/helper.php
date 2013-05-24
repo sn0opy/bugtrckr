@@ -239,7 +239,7 @@ class Helper {
 		$string = preg_replace('/\'\'(.+)\'\'/', '<i>${1}</i>', $string);
         $string = preg_replace('/----/', '<hr />', $string);
 		$string = preg_replace('/\[\[(.+) (.+)\]\]/', '<a href="${1}">${2}</a>', $string);
-        $string = preg_replace('/\[\[(.+)\]\]/', '<a href="' . \F3::get('BASE') . '/wiki/${1}">${1}</a>', $string);
+        $string = preg_replace('/\[\[(.+)\]\]/', '<a href="' . Base::instance()->get('BASE') . '/wiki/${1}">${1}</a>', $string);
         $string = preg_replace('/\~\~(.+)\~\~/', '<pre>${1}</pre>', $string);
         $string = preg_replace('/\n/', '<br />', $string);
 

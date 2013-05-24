@@ -1,6 +1,6 @@
 <h2>{{@lng.timeline}}</h2>
 
-<table class="table-striped table table-bordered">
+<table class="table-striped table">
     <thead>
         <tr>
             <th>{{@lng.description}}</th>
@@ -11,9 +11,9 @@
     <tbody>
     <repeat group="{{@activities}}" value="{{@activity}}">
         <tr>
-            <td>{{@activity->description}}</td>
-            <td>{{date('d.m.Y H:i', @activity->changed)}}</td>
-            <td><a href="/user/{{@activity->username}}">{{@activity->username}}</a></td>
+            <td>{{@activity.description}}</td>
+            <td>{{date('d.m.Y H:i', @activity.changed)}}</td>
+            <td><a href="/user/{{@activity->username}}">{{@activity.username}}</a></td>
         </tr>
     </repeat>
     </tbody>

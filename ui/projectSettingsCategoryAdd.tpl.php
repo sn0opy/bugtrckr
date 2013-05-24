@@ -11,6 +11,7 @@
             </div>
         </div>
         
-        <input type="submit" value="{{@lng.save}}" class="btn" />
+        <input type="submit" value="{{@lng.addcategory}}" class="btn btn-primary" />
+		<a href="/project/settings#categories" class="btn btn-default">{{@lng.cancel}}</a>
     </form>
 </div>

@@ -128,7 +128,18 @@
         <div class="formValue">
             <input type="checkbox" name="iss_viewWatchers" {{(@roleData->iss_viewWatchers)?'checked="checked"':''}} />
         </div>
-    </div>    
+    </div> 
+
+    <div class="formRow">
+        <div class="formLabel">
+            {{@lng.wiki_editWiki}}
+        </div>
+        <div class="formValue">
+            <input type="checkbox" name="wiki_editWiki" {{(@roleData->wiki_editWiki)?'checked="checked"':''}} />
+        </div>
+    </div>
+	
     <input type="submit" value="{{@lng.save}}" class="btn btn-primary" />
+	<a href="/project/settings#roles" class="btn btn-default">{{@lng.cancel}}</a>
 </form>
 </div>

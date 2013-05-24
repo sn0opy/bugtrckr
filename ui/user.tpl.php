@@ -1,7 +1,7 @@
-<h2>{{@lng.user}} › {{@user->name}}</h2>
+<h2>{{@user->name}}</h2>
 
 <h3>{{@lng.tickets}}:</h3>
-<check if="{{count({@tickets)}}">
+<check if="{{count(@tickets)}}">
 	<true>
 		<table class="table table-striped sortable table-bordered">
 			<thead>

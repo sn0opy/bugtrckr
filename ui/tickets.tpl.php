@@ -1,10 +1,4 @@
-<h2 class="pull-left">{{@lng.tickets}}</h2>
-
-<div class="pull-right">
-	<form action="/search" method="post" id="searchForm" class="form-search">
-		<input type="input" name="search" value="{{@SESSION.ticketSearch}}" id="searchInput" class="search-query input-medium" /> <input type="submit" value="{{@lng.search}}" class="btn" /> <check if="{{@getPermission('iss_addIssues')}}"><button class="btn btn-primary" data-toggle="modal" href="#addIssue">{{@lng.addticket}}</button></check>
-	</form>
-</div>
+<h2>{{@lng.tickets}}</h2>
 
 <check if="{{count(@tickets)}}">
     <true>
@@ -40,73 +34,79 @@
     </false>
 </check>
 
-
-<div class="modal hide" id="addIssue">
-	<form method="post" action="/ticket/">
-		<div class="modal-header">
-			<button type="button" class="close" data-dismiss="modal">×</button>
-			<h3>{{@lng.addticket}}</h3>
-		</div>
-		<div class="modal-body">
-			<div class="formRow">
-				<div class="formLabel">{{@lng.title}}</div>
-				<div class="formValue"><input type="text" name="title" /></div>
-			</div>
-
-			<div class="formRow">
-				<div class="formLabel">{{@lng.category}}</div>
-				<div class="formValue">
-					<select name="category" size="1">
-						<repeat group="{{@categories}}" value="{{@category}}">
-							<option value="{{@category->hash}}">{{@category->name}}</option>
-						</repeat>
-					</select>
-				</div>
-			</div>
-
-			<div class="formRow">
-				<div class="formLabel">{{@lng.type}}</div>
-				<div class="formValue">
-					<select name="type" size="1">
-						<repeat group="{{@lng.types}}" value="{{@type}}">
-							<option value="{{@type.id}}">{{@type.name}}</option>
-						</repeat>
-					</select>
-				</div>
-			</div>
-
-			<div class="formRow">
-				<div class="formLabel">{{@lng.priority}}</div>
-				<div class="formValue">
-					<select name="priority" size="1">
-						<repeat group="{{@lng.priorities}}" value="{{@priority}}">
-							<option value="{{@priority.id}}" {{(@priority.id==3)?'selected="selected"':''}}>{{@priority.id}} - {{@priority.name}}</option>
-						</repeat>
-					</select>
-				</div>
-			</div>
-
-			<div class="formRow">
-				<div class="formLabel">{{@lng.milestone}}</div>
-				<div class="formValue">
-					<select name="milestone" size="1">
-					<repeat group="{{@milestones}}" value="{{@milestone}}">
-						<option value="{{@milestone->hash}}">{{@milestone->name}}</option>
-					</repeat>
-					</select>
-				</div>
-			</div>
-			
-			<div class="formRow">
-				<div class="formLabel">{{@lng.description}}</div>
-				<div class="formValue">
-					<textarea name="description" class="ticketComment"></textarea>
-				</div>
-			</div>
-			
-		</div>
-		<div class="modal-footer">
-			<input type="submit" value="{{@lng.add}}" class="btn btn-primary" />
-		</div>
+<div>
+	<form action="/search" method="post" id="searchForm" class="form-search">
+		<input type="input" name="search" value="{{@SESSION.ticketSearch}}" id="searchInput" class="search-query" /> <input type="submit" value="{{@lng.search}}" class="btn" /> <check if="{{@getPermission('iss_addIssues')}}"><button class="btn btn-primary" data-toggle="modal" href="#addIssue">{{@lng.addticket}}</button></check>
 	</form>
+</div>
+
+<div class="modal" id="addIssue">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form method="post" action="/ticket">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">×</button>
+					<h3>{{@lng.addticket}}</h3>
+				</div>
+				<div class="modal-body form-horizontal">
+					<div class="row">
+						<label for="" class="col col-lg-2 control-label">{{@lng.title}}</label>
+						<div class="col col-lg-10">
+							<input type="text" name="title" />
+						</div>
+					</div>
+					<div class="row">
+						<label for="" class="col col-lg-2 control-label">{{@lng.category}}</label>
+						<div class="col col-lg-10">
+							<select name="category" size="1">
+								<repeat group="{{@categories}}" value="{{@category}}">
+									<option value="{{@category->hash}}">{{@category->name}}</option>
+								</repeat>
+							</select>
+						</div>
+					</div>					
+					<div class="row">
+						<label for="" class="col col-lg-2 control-label">{{@lng.type}}</label>
+						<div class="col col-lg-10">
+							<select name="type" size="1">
+								<repeat group="{{@lng.types}}" value="{{@type}}">
+									<option value="{{@type.id}}">{{@type.name}}</option>
+								</repeat>
+							</select>
+						</div>
+					</div>					
+					<div class="row">
+						<label for="" class="col col-lg-2 control-label">{{@lng.priority}}</label>
+						<div class="col col-lg-10">
+							<select name="priority" size="1">
+								<repeat group="{{@lng.priorities}}" value="{{@priority}}">
+									<option value="{{@priority.id}}" {{(@priority.id==3)?'selected="selected"':''}}>{{@priority.id}} - {{@priority.name}}</option>
+								</repeat>
+							</select>
+						</div>
+					</div>					
+					<div class="row">
+						<label for="" class="col col-lg-2 control-label">{{@lng.milestone}}</label>
+						<div class="col col-lg-10">
+							<select name="milestone" size="1">
+								<repeat group="{{@milestones}}" value="{{@milestone}}">
+									<option value="{{@milestone->hash}}">{{@milestone->name}}</option>
+								</repeat>
+							</select>
+						</div>
+					</div>
+					
+					<div class="row">
+						<label for="" class="col col-lg-2 control-label">{{@lng.description}}</label>
+						<div class="col col-lg-10">
+							<textarea name="description" class="ticketComment"></textarea>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<input type="submit" value="{{@lng.addTicket}}" class="btn btn-primary" />
+				</div>
+			</form>
+		</div>
+	</div>
 </div>

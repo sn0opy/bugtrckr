@@ -12,6 +12,7 @@
         </div>
         
 		<input type="hidden" name="hash" value="{{@category->hash}}" />
-        <input type="submit" value="{{@lng.save}}" class="btn" />
+        <input type="submit" value="{{@lng.save}}" class="btn btn-primary" />
+		<a href="/project/settings#categories" class="btn btn-default">{{@lng.cancel}}</a>
     </form>
 </div>

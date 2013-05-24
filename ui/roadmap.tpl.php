@@ -1,4 +1,4 @@
-<h2 class="floatleft">{{@lng.roadmap}}</h2>
+<h2>{{@lng.roadmap}}</h2>
 
 <check if="{{count(@road)}}">
     <true>
@@ -32,6 +32,6 @@
         </repeat>
     </true>
     <false>
-        <p class="info message clearfix">{{@lng.noMilestones}}</p>
+        <p class="alert alert-info clearfix">{{@lng.noMilestones}}</p>
     </false>
 </check>
