@@ -74,8 +74,8 @@ class Project extends Controller {
         $projPerms->load(array('user = :user AND project = :project', array(':user' => $user->hash, ':project' => $projectHash)));
         $projPerms->erase();
 
-        $this->set('SESSION.SUCCESS', $this->get('lng.memberRemoved'));
-        $this->reroute('/project/settings#members');
+        $f3->set('SESSION.SUCCESS', $f3->get('lng.memberRemoved'));
+        $f3->reroute('/project/settings#members');
     }
 
 	

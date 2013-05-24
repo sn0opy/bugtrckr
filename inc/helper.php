@@ -219,9 +219,8 @@ class Helper {
 	 */
     public static function getMsName($hash) {
 		$f3 = Base::instance();
-		$db = $f3->get('DB');
 		
-        $ms = new DB\SQL\Mapper($db, 'Model');
+        $ms = new DB\SQL\Mapper($f3->get('DB'), 'Milestone');
         $ms->load(array('hash = :hash', array(':hash' => $hash)));
         return $ms->name;
     }

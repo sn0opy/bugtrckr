@@ -16,10 +16,13 @@ class Ticket extends Controller {
 	 * @return type
 	 */
     function addTicket($f3) {
+		if(!$f3)
+			$f3 = Base::instance();
+	
         if (!helper::getPermission('iss_addIssues'))
             return $this->tpfail($f3->get('lng.insuffPermissions'));
 
-        $ticket = new \DB\SQL\Mapper($f3->db, 'Ticket');
+        $ticket = new \DB\SQL\Mapper($this->db, 'Ticket');
         $ticket->hash = helper::getFreeHash('Ticket');
         $ticket->title = $f3->get('POST.title');
         $ticket->description = $f3->get('POST.description');
@@ -33,10 +36,10 @@ class Ticket extends Controller {
         $ticket->milestone = $f3->get('POST.milestone');
         $ticket->save();
 
-        if (!$ticket->_id)
+        if(!$ticket->_id)
             return $this->tpfail($f3->get('lng.saveTicketFail'));
 
-        helper::addActivity($f3->get('lng.ticket') . " '$f3->title' " . $f3->get('lng.added') . ".", $ticket->hash);
+        helper::addActivity($f3->get('lng.ticket') . ' ' . $ticket->title . ' ' . $f3->get('lng.added') . ".", $ticket->hash);
 
         $f3->reroute('/ticket/' . $ticket->hash);
     }

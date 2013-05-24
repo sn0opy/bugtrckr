@@ -1,6 +1,6 @@
 <h2 class="floatleft">{{@lng.ticket}} › {{@ticket->title}}</h2>
 
-<a href="/#editIssue" data-toggle="modal" class="btn floatright">Ticket editieren</a>
+<a href="/#editIssue" data-toggle="modal" class="btn btn-primary floatright">{{@lng.editTicket}}</a>
 
 <br class="clearfix" />
 
@@ -33,7 +33,7 @@
         <tr>
             <th>{{@lng.milestone}}</th>
             <td>
-                {{Helper::getMsName(@ticket->milestone)}}
+                <a href="/milestone/{{@ticket->milestone}}">{{Helper::getMsName(@ticket->milestone)}}</a>
             </td>
             <th></th>
             <td></td>
