@@ -65,8 +65,8 @@
 					<table class="sortable table">
 						<thead>
 							<tr>
-								<th>Name</th>
-								<th>Rolle</th> 
+								<th>{{@lng.name}}</th>
+								<th>{{@lng.role}}</th> 
 							</tr>
 						</thead>
 						<tbody>
