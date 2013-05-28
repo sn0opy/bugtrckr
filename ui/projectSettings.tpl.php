@@ -66,7 +66,8 @@
 						<thead>
 							<tr>
 								<th>{{@lng.name}}</th>
-								<th>{{@lng.role}}</th> 
+                <th>{{@lng.role}}</th> 
+                <th>{{@lng.actions}}</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -76,20 +77,23 @@
 									<a href="/user/{{@member->name}}">{{@member->name}}</a>
 								</td>
 								<td class="type manageMember">
-									<form action="/project/settings/member/setrole" method="post" class="pull-left">
+									<form action="/project/settings/member/setrole" method="post" class="form-inline">
 										<input type="hidden" name="user" value="{{@member->hash}}" />
-										<select name="role" class="floatleft" class="input-small">
+										<select name="role" class="col col-lg-6 input-small">
 											<repeat group="{{@projRoles}}" value="{{@role}}">
 												<option value="{{@role->hash}}" {{(@member->role == @role->hash)?'selected="selected"':''}}>{{@role->name}}</option>
 											</repeat>
 										</select>
 										<input type="submit" value="{{@lng.edit}}" class="btn btn-default btn-small" />
-									</form>
-									<form action="/project/setttings/member/delete" method="post" class="inline-form">
+                  </form>
+                </td>
+                <td>
+									<form action="/project/setttings/member/delete" method="post">
 										<input type="hidden" name="user" value="{{@member->hash}}" />
 										<input type="submit" value="{{@lng.delete}}" class="btn btn-danger btn-small" />
-									</form>									
-								</td>
+									</form>
+                </td>
+
 							</tr>
 						</repeat>
 						</tbody>
