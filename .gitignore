@@ -1,1 +1,4 @@
 .DS_Store
+temp
+app/sql.ini
+app/*.db

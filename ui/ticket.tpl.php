@@ -94,88 +94,94 @@
 </div>
 
 <F3:check if="{{@SESSION.user}}">
-    <F3:true>
-	<div class="modal hide" id="editIssue">
-		<form method="post" action="/ticket/{{@ticket->tickethash}}">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal">×</button>
-				<h3>{{@lng.editTicket}}</h3>
-			</div>
-			<div class="modal-body">
-				<div class="formRow">
-					<div class="formLabel">{{@lng.assignedTo}}</div>
-					<div class="formValue">
-						<select name="assigned" size="1">
-							<option value=""></option>
-							<F3:repeat group="{{@users}}" value="{{@user}}">
-								<F3:check if="{{@user->hash==@ticket->assigned}}">
-									<F3:true>
-										<option value="{{@user->hash}}" selected="selected">{{@user->name}}</option>
-									</F3:true>
-									<F3:false>
-										<option value="{{@user->hash}}">{{@user->name}}</option>
-									</F3:false>
-							</F3:repeat>
-						</select>
-					</div>
-				</div>
+  <div class="modal" id="editIssue">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form method="post" action="/ticket/{{@ticket->tickethash}}">
 
-				<div class="formRow">
-					<div class="formLabel">{{@lng.milestone}}</div>
-					<div class="formValue">
-						<select name="milestone" size="1">
-							<F3:repeat group="{{@milestones}}" value="{{@milestone}}">
-								<F3:check if="{{@milestone->hash==@ticket->milestone}}">
-									<F3:true>
-										<option value="{{@milestone->hash}}" selected="selected">{{@milestone->name}}</option>
-									</F3:true>
-									<F3:false>
-										<option value="{{@milestone->hash}}">{{@milestone->name}}</option>
-									</F3:false>
-							</F3:repeat>
-						</select>
-					</div>
-				</div>               
+		    	<div class="modal-header">
+				    <button type="button" class="close" data-dismiss="modal">×</button>
+    				<h3>{{@lng.editTicket}}</h3>
+          </div>
 
-				<div class="formRow">
-					<div class="formLabel">{{@lng.status}}</div>
-					<div class="formValue">
-						<select name="state" size="1">
-							<F3:repeat group="{{@lng.states}}" key="{{@i}}" value="{{@state}}">
-								<F3:check if="{{@state.id == @ticket->state}}">
-									<F3:true><option value="{{@state.id}}" selected="selected">{{@state.name}}</option></F3:true>
-									<F3:false><option value="{{@state.id}}">{{@state.name}}</option></F3:false>
-								</F3:check>
-							</F3:repeat>
-						</select>
-					</div>
-				</div>
+		    	<div class="modal-body form-horizontal">
+				    <div class="row">
+    					<div class="formLabel">{{@lng.assignedTo}}</div>
+		    			<div class="formValue">
+				    		<select name="assigned" size="1">
+						    	<option value=""></option>
+    							<F3:repeat group="{{@users}}" value="{{@user}}">
+		    						<F3:check if="{{@user->hash==@ticket->assigned}}">
+				    					<F3:true>
+						    				<option value="{{@user->hash}}" selected="selected">{{@user->name}}</option>
+								    	</F3:true>
+									    <F3:false>
+    										<option value="{{@user->hash}}">{{@user->name}}</option>
+		    							</F3:false>
+				    			</F3:repeat>
+						    </select>
+    					</div>
+		    		</div>
 
-				<div class="formRow">
-					<div class="formLabel">{{@lng.priority}}</div>
-					<div class="formValue">
-						<select name="priority" size="1">
-							<F3:repeat group="{{@lng.priorities}}" key="{{@i}}" value="{{@priority}}">
-								<F3:check if="{{@priority.id == @ticket->priority}}">
-									<F3:true><option value="{{@priority.id}}" selected="selected">{{@priority.name}}</option></F3:true>
-									<F3:false><option value="{{@priority.id}}">{{@priority.name}}</option></F3:false>
-								</F3:check>
-							</F3:repeat>
-						</select>
-					</div>
-				</div>
+				    <div class="row">
+    					<div class="formLabel">{{@lng.milestone}}</div>
+		      		<div class="formValue">
+					    	<select name="milestone" size="1">
+							    <F3:repeat group="{{@milestones}}" value="{{@milestone}}">
+    								<F3:check if="{{@milestone->hash==@ticket->milestone}}">
+		    							<F3:true>
+				    						<option value="{{@milestone->hash}}" selected="selected">{{@milestone->name}}</option>
+						    			</F3:true>
+								    	<F3:false>
+										    <option value="{{@milestone->hash}}">{{@milestone->name}}</option>
+    									</F3:false>
+		    					</F3:repeat>
+				    		</select>
+					    </div>
+    				</div>               
 
-				<div class="formRow">
-					<div class="formLabel">{{@lng.comment}}</div>
-					<div class="formValue">
-						<textarea name="comment" class="ticketComment"></textarea>
-					</div>
-				</div>
-			</div>
-			<div class="modal-footer">
-				<input type="submit" value="{{@lng.edit}}" class="btn btn-primary" />
-			</div>
-		</form>
+		    		<div class="row">
+				    	<div class="formLabel">{{@lng.status}}</div>
+    					<div class="formValue">
+		    				<select name="state" size="1">
+				    			<F3:repeat group="{{@lng.states}}" key="{{@i}}" value="{{@state}}">
+						    		<F3:check if="{{@state.id == @ticket->state}}">
+								    	<F3:true><option value="{{@state.id}}" selected="selected">{{@state.name}}</option></F3:true>
+    									<F3:false><option value="{{@state.id}}">{{@state.name}}</option></F3:false>
+		    						</F3:check>
+				    			</F3:repeat>
+						    </select>
+    					</div>
+		    		</div>
+
+				    <div class="row">
+    					<div class="formLabel">{{@lng.priority}}</div>
+		    			<div class="formValue">
+				    		<select name="priority" size="1">
+						    	<F3:repeat group="{{@lng.priorities}}" key="{{@i}}" value="{{@priority}}">
+								    <F3:check if="{{@priority.id == @ticket->priority}}">
+    									<F3:true><option value="{{@priority.id}}" selected="selected">{{@priority.name}}</option></F3:true>
+		    							<F3:false><option value="{{@priority.id}}">{{@priority.name}}</option></F3:false>
+				    				</F3:check>
+						    	</F3:repeat>
+    						</select>
+		    			</div>
+				    </div>
+
+    				<div class="row">
+		    			<div class="formLabel">{{@lng.comment}}</div>
+				    	<div class="formValue">
+						    <textarea name="comment" class="ticketComment"></textarea>
+    					</div>
+		    		</div>
+          </div>
+
+			    <div class="modal-footer">
+				    <input type="submit" value="{{@lng.edit}}" class="btn btn-primary" />
+          </div>
+
+        </form>
+      </div>
+    </div>
 	</div>
-    </F3:true>
 </F3:check>

@@ -1,4 +1,10 @@
-<h2>{{@lng.tickets}}</h2>
+<h2 class="floatleft">{{@lng.tickets}}</h2>
+
+<check if="{{@getPermission('iss_addIssues')}}">
+  <a class="btn btn-primary floatright" href="#addIssue" data-toggle="modal">{{@lng.addticket}}</a>
+</check>
+
+<br class="clearfix" />
 
 <check if="{{count(@tickets)}}">
     <true>
@@ -35,8 +41,13 @@
 </check>
 
 <div>
-	<form action="/search" method="post" id="searchForm" class="form-search">
-		<input type="input" name="search" value="{{@SESSION.ticketSearch}}" id="searchInput" class="search-query" /> <input type="submit" value="{{@lng.search}}" class="btn" /> <check if="{{@getPermission('iss_addIssues')}}"><button class="btn btn-primary" data-toggle="modal" href="#addIssue">{{@lng.addticket}}</button></check>
+  <form action="/search" method="post" id="searchForm" class="form-search">
+    <div class="input-group col col-lg-7">
+      <input type="text" name="search" value="{{@SESSION.ticketSearch}}" id="searchInput" />
+      <div class="input-group-btn">
+        <button class="btn btn-default" type="submit">{{@lng.search}}</button>
+      </div>
+    </div>
 	</form>
 </div>
 
