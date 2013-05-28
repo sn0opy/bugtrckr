@@ -1,8 +1,8 @@
 <script type="text/javascript">
 	function edit()
 	{
-		document.getElementById('submitbutton').style.display = 'block';
-		document.getElementById('cancelbutton').style.display = 'block';
+		document.getElementById('submitbutton').style.display = 'inline-block';
+		document.getElementById('cancelbutton').style.display = 'inline-block';
 		document.getElementById('wikiedit_textarea').style.display = 'block';
 		document.getElementById('editbutton').style.display = 'none';
 		document.getElementById('wikicontent').style.display = 'none';
@@ -13,7 +13,7 @@
 		document.getElementById('submitbutton').style.display = 'none';
 		document.getElementById('cancelbutton').style.display = 'none';
 		document.getElementById('wikiedit_textarea').style.display = 'none';
-		document.getElementById('editbutton').style.display = 'block';
+		document.getElementById('editbutton').style.display = 'inline-block';
 		document.getElementById('wikicontent').style.display = 'block';
 	}
 
@@ -41,7 +41,7 @@
 		<input type="hidden" name="title" value="{{@entry->title}}" />
 	</form>
 
-	<a href="#" id="editbutton" onclick="edit()" class="btn">Edit</a>
-	<a href="#" id="submitbutton" onclick="submit()" class="btn btn-primary">Submit</a>
-	<a href="#" id="cancelbutton" onclick="cancel()" class="btn">Cancel</a>
+	<button id="editbutton" onclick="edit()" class="btn" type="button">Edit</button>
+	<button id="submitbutton" onclick="submit()" class="btn btn-primary" type="button">Submit</button>
+	<button id="cancelbutton" onclick="cancel()" class="btn" type="button">Cancel</button>
 </div>

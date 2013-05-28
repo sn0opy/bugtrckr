@@ -7,11 +7,13 @@
 		{{@disc->content}}
 	</div>
 </div>
+
+<hr />
 </repeat>
 
 <form action="/{{@BASE}}wikidiscussion" method="POST">
 	<textarea name="content"></textarea>
 
 	<input type="hidden" name="entry" value="{{@entry->hash}}" />
-	<input type="submit" value="submit" />
+	<input class="btn" type="submit" value="submit" />
 </form>
