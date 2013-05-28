@@ -9,7 +9,8 @@
  *   
  */
 
-class Controller {
+class Controller
+{
 	/**
 	 *
 	 * @var type 
@@ -19,10 +20,12 @@ class Controller {
 	/**
 	 * 
 	 */
-	public function __construct() {
+  public function __construct()
+  {
 		$f3 = Base::instance();		
 		
-		if(file_exists('../app/sql.ini')) {
+    if(file_exists('../app/sql.ini'))
+    {
 			$f3->config('../app/sql.ini');
 
 			helper::dbconnection();
@@ -35,46 +38,48 @@ class Controller {
 
 			$f3->set('onpage', '');	
 			
-		} else {
+    }
+    else
 			$f3->reroute('/setup');
-		}
 	}
 	
 	/**
 	 * 
 	 */
-    public function afterRoute() {
+  public function afterRoute()
+  {
 		$f3 = Base::instance();
 	
-        $project = new \DB\SQL\Mapper($this->db, 'Project');
-        $projects = $project->find();
-        $f3->set('projects', $projects);
+    $project = new \DB\SQL\Mapper($this->db, 'Project');
+    $projects = $project->find();
+    $f3->set('projects', $projects);
         
-        if(file_exists('setup.php') || file_exists('install/sqlite.php') || file_exists('install/mysql.php'))
-			$f3->set('installWarning', true);
+    if(file_exists('setup.php') || file_exists('install/sqlite.php') || file_exists('install/mysql.php'))
+    $f3->set('installWarning', true);
 		       		
-        echo Template::instance()->render('main.tpl.php');
+    echo Template::instance()->render('main.tpl.php');
 		
-		$f3->clear('SESSION.SUCCESS');
-		$f3->clear('SESSION.FAILURE');
-    }
+    $f3->clear('SESSION.SUCCESS');
+    $f3->clear('SESSION.FAILURE');
+  }
 
-    /**
-     *
-     */
-    protected function tpdeny() {
-        echo Template::instance()->render('main.tpl.php');
-    }
+  /**
+   *
+   */
+  protected function tpdeny()
+  {
+    echo Template::instance()->render('main.tpl.php');
+  }
 
-    /**
-     *
-     */
-    protected function tpfail($msg) {
-		$f3 = Base::instance();
+  /**
+   *
+   */
+  protected function tpfail($msg)
+  {
+    $f3 = Base::instance();
 		
 		$f3->set('template', 'error.tpl.php');
-        $f3->set('pageTitle', $f3->get('lng.error'));
-        $f3->set('SESSION.FAILURE', $msg);
-    }
-
+    $f3->set('pageTitle', $f3->get('lng.error'));
+    $f3->set('SESSION.FAILURE', $msg);
+  }
 }
