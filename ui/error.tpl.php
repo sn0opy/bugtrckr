@@ -1,1 +1,1 @@
-<h2>{{@lng.error}}</h2>
+<h2>{{@pageTitle}}</h2>

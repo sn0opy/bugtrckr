@@ -11,12 +11,10 @@
 
 class Project extends Controller
 {
-  public function projectAddMember()
+  public function projectAddMember($f3)
   {
-    if(!$helper::getPermission('proj_manageMembers')) {
-      $this->tpfail($f3->get('lng.insuffPermissions'));
-      return;
-    }
+    if(!\Helper::getPermission('proj_manageMembers'))
+      return $this->tpfail($f3->get('lng.insuffPermissions'));
 
     $projectHash = $f3->get('SESSION.project');
     $userHash = $f3->get('POST.member');
@@ -25,26 +23,20 @@ class Project extends Controller
     $role = new DB\SQL\Mapper($this->db, 'Role');
     $role->load(array('hash = :hash', array(':hash' => $roleHash)));
 
-    if($role->dry()) {
-      $this->tpfail('Failure while getting role.');
-      return;
-    }
+    if($role->dry())
+      return $this->tpfail('Failure while getting role.');
 
     $user = new DB\SQL\Mapper($this->db, 'User');
     $user->load(array('hash = :hash', array(':hash' => $userHash)));
 
-    if($user->dry()) {
-      $this->tpfail('Failure while getting user.');
-      return;
-    }
+    if($user->dry())
+      return $this->tpfail('Failure while getting user.');
 
     $projPerms = new DB\SQL\Mapper($this->db, 'ProjectPermission');
     $projPerms->load(array('user = :user AND project = :project', array(':user' => $user->hash, ':project' => $projectHash)));
 
-    if (!$projPerms->dry()) {
-      $this->tpfail($f3->get('lng.userExistsInProj'));
-      return;
-    }
+    if (!$projPerms->dry())
+      return $this->tpfail($f3->get('lng.userExistsInProj'));
 
     $projPerms->user = $user->hash;
     $projPerms->role = $role->hash;
@@ -59,11 +51,8 @@ class Project extends Controller
    */
   public function projectDelMember($f3)
   {
-    if(!helper::getPermission('proj_manageMembers'))
-    {
-      $this->tpfail($f3->get('lng.addMemberNotAllowed'));
-      return;
-    }
+    if(\Helper::getPermission('proj_manageMembers'))
+      return $this->tpfail($f3->get('lng.addMemberNotAllowed'));
 
     $userHash = $f3->get('POST.user');
     $projectHash = $f3->get('SESSION.project');
@@ -72,10 +61,7 @@ class Project extends Controller
     $user->load(array('hash = :hash', array(':hash' => $userHash)));
 
     if($user->dry())
-    {
-      $this->tpfail('Failure while getting user.');
-      return;
-    }
+      return $this->tpfail('Failure while getting user.');
 
     $projPerms = new DB\SQL\Mapper($this->db, 'ProjectPermission');
     $projPerms->load(array('user = :user AND project = :project', array(':user' => $user->hash, ':project' => $projectHash)));
@@ -92,11 +78,8 @@ class Project extends Controller
 	 */
   public function projectSetRole($f3)
   {
-    if(!helper::getPermission('proj_manageMembers'))
-    {
-      $this->tpfail($f3->get('lng.insuffPermissions'));
-      return;
-    }
+    if(!\Helper::getPermission('proj_manageMembers'))
+      return $this->tpfail($f3->get('lng.insuffPermissions'));
 
     $projectHash = $f3->get('SESSION.project');
 
@@ -122,7 +105,7 @@ class Project extends Controller
     $perms->role = $role->hash;
     $perms->save();
 
-    $this->reroute('/project/settings#members');
+    $f3->reroute('/project/settings#members');
   }
 
 	/**
@@ -132,7 +115,7 @@ class Project extends Controller
 	 */
   public function deleteProjectSettingsMilestone($f3)
   {
-    if(!helper::getPermission('proj_manageMilestones'))
+    if(\Helper::getPermission('proj_manageMilestones'))
       return $this->tpfail($f3->get('lng.insuffPermissions'));
 
     $msHash = $f3->get('PARAMS.hash');
