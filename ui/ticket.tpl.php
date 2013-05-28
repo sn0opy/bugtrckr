@@ -59,41 +59,41 @@
             </tr>
         </thead>
         <tbody>
-        <F3:repeat group="{{@activities}}" key="{{@i}}" value="{{@activity}}">
+        <repeat group="{{@activities}}" key="{{@i}}" value="{{@activity}}">
             <tr>
                 <td>                    
                     {{@activity->description}}
-                    <F3:check if="{{@activity->changedFields > 0}}">
+                    <check if="{{@activity->changedFields > 0}}">
                         <ul class="changedFields">
-                            <F3:repeat group="{{@activity->changedFields}}" value="{{@changedField}}">
-                                <F3:check if="{{@changedField->field=='state'}}">
+                            <repeat group="{{@activity->changedFields}}" value="{{@changedField}}">
+                                <check if="{{@changedField->field=='state'}}">
                                     <li>{{@lng.status}} {{@lng.changedfrom}} <strong>{{Helper::getName('states', @changedField->from)}}</strong> {{@lng.to}} <strong>{{Helper::getName('states', @changedField->to)}}</strong></li>
-                                </F3:check>
-                                <F3:check if="{{@changedField->field=='priority'}}">
+                                </check>
+                                <check if="{{@changedField->field=='priority'}}">
                                     <li>{{@lng.theprioritychanged}} <strong>{{Helper::getName('priorities', @changedField->from)}}</strong> {{@lng.to}} <strong>{{Helper::getName('priorities', @changedField->to)}}</strong></li>
-                                </F3:check>
-                                <F3:check if="{{@changedField->field=='milestone'}}">
+                                </check>
+                                <check if="{{@changedField->field=='milestone'}}">
                                     <li>{{@lng.milestone}} {{@lng.changedfrom}} <strong>{{Helper::getMsName(@changedField->from)}}</strong> {{@lng.to}} <strong>{{Helper::getMsName(@changedField->to)}}</strong></li>
-                                </F3:check>
-                                <F3:check if="{{@changedField->field=='assigned'}}">
+                                </check>
+                                <check if="{{@changedField->field=='assigned'}}">
                                     <li>Ticket von <strong>{{Helper::getUserName(@changedField->from)}}</strong> an <strong>{{Helper::getUserName(@changedField->to)}}</strong> {{strtolower(@lng.assigned)}}</li>
-                                </F3:check>
-                            </F3:repeat>
+                                </check>
+                            </repeat>
                         </ul>
-                    </F3:check>
-                    <F3:check if="{{@activity->comment}}">
+                    </check>
+                    <check if="{{@activity->comment}}">
                         <br/><span class="acitivityCmnt">{{@lng.comment}}: <em>{{nl2br(@activity->comment)}}</em></span>
-                    </F3:check>
+                    </check>
                 </td>
                 <td>{{date('d.m.Y H:i', @activity->changed)}}</td>
                 <td><a href="/user/{{@activity->username}}">{{@activity->username}}</a></td>
             </tr>
-        </F3:repeat>
+        </repeat>
         </tbody>
     </table>
 </div>
 
-<F3:check if="{{@SESSION.user}}">
+<check if="{{isset(@SESSION.user)}}">
   <div class="modal" id="editIssue">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -110,15 +110,15 @@
 		    			<div class="formValue">
 				    		<select name="assigned" size="1">
 						    	<option value=""></option>
-    							<F3:repeat group="{{@users}}" value="{{@user}}">
-		    						<F3:check if="{{@user->hash==@ticket->assigned}}">
-				    					<F3:true>
+    							<repeat group="{{@users}}" value="{{@user}}">
+		    						<check if="{{@user->hash==@ticket->assigned}}">
+				    					<true>
 						    				<option value="{{@user->hash}}" selected="selected">{{@user->name}}</option>
-								    	</F3:true>
-									    <F3:false>
+								    	</true>
+									    <false>
     										<option value="{{@user->hash}}">{{@user->name}}</option>
-		    							</F3:false>
-				    			</F3:repeat>
+		    							</false>
+				    			</repeat>
 						    </select>
     					</div>
 		    		</div>
@@ -127,15 +127,15 @@
     					<div class="formLabel">{{@lng.milestone}}</div>
 		      		<div class="formValue">
 					    	<select name="milestone" size="1">
-							    <F3:repeat group="{{@milestones}}" value="{{@milestone}}">
-    								<F3:check if="{{@milestone->hash==@ticket->milestone}}">
-		    							<F3:true>
+							    <repeat group="{{@milestones}}" value="{{@milestone}}">
+    								<check if="{{@milestone->hash==@ticket->milestone}}">
+		    							<true>
 				    						<option value="{{@milestone->hash}}" selected="selected">{{@milestone->name}}</option>
-						    			</F3:true>
-								    	<F3:false>
+						    			</true>
+								    	<false>
 										    <option value="{{@milestone->hash}}">{{@milestone->name}}</option>
-    									</F3:false>
-		    					</F3:repeat>
+    									</false>
+		    					</repeat>
 				    		</select>
 					    </div>
     				</div>               
@@ -144,12 +144,12 @@
 				    	<div class="formLabel">{{@lng.status}}</div>
     					<div class="formValue">
 		    				<select name="state" size="1">
-				    			<F3:repeat group="{{@lng.states}}" key="{{@i}}" value="{{@state}}">
-						    		<F3:check if="{{@state.id == @ticket->state}}">
-								    	<F3:true><option value="{{@state.id}}" selected="selected">{{@state.name}}</option></F3:true>
-    									<F3:false><option value="{{@state.id}}">{{@state.name}}</option></F3:false>
-		    						</F3:check>
-				    			</F3:repeat>
+				    			<repeat group="{{@lng.states}}" key="{{@i}}" value="{{@state}}">
+						    		<check if="{{@state.id == @ticket->state}}">
+								    	<true><option value="{{@state.id}}" selected="selected">{{@state.name}}</option></true>
+    									<false><option value="{{@state.id}}">{{@state.name}}</option></false>
+		    						</check>
+				    			</repeat>
 						    </select>
     					</div>
 		    		</div>
@@ -158,12 +158,12 @@
     					<div class="formLabel">{{@lng.priority}}</div>
 		    			<div class="formValue">
 				    		<select name="priority" size="1">
-						    	<F3:repeat group="{{@lng.priorities}}" key="{{@i}}" value="{{@priority}}">
-								    <F3:check if="{{@priority.id == @ticket->priority}}">
-    									<F3:true><option value="{{@priority.id}}" selected="selected">{{@priority.name}}</option></F3:true>
-		    							<F3:false><option value="{{@priority.id}}">{{@priority.name}}</option></F3:false>
-				    				</F3:check>
-						    	</F3:repeat>
+						    	<repeat group="{{@lng.priorities}}" key="{{@i}}" value="{{@priority}}">
+								    <check if="{{@priority.id == @ticket->priority}}">
+    									<true><option value="{{@priority.id}}" selected="selected">{{@priority.name}}</option></true>
+		    							<false><option value="{{@priority.id}}">{{@priority.name}}</option></false>
+				    				</check>
+						    	</repeat>
     						</select>
 		    			</div>
 				    </div>
@@ -184,4 +184,4 @@
       </div>
     </div>
 	</div>
-</F3:check>
+</check>
