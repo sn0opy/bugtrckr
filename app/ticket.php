@@ -90,7 +90,7 @@ class Ticket extends Controller {
         if (!$ticket->hash)
             return $this->tpfail($f3->get('lng.saveTicketFail'));
 
-        helper::addActivity($f3->get('lng.ticket') . " '" .$ticket->title. "' " .$f3->get('lng.edited'), $ticket->hash, $this->get('POST.comment'), json_encode($changed));
+        helper::addActivity($f3->get('lng.ticket') . " '" .$ticket->title. "' " .$f3->get('lng.edited'), $ticket->hash, $f3->get('POST.comment'), json_encode($changed));
         
        $f3->reroute('/ticket/'.$hash);
     }
