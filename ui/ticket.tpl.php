@@ -1,6 +1,8 @@
 <h2 class="floatleft">{{@lng.ticket}} › {{@ticket->title}}</h2>
 
+<check if="Helper::getPermission('iss_editIssues')">
 <a href="/#editIssue" data-toggle="modal" class="btn btn-primary floatright">{{@lng.editTicket}}</a>
+</check>
 
 <br class="clearfix" />
 

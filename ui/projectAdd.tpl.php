@@ -1,5 +1,5 @@
 <h2>{{@lng.project}} › {{@lng.add}}</h2>
-<check if="{{@SESSION.user.hash}}">
+<check if="{{isset(@SESSION.user.hash)}}">
     <true>
         <form action="/project/add" method="post">
             <div class="formRow">
@@ -32,6 +32,6 @@
         </form>
     </true>
     <false>
-        <div class="info message">{{@lng.noAccess}}</div>
+        <div class="alert alert-danger message">{{@lng.noAccess}}</div>
     </false>
 </check>
