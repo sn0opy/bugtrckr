@@ -25,7 +25,7 @@ class Milestone extends Controller
     $f3->get("log")->write("Calling /project/settings/milestone/edit or addEditMilestone is called by projectAdd");
     $f3->get("log")->write("POST: " . print_r($f3->get("POST"), true));
 
-    if(!helper::getPermission('proj_manageMilestones'))
+    if(!Helper::getPermission('proj_manageMilestones'))
       return $this->tpfail($f3->get('lng.insuffPermissions'));
 
     $name = $projHash ? $f3->get('lng.firstMilestone') : $f3->get('POST.name');
@@ -34,7 +34,7 @@ class Milestone extends Controller
       return $this->tpfail( $f3->get('lng.failMilestoneSave'),
                             "projHash = $projHash, POST.name = " . $f3->get('POST.name') . ", SESSION.project = " . $f3->get('SESSION.project'));
 
-    $msHash = $f3->get('POST.hash') ? $f3->get('POST.hash') : helper::getFreeHash('Milestone');
+    $msHash = $f3->get('POST.hash') ? $f3->get('POST.hash') : Helper::getFreeHash('Milestone');
 
     $milestone = new DB\SQL\Mapper($this->db, 'Milestone');
     if($f3->exists('POST.hash'))
@@ -69,7 +69,7 @@ class Milestone extends Controller
   {
     $f3->get("log")->write("Calling /project/settings/milestone/delete/@hash with @hash = " . $f3->get('PARAMS.hash'));
 
-    if (!helper::getPermission('proj_manageMilestones'))
+    if (!Helper::getPermission('proj_manageMilestones'))
       return $this->tpfail($f3->get('lng.insuffPermissions'));
         
     $msHash = $f3->get('PARAMS.hash');
@@ -101,7 +101,7 @@ class Milestone extends Controller
     if (!ctype_alnum($f3->get('SESSION.project')))
       return $this->tpfail($f3->get('lng.noProject'));
 
-    if (!helper::canRead($f3->get('SESSION.project')))
+    if (!Helper::canRead($f3->get('SESSION.project')))
       return $this->tpfail($f3->get('lng.insuffPermissions'));
 
     $ms = array();
@@ -117,7 +117,7 @@ class Milestone extends Controller
     foreach ($milestones as $milestone)
     {
       $ms[$milestone->hash]['infos'] = $milestone;
-      $ms[$milestone->hash]['ticketCount'] = helper::getTicketCount($milestone->hash);
+      $ms[$milestone->hash]['ticketCount'] = Helper::getTicketCount($milestone->hash);
 
       $ms[$milestone->hash]['fullTicketCount'] = 0;
       foreach ($ms[$milestone->hash]['ticketCount'] as $cnt)
@@ -151,7 +151,7 @@ class Milestone extends Controller
     if (!ctype_alnum($f3->get('SESSION.project')))
       return $this->tpfail($f3->get('lng.noProject'));
 
-    if (!helper::canRead($f3->get('SESSION.project')))
+    if (!Helper::canRead($f3->get('SESSION.project')))
       return $this->tpfail($f3->get('lng.insuffPermissions'));
 
     $hash = $f3->get('PARAMS.hash');
@@ -168,7 +168,7 @@ class Milestone extends Controller
     if($milestone->dry())
       return $this->tpfail($f3->get("lng.milestoneTicketsNotLoaded"));
 
-    $ms['ticketCount'] = helper::getTicketCount($milestone->hash);
+    $ms['ticketCount'] = Helper::getTicketCount($milestone->hash);
 
     $ms['fullTicketCount'] = 0;
     foreach ($ms['ticketCount'] as $cnt)

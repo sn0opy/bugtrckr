@@ -28,7 +28,7 @@ class Controller
     {
 			$f3->config('../app/sql.ini');
 
-			helper::dbconnection();
+			Helper::dbconnection();
 
 			$this->db = $f3->get('DB');			
 			

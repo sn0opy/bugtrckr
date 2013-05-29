@@ -16,7 +16,7 @@ class Timeline extends Controller {
     if (!ctype_alnum($f3->get('SESSION.project')))
       return $this->tpfail($f3->get('lng.noProject'));
 
-    if (!helper::canRead($f3->get('SESSION.project')))
+    if (!Helper::canRead($f3->get('SESSION.project')))
       return $this->tpfail($f3->get('lng.insuffPermissions'));
 
     $timeline = array();

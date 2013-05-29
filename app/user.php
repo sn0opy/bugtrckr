@@ -34,14 +34,14 @@ class User extends Controller
     if(($f3->get('POST.name') == "" && $name == "") || ($f3->get('POST.email') == "" && $email == ""))
     	return $this->tpfail('Nope', "name = $name" . $f3->get('POST.name') . ", email = $email" . $f3->get("POST.email"));
 
-    $salt = helper::randStr(22);
+    $salt = Helper::randStr(22);
 
     $user = new DB\SQL\Mapper($this->db, 'User');
     $user->name = $name ? $name : $f3->get('POST.name');
     $user->email = $email ? $email : $f3->get('POST.email');
     $user->password = $password ? Bcrypt::instance()->hash($password, $salt, BCRYPT_COUNT) : Bcrypt::instance()->hash($f3->get('POST.password'), $salt, BCRYPT_COUNT);
     $user->salt = $salt;
-    $user->hash = helper::getFreeHash('User');
+    $user->hash = Helper::getFreeHash('User');
     $user->admin = $admin ? 1 : 0;
     $user->save();
  

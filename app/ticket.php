@@ -21,11 +21,11 @@ class Ticket extends Controller
     $f3->get("log")->write("Calling /ticket");
     $f3->get("log")->write("POST: " . print_r($f3->get("POST"), true));
 	
-    if (!helper::getPermission('iss_addIssues'))
+    if (!Helper::getPermission('iss_addIssues'))
       return $this->tpfail($f3->get('lng.insuffPermissions'));
 
     $ticket = new \DB\SQL\Mapper($this->db, 'Ticket');
-    $ticket->hash = helper::getFreeHash('Ticket');
+    $ticket->hash = Helper::getFreeHash('Ticket');
     $ticket->title = $f3->get('POST.title');
     $ticket->description = $f3->get('POST.description');
     $ticket->owner = $f3->get('SESSION.user.hash');
@@ -41,7 +41,7 @@ class Ticket extends Controller
     if(!$ticket->_id)
       return $this->tpfail($f3->get('lng.saveTicketFail'));
 
-    helper::addActivity($f3->get('lng.ticket') . ' ' . $ticket->title . ' ' . $f3->get('lng.added') . ".", $ticket->hash);
+    Helper::addActivity($f3->get('lng.ticket') . ' ' . $ticket->title . ' ' . $f3->get('lng.added') . ".", $ticket->hash);
 
     $f3->reroute('/ticket/' . $ticket->hash);
   }
@@ -56,7 +56,7 @@ class Ticket extends Controller
     $f3->get("log")->write("Calling /ticket/@hash with @hash = " . $f3->get("PARAMS.hash"));
     $f3->get("log")->write("POST: " . print_r($f3->get("POST"), true));
 
-		if (!helper::getPermission('iss_editIssues'))
+		if (!Helper::getPermission('iss_editIssues'))
       return $this->tpfail($f3->get('lng.insuffPermissions'));
 
     if (!is_numeric($f3->get('POST.state')) || $f3->get('POST.state') <= 0 || $f3->get('POST.state') > 5)
@@ -96,7 +96,7 @@ class Ticket extends Controller
     if (!$ticket->hash)
       return $this->tpfail($f3->get('lng.saveTicketFail'));
 
-    helper::addActivity($f3->get('lng.ticket') . " '" .$ticket->title. "' " .$f3->get('lng.edited'), $ticket->hash, $f3->get('POST.comment'), json_encode($changed));
+    Helper::addActivity($f3->get('lng.ticket') . " '" .$ticket->title. "' " .$f3->get('lng.edited'), $ticket->hash, $f3->get('POST.comment'), json_encode($changed));
  
     $f3->reroute('/ticket/'.$hash);
   }
@@ -113,7 +113,7 @@ class Ticket extends Controller
     if (!ctype_alnum($f3->get('SESSION.project')))
       return $this->tpfail($f3->get('lng.noProject'));
 
-    if (!helper::canRead($f3->get('SESSION.project')))
+    if (!Helper::canRead($f3->get('SESSION.project')))
       return $this->tpfail($f3->get('lng.insuffPermissions'));
 
     $order = 'created';
@@ -171,7 +171,7 @@ class Ticket extends Controller
     if($ticket->dry())
       return $this->tpfail($f3->get('lng.noTicket'));
 
-    if (!helper::canRead($f3->get('SESSION.project')))
+    if (!Helper::canRead($f3->get('SESSION.project')))
       return $this->tpfail($f3->get('lng.insuffPermissions'));
 
     $milestone = new DB\SQL\Mapper($this->db, 'Milestone');

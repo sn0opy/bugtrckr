@@ -17,7 +17,7 @@ class Wiki extends Controller
     $f3->get("log")->write("Calling /wiki");
     $f3->get("log")->write("POST: " . print_r($f3->get("POST"), true));
 
-    if (!helper::getPermission('wiki_editWiki'))
+    if (!Helper::getPermission('wiki_editWiki'))
       return $this->tpfail($this->get('lng.insuffPermissions'));
 
     $hash = $f3->get('POST.hash');
@@ -30,7 +30,7 @@ class Wiki extends Controller
 
     if ($entry->dry())
     {
-      $entry->hash = helper::getFreeHash('WikiEntry');
+      $entry->hash = Helper::getFreeHash('WikiEntry');
       $entry->title = $title;
       $entry->created = date("Y-m-d H:i:s");
       $entry->created_by = $f3->get('SESSION.user.hash');
@@ -54,7 +54,7 @@ class Wiki extends Controller
     $f3->get("log")->write("Calling /wikidiscussion");
     $f3->get("log")->write("POST: " . print_r($f3->get("POST"), true));
 
-    if (!helper::getPermission('wiki_editWiki'))
+    if (!Helper::getPermission('wiki_editWiki'))
       return $this->tpfail($f3->get('lng.insuffPermissions'));
 
     $disc = new DB\SQL\Mapper($this->db, 'WikiDiscussion');
@@ -62,7 +62,7 @@ class Wiki extends Controller
 		$entry = $f3->get('POST.entry');
 		$content = $f3->get('POST.content');
 
-		$disc->hash = helper::getFreeHash('WikiDiscussion');
+		$disc->hash = Helper::getFreeHash('WikiDiscussion');
 		$disc->entry = $entry;
 		$disc->content = $content;
 		$disc->created = date("Y-m-d H:i:s");
@@ -95,7 +95,7 @@ class Wiki extends Controller
   {
     $f3->get("log")->write("Calling /wiki/@title with @title = " . $f3->get("PARAMS.title"));
 
-    if (!helper::canRead($f3->get('SESSION.project')))
+    if (!Helper::canRead($f3->get('SESSION.project')))
 	  	return $this->tpfail($f3->get('lng.insuffPermissions'));
 
     $title = $f3->get('PARAMS.title');
@@ -136,7 +136,7 @@ class Wiki extends Controller
   {
     $f3->get("log")->write("Calling /wiki/discussion/@hash with @hash = " . $f3->get("PARAMS.hash"));
 
-    if (!helper::canRead($f3->get('SESSION.project')))
+    if (!Helper::canRead($f3->get('SESSION.project')))
       return $this->tpfail($f3->get('lng.insuffPermissions'));
 
     $hash = $f3->get('PARAMS.hash');

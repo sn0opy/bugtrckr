@@ -16,7 +16,7 @@ class Project extends Controller
     $f3->get("log")->write("Calling /project/settings/member/add");
     $f3->get("log")->write("POST: " . print_r($f3->get("POST"), true));
 
-    if(!\Helper::getPermission('proj_manageMembers'))
+    if(!Helper::getPermission('proj_manageMembers'))
       return $this->tpfail($f3->get('lng.insuffPermissions'));
 
     $projectHash = $f3->get('SESSION.project');
@@ -57,7 +57,7 @@ class Project extends Controller
     $f3->get("log")->write("Calling /project/setttings/member/delete");
     $f3->get("log")->write("POST: " . print_r($f3->get("POST"), true));
 
-    if(\Helper::getPermission('proj_manageMembers'))
+    if(!Helper::getPermission('proj_manageMembers'))
       return $this->tpfail($f3->get('lng.addMemberNotAllowed'));
 
     $userHash = $f3->get('POST.user');
@@ -87,7 +87,7 @@ class Project extends Controller
     $f3->get("log")->write("Calling /project/settings/member/setrole");
     $f3->get("log")->write("POST: " . print_r($f3->get("POST"), true));
 
-    if(!\Helper::getPermission('proj_manageMembers'))
+    if(!Helper::getPermission('proj_manageMembers'))
       return $this->tpfail($f3->get('lng.insuffPermissions'));
 
     $projectHash = $f3->get('SESSION.project');
@@ -126,7 +126,7 @@ class Project extends Controller
   {
     $f3->get("log")->write("Calling deleteProjectSettingsMilestone with @hash = " . $f3->get("PARAMS.hash"));
 
-    if(\Helper::getPermission('proj_manageMilestones'))
+    if(!Helper::getPermission('proj_manageMilestones'))
       return $this->tpfail($f3->get('lng.insuffPermissions'));
 
     $msHash = $f3->get('PARAMS.hash');
@@ -161,7 +161,7 @@ class Project extends Controller
    	if(!$f3)
       $f3 = Base::instance();
 		
-    $roleHash = $f3->get('POST.hash') ? $f3->get('POST.hash') : helper::getFreeHash('Role');
+    $roleHash = $f3->get('POST.hash') ? $f3->get('POST.hash') : Helper::getFreeHash('Role');
     $role = new DB\SQL\Mapper($this->db, 'Role');
 		
     if($f3->exists('POST.hash')) {
@@ -211,7 +211,7 @@ class Project extends Controller
 
     $hash = $f3->get('PARAMS.hash');
 
-    if (!helper::getPermission('proj_manageRoles'))
+    if (!Helper::getPermission('proj_manageRoles'))
       return $this->tpfail($f3->get("lng.insuffPermissions"));
         
     $ax = new DB\SQL\Mapper($this->db, 'Role');
@@ -243,7 +243,7 @@ class Project extends Controller
     $f3->get("log")->write("Calling /project/settings/category/add");
     $f3->get("log")->write("POST: " . print_r($f3->get("POST"), true));
 		
-    if(!helper::getPermission('proj_editProject'))
+    if(!Helper::getPermission('proj_editProject'))
       return $this->tpfail($f3->get('lng.insuffPermissions'));
 
     $category = new DB\SQL\Mapper($this->db, 'Category');
@@ -257,7 +257,7 @@ class Project extends Controller
     else
     {
       $category->project = ($projHash) ? $projHash : $f3->get('SESSION.projectHash');
-      $category->hash = helper::getFreeHash('Category');
+      $category->hash = Helper::getFreeHash('Category');
     }
 
     $category->name = ($name) ? $name : $f3->get('POST.name');
@@ -282,7 +282,7 @@ class Project extends Controller
   {
     $f3->get("log")->write("Calling /project/settings/category/delete/@hash with @hash = " . $f3->get("PARAMS.hash"));
 
-    if(!helper::getPermission('proj_editProject'))
+    if(!Helper::getPermission('proj_editProject'))
       return $this->tpfail($f3->get('lng.insuffPermissions'));
 
     $hash = $f3->get('PARAMS.hash');
@@ -309,7 +309,7 @@ class Project extends Controller
     $f3->get("log")->write("Calling /project/add");
     $f3->get("log")->write("POST: " . print_r($f3->get("POST"), true));
 		
-    $hash = helper::getFreeHash('Project');
+    $hash = Helper::getFreeHash('Project');
       
     $ax = new DB\SQL\Mapper($this->db, 'Project');
     $ax->name = $f3->get('POST.name');
@@ -332,7 +332,7 @@ class Project extends Controller
         
     $this->addEditCategory(false, false, $hash, $f3->get('lng.uncategorized'));
        
-    helper::addActivity($f3->get('lng.projCreated'), 0, '', '', $hash);
+    Helper::addActivity($f3->get('lng.projCreated'), 0, '', '', $hash);
       
     $f3->reroute('/'); 
   }
@@ -347,7 +347,7 @@ class Project extends Controller
     $f3->get("log")->write("Calling /project/settings/main/edit");
     $f3->get("log")->write("POST: " . print_r($f3->get("POST"), true));
 
-    if (!helper::getPermission('proj_editProject'))
+    if (!Helper::getPermission('proj_editProject'))
       return $this->tpfail($f3->get('lng.insuffPermissions'));
 
     $project = new DB\SQL\Mapper($this->db, 'Project');
