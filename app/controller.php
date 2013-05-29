@@ -74,9 +74,13 @@ class Controller
   /**
    *
    */
-  protected function tpfail($msg)
+  protected function tpfail($msg, $reason = false)
   {
     $f3 = Base::instance();
+
+    $f3->get("log")->write("Error: " . $msg);
+    if ($reason)
+      $f3->get("log")->write("Reason: " . $reason);
 		
 		$f3->set('template', 'error.tpl.php');
     $f3->set('pageTitle', $f3->get('lng.error'));

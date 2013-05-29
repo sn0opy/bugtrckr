@@ -19,6 +19,8 @@ class Setup
   {
     $f3 = Base::instance();
 
+    $f3->get("log")->write("Calling /setup");
+
     $f3->set('reqs', $this->_doChecks());        
     $this->tpserve();
    }    
@@ -32,6 +34,9 @@ class Setup
     $f3 = Base::instance();
     $err = '';
     $success = false;
+
+    $f3->get("log")->write("Calling /setup");
+    $f3->get("log")->write("POST: " . print_r($f3->get("POST"), true));
 		
     foreach($f3->get('POST') as $elem => $val)
       $f3->set('SESSION.'.$elem, $val);

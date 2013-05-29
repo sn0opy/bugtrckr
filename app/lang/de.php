@@ -192,5 +192,10 @@ return array('lng' => array(
     'done' => 'Installations abgeschlossen!',
     'toApp' => 'zur App',
     'mysqlfailed' => 'Die MySQL Verbindung schlug fehl',
-    'usererror' => 'Beim registrieren des Users ist ein Fehler aufgetreten.'
+    'usererror' => 'Beim registrieren des Users ist ein Fehler aufgetreten.',
+    'milestoneTicketsNotLoaded' => 'Tickets des Meilensteins konnten nicht geladen werden.',
+    'milestoneDoesNotExist' => 'Der Meilenstein existiert nicht.',
+    'cantGetRole' => 'Fehler beim Laden der Rolle.',
+    'cantGetUser' => 'Fehler beim Laden des Benutzers.',
+    'cantGetCategory' => 'Fehler beim Laden der Kategorie.',
 ));

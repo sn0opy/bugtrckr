@@ -17,6 +17,7 @@ class Main extends Controller
 	 */
   function start($f3)
   {
+    $f3->get("log")->write("Calling /");
     $f3->set('pageTitle', $f3->get('lng.home'));
     $f3->set('template', 'home.tpl.php');
     $f3->set('onpage', 'start');
@@ -34,6 +35,8 @@ class Main extends Controller
   {
     if(!$f3)
       $f3 = Base::instance();
+
+    $f3->get("log")->write("Calling /project/select/@project with @project = " . $f3->get("PARAMS.project"));
 		
     $url = $f3->get('SERVER.HTTP_REFERER');
     $projHash = ($hash) ? $hash : $f3->get('PARAMS.project');

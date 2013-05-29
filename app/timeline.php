@@ -11,6 +11,8 @@
 
 class Timeline extends Controller {
   function showTimeline($f3) {
+    $f3->get("log")->write("Calling /timeline");
+
     if (!ctype_alnum($f3->get('SESSION.project')))
       return $this->tpfail($f3->get('lng.noProject'));
 

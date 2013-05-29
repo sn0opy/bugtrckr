@@ -13,5 +13,6 @@ $app = include('../lib/base.php');
 
 $app->config('../app/config.ini');
 $app->config('../app/routes.ini');
+$app->set("log", new Log("log.txt"));
 
 $app->run();

@@ -18,8 +18,8 @@ class Ticket extends Controller
 	 */
   function addTicket($f3)
   {
-    if(!$f3)
-			$f3 = Base::instance();
+    $f3->get("log")->write("Calling /ticket");
+    $f3->get("log")->write("POST: " . print_r($f3->get("POST"), true));
 	
     if (!helper::getPermission('iss_addIssues'))
       return $this->tpfail($f3->get('lng.insuffPermissions'));
@@ -53,11 +53,14 @@ class Ticket extends Controller
 	 */
   function editTicket($f3)
   {
-    if (!is_numeric($f3->get('POST.state')) || $f3->get('POST.state') <= 0 || $f3->get('POST.state') > 5)
-      return $this->tpfail($f3->get('lng.saveTicketFail'));
+    $f3->get("log")->write("Calling /ticket/@hash with @hash = " . $f3->get("PARAMS.hash"));
+    $f3->get("log")->write("POST: " . print_r($f3->get("POST"), true));
 
 		if (!helper::getPermission('iss_editIssues'))
-			return $this->tpfail($f3->get('lng.insuffPermissions'));	
+      return $this->tpfail($f3->get('lng.insuffPermissions'));
+
+    if (!is_numeric($f3->get('POST.state')) || $f3->get('POST.state') <= 0 || $f3->get('POST.state') > 5)
+      return $this->tpfail($f3->get('lng.saveTicketFail'), "POST.state = " . $f3->get('POST.sate') . ", but must be between 0 and 5");
 
     $hash = $f3->get('PARAMS.hash');
 
@@ -65,23 +68,23 @@ class Ticket extends Controller
     $ticket->load(array('hash = :hash', array(':hash' => $hash)));
 
     $changed = '';
-                
+ 
     // get the diff stuff
     if($ticket->state != $f3->get('POST.state'))
       $changed[] = array('field' => 'state', 'from' => $ticket->state, 'to' => $f3->get('POST.state'));
-        
+ 
     if($ticket->assigned != $f3->get('POST.assigned'))
       $changed[] = array('field' => 'assigned', 'from' => $ticket->assigned, 'to' => $f3->get('POST.assigned'));
-     
+
     if($ticket->milestone != $f3->get('POST.milestone'))
       $changed[] = array('field' => 'milestone', 'from' => $ticket->milestone, 'to' => $f3->get('POST.milestone'));
-     
+
     if($ticket->priority != $f3->get('POST.priority'))
       $changed[] = array('field' => 'priority', 'from' => $ticket->priority, 'to' => $f3->get('POST.priority'));
-        
+ 
     $ticket->state = $f3->get('POST.state');
     $ticket->priority = $f3->get('POST.priority');
-        
+ 
     if (ctype_alnum($f3->get('POST.assigned')))
       $ticket->assigned = $f3->get('POST.assigned');
 
@@ -94,7 +97,7 @@ class Ticket extends Controller
       return $this->tpfail($f3->get('lng.saveTicketFail'));
 
     helper::addActivity($f3->get('lng.ticket') . " '" .$ticket->title. "' " .$f3->get('lng.edited'), $ticket->hash, $f3->get('POST.comment'), json_encode($changed));
-        
+ 
     $f3->reroute('/ticket/'.$hash);
   }
 	
@@ -105,6 +108,8 @@ class Ticket extends Controller
 	 */
   function showTickets($f3)
   {
+    $f3->get("log")->write("Calling /tickets");
+
     if (!ctype_alnum($f3->get('SESSION.project')))
       return $this->tpfail($f3->get('lng.noProject'));
 
@@ -156,6 +161,8 @@ class Ticket extends Controller
 	 */
   function showTicket($f3)
   {
+    $f3->get("log")->write("Calling /ticket/@hash with @hash = " . $f3->get("PARAMS.hash"));
+
     $hash = $f3->get('PARAMS.hash');
 
     $ticket = new DB\SQL\Mapper($this->db, 'displayableticket');

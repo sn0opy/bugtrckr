@@ -22,13 +22,17 @@ class Milestone extends Controller
     if(!$f3)
       $f3 = Base::instance();
 
+    $f3->get("log")->write("Calling /project/settings/milestone/edit or addEditMilestone is called by projectAdd");
+    $f3->get("log")->write("POST: " . print_r($f3->get("POST"), true));
+
     if(!helper::getPermission('proj_manageMilestones'))
       return $this->tpfail($f3->get('lng.insuffPermissions'));
 
     $name = $projHash ? $f3->get('lng.firstMilestone') : $f3->get('POST.name');
         
     if(!isset($projHash) && $f3->get('POST.name') == "" || $f3->get('SESSION.project') <= 0)
-      return $this->tpfail($f3->get('lng.failMilestoneSave'));
+      return $this->tpfail( $f3->get('lng.failMilestoneSave'),
+                            "projHash = $projHash, POST.name = " . $f3->get('POST.name') . ", SESSION.project = " . $f3->get('SESSION.project'));
 
     $msHash = $f3->get('POST.hash') ? $f3->get('POST.hash') : helper::getFreeHash('Milestone');
 
@@ -63,6 +67,8 @@ class Milestone extends Controller
 	 */
   function deleteMilestone($f3)
   {
+    $f3->get("log")->write("Calling /project/settings/milestone/delete/@hash with @hash = " . $f3->get('PARAMS.hash'));
+
     if (!helper::getPermission('proj_manageMilestones'))
       return $this->tpfail($f3->get('lng.insuffPermissions'));
         
@@ -90,6 +96,8 @@ class Milestone extends Controller
 	 */
   function showRoadmap($f3)
   {
+    $f3->get("log")->write("Calling /roadmap");
+
     if (!ctype_alnum($f3->get('SESSION.project')))
       return $this->tpfail($f3->get('lng.noProject'));
 
@@ -138,6 +146,8 @@ class Milestone extends Controller
 	 */
   function showMilestone($f3)
   {
+    $f3->get("log")->write("Calling /milestone/@hash with @hash = " . $f3->get('PARAMS.hash'));
+
     if (!ctype_alnum($f3->get('SESSION.project')))
       return $this->tpfail($f3->get('lng.noProject'));
 
@@ -150,13 +160,13 @@ class Milestone extends Controller
     $milestone->load(array('hash = :hash', array(':hash' => $hash)));
 
     if($milestone->dry())
-      return $this->tpfail("The milestone doesn't exist.");
+      return $this->tpfail($f3->get("lng.milestoneDoesNotExist"));
 
     $ticket = new DB\SQL\Mapper($this->db, 'displayableticket');
     $tickets = $ticket->find(array('milestone = :hash', array(':hash' => $milestone->hash)));
 
     if($milestone->dry())
-      return $this->tpfail("The milestone tickets can't be loaded.");
+      return $this->tpfail($f3->get("lng.milestoneTicketsNotLoaded"));
 
     $ms['ticketCount'] = helper::getTicketCount($milestone->hash);
 

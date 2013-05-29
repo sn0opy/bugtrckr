@@ -13,6 +13,9 @@ class Project extends Controller
 {
   public function projectAddMember($f3)
   {
+    $f3->get("log")->write("Calling /project/settings/member/add");
+    $f3->get("log")->write("POST: " . print_r($f3->get("POST"), true));
+
     if(!\Helper::getPermission('proj_manageMembers'))
       return $this->tpfail($f3->get('lng.insuffPermissions'));
 
@@ -24,13 +27,13 @@ class Project extends Controller
     $role->load(array('hash = :hash', array(':hash' => $roleHash)));
 
     if($role->dry())
-      return $this->tpfail('Failure while getting role.');
+      return $this->tpfail($f3->get("lng.cantGetRole"));
 
     $user = new DB\SQL\Mapper($this->db, 'User');
     $user->load(array('hash = :hash', array(':hash' => $userHash)));
 
     if($user->dry())
-      return $this->tpfail('Failure while getting user.');
+      return $this->tpfail($f3->get("lng.cantGetUser"));
 
     $projPerms = new DB\SQL\Mapper($this->db, 'ProjectPermission');
     $projPerms->load(array('user = :user AND project = :project', array(':user' => $user->hash, ':project' => $projectHash)));
@@ -51,6 +54,9 @@ class Project extends Controller
    */
   public function projectDelMember($f3)
   {
+    $f3->get("log")->write("Calling /project/setttings/member/delete");
+    $f3->get("log")->write("POST: " . print_r($f3->get("POST"), true));
+
     if(\Helper::getPermission('proj_manageMembers'))
       return $this->tpfail($f3->get('lng.addMemberNotAllowed'));
 
@@ -61,7 +67,7 @@ class Project extends Controller
     $user->load(array('hash = :hash', array(':hash' => $userHash)));
 
     if($user->dry())
-      return $this->tpfail('Failure while getting user.');
+      return $this->tpfail($f3->get("lng.cantGetUser"));
 
     $projPerms = new DB\SQL\Mapper($this->db, 'ProjectPermission');
     $projPerms->load(array('user = :user AND project = :project', array(':user' => $user->hash, ':project' => $projectHash)));
@@ -78,6 +84,9 @@ class Project extends Controller
 	 */
   public function projectSetRole($f3)
   {
+    $f3->get("log")->write("Calling /project/settings/member/setrole");
+    $f3->get("log")->write("POST: " . print_r($f3->get("POST"), true));
+
     if(!\Helper::getPermission('proj_manageMembers'))
       return $this->tpfail($f3->get('lng.insuffPermissions'));
 
@@ -87,7 +96,7 @@ class Project extends Controller
     $user->load(array('hash = :hash', array(':hash' => $f3->get('POST.user'))));
 
     if(!$user->hash)
-      return $this->tpfail($f3->get('lng.gettingUserFail'));
+      return $this->tpfail($f3->get('lng.cantGetUser'));
 
     $role = new DB\SQL\Mapper($this->db, 'Role');
     $role->load(array('hash = :hash', 
@@ -97,7 +106,7 @@ class Project extends Controller
       return $this->tpfail($f3->get('lng.gettingRoleFail'));
 
     if($role->project != $projectHash)
-      return $this->tpfail($f3->get('lng.roleDoesNotBelong'));
+      return $this->tpfail($f3->get('lng.roleDoesNotBelong'), "role->project = " . $role->project . ", projectHash = " . $projectHash);
 
     $perms = new DB\SQL\Mapper($this->db, 'ProjectPermission');
     $perms->load( array('project = :proj AND user = :user',
@@ -115,6 +124,8 @@ class Project extends Controller
 	 */
   public function deleteProjectSettingsMilestone($f3)
   {
+    $f3->get("log")->write("Calling deleteProjectSettingsMilestone with @hash = " . $f3->get("PARAMS.hash"));
+
     if(\Helper::getPermission('proj_manageMilestones'))
       return $this->tpfail($f3->get('lng.insuffPermissions'));
 
@@ -144,6 +155,9 @@ class Project extends Controller
 	 */
   public function addEditRole($f3 = false, $url = false, $projHash = false)
   {
+    $f3->get("log")->write("Calling /project/settings/role/edit");
+    $f3->get("log")->write("POST: " . print_r($f3->get("POST"), true));
+
    	if(!$f3)
       $f3 = Base::instance();
 		
@@ -193,24 +207,24 @@ class Project extends Controller
    */  
   public function deleteRole($f3)
   {
+    $f3->get("log")->write("Calling /project/settings/role/delete/@hash with hash = " . $f3->get("PARAMS.hash"));
+
     $hash = $f3->get('PARAMS.hash');
+
+    if (!helper::getPermission('proj_manageRoles'))
+      return $this->tpfail($f3->get("lng.insuffPermissions"));
         
-    if(helper::getPermission('proj_manageRoles'))
-    {
-      $ax = new DB\SQL\Mapper($this->db, 'Role');
-      $ax->load(array('hash = :hash', array(':hash' => $hash)));
+    $ax = new DB\SQL\Mapper($this->db, 'Role');
+    $ax->load(array('hash = :hash', array(':hash' => $hash)));
 
-      $ax2 = new DB\SQL\Mapper($this->db, 'ProjectPermission');
+    $ax2 = new DB\SQL\Mapper($this->db, 'ProjectPermission');
 
-      if($ax2->count('role = :role', array(':role' => $ax->hash)))
-        return $this->tpfail($f3->get('lng.deleteRoleFail'));
+    if($ax2->count('role = :role', array(':role' => $ax->hash)))
+      return $this->tpfail($f3->get('lng.deleteRoleFail'));
 
-      $ax->erase();
-      $f3->set('SESSION.SUCCESS', $f3->get('lng.roleDeleted'));
-      $f3->reroute('/project/settings#roles');     
-    }
-    else
-      $this->tpfail($f3->get('lng.insuffPermissions'));
+    $ax->erase();
+    $f3->set('SESSION.SUCCESS', $f3->get('lng.roleDeleted'));
+    $f3->reroute('/project/settings#roles');     
   }
 	
 	/**
@@ -225,6 +239,9 @@ class Project extends Controller
   {
     if(!$f3)
       $f3 = Base::instance();
+
+    $f3->get("log")->write("Calling /project/settings/category/add");
+    $f3->get("log")->write("POST: " . print_r($f3->get("POST"), true));
 		
     if(!helper::getPermission('proj_editProject'))
       return $this->tpfail($f3->get('lng.insuffPermissions'));
@@ -232,7 +249,11 @@ class Project extends Controller
     $category = new DB\SQL\Mapper($this->db, 'Category');
 
     if($f3->get('POST.hash') != "")
+    {
       $category->load(array('hash = :hash', array(':hash' => $f3->get('POST.hash'))));
+      if ($category->dry())
+        return $this->tpfail($f3->get("lng.cantGetCategory"));
+    }
     else
     {
       $category->project = ($projHash) ? $projHash : $f3->get('SESSION.projectHash');
@@ -259,22 +280,19 @@ class Project extends Controller
 	 */
   public function deleteCategory($f3)
   {
+    $f3->get("log")->write("Calling /project/settings/category/delete/@hash with @hash = " . $f3->get("PARAMS.hash"));
+
     if(!helper::getPermission('proj_editProject'))
-      return $this->tpfail($f3->get('lng.insuffPermissions'));			
+      return $this->tpfail($f3->get('lng.insuffPermissions'));
 
     $hash = $f3->get('PARAMS.hash');
 
-    if(helper::getPermission('proj_editProject'))
-    {
-      $category = new DB\SQL\Mapper($this->db, 'Category');
-      $category->load(array('hash = :hash', array(':hash' => $hash)));
+    $category = new DB\SQL\Mapper($this->db, 'Category');
+    $category->load(array('hash = :hash', array(':hash' => $hash)));
 
-      $category->erase();
-      $this->set('SESSION.SUCCESS', $f3->get('lng.categoryDeleted'));
-      $this->reroute('/project/settings#categories');
-    }
-    else
-      $this->tpfail($f3->get('lng.insuffPermissions'));
+    $category->erase();
+    $this->set('SESSION.SUCCESS', $f3->get('lng.categoryDeleted'));
+    $this->reroute('/project/settings#categories');
 	}
 	
 	/**
@@ -286,7 +304,10 @@ class Project extends Controller
 		/* TODO: Fehlgedanke
 		if (!$this->get('SESSION.user.admin'))
 			return $this->tpfail($this->get('lng.insuffPermissions'));			
-		*/
+     */
+
+    $f3->get("log")->write("Calling /project/add");
+    $f3->get("log")->write("POST: " . print_r($f3->get("POST"), true));
 		
     $hash = helper::getFreeHash('Project');
       
@@ -323,6 +344,9 @@ class Project extends Controller
 	 */
   public function projectEditMain($f3)
   {
+    $f3->get("log")->write("Calling /project/settings/main/edit");
+    $f3->get("log")->write("POST: " . print_r($f3->get("POST"), true));
+
     if (!helper::getPermission('proj_editProject'))
       return $this->tpfail($f3->get('lng.insuffPermissions'));
 
@@ -346,12 +370,17 @@ class Project extends Controller
    */
   public function showProjectSettings($f3)
   {
+    $f3->get("log")->write("Calling /project/settings");
+    
     $projectHash = $f3->get('SESSION.project');
 
     if($projectHash != "")
     {
       $project = new DB\SQL\Mapper($this->db, 'Project');
       $project->load(array('hash = :hash', array(':hash' => $projectHash)));
+
+      if (!$project->hash)
+        return $this->tpfail($f3->get('lng.openProjectFail'));
 
       $role = new DB\SQL\Mapper($this->db, 'Role');
       $roles = $role->find(array('project = :hash', array(':hash' => $projectHash)));
@@ -369,9 +398,6 @@ class Project extends Controller
 
       $categories = new DB\SQL\Mapper($this->db, 'Category');
       $categories = $categories->find();
-
-      if (!$project->hash)
-        return $this->tpfail($f3->get('lng.openProjectFail'));
 
       $f3->set('users', $users);
       $f3->set('projMilestones', $milestones);
@@ -398,13 +424,15 @@ class Project extends Controller
 	 */
   public function showProjectSettingsRole($f3)
   {
+    $f3->get("log")->write("Calling /project/settings/role/@hash with @hash = " . $f3->get("PARAMS.hash"));
+
     $roleHash = $f3->get('PARAMS.hash');
 
     $role = new DB\SQL\Mapper($this->db, 'Role');
     $role->load(array('hash = :hash', array(':hash' => $roleHash)));
 
     if (!$role->hash)
-       return $this->tpfail("Failure while getting Role");
+       return $this->tpfail($f3->get("lng.cantGetRole"));
 
     $f3->set('roleData', $role);
     $f3->set('template', 'projectSettingsRole.tpl.php');
@@ -419,6 +447,8 @@ class Project extends Controller
    */
   public function showProjectSettingsMilestone($f3)
   {
+    $f3->get("log")->write("Calling /project/settings/milestone/@hash with @hash = " . $f3->get("PARAMS.hash"));
+
     $msHash = $f3->get('PARAMS.hash');
 
     $milestone = new DB\SQL\Mapper($this->db, 'Milestone');
@@ -439,6 +469,8 @@ class Project extends Controller
 	 */
   public function showAddRole($f3)
   {
+    $f3->get("log")->write("Calling /project/settings/role/add");
+
     $f3->set('template', 'projectSettingsRoleAdd.tpl.php');
     $f3->set('pageTitle', $f3->get('lng.project') . ' › ' . $f3->get('lng.settings') . ' › ' . $f3->get('lng.addrole'));
     $f3->set('onpage', 'settings');
@@ -450,6 +482,8 @@ class Project extends Controller
 	 */
   public function showAddMilestone($f3)
   {
+    $f3->get("log")->write("Calling /project/settings/milestone/add");
+
     $f3->set('today', date('Y-m-d', time()));
     $f3->set('template', 'projectSettingsMilestoneAdd.tpl.php');
     $f3->set('pageTitle', $f3->get('lng.project') . ' › ' . $f3->get('lng.settings') . ' › ' . $f3->get('lng.addmilestone'));
@@ -462,6 +496,8 @@ class Project extends Controller
 	 */
   public function showAddCategory($f3)
   {
+    $f3->get("log")->write("Calling /project/settings/category/add");
+
     $f3->set('template', 'projectSettingsCategoryAdd.tpl.php');
     $f3->set('pageTitle', $f3->get('lng.project') . ' › ' . $f3->get('lng.settings') . ' › ' . $f3->get('lng.addcategory'));
     $f3->set('onpage', 'settings');
@@ -473,6 +509,8 @@ class Project extends Controller
 	 */
   public function showEditCategory($f3)
   {
+    $f3->get("log")->write("Calling /project/settings/category/edit/@hash with @hash = " . $f3->get("PARAMS.hash"));
+
     $hash = $f3->get('PARAMS.hash');
 
     $category = new DB\SQL\Mapper($this->db, 'Category');
@@ -490,6 +528,8 @@ class Project extends Controller
 	 */
   public function showAddProject($f3)
   {
+    $f3->get("log")->write("Calling /project/add");
+
     $f3->set('template', 'projectAdd.tpl.php');
     $f3->set('pageTitle', $f3->get('lng.project') . ' › ' . $f3->get('lng.add'));
     $f3->set('onpage', 'settings');

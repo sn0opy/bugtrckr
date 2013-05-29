@@ -14,6 +14,9 @@ class Wiki extends Controller
 
   public function editEntry($f3)
   {
+    $f3->get("log")->write("Calling /wiki");
+    $f3->get("log")->write("POST: " . print_r($f3->get("POST"), true));
+
     if (!helper::getPermission('wiki_editWiki'))
       return $this->tpfail($this->get('lng.insuffPermissions'));
 
@@ -48,6 +51,9 @@ class Wiki extends Controller
 
   public function addDiscussion($f3)
   {
+    $f3->get("log")->write("Calling /wikidiscussion");
+    $f3->get("log")->write("POST: " . print_r($f3->get("POST"), true));
+
     if (!helper::getPermission('wiki_editWiki'))
       return $this->tpfail($f3->get('lng.insuffPermissions'));
 
@@ -70,7 +76,7 @@ class Wiki extends Controller
   public function translateHTML($string)
   {
     $f3 = Base::instance();
-		
+
     $string = preg_replace('/===(.+)===/', '<h3>${1}</h3>', $string);
     $string = preg_replace('/==(.+)==/', '<h2>${1}</h2>', $string);
     $string = preg_replace('/\'\'\'(.+)\'\'\'/', '<b>${1}</b>', $string);			
@@ -87,6 +93,8 @@ class Wiki extends Controller
     
   public function showEntry($f3)
   {
+    $f3->get("log")->write("Calling /wiki/@title with @title = " . $f3->get("PARAMS.title"));
+
     if (!helper::canRead($f3->get('SESSION.project')))
 	  	return $this->tpfail($f3->get('lng.insuffPermissions'));
 
@@ -125,7 +133,9 @@ class Wiki extends Controller
   }
 
 	public function showDiscussion($f3)
-	{
+  {
+    $f3->get("log")->write("Calling /wiki/discussion/@hash with @hash = " . $f3->get("PARAMS.hash"));
+
     if (!helper::canRead($f3->get('SESSION.project')))
       return $this->tpfail($f3->get('lng.insuffPermissions'));
 

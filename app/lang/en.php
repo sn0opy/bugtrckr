@@ -178,5 +178,8 @@ return array('lng' => array(
 	'milestoneAdded' => 'Milestone addedd successfully',
 	'projectEdited' => 'Project settings edited successfully',
 	'addProject' => 'Add project',
-	'addTicket' => 'Add ticket'
+  'addTicket' => 'Add ticket',
+  'milestoneTicketsNotLoaded' => 'The milestone tickets can\'t be loaded.',
+  'milestoneDoesNotExist' => 'The milestone doesn\'t exist.',
+  'cantGetRole' => 'Failure while getting role.',
 ));
