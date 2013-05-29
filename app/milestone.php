@@ -29,10 +29,10 @@ class Milestone extends Controller
       return $this->tpfail($f3->get('lng.insuffPermissions'));
 
     $name = $projHash ? $f3->get('lng.firstMilestone') : $f3->get('POST.name');
-        
-    if(!isset($projHash) && $f3->get('POST.name') == "" || $f3->get('SESSION.project') <= 0)
+
+    if(!$projHash && ( trim($f3->get('POST.name'))  == "" || $f3->get('SESSION.project') == "" || trim($f3->get('POST.finished')) == "" ))
       return $this->tpfail( $f3->get('lng.failMilestoneSave'),
-                            "projHash = $projHash, POST.name = " . $f3->get('POST.name') . ", SESSION.project = " . $f3->get('SESSION.project'));
+                            "POST.name = " . $f3->get('POST.name') . ", SESSION.project = " . $f3->get('SESSION.project') . ", POST.finished = " . $f3->get("POST.finished"));
 
     $msHash = $f3->get('POST.hash') ? $f3->get('POST.hash') : Helper::getFreeHash('Milestone');
 
