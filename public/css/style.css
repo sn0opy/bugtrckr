@@ -367,15 +367,13 @@ td.action a {
 
 #wikicontent {
 	min-height: 400px;
-	width: 600px;
 }
 
 #wikiedit_textarea {
-	display: none;
 	margin: 5px;
 	min-height: 400px;
 	padding: 5px;
-	width: 600px;
+  width: 100%;
 }
 
 #submitbutton, #cancelbutton {
