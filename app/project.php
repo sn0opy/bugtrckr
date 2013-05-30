@@ -60,6 +60,9 @@ class Project extends Controller
     if(!Helper::getPermission('proj_manageMembers'))
       return $this->tpfail($f3->get('lng.addMemberNotAllowed'));
 
+    if ($f3->get("POST.user") == $f3->get("SESSION.user.hash"))
+      return $this->tpfail($f3->get("lng.cantRemoveYourselfFromMembership"));
+
     $userHash = $f3->get('POST.user');
     $projectHash = $f3->get('SESSION.project');
 
