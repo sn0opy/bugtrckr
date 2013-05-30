@@ -22,7 +22,9 @@ class Controller
 	 */
   public function __construct()
   {
-		$f3 = Base::instance();		
+		$f3 = Base::instance();
+		
+		$f3->set("log", new Log("log.txt"));
 		
     if(file_exists('../app/sql.ini'))
     {
