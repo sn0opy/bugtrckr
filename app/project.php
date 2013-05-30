@@ -155,11 +155,11 @@ class Project extends Controller
 	 */
   public function addEditRole($f3 = false, $url = false, $projHash = false)
   {
-    $f3->get("log")->write("Calling /project/settings/role/edit");
-    $f3->get("log")->write("POST: " . print_r($f3->get("POST"), true));
-
    	if(!$f3)
       $f3 = Base::instance();
+
+    $f3->get("log")->write("Calling /project/settings/role/edit");
+    $f3->get("log")->write("POST: " . print_r($f3->get("POST"), true));
 		
     $roleHash = $f3->get('POST.hash') ? $f3->get('POST.hash') : Helper::getFreeHash('Role');
     $role = new DB\SQL\Mapper($this->db, 'Role');
