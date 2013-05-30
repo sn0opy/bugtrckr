@@ -326,7 +326,7 @@ class Project extends Controller
     $perms->project = $hash;
     $perms->role = $this->addEditRole(false, false, $hash);
     $perms->save();
-         
+
     $milestone = new Milestone;
     $milestone->addEditMilestone(false, false, $hash);
         

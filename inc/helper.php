@@ -133,10 +133,10 @@ class Helper {
 		$project->load(array('hash = :hash', array(':hash' => $hash)));
 
 		if ($project->public)
-			return true;
+      return true;
 
-		$perm = new DB\SQL\Mapper($db, 'ProjectPermission');
-		return $perm->count(array('user = :user AND project = :project', array(':user' => $f3->get('SESSION.user.hash'), ':project' => $f3->get('SESSION.project'))));
+    $perm = new DB\SQL\Mapper($db, 'ProjectPermission');
+		return $perm->count(array('user = :user AND project = :project', array(':user' => $f3->get('SESSION.user.hash'), ':project' => $hash)));
 	}
 
 	
