@@ -73,8 +73,7 @@ class Project extends Controller
       return $this->tpfail($f3->get("lng.cantGetUser"));
 
     $projPerms = new DB\SQL\Mapper($this->db, 'ProjectPermission');
-    $projPerms->load(array('user = :user AND project = :project', array(':user' => $user->hash, ':project' => $projectHash)));
-    $projPerms->erase();
+    $projPerms->erase(array("user = ? AND project = ?", $user->hash, $projectHash));
 
     $f3->set('SESSION.SUCCESS', $f3->get('lng.memberRemoved'));
     $f3->reroute('/project/settings#members');

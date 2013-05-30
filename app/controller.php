@@ -32,7 +32,7 @@ class Controller
 
 			Helper::dbconnection();
 
-			$this->db = $f3->get('DB');			
+			$this->db = $f3->get('DB');
 			
 			$f3->set('getPermission', function($permission) {
 				return Helper::getPermission($permission);
@@ -60,6 +60,8 @@ class Controller
     $f3->set('installWarning', true);
 		       		
     echo Template::instance()->render('main.tpl.php');
+
+    $f3->get("log")->write(print_r($f3->get("DB")->log(), true));
 		
     $f3->clear('SESSION.SUCCESS');
     $f3->clear('SESSION.FAILURE');
