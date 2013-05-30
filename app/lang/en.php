@@ -57,6 +57,7 @@ return array('lng' =>
     'cantGetUser' => 'Failure while getting user.',
     'cantGetCategory' => 'Failure while getting category.',
     'cannotDeleteMilestone' => 'This Milestone can\'t be deleted, becase he doesn\'t exist or contains Tickets',
+    'cantRemoveYourselfFromMembership' => 'Can\'t remove yourself from membership.',
     'categories' => 'Categories',
     'category' => 'Category',
     'categoryAdded' => 'Category successfully added',

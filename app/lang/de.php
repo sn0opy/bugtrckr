@@ -57,6 +57,7 @@ return array('lng' =>
     'cantGetUser' => 'Fehler beim Laden des Benutzers.',
     'cantGetCategory' => 'Fehler beim Laden der Kategorie.',
     'cannotDeleteMilestone' => 'Dieser Meilenstein kann nicht gelöscht werden, weil nur noch dieser existiert, oder noch Tickets beinhaltet.',
+    'cantRemoveYourselfFromMembership' => 'Sie können sich nicht selbst als Mitglied entfernen.',
     'categories' => 'Kategorien',
     'category' => 'Kategorie',
     'categoryAdded' => 'Kategorie erfolgreich hinzugefügt',
