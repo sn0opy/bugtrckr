@@ -17,7 +17,7 @@ Features:
 
 ## Bugtrckr-Team
 * Sascha Ohms 
-* Phillipp Hirsch
+* Philipp Hirsch
 
 ## License & Copyright
 Copyright 2013 Bugtrckr-Team
