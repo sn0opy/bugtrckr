@@ -4,6 +4,7 @@
 		document.getElementById('submitbutton').style.display = 'inline-block';
 		document.getElementById('cancelbutton').style.display = 'inline-block';
 		document.getElementById('wikiedit').style.display = 'block';
+		document.getElementById('createbutton').style.display = 'none';
 		document.getElementById('editbutton').style.display = 'none';
 		document.getElementById('wikicontent').style.display = 'none';
 	}
@@ -13,6 +14,7 @@
 		document.getElementById('submitbutton').style.display = 'none';
 		document.getElementById('cancelbutton').style.display = 'none';
 		document.getElementById('wikiedit').style.display = 'none';
+		document.getElementById('createbutton').style.display = 'inline-block';
 		document.getElementById('editbutton').style.display = 'inline-block';
 		document.getElementById('wikicontent').style.display = 'block';
 	}
@@ -20,7 +22,13 @@
 	function submit()
 	{
 		document.forms['wiki'].submit();		
-	}
+  }
+
+  function create()
+  {
+    var site = prompt("{{@lng.nameofwikipage}}?");
+    window.location.href = "/wiki/" + site;
+  }
 </script>
 
 
@@ -93,8 +101,9 @@
 
 <div class="row">
   <div class="col col-lg-12">
-  	<button id="editbutton" onclick="edit()" class="btn" type="button">Edit</button>
-	  <button id="submitbutton" onclick="submit()" class="btn btn-primary" type="button">Submit</button>
-    <button id="cancelbutton" onclick="cancel()" class="btn" type="button">Cancel</button>
+  	<button id="createbutton" onclick="create()" class="btn btn-success" type="button">{{@lng.new}}</button>
+  	<button id="editbutton" onclick="edit()" class="btn btn-default" type="button">{{@lng.edit}}</button>
+    <button id="submitbutton" onclick="submit()" class="btn btn-primary" type="button">{{@lng.submit}}</button>
+    <button id="cancelbutton" onclick="cancel()" class="btn btn-default" type="button">{{@lng.cancel}}</button>
   </div>
 </div>

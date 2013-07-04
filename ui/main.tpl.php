@@ -10,48 +10,59 @@
 
   <body>
     <div class="navbar navbar-fixed-top navbar-inverse">
-    	<a class="navbar-brand" href="/">Bugtrckr</a>
-	    <ul class="nav navbar-nav">
-		    <li{{@onpage=='start'?' class="active"':''}}><a href="/">{{@lng.home}}</a></li>
-		    <check if="{{isset(@SESSION.project)}}">
-			    <true>
-				    <li{{@onpage=='tickets'?' class="active"':''}}><a href="/tickets">{{@lng.tickets}}</a></li>
-				    <li{{@onpage=='roadmap'?' class="active"':''}}><a href="/roadmap">{{@lng.roadmap}}</a></li>
-				    <li{{@onpage=='timeline'?' class="active"':''}}><a href="/timeline">{{@lng.timeline}}</a></li>
-				    <li{{@onpage=='wiki'?' class="active"':''}}><a href="/wiki">{{@lng.wiki}}</a></li>
-				    <check if="{{isset(@SESSION.user)}}">
-			  	    <li{{@onpage=='settings'?' class="active"':''}}><a href="/project/settings">{{@lng.settings}}</a></li>
-				    </check>
-    			</true>
-		    </check>  
+      <div class="container">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
 
-        <check if="{{(isset(@projects) && count(@projects) > 0) || isset(@SESSION.user.hash)}}">
-		    	<li class="projectChooser dropdown">	
-				    <a class="dropdown-toggle textDropdown" data-toggle="dropdown">Project <span class="caret"></span></a>
-				    <ul class="dropdown-menu">
-					    <repeat group="{{@projects}}" value="{{@project}}">
-						    <check if="{{helper::canRead(@project->hash)}}">
-							    <li><a href="/project/select/{{@project->hash}}">{{@project->name}} {{(isset(@SESSION.project) && @project->hash == @SESSION.project)?'<span class="label label-success">'.strtolower(@lng.active).'</span>':''}}</a></li>
-						    </check>
-					    </repeat>
-    					<li><a href="/project/add"><em>{{@lng.newProject}}</em></a>
-		    		</ul>
-			    </li>
-		    </check>
-      </ul>
+        <a class="navbar-brand" href="/">Bugtrckr</a>
+      
+        <div class="nav-collapse collapse navbar-responsive-collapse">
+          <ul class="nav navbar-nav">
+	    	    <li{{@onpage=='start'?' class="active"':''}}><a href="/">{{@lng.home}}</a></li>
+		        <check if="{{isset(@SESSION.project)}}">
+			        <true>
+				        <li{{@onpage=='tickets'?' class="active"':''}}><a href="/tickets">{{@lng.tickets}}</a></li>
+				        <li{{@onpage=='roadmap'?' class="active"':''}}><a href="/roadmap">{{@lng.roadmap}}</a></li>
+				        <li{{@onpage=='timeline'?' class="active"':''}}><a href="/timeline">{{@lng.timeline}}</a></li>
+				        <li{{@onpage=='wiki'?' class="active"':''}}><a href="/wiki">{{@lng.wiki}}</a></li>
+				        <check if="{{isset(@SESSION.user)}}">
+			  	        <li{{@onpage=='settings'?' class="active"':''}}><a href="/project/settings">{{@lng.settings}}</a></li>
+				        </check>
+    			    </true>
+		        </check>  
 
-    	<ul class="nav navbar-nav pull-right">
-    		<check if="{{isset(@SESSION.user)}}">
-		    	<true>
-				    <li><a href="/user/{{@SESSION.user.name}}">{{@SESSION.user.name}}</a></li>
-				    <li><a href="/user/logout">{{@lng.logout}}</a></li>
-			    </true>
-    			<false>
-		    		<li{{@onpage=='registration'?' class="active"':''}}><a href="/user/new">{{@lng.registration}}</a></li>
-    				<li><a href="#login" data-toggle="modal">{{@lng.login}}</a></li>
-    			</false>
-    		</check>
-    	</ul>
+            <check if="{{(isset(@projects) && count(@projects) > 0) || isset(@SESSION.user.hash)}}">
+		        	<li class="projectChooser dropdown">	
+				        <a class="dropdown-toggle textDropdown" data-toggle="dropdown">Project <span class="caret"></span></a>
+				        <ul class="dropdown-menu">
+					        <repeat group="{{@projects}}" value="{{@project}}">
+						        <check if="{{helper::canRead(@project->hash)}}">
+							        <li><a href="/project/select/{{@project->hash}}">{{@project->name}} {{(isset(@SESSION.project) && @project->hash == @SESSION.project)?'<span class="label label-success">'.strtolower(@lng.active).'</span>':''}}</a></li>
+    						    </check>
+		    			    </repeat>
+    		    			<li><a href="/project/add"><em>{{@lng.newProject}}</em></a>
+		    		    </ul>
+			        </li>
+		        </check>
+          </ul>
+
+        	<ul class="nav navbar-nav pull-right">
+        		<check if="{{isset(@SESSION.user)}}">
+		        	<true>
+				        <li><a href="/user/{{@SESSION.user.name}}">{{@SESSION.user.name}}</a></li>
+				        <li><a href="/user/logout">{{@lng.logout}}</a></li>
+			        </true>
+    			    <false>
+		    		    <li{{@onpage=='registration'?' class="active"':''}}><a href="/user/new">{{@lng.registration}}</a></li>
+    				    <li><a href="#login" data-toggle="modal">{{@lng.login}}</a></li>
+    			    </false>
+    		    </check>
+    	    </ul>
+        </div>
+      </div>
     </div>
 
     <check if="{{isset(@installWarning) && isset(@RELEASE)}}">

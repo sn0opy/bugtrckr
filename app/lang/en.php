@@ -132,6 +132,7 @@ return array('lng' =>
 	  'milestoneTicketsNotLoaded' => 'The milestone tickets can\'t be loaded.',
     'mysqlfailed' => 'Cannot connect to the database.',
     'name' => 'Name',
+    'nameofwikipage' => 'Name of Page',
     'new' => 'New',
     'newProject' => 'New project',
     'noAccess' => 'You don\'t have access to this area.',

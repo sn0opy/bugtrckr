@@ -132,6 +132,7 @@ return array('lng' =>
     'milestoneTicketsNotLoaded' => 'Tickets des Meilensteins konnten nicht geladen werden.',
     'mysqlfailed' => 'Die MySQL Verbindung schlug fehl',
     'name' => 'Name',
+    'nameofwikipage' => 'Name der Seite',
 	  'new' => 'Neu',
     'newProject' => 'Neues Projekt',
     'noAccess' => 'Du hast keinen Zugriff auf diesen Bereich.',
