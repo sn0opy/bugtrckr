@@ -1,3 +1,5 @@
+**Hint:** We're already working on [Bugtrckr v2](https://github.com/sn0opy/bugtrckr/tree/v2)
+
 # bugtrckr
 
 This will be a simple bug tracking system. When it's done ...
