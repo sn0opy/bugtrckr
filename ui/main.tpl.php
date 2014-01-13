@@ -116,7 +116,7 @@
     </div>
 
     <div id="footer">
-    	<p>&copy; 2013 Bugtrckr-Team</p>
+    	<p>&copy; 2014 Bugtrckr-Team</p>
     </div>
 
     <script src="/js/jquery.js"></script>

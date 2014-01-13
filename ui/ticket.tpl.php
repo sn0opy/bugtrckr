@@ -65,26 +65,28 @@
             <tr>
                 <td>                    
                     {{@activity->description}}
-                    <check if="{{@activity->changedFields > 0}}">
-                        <ul class="changedFields">
-                            <repeat group="{{@activity->changedFields}}" value="{{@changedField}}">
-                                <check if="{{@changedField->field=='state'}}">
-                                    <li>{{@lng.status}} {{@lng.changedfrom}} <strong>{{Helper::getName('states', @changedField->from)}}</strong> {{@lng.to}} <strong>{{Helper::getName('states', @changedField->to)}}</strong></li>
-                                </check>
-                                <check if="{{@changedField->field=='priority'}}">
-                                    <li>{{@lng.theprioritychanged}} <strong>{{Helper::getName('priorities', @changedField->from)}}</strong> {{@lng.to}} <strong>{{Helper::getName('priorities', @changedField->to)}}</strong></li>
-                                </check>
-                                <check if="{{@changedField->field=='milestone'}}">
-                                    <li>{{@lng.milestone}} {{@lng.changedfrom}} <strong>{{Helper::getMsName(@changedField->from)}}</strong> {{@lng.to}} <strong>{{Helper::getMsName(@changedField->to)}}</strong></li>
-                                </check>
-                                <check if="{{@changedField->field=='assigned'}}">
-                                    <li>Ticket von <strong>{{Helper::getUserName(@changedField->from)}}</strong> an <strong>{{Helper::getUserName(@changedField->to)}}</strong> {{strtolower(@lng.assigned)}}</li>
-                                </check>
-                            </repeat>
-                        </ul>
-                    </check>
+					<ul class="changedFields">
+						<repeat group="{{@changed}}" key="{{@j}}" value="{{@changedField}}">
+							<check if="{{@j == @i}}">
+								<check if="{{isset(@changedField.field)}}">
+									<check if="{{@changedField.field=='state'}}">
+										<li>{{@lng.status}} {{@lng.changedfrom}} <strong>{{Helper::getName('states', @changedField.from)}}</strong> {{@lng.to}} <strong>{{Helper::getName('states', @changedField.to)}}</strong></li>
+									</check>
+									<check if="{{@changedField.field=='priority'}}">
+										<li>{{@lng.theprioritychanged}} <strong>{{Helper::getName('priorities', @changedField.from)}}</strong> {{@lng.to}} <strong>{{Helper::getName('priorities', @changedField.to)}}</strong></li>
+									</check>
+									<check if="{{@changedField.field=='milestone'}}">
+										<li>{{@lng.milestone}} {{@lng.changedfrom}} <strong>{{Helper::getMsName(@changedField.from)}}</strong> {{@lng.to}} <strong>{{Helper::getMsName(@changedField.to)}}</strong></li>
+									</check>
+									<check if="{{@changedField.field=='assigned'}}">
+										<li>Ticket von <strong>{{Helper::getUserName(@changedField.from)}}</strong> an <strong>{{Helper::getUserName(@changedField.to)}}</strong> {{strtolower(@lng.assigned)}}</li>
+									</check>
+								</check>
+							</check>
+						</repeat>
+					</ul>
                     <check if="{{@activity->comment}}">
-                        <br/><span class="acitivityCmnt">{{@lng.comment}}: <em>{{nl2br(@activity->comment)}}</em></span>
+                        <br/><span class="acitivityCmnt">{{@lng.comment}}: {{nl2br(@activity->comment)}}</span>
                     </check>
                 </td>
                 <td>{{date('d.m.Y H:i', @activity->changed)}}</td>

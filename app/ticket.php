@@ -166,8 +166,8 @@ class Ticket extends Controller
     $hash = $f3->get('PARAMS.hash');
 
     $ticket = new DB\SQL\Mapper($this->db, 'displayableticket');
-    $ticket->load(array("tickethash = :hash", array(':hash' => $hash)));
-
+    $ticket->load(array("tickethash = ?", $hash));
+	
     if($ticket->dry())
       return $this->tpfail($f3->get('lng.noTicket'));
 
@@ -177,15 +177,20 @@ class Ticket extends Controller
     $milestone = new DB\SQL\Mapper($this->db, 'Milestone');
 
     $activities = new DB\SQL\Mapper($this->db, 'displayableactivity');
-    $activities = $activities->find(array("ticket = :ticket", array(':ticket' => $ticket->hash)));
-
-    foreach($activities as $key => $activity)
-      $activities[$key]->changedFields = json_decode($activity->changedFields);
-
+    $activities = $activities->find(array("ticket = ?", $ticket->hash));
+	
+    foreach($activities as $key => $activity) {
+	  if($activity->changedFields > "") {
+		$json = json_decode($activity->changedFields, true);
+		$changed[$key] = $json[0];
+	  }
+	}
+	  
     $users = new DB\SQL\Mapper($this->db, 'User');        
     $f3->set('ticket', $ticket);
     $f3->set('milestones', $milestone->find());
-    $f3->set('activities', $activities);        
+    $f3->set('activities', $activities); 
+	$f3->set('changed', $changed);
     $f3->set('users', $users = $users->find());
     $f3->set('pageTitle', $f3->get('lng.tickets') . ' › ' .$ticket->title);
     $f3->set('template', 'ticket.tpl.php');
