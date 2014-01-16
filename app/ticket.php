@@ -179,6 +179,7 @@ class Ticket extends Controller
     $activities = new DB\SQL\Mapper($this->db, 'displayableactivity');
     $activities = $activities->find(array("ticket = ?", $ticket->hash));
 	
+	$changed = array();
     foreach($activities as $key => $activity) {
 	  if($activity->changedFields > "") {
 		$json = json_decode($activity->changedFields, true);
