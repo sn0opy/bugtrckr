@@ -16,7 +16,7 @@
     </ul>
 
     <h3>Help & Support</h3>
-    <p>Bugtrckr is still under developement, so errors may appear or functions may not work, but feel free to file issues or feature requests on our <a href="http://github.com/sn0opy/bugtrckr">Github page</a> or join our chat on irc.kassel.ccc.de channel #cccks (you will auto-join it).</p>
+    <p>Bugtrckr is still under developement, so errors may appear or functions may not work, but feel free to file issues or feature requests on our <a href="http://github.com/sn0opy/bugtrckr">Github repository</a></p>
 
     <h3>Bugtrckr-Team</h3>
     <p>Our current team consists of two persons</p>
