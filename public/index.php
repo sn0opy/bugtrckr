@@ -15,11 +15,15 @@ $start = microtime();
 $f3 = require __DIR__ . '/../lib/base.php';
 
 // really dirty, but works great
-if(!file_exists('../setup.cfg'))
-  exit("Create a setup.cfg first.");
+if(file_exists('../setup.cfg'))
+    include '../data/config.inc.php';
+elseif($f3->exists('POST.email'))
+    $f3->mock('POST /setup');
+else
+    $f3->mock('GET /setup');
 
-$f3->config('../setup.cfg');
-$f3->config('../routes.cfg');
+$f3->setup('../setup.cfg');
+$f3->setup('../routes.cfg');
 
 $f3->set('getPermission', function($permission) {
     $helper = new \misc\helper();
