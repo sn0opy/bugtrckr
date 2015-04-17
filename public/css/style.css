@@ -489,6 +489,9 @@ td.action a {
 	border-top-color: #FFF;
 }
 
+.navbar ul.nav li.projectChooser {
+    position: relative;
+}
 .navbar ul.nav li.projectChooser .dropdown-menu a {
 	color: #333 !important;
 }
