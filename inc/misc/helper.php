@@ -102,7 +102,7 @@ class helper extends \F3instance
 			return true;
 
 		$perm = new \models\projPerms();
-		return $perm->found(array('user = :user AND project = :project', array(':user' => \F3::get('SESSION.user.hash'), ':project' => \F3::get('SESSION.project'))));
+		return $perm->found(array('user = :user AND project = :project', array(':user' => \F3::get('SESSION.user.hash'), ':project' => $hash)));
 	}
 
 	/**
