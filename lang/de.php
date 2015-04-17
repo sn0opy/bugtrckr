@@ -45,6 +45,7 @@ return array('lng' => array(
     'milestone' => 'Meilenstein',
     'milestones' => 'Meilensteine',
     'registration' => 'Registrieren',
+    'register' => 'Registrieren',
     'timeline' => 'Zeitachse',
     'home' => 'Start',
     'tickets' => 'Tickets',
