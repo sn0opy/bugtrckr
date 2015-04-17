@@ -46,6 +46,7 @@ return array('lng' => array(
     'milestone' => 'Milestone',
     'milestones' => 'Milestones',
     'registration' => 'Registration',
+    'register' => 'Register',
     'timeline' => 'Timeline',
     'home' => 'Home',
     'tickets' => 'Tickets',
