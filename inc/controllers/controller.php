@@ -46,4 +46,15 @@ class Controller extends \F3instance
         $this->tpserve();
     }
 
+    /**
+     * Reroute to specified URI
+     * @param string $uri
+     * @param bool $permanent
+     */
+    function reroute($uri,$permanent=FALSE) {
+        if (!$permanent)
+            $_SERVER['REQUEST_METHOD']='POST';//dirty hack to force a 303 redirection
+        parent::reroute($uri);
+    }
+
 }
