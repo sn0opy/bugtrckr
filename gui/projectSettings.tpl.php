@@ -81,7 +81,7 @@
 										<input type="hidden" name="user" value="{{@member->hash}}" />
 										<select name="role" class="floatleft">
 											<F3:repeat group="{{@projRoles}}" value="{{@role}}">
-												<option value="{{@role->hash}}" {{(@member->roleId == @role->id)?'selected="selected"':''}}>{{@role->name}}</option>
+												<option value="{{@role->hash}}" {{(@member->role == @role->hash)?'selected="selected"':''}}>{{@role->name}}</option>
 											</F3:repeat>
 										</select>
 										<input type="submit" value="Ändern" class="btn" />
