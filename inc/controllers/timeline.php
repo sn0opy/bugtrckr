@@ -30,7 +30,7 @@ class Timeline extends \controllers\Controller
         $project = $this->get('SESSION.project');
 
         $activities = new \models\DisplayableActivity();
-        $activities = $activities->find(array("project = :proj", array(':proj' => $project)));
+        $activities = $activities->find(array("project = :proj", array(':proj' => $project)),'changed DESC');
 
         $this->set('activities', $activities);
         $this->set('pageTitle', '{{@lng.timeline}}');
